@@ -22,7 +22,7 @@ IntMeter::IntMeter( XOSView *parent,
   //  ought to auto-detect how many there are.  I'll delay adding the
   //  code to do this for a few weeks, so that we can get version 1.6
   //  out the door.
-  : BitMeter( parent, "INTS", "IRQs (0 - 15)", 16, 
+  : BitMeter( parent, "INTS", "IRQs", BSDNumInts(), 
               dolegends, dousedlegends ) {
   for ( int i = 0 ; i < 16 ; i++ )
     irqs_[i] = lastirqs_[i] = 0;
