@@ -184,7 +184,7 @@ hpux*)    AC_XOSV_HPUX
 	  host_dir=hpux
           host_os=hpux ;;
 solaris2*)
-	EXTRALIBS="-lsocket -lnsl -lkstat $XPMLIB"
+	EXTRALIBS="-R$x_libraries -lsocket -lnsl -lkstat $XPMLIB"
 	host_dir=sunos5
 	host_os=sunos5 ;;
 *)       AC_MSG_ERROR([xosview has not been ported to $host_os :(.  Sorry.]) ;;
