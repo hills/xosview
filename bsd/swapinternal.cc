@@ -65,7 +65,9 @@
 //		       code has been removed.  BCG  FIXME SOMEDAY
 
 #include <sys/param.h>
-#include <sys/buf.h>
+//---------------------  It appears buf.h is not needed, and
+//			causes breakage on FreeBSD.
+/*#include <sys/buf.h>*/
 #include <sys/conf.h>
 #include <sys/ioctl.h>
 #include <sys/stat.h>
