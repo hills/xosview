@@ -18,7 +18,7 @@
 #include "netmeter.h"
 #include "xosview.h"
 #include "Host.h"
-#include "netbsd.h"
+#include "kernel.h"
 #include <stdlib.h>		//  For atoi().  BCG
 #include <unistd.h>  /*  For gethostname().  BCG */
 
@@ -67,7 +67,7 @@ void NetMeter::checkevent( void ){
 //  Begin NetBSD-specific code.  BCG
   long long nowBytesIn, nowBytesOut;
 
-//  The NetBSDGetNetInOut() function is in netbsd.cc    BCG
+//  The NetBSDGetNetInOut() function is in kernel.cc    BCG
   NetBSDGetNetInOut (&nowBytesIn, &nowBytesOut);
   float t = (1e6) / IntervalTimeInMicrosecs();
   fields_[0] = (float)(nowBytesIn - _lastBytesIn) * t;

@@ -19,7 +19,7 @@
 #include "xosview.h"
 
 #include "swapinternal.h"
-#include "netbsd.h"
+#include "kernel.h"
 #include <err.h>			//  For warnx.  BCG
 #include <stdlib.h>		//  For atoi().  BCG
 
@@ -33,7 +33,7 @@ SwapMeter::SwapMeter( XOSView *parent )
 #ifdef HAVE_SWAPCTL
   useSwapCtl = 0;
 #endif
-  NetBSDSwapInit();	//  In netbsd.cc
+  NetBSDSwapInit();	//  In kernel.cc
   if (!NetBSDInitSwapInfo())
   {
 #ifdef HAVE_SWAPCTL

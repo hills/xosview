@@ -28,10 +28,10 @@
 #include <sys/socket.h>         /*  These two are needed for the  */
 #include <net/if.h>             /*    NetMeter helper functions.  */
 #include <sys/vmmeter.h>	/*  For struct vmmeter.  */
-#include "netbsd.h"		/*  To grab CVSID stuff.  */
+#include "kernel.h"		/*  To grab CVSID stuff.  */
 
 CVSID("$Id$");
-CVSID_DOT_H(NETBSD_H_CVSID);
+CVSID_DOT_H(KERNEL_H_CVSID);
 
 
 // ------------------------  local variables  ---------------------

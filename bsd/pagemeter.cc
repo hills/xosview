@@ -23,7 +23,7 @@
 #include <sys/sysctl.h>
 #include <vm/vm_param.h>
 #include <stdlib.h>		//  For atoi().  BCG
-#include "netbsd.h"		//  For NetBSD Page functions.
+#include "kernel.h"		//  For NetBSD Page functions.
 
 CVSID("$Id$");
 CVSID_DOT_H(PAGEMETER_H_CVSID);

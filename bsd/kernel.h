@@ -1,5 +1,5 @@
-#ifndef __netbsd_h__
-#define __netbsd_h__
+#ifndef __kernel_h__
+#define __kernel_h__
 
 //
 //  NetBSD port:  
@@ -27,7 +27,7 @@
 //  sys/socket.h???  bgrayson
 //#include <net/if.h>
 
-#define NETBSD_H_CVSID	"$Id$"
+#define KERNEL_H_CVSID	"$Id$"
 void
 NetBSDInit();
 

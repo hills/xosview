@@ -16,7 +16,7 @@
 #include "xosview.h"
 #include <sys/dkstat.h>
 #include <err.h>        //  For err() and warn(), etc.  BCG
-#include "netbsd.h"     //  For NetBSD-specific icky (but handy) kvm_ code.  BCG
+#include "kernel.h"     //  For NetBSD-specific icky (but handy) kvm_ code.  BCG
 #include <stdlib.h>	//  For use of atoi  BCG
 
 CVSID("$Id$");

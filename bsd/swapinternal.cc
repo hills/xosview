@@ -86,7 +86,7 @@
 extern char *getbsize __P((int *headerlenp, long *printoutblocksizep));
 
 //-----------------------  We use a single kd for kvm access,
-//			   initialized in netbsd.cc, so the local one
+//			   initialized in kernel.cc, so the local one
 //			   (swap_kd) has been commented out, and a
 //			   #define has been added to make future
 //			   references to swap_kd look like kd.  BCG
