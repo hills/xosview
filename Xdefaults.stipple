@@ -57,6 +57,7 @@ xosvstipplebw*memActiveColor:	black
 xosvstipplebw*memInactiveColor: black
 xosvstipplebw*swapUsedColor:    black
 xosvstipplebw*swapFreeColor:    black
+xosvstipplebw*swapReservedColor:  black
 xosvstipplebw*netInColor:       black
 xosvstipplebw*netOutColor:      black
 xosvstipplebw*netBackground:    black

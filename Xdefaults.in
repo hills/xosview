@@ -66,6 +66,7 @@ xosview*memUsedFormat:	  autoscale
 xosview*swap: True
 xosview*swapUsedColor:    seagreen
 xosview*swapFreeColor:    aquamarine
+xosview*swapReservedColor: yellow
 xosview*swapPriority:     10
 xosview*swapDecay:        False
 xosview*swapUsedFormat:	  autoscale
