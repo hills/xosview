@@ -159,10 +159,6 @@ this mumbo jumbo.
 	prints a helpful message saying a recompilation is
 	needed.
 
-      Doing the coding to do the above took me a little while,
-	and occurred at a busy time for me, so unfortunately it
-	took me two weeks to get the final version ready.  Sorry!
-
       So, if swap isn't working, either:
         a)  You aren't using /netbsd as the kernel, and forgot to
 	  use the -N option.
