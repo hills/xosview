@@ -1,0 +1,25 @@
+If you have gotten this package from CVS and want to build a package
+from it, it is advisable to update the changelog to show that a more
+recent version is being built than the version that was current as of
+the last changelog update.  The recommended way to do this is to take
+the last release version (without the Debian revision number) and then
+add +cvs.<date>-0 to the end.  For example, if the most recent release
+was 1.8.0-2 and the date was April 7, 2002 (both of which are true as
+of the moment of this writing), the version would be:
+
+1.8.0+cvs.20020407-0
+
+The easiest way to set up the changelog this way is to install the
+devscripts package (apt-get install devscripts), and then from inside
+the main unpacked source tree or the debian subdirectory, type:
+
+dch -v 1.8.0+cvs.20020407-0
+
+Make a note in the changelog that it's a personal build, and then
+type:
+
+fakeroot debian/rules binary
+
+to build the package.
+
+ -- Zed Pobre, Debian Maintainer, 2002.04.07

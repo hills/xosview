@@ -1,0 +1,75 @@
+#!/usr/bin/make -f
+# MAde with the aid of dh_make, by Craig Small
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+export DH_COMPAT=3
+
+PACKAGE=xosview
+
+CXX=g++-3.0
+
+configure: configure-stamp
+configure-stamp:
+	dh_testdir
+	ln -sf /usr/share/misc/config.guess config/
+	ln -sf /usr/share/misc/config.sub config/
+	cd config && $(MAKE)
+	CXX=$(CXX) ./configure --prefix=/usr --disable-linux-memstat
+	touch configure-stamp
+
+build: configure-stamp build-stamp
+build-stamp:
+	dh_testdir
+	$(MAKE)
+	touch build-stamp
+
+clean:
+	dh_testdir
+	rm -f build-stamp configure-stamp
+	rm -f configure config.cache config.status
+	rm -f config/config.guess config/config.sub
+	rm -f linux/memstat/Makefile
+
+	-$(MAKE) distclean
+
+	dh_clean
+
+# Build architecture-independent files here.
+binary-indep: build
+# We have nothing to do by default.
+
+# Build architecture-dependent files here.
+binary-arch: build
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_installdirs
+
+	cp xosview debian/$(PACKAGE)/usr/bin/
+	cp Xdefaults debian/$(PACKAGE)/etc/X11/app-defaults/XOsview
+
+	dh_installdocs Xdefaults Xdefaults.stipple
+
+	dh_installexamples
+	dh_installmenu
+
+	cp xosview.1 debian/$(PACKAGE)/usr/share/man/man1/xosview.1
+
+	dh_installchangelogs -k CHANGES
+	dh_strip
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	dh_shlibdeps
+	dh_gencontrol
+	dh_makeshlibs
+	dh_md5sums
+	dh_builddeb
+
+source diff:                                                                  
+	@echo >&2 'source and diff are obsolete - use dpkg-source -b'; false
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary

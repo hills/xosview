@@ -1,0 +1,4 @@
+# Rename this file to "watch" and then you can run the "uscan" command
+# to check for upstream updates and more.
+# Site				   Directory	 Pattern		Version	Script
+http://prdownloads.sourceforge.net /xosview/	 xosview-(.*)\.tar\.gz	debian	uupdate

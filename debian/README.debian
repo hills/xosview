@@ -1,0 +1,7 @@
+xosview for DEBIAN
+----------------------
+
+The memstat module required to display shared memory percentage has
+been disabled due to compilation problems.
+
+Zed Pobre <zed@debian.org>

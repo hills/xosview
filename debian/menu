@@ -1,0 +1,3 @@
+?package(xosview):needs=X11 section=Apps/System\
+  title="xosview" command="/usr/bin/xosview"\
+  hints="Monitoring"
