@@ -84,9 +84,9 @@ void NetMeter::checkOSVersion(void)
             chains >> buf;
             chains.ignore(1024, '\n');
             
-            if (!strcmp(buf, "iacct"))
+            if (!strncmp(buf, "iacct", 5))
                 n |= 1;
-            if (!strcmp(buf, "oacct"))
+            if (!strncmp(buf, "oacct", 5))
                 n |= 2;
             }
 
@@ -156,9 +156,9 @@ void NetMeter::checkeventNew(void)
         {
 	ifs >> buf;
 
-	if (!strcmp(buf, "iacct")) 
+	if (!strncmp(buf, "iacct", 5)) 
 	  ifs >> buf >> buf >> ig >> ig >> ig >> ig >> ig >> ig >> totin;
-	else if (!strcmp(buf, "oacct")) 
+	else if (!strncmp(buf, "oacct", 5)) 
 	  ifs >> buf >> buf >> ig >> ig >> ig >> ig >> ig >> ig >> totout;
 
 	ifs.ignore(1024, '\n');
