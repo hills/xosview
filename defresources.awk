@@ -34,7 +34,7 @@ BEGIN {
 #
 # Echo each line of input (that is not a comment or empty) to stdout.
 #
-(! /^!/) && (NF != 0) { printf "%s\\n", $0 }
+(! /^!/) && (NF != 0) { printf "%s\\n\\\n", $0 }
 
 #
 # Insert the "tail" for defresources.cc
