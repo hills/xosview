@@ -125,14 +125,19 @@ safe_kvm_read (u_long kernel_addr, void* user_addr, size_t nbytes)
     /*  Check for obvious bad symbols (i.e., from /netbsd when we
      *  booted off of /netbsd.old), such as symbols that reference
      *  0x00000000 (or anywhere in the first 256 bytes of memory).  */
+  int retval = 0;
   if ((kernel_addr&0xffffff00) == 0)
     errx(-1, "safe_kvm_read() was attempted on EA %#lx\n", kernel_addr);
 #if 0
   if ((kernel_addr&0xf0000000) != 0xf0000000)
     warnx("safe_kvm_read() was attempted on EA %#lx\n", kernel_addr);
 #endif
-  if (kvm_read (kd, kernel_addr, user_addr, nbytes)==-1)
+  if ((retval = kvm_read (kd, kernel_addr, user_addr, nbytes))==-1)
     err(-1, "kvm_read() of kernel address %#lx", kernel_addr);
+  if (retval != (int) nbytes) {
+    warnx("safe_kvm_read(%#lx) returned %d bytes, not %d!",
+	kernel_addr, retval, nbytes);
+  }
 }
 
 //  This version uses the symbol offset in the nlst variable, to make it
@@ -284,9 +289,9 @@ BSDGetNetInOut (long long * inbytes, long long * outbytes)
 
   while (ifnetp) {
     //  Now, dereference the pointer to get the ifnet struct.
-    safe_kvm_read ((unsigned long) ifnetp, &ifnet, sizeof(ifnet));
+    safe_kvm_read ((u_long) ifnetp, &ifnet, sizeof(ifnet));
 #ifdef NET_DEBUG
-    safe_kvm_read ((unsigned long) ifnet.if_name, ifname, 256);
+    safe_kvm_read ((u_long) ifnet.if_name, ifname, 256);
     snprintf (ifname, 256, "%s%d", ifname, ifnet.if_unit);
     printf ("Interface name is %s\n", ifname);
     printf ("Ibytes: %8ld Obytes %8ld\n", ifnet.if_ibytes, ifnet.if_obytes);
@@ -424,7 +429,7 @@ BSDGetDiskXFerBytes (unsigned long long *bytesXferred)
   *bytesXferred = 0;
   while (kvmdiskptr != NULL)
   {
-    safe_kvm_read ((unsigned int)kvmdiskptr, &kvmcurrdisk, sizeof(kvmcurrdisk));
+    safe_kvm_read ((u_long)kvmdiskptr, &kvmcurrdisk, sizeof(kvmcurrdisk));
       /*  Add up the contribution from this disk.  */
     *bytesXferred += kvmcurrdisk.dk_bytes;
 #ifdef DEBUG
