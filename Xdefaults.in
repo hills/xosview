@@ -124,3 +124,7 @@ xosview*diskIdleColor:	black
 xosview*diskPriority:	10
 xosview*diskDecay:	True
 xosview*diskUsedFormat: autoscale
+xosview*diskBandwidth:  5000000	!  Default to 5MB/s bandwidth -- I
+				! think that's IDE's theoretical
+				! peak?, and SCSI-II's peak (no fast, no
+				! wide) bgrayson
