@@ -27,16 +27,4 @@ clean :
 libmeter.a : $(OBJS)
 	ar cvr libmeter.a $(OBJS)
 
-dependfile: $(CFILES)
-	gcc -MM $(CXXFLAGS) $(CFILES) | sed -e 's:'$(TOP)'/::g' > dependfile
-
-#  The following is the depend-magic that modifies the Makefile.  BCG
-concatdepend: cleandepend
-	sed -e '/^#DEPENDENCIES/r dependfile' Makefile > Makefile.new
-	mv Makefile.new Makefile
-cleandepend: Makefile
-	sed -e '/^#DEPENDENCIES/,9999d' Makefile > Makefile.clean
-	echo "#DEPENDENCIES" >> Makefile.clean
-	mv Makefile.clean Makefile
-
 @AUTODEPEND@

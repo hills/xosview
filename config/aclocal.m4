@@ -15,11 +15,11 @@ if test "$enableval" = "no"
 then
         echo "disabled Linux system calls"
 else
-        DEFINES="$DEFINES -DUSESYSCALLS"
+        AC_DEFINE(USESYSCALLS)
         echo "enabled  Linux system calls"
 fi
 ,
-DEFINES="$DEFINES -DUSESYSCALLS"
+AC_DEFINE(USESYSCALLS)
 echo "enabled  Linux system calls by default"
 )
 
@@ -42,6 +42,8 @@ MEMSTAT=
 echo "disabled the Linux memstat module by default"
 )
 AC_SUBST(MEMSTAT)
+
+INSTALL_ARGS='-s -m 4755'
 ])
 
 
@@ -50,6 +52,7 @@ dnl
 dnl Nethsd needs to link with libknm
 dnl
         EXTRALIBS=-lkvm
+        INSTALL_ARGS='-s -g kmem -m 02555'
 ])
 
 

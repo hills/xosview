@@ -45,7 +45,7 @@ dnl The nethsd and linux ports modify these variables which
 dnl are exported by AC_OUTPUT.
 dnl
 AC_SUBST(EXTRALIBS)
-AC_SUBST(DEFINES)
+AC_SUBST(INSTALL_ARGS)
 
 AC_OUTPUT(\
   Makefile:config/Makefile.top.in \

@@ -20,53 +20,42 @@ CFILES := $(OBJS:.o=.cc)
 DEPFILES := $(OBJS:%=.%.d)
 
 INSTALL            = @INSTALL@
-INSTALL_PROGRAM    = @INSTALL_PROGRAM@
-INSTALL_DATA       = @INSTALL_DATA@
 
 #-----------------------------------------------------------------------
 
-all : meters xosview
+all : xosview
 
 defaultstring.cc: Xdefaults defresources.awk
 	@AWK@ -f defresources.awk Xdefaults > defaultstring.cc
 
-meters :
-	$(MAKE) -C @host_os@
+@host_os@/libmeter.a :
+	$(MAKE) -C @top_srcdir@/@host_os@
 
-@host_os@/libmeter.a : meters
+xosview: @host_os@/libmeter.a $(OBJS) 
+	$(CXX) $(LFLAGS) -o xosview $(OBJS) $(LIBS)
+
+install: xosview
+	@INSTALL_PROGRAM@ @INSTALL_ARGS@ xosview @prefix@/bin
+	@INSTALL_DATA@ Xdefaults /usr/lib/X11/app-defaults/XOsview
+	@INSTALL_DATA@ xosview.1 @prefix@/man/man1
+
+install-man:
+	install -c xosview.1 /usr/X11/man/man1
+
+distrib: distclean
+	cd @top_srcdir@/..;tar cf `basename $(PWD)`.tar `basename $(PWD)`; \
+        gzip -9 `basename $(PWD)`.tar
 
 clean :
 	$(MAKE) -C @host_os@ clean
 	$(MAKE) -C config clean
 	rm -f xosview $(OBJS) $(DEPFILES) *~ defaultstring.cc
 
-xosview: $(OBJS) @host_os@/libmeter.a
-	$(CXX) $(LFLAGS) -o xosview $(OBJS) $(LIBS)
-
-ifeq (@host_os@,linux)
-install: 
-	install -c -s -m 4755  xosview /usr/bin/X11
-	install -c Xdefaults /usr/lib/X11/app-defaults/XOsview
-endif
-
-ifeq (@host_os@,netbsd)
-install: xosview
-	install -c -s -g kmem -m 02555 xosview /usr/bin/X11
-	install -c Xdefaults /usr/lib/X11/app-defaults/XOsview
-endif
-
-install-man:
-	install -c xosview.1 /usr/X11/man/man1
-
-distrib: clean clean_config config_ # concatdepend
-	cd ..;tar cf `basename $(PWD)`.tar `basename $(PWD)`; \
-        gzip -9 `basename $(PWD)`.tar
-
-config_:
-	$(MAKE) -C config
-
-clean_config:
+distclean: clean
 	rm -f Makefile Makefile.config @host_os@/Makefile \
-           config.cache config.log config.status configure
+           config.cache config.log config.status
+
+maintainer-clean: distclean
+	rm -f configure
 
 @AUTODEPEND@

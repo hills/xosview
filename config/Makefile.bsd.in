@@ -4,11 +4,6 @@
 include ../Makefile.config
 
 CXXFLAGS += -I@top_srcdir@
-vpath %.h $(TOP)
-vpath %.cc $(TOP)
-
-#  NOTE:  I had to move the MeterMaker to the top so that the link
-#           would work properly.  BCG
 
 OBJS = \
 MeterMaker.o \
@@ -36,17 +31,5 @@ clean :
 
 libmeter.a : $(OBJS)
 	ar cvr libmeter.a $(OBJS)
-
-dependfile: $(CFILES)
-	gcc -MM $(CXXFLAGS) $(CFILES) | sed -e 's:'$(TOP)'/::g' > dependfile
-
-#  The following is the depend-magic that modifies the Makefile.  BCG
-concatdepend: cleandepend
-	sed -e '/^#DEPENDENCIES/r dependfile' Makefile > Makefile.new
-	mv Makefile.new Makefile
-cleandepend: Makefile
-	sed -e '/^#DEPENDENCIES/,9999d' Makefile > Makefile.clean
-	echo "#DEPENDENCIES" >> Makefile.clean
-	mv Makefile.clean Makefile
 
 @AUTODEPEND@
