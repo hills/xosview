@@ -144,8 +144,7 @@ void FieldMeterGraph::drawfields( int manditory )
 			XOSDEBUG("True exposure! %d\n", firstTimeDrawn_);
 			firstTimeDrawn_ = 0;
 		}
-		else XOSDEBUG("Full draw:  isPart %d, isAtLeastPart %d, hasBeenExposed %d\n",
-			parent_->isPartiallyVisible(),
+		else XOSDEBUG("Full draw:  isAtLeastPart %d, hasBeenExposed %d\n",
 			parent_->isAtLeastPartiallyVisible(),
 			parent_->hasBeenExposedAtLeastOnce());
 		// need to draw entire graph on expose event
