@@ -27,6 +27,7 @@
 #include "diskmeter.h"
 #include "pagemeter.h"
 #include "intmeter.h"
+#include "intratemeter.h"
 //  This one is not yet supported under *BSD.
 //#include "serialmeter.h"
 
@@ -65,6 +66,11 @@ void MeterMaker::makeMeters(void){
 
   if (_xos->isResourceTrue("interrupts"))
       push(new IntMeter(_xos));
+
+  if (_xos->isResourceTrue("irqrate"))
+  {
+      push(new IrqRateMeter(_xos));
+  }
 
 #ifdef HAVE_BATTERY_METER
   //  This one is done in its own file, not kernel.cc

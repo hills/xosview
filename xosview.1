@@ -175,6 +175,12 @@ an abbreviation for all three of the free BSD operating systems
     *BSD   : IRQs 0 - 15 (or fewer, depending on architecture)
     HPUX   : < Not Supported >
 
+\fBInterrupt rate\fP
+    interrupts per second
+    Linux  : < Not Supported >
+    *BSD   : interrupts | free
+    HPUX   : < Not Supported >
+
 \fBSerial Port Status\fP
     "leds" which show the serial port parameters.
     Linux  : Both the Line Status Register
@@ -310,6 +316,13 @@ xosview*pageBandWidth will be set to \fIval\fP.
 -interrupts +interrupts
 .RS
 Equivalent to -int and +int.
+.RE
+
+.pm irqrate
+
+-intrate +intrate
+.RS
+Equivalent to -irqrate and +irqrate.
 .RE
 
 -xrm \fIresource_string\fP

@@ -74,6 +74,13 @@ static XrmOptionDescRec options[] = {
 { "+ints", "*interrupts", XrmoptionNoArg, "True" },
 { "-interrupts", "*interrupts", XrmoptionNoArg, "False" },
 { "+interrupts", "*interrupts", XrmoptionNoArg, "True" },
+
+// Intrate meter resources, for platforms that support it.
+{ "-irqrate", "*irqrate", XrmoptionNoArg, "False" },
+{ "+irqrate", "*irqrate", XrmoptionNoArg, "True" },
+{ "-intrate", "*irqrate", XrmoptionNoArg, "False" },
+{ "+intrate", "*irqrate", XrmoptionNoArg, "True" },
+
 //  Special, catch-all option here --
 //    xosview -xrm "*memFreeColor: purple" should work, for example.
 { "-xrm", "*xrm", XrmoptionResArg, (caddr_t) NULL },
