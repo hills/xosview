@@ -21,6 +21,7 @@ FieldMeter::FieldMeter( XOSView *parent, int numfields, const char *title,
     /*  We need to set print_ to something valid -- the meters
      *  apparently get drawn before the meters have a chance to call
      *  CheckResources() themselves.  */
+  printedZeroTotalMesg_ = 0;
   print_ = PERCENT;
   used_ = 0;
   lastused_ = -1;
@@ -80,8 +81,12 @@ void FieldMeter::setUsed (float val, float total)
       used_ = val / total * 100.0;
     else
     {
-      fprintf(stderr, "Warning:  %s meter had a zero total field!  Would have "
-	      "caused a div-by-zero exception.\n", name());
+      if (!printedZeroTotalMesg_) {
+        printedZeroTotalMesg_ = 1;
+	fprintf(stderr, "Warning:  %s meter had a zero total "
+		"field!  Would have caused a div-by-zero "
+		"exception.\n", name());
+      }
       used_ = 0.0;
     }
   }

@@ -46,6 +46,7 @@ protected:
   int *lastvals_, *lastx_;
   unsigned long *colors_, usedcolor_;
   UsedType print_;
+  int printedZeroTotalMesg_;
 
   void SetUsedFormat ( const char * const str );
   void drawlegend( void );
