@@ -2,6 +2,9 @@
 
 Changes since xosview-1.7.3
 
+- Add Mike Butler's patch which fixes an infinite loop in
+  the linux netmeter when a pcmcia card is ejected.
+
 - Add Leopold Toetsch's linux lmstemp meter.
 
 - Linux port (and maybe others) now works with gcc-3.0.4

@@ -154,7 +154,7 @@ void NetMeter::checkeventNew(void)
     _timer.stop();
 
     if (_usechains)
-      while (!ifs.eof())
+      while (ifs)
         {
 	ifs >> buf;
 
@@ -170,7 +170,7 @@ void NetMeter::checkeventNew(void)
 	  ifs.ignore(1024, '\n');
 	  ifs.ignore(1024, '\n');
 
-	  while (!ifs.eof())
+	  while (ifs)
 	      {
 	      ifs.ignore(1024, ':');
 	      ifs >> in >> ig >> ig >> ig >> ig >> ig >> ig >> ig >> out;
@@ -235,7 +235,7 @@ void NetMeter::checkeventOld(void)
 
     ifs.ignore(1024, '\n');
 
-    while (!ifs.eof())
+    while (ifs)
         {
         ifs >> hex >> sa >> c >> sm >> c >> c >> da >> c >> dm;
         for (int index = 0 ; index < 7 ; index++)
