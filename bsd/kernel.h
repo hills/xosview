@@ -46,7 +46,7 @@ void
 BSDGetCPUTimes(long* timesArray);
 #endif
 
-void
+int
 BSDNetInit();
 
 void
