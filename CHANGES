@@ -1,4 +1,8 @@
   /*  $Id$  */
+Changes since xosview-1.6.1:
+  BSD directories merged -- now a single bsd subdir shared by
+    NetBSD, FreeBSD, and OpenBSD.
+
 Changes since xosview-1.6.0:
   Linux netmeter for kernels 1.1 and above no longer hangs after
     the packet count gets too high.
