@@ -55,6 +55,7 @@ void IntMeter::getirqs( void ){
 
   while ( !intfile.eof() ){
     intfile >>intno;
+    if (!intfile) break;
     intfile.ignore(1);
     if ( !intfile.eof() ){
       intfile >>count;
@@ -63,4 +64,17 @@ void IntMeter::getirqs( void ){
       irqs_[intno] = count;
     }
   }
+
+#if 0
+  while ( !intfile.eof() ){
+    intfile >>intno;
+    intfile.ignore(1);
+    if ( !intfile.eof() ){
+      intfile >>count;
+      intfile.istream::ignore(1024, '\n');
+      
+      irqs_[intno] = count;
+    }
+  }
+#endif
 }
