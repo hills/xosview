@@ -18,9 +18,7 @@
 #include "xosview.h"
 #include "cpumeter.h"
 #include "memmeter.h"
-#ifndef XOSVIEW_FREEBSD		/*  FreeBSD swap meter isn't done yet.  */
-# include "swapmeter.h"
-#endif
+#include "swapmeter.h"
 #include "netmeter.h"
 #include "loadmeter.h"
 #include "diskmeter.h"
@@ -44,13 +42,12 @@ void MeterMaker::makeMeters(void){
   // Standard meters (usually added, but users could turn them off)
   if (_xos->isResourceTrue("cpu"))
     push(new CPUMeter(_xos));
+
   if (_xos->isResourceTrue("mem"))
     push(new MemMeter(_xos));
-  /*  Some FreeBSD meters are bogus or nonfunctional.  */
-#ifndef XOSVIEW_FREEBSD		/*  FreeBSD swap meter isn't done yet.  */
+
   if (_xos->isResourceTrue("swap"))
     push(new SwapMeter(_xos));
-#endif
 
   if (_xos->isResourceTrue("page"))
     push(new PageMeter (_xos, atof(_xos->getResource("pageBandwidth"))));

@@ -17,16 +17,19 @@ netmeter.o \
 loadmeter.o \
 diskmeter.o \
 pagemeter.o \
+swapmeter.o \
+swapinternal.o \
 kernel.o
 
-#  These next four are not yet supported in the FreeBSD port.
+#  These next two are not yet supported in the FreeBSD port.
 #intmeter.o \
 #serialmeter.o \
-#swapmeter.o \
-#swapinternal.o \
 
 CFILES := $(OBJS:.o=.cc)
-BSDCSRCS := MeterMaker.cc cpumeter.cc memmeter.cc netmeter.cc loadmeter.cc diskmeter.cc pagemeter.cc kernel.cc
+BSDCSRCS := MeterMaker.cc cpumeter.cc memmeter.cc netmeter.cc \
+   loadmeter.cc diskmeter.cc pagemeter.cc kernel.cc swapmeter.cc \
+   swapinternal.cc
+
 BSDHEADERS := $(BSDCSRCS:%.cc=%.h)
 DEPFILES := $(OBJS:%=.%.d)
 

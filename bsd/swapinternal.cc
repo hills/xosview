@@ -68,8 +68,12 @@
 #include <sys/buf.h>
 #include <sys/conf.h>
 #include <sys/ioctl.h>
-#include <sys/map.h>
 #include <sys/stat.h>
+#ifdef XOSVIEW_FREEBSD
+#include <sys/rlist.h>
+#else
+#include <sys/map.h>
+#endif
 
 #include <kvm.h>
 #include <nlist.h>
@@ -95,26 +99,36 @@ extern char *getbsize __P((int *headerlenp, long *printoutblocksizep));
 extern kvm_t*	swap_kd;
 
 struct nlist syms[] = {
-        { "_swapmap" }, /* list of free swap areas */
-#define VM_SWAPMAP      0
-        { "_nswapmap" },/* size of the swap map */
-#define VM_NSWAPMAP     1
         { "_swdevt" },  /* list of swap devices and sizes */
-#define VM_SWDEVT       2
+#define VM_SWDEVT       0
         { "_nswap" },   /* size of largest swap device */
-#define VM_NSWAP        3
+#define VM_NSWAP        1
         { "_nswdev" },  /* number of swap devices */
-#define VM_NSWDEV       4
+#define VM_NSWDEV       2
         { "_dmmax" },   /* maximum size of a swap block */
-#define VM_DMMAX        5
+#define VM_DMMAX        3
+#ifdef XOSVIEW_FREEBSD
+        { "_swaplist" },/* list of free swap areas */
+#define VM_SWAPLIST     4
+#else /* XOSVIEW_FREEBSD */
+        { "_swapmap" }, /* list of free swap areas */
+#define VM_SWAPMAP      4
+        { "_nswapmap" },/* size of the swap map */
+#define VM_NSWAPMAP     5
+#endif /* XOSVIEW_FREEBSD */
         {0}		/* End-of-list (need {} to avoid gcc warning) */
 };
 
-static int nswap, nswdev, dmmax, nswapmap;
+static int nswap, nswdev, dmmax;
 static struct swdevt *sw;
 static long *perdev;
+#ifdef XOSVIEW_FREEBSD
+static struct rlisthdr swaplist;
+#else
+static int nswapmap;
 static struct map *swapmap, *kswapmap;
 static struct mapent *mp;
+#endif
 static int nfree;
 
 #define SVAR(var) __STRING(var) /* to force expansion */
@@ -132,6 +146,7 @@ int
 NetBSDInitSwapInfo()
 {
         static int once = 0;
+        u_long ptr;
 
         if (once)
                 return (1);
@@ -155,6 +170,16 @@ NetBSDInitSwapInfo()
         KGET(VM_NSWAP, nswap);
         KGET(VM_NSWDEV, nswdev);
         KGET(VM_DMMAX, dmmax);
+#ifdef XOSVIEW_FREEBSD
+        if ((sw = (struct swdevt*) malloc(nswdev * sizeof(*sw))) == NULL ||
+            (perdev = (long*) malloc(nswdev * sizeof(*perdev))) == NULL) {
+                printf("xosview: swap: malloc returned NULL.\n"  
+		  "Number of Swap devices (nswdef) looked like %d\n", nswdev);
+                return (0);
+        }
+	KGET1(VM_SWDEVT, &ptr, sizeof ptr, "swdevt");
+	KGET2(ptr, sw, (signed) (nswdev * sizeof(*sw)), "*swdevt");
+#else /* XOSVIEW_FREEBSD */
         KGET(VM_NSWAPMAP, nswapmap);
         KGET(VM_SWAPMAP, kswapmap);     /* kernel `swapmap' is a pointer */
         if ((sw = (struct swdevt*) malloc(nswdev * sizeof(*sw))) == NULL ||
@@ -165,10 +190,61 @@ NetBSDInitSwapInfo()
                 return (0);
         }
         KGET1(VM_SWDEVT, sw, (signed) (nswdev * sizeof(*sw)), "swdevt");
+#endif /* XOSVIEW_FREEBSD */
         once = 1;
         return (1);
 }
 
+#ifdef XOSVIEW_FREEBSD
+/* Taken verbatim from /usr/src/usr.bin/systat/swap.c (pavel 24-Jan-1998) */
+void
+fetchswap()
+{
+	struct rlist head;
+	struct rlist *swapptr;
+
+	/* Count up swap space. */
+	nfree = 0;
+	memset(perdev, 0, nswdev * sizeof(*perdev));
+	KGET1(VM_SWAPLIST, &swaplist, sizeof swaplist, "swaplist");
+	swapptr = swaplist.rlh_list;
+	while (swapptr) {
+		int	top, bottom, next_block;
+
+		KGET2((unsigned long)swapptr, &head,
+		      sizeof(struct rlist), "swapptr");
+
+		top = head.rl_end;
+		bottom = head.rl_start;
+
+		nfree += top - bottom + 1;
+
+		/*
+		 * Swap space is split up among the configured disks.
+		 *
+		 * For interleaved swap devices, the first dmmax blocks
+		 * of swap space some from the first disk, the next dmmax
+		 * blocks from the next, and so on up to nswap blocks.
+		 *
+		 * The list of free space joins adjacent free blocks,
+		 * ignoring device boundries.  If we want to keep track
+		 * of this information per device, we'll just have to
+		 * extract it ourselves.
+		 */
+		while (top / dmmax != bottom / dmmax) {
+			next_block = ((bottom + dmmax) / dmmax);
+			perdev[(bottom / dmmax) % nswdev] +=
+				next_block * dmmax - bottom;
+			bottom = next_block * dmmax;
+		}
+		perdev[(bottom / dmmax) % nswdev] +=
+			top - bottom + 1;
+
+		swapptr = head.rl_next;
+	}
+
+}
+#else /* XOSVIEW_FREEBSD */
 void
 fetchswap()
 {
@@ -229,6 +305,7 @@ fetchswap()
                 }
         }
 }
+#endif /* XOSVIEW_FREEBSD */
 
 void
 NetBSDGetSwapInfo(int* total, int* free)
@@ -249,8 +326,16 @@ NetBSDGetSwapInfo(int* total, int* free)
 			 * bgrayson  */
                         continue;
                 }
+#ifdef XOSVIEW_FREEBSD
+                /*
+                 * The first dmmax is never allocated to avoid trashing of
+                 * disklabels
+                 */
+                xsize = sw[i].sw_nblks - dmmax;
+#else
                 xsize = sw[i].sw_nblks;
-                xfree = perdev[i];
+#endif /* XOSVIEW_FREEBSD */
+		xfree = perdev[i];
                 used = xsize - xfree;
                 npfree++;
                 avail += xsize;
