@@ -34,8 +34,11 @@
 
 #include <sys/socket.h>         /*  These two are needed for the  */
 #include <net/if.h>             /*    NetMeter helper functions.  */
-#if defined(XOSVIEW_FREEBSD) && (__FreeBSD_version >= 300000)
-#include <net/if_var.h>
+#if defined(XOSVIEW_FREEBSD)
+# include <osreldate.h>
+# if (__FreeBSD_version >= 300000)
+#  include <net/if_var.h>
+# endif
 #endif
 
 #include <sys/param.h>	/*  Needed by both UVM and swapctl stuff.  */
