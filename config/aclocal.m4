@@ -53,16 +53,24 @@ AC_DEFINE(LONG_LONG,long)
 fi
 ])dnl
 
+AC_DEFUN(SMP_LINUX,
+[
+AC_MSG_CHECKING(for SMP)
+AC_EGREP_CPP(yes,
+[#include <linux/autoconf.h>
+#ifdef CONFIG_SMP
+yes
+#endif
+], smp=yes, smp=no)
+AC_MSG_RESULT($smp)
+])dnl
+
 
 AC_DEFUN(AC_SYS_LINUX_VERS,[[
 changequote(<<, >>)
 <<
 LVERSION=`uname -r`
 LVERSION=`expr $LVERSION : '\([0-9]*\.[0-9]*\)'`
-if test "$LVERSION" = "2.2"
-then
-    LVERSION=2.1
-fi
 >>
 changequote([, ])
 ]])
@@ -119,11 +127,12 @@ dnl If this module is to be built then check to see if we can
 dnl use MODVERSIONS.
 dnl
 AC_CHECK_HEADER(linux/modversions.h, [USE_MOD_VERSIONS=-DMODVERSIONS])
+SMP_LINUX
 INSTALL_ARGS='-s -m 4755'
 fi
 ,
 AC_SYS_LINUX_VERS
-if test "$LVERSION" = "2.0"
+if test "$LVERSION" = "2.0" -o "$LVERSION" = "2.2"
 then
         MEMSTAT=MemStat
         echo "enabled  the Linux $LVERSION memstat module by default"
@@ -132,14 +141,19 @@ dnl If this module is to be built then check to see if we can
 dnl use MODVERSIONS.
 dnl
         AC_CHECK_HEADER(linux/modversions.h, [USE_MOD_VERSIONS=-DMODVERSIONS])
+        SMP_LINUX
 else
         MEMSTAT=
         echo "disabled the Linux $LVERSION memstat module by default"
 fi
 )
 INSTALL_ARGS='-s -m 4755'
+if test "$smp" = "yes"
+then
+LINUX_SMP="-D__SMP__"
+fi
+AC_SUBST(LINUX_SMP)
 ])
-
 
 AC_DEFUN(AC_XOSV_BSD_COMMON, [
 dnl  The BSD versions need to link with libkvm, and have the BSD install flags.

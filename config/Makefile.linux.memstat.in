@@ -6,7 +6,7 @@
 #
 CC     = gcc
 CFLAGS = -D__KERNEL__ -Wall -Wstrict-prototypes \
-         -O2 -fomit-frame-pointer -pipe -DMODULE @USE_MOD_VERSIONS@
+         -O2 -fomit-frame-pointer -pipe -DMODULE @USE_MOD_VERSIONS@ @LINUX_SMP@
 FEXT   = c
 
 
