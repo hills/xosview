@@ -6,9 +6,7 @@
 //
 // $Id$
 //
-#include <iostream.h>
 #include <unistd.h>
-#include <string.h>
 #include <stdlib.h>
 #include <sys/time.h>
 #include "snprintf.h"
@@ -393,7 +391,7 @@ void XOSView::checkArgs (int argc, char** argv) const
   {
     switch (argv[0][1]) {
       case 'v':
-      		cerr << versionString << endl;
+      		std::cerr << versionString << std::endl;
 		exit(0);
       case 'n': //  Check for -name option that was already parsed
 		//  and acted upon by main().
@@ -416,12 +414,12 @@ void XOSView::checkArgs (int argc, char** argv) const
 #endif
       case '-':  /*  Check for --version argument.  */
               if (!strncasecmp(*argv, "--version", 10)) {
-	        cerr << versionString << endl;
+	        std::cerr << versionString << std::endl;
 		exit(0);
 	      }
 	      /*  Fall through to default/error case.  */
       default:
-      		cerr << "Ignoring unknown option '" << argv[0] << "'.\n";
+      		std::cerr << "Ignoring unknown option '" << argv[0] << "'.\n";
 	  	break;
     }
     argc--;
