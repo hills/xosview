@@ -1,0 +1,32 @@
+  README for xosview-1.4.0:
+
+  To build xosview:
+
+    Version 1.4 requires gcc to compile.  Versions of gcc earlier than
+    2.7.0 may fail to build xosview.  Please see the README file for
+    your the platform you are building on for further details.
+
+    edit Makefile.config for your setup.  Probably all you need to
+    change here is the definition of your platform near the top.
+
+    make
+
+
+  To run xosview :
+
+    Please see the README file for your platform for any special 
+    instructions for running xosview on that platform.
+
+    See the man page for information on what xosview displays and
+    how you can customize it.
+
+---- FAQ ----
+
+1.  xosview seems to throw out any X-positional argument I give it.
+
+Are you using fvwm/twm/tvtwm for a window manager?  If so, is the
+NoPPosition (or UsePPosition) flag set in your .fvwmrc/.twmrc/.tvtwmrc
+file?  Read the window-manager's man page to see how these variables
+should be set.  Fvwm, and other window managers, use flags like this to
+throw out the position part of the geometry string that an application
+passes to it.

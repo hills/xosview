@@ -1,0 +1,9 @@
+* Do if(dolegends_) fix for loadmeter.cc for all ports.
+* Add a version string, so that xosview -v prints out the version.
+
+  Make xosview re-check resources when the resources are changed, 
+    or when a signal is sent to it, or a key is pressed in it?
+
+  Fix MeterMaker in the other ports to check for all meters, not 
+    just load and serial.
+

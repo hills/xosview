@@ -1,0 +1,18 @@
+  A little bit about the makefiles.  I like to make memstat from the root 
+of the linux src tree.  To do this, I added memstat to the all rule, and then
+created a memstat rule immediately before the modules rule.  the memstat rule
+is as follows:
+memstat: dummy
+	$(MAKE) -C memstat CFLAGS="$(CFLAGS) $(MODFLAGS)"
+
+  You may need to edit memstat.h.  
+
+  To get the hacker-insmod utility, go to a site with dosemu and get the tar
+file.  It is in its own tar file, and is fairly small.  Without it, the module 
+will have to live in /proc/net or you will have to patch ksyms.c.
+
+  Let me know how it works for you!
+
+-Mike
+kujawa@cs.ucf.edu
+

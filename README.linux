@@ -1,0 +1,68 @@
+  To build xosview:
+
+    Follow the instructions found in README.  In addition please consider
+    the following:
+
+      - xosview uses the C++ iostream library.  On linux this is usually
+        distributed as part of libg++.  If you have an ELF system please
+        check and make sure that you have a recent copy of libg++ from
+        tsx-11.mit.edu:/pub/linux/packages/GCC as early ELF versions of
+        libg++ were not compatable with code in the C library.  If you
+        use one of these early ELF versions of libg++ xosview will probably
+        crash due to a segmentation violation.
+
+  To run xosview :
+
+      - The network meter has been changed from the way it behaved in
+        version 1.3.2.  It now displays the network usage in bytes / sec.
+        This is done by using the IP accounting features of the kernel.
+        In order for this new network meter to function you must do the
+        following:
+
+                  1 Make sure that IP accounting is enabled in your
+                    kernel.  This means you may need to rebuild it.
+
+                  2 Enable IP accounting for all IP packets into and out
+                    of your machine.  This is done by using a program called
+                    'ipfw'.  If you do not have this program on your system
+                    it can be found as part of the net-tools package available
+                    at your favorite Linux ftp site.  The example below is 
+                    how I run ipfw to do this at boot time in my rc.local:
+
+/sbin/ipfw add accounting all iface 192.168.0.3 from 192.168.0.3 to 0/0
+/sbin/ipfw add accounting all iface 192.168.0.3 from 0/0 to 192.168.0.3
+
+                    Just to make things interesting, it seems that kernels 
+                    newer than 1.3.66 have made ipfw obsolete.  It has been
+                    been replaced with ipfwadm.  Here is how to setup the
+                    accounting using ipfwadm:
+
+/sbin/ipfwadm -A -a -P all -S 192.168.0.3 -D 0/0
+/sbin/ipfwadm -A -a -P all -S 0/0 -D 192.168.0.3
+
+        If you do not do these steps, you will still be able to use xosview.
+        You just will not be able to use the network meter.
+
+      - The serial meter code in xosview-1.4 has been updated so that it
+        displays more useful information.  To do this xosview now looks
+        directly at a couple of the serial registers.  As a result of
+        this, xosview now need to be suid root in order to use the serial
+        meters.  If you try to use xosview with a serial meter enabled
+        and it is not suid root it will display a message to this effect 
+        and exit.  A non suid version of xosview will still function 
+        normally.  It just will not be able to run with the serial meters
+        toggled on.  I hope that at some point in the future the Linux
+        /proc filesystem will provide some more useful serial stats and
+        xosview will not have to be suid to get serial information.
+
+To install xosview:
+        
+        If one installs xosview via the 'make install' target it will place
+     things in the following locations.  The binary (xosview) will be copied
+     to /usr/bin/X11/xosview and will be suid root.  If you do not want to
+     run xosview suid root (this will just disable the serial meters) you
+     can change the permissions to whatever you like.  The X defaults for
+     xosview (Xdefaults) are copied to /usr/lib/X11/app-defaults/XOsview.
+
+
+

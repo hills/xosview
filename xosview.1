@@ -1,0 +1,564 @@
+'\" t
+.\" @(#)xosview.1	1.3 1/17/96 "
+.TH XOSVIEW 1.4 "January 17, 1996"
+.UC
+.SH NAME
+xosview \- X based system monitor
+.SH SYNOPSIS
+xosview [options]
+
+.SH DESCRIPTION
+\fIxosview\fP is a monitor which displays the status of several system based
+parameters.  These include CPU usage, load average, memory usage, swap 
+space usage, network usage, interrupts, and serial port status.  Each of 
+these is displayed as a horizontal bar which is separated into color coded 
+regions.  Each region represents a percentage of the resource which is begin 
+put to a particular use.  Typing a 'q' in the window will terminate xosview.
+
+At the moment \fIxosview\fP runs on three platforms (Linux, NetBSD, and HPUX).
+Not all of the meters described below are supported on all 
+platforms.  Some of the meters may appear different depending upon the 
+platform \fIxosview\fP is running on.
+
+\fBCPU Usage\fP
+   Linux  : user | nice | system | idle
+   NetBSD : user | nice | system | idle
+   HPUX   : user | nice | system | interrupt | idle
+
+\fBMemory Usage\fP
+   Linux  : used | shared | buffers | free
+   NetBSD : active | inactive | shared | free
+   HPUX   : text | used   | other   | free
+
+\fBSwap Usage\fP
+   Linux  : used | free
+   NetBSD : used | free
+   HPUX   : used | free
+
+\fBNET Usage\fP
+    bytes/sec
+    Linux  : in | out | idle
+    NetBSD : in | out | idle
+    HPUX   : < Not Supported >
+
+\fBInterrupts\fP
+    "leds" which blink when an interrupt occurs.
+    Linux  : IRQs 0 - 15
+    NetBSD : < Not Supported >
+    HPUX   : < Not Supported >
+
+\fBSerail Port Status\fP
+    "leds" which show the serial port parameters.
+    Linux  : Both the Line Status Register
+             (LSR) and Modem Status Register 
+             (MSR) are displayed.
+    NetBSD : < Not Supported >
+    HPUX   : < Not Supported >
+
+.SH OPTIONS
+
+Most of these command line options are just a convenient way to set one or
+more of xosview's resources.  Please see the \fBRESOURCES\fP section for
+more details on what the resource is for.
+
+-display \fIdisplay\fP
+.RS
+Sets the X display to \fIdisplay\fP.  This option overrides the 
+xosview*display resource.
+.RE
+
+-font \fIfont\fP
+.RS
+Specifies the font xosview will use for labels.  This option overrides the
+xosview*font resource.
+.RE
+
+-title \fItitle\fP
+.RS
+This option sets the name xosview will tell the window manager to use for
+the X window and icon.  This option overrides the xosview*title resource.
+.RE
+
+-geometry \fIgeometry_string\fP
+.RS
+Sets the X geometry to \fIgeometry_string\fP.  This option overrides the
+xosview*geometry resource.
+.RE
+
+-labels
+.RS
+This option overrides the xosview*labels resource.  It is equivalent to setting
+xosview*labels to "False".
+.RE
+
++labels
+.RS
+This option overrides the xosview*labels resource.  It is equivalent to setting
+xosview*labels to "True".
+.RE
+
+-load
+.RS
+This option overrides the xosview*load resource.  It is equivalent to setting
+xosview*load to "False".
+.RE
+
++load
+.RS
+This option overrides the xosview*load resource.  It is equivalent to setting
+xosview*load to "True".
+.RE
+
+-network \fImaxbandwidth\fP 
+.RE
+-net     \fImaxbandwidth\fP
+.RS
+These options override the xosview*network resource.  They cause xosview to
+display a meter that will shows network usage, with a maximum bandwidth of
+\fBmaxbandwidth\fP.  If \fBmaxbandwidth\fP is 0 then the network meter will
+not be displayed.
+.RE
+
++serial1
+.RE
++serial2
+.RE
++serial3
+.RE
++serial4
+.RS
+These options override the the appropriate xosview*serial{\fBi\fP} resource.  
+They are equivalent to setting xosview*serial{\fBi\fP} to "True".
+.RE
+
+-serial1
+.RE
+-serial2
+.RE
+-serial3
+.RE
+-serial4
+.RS
+These options override the the appropriate xosview*serial{\fBi\fP} resource.  
+They are equivalent to setting xosview*serial{\fBi\fP} to "False".
+.RE
+
+-xrm \fIresource_string\fP
+.RS
+This switch allows any of xosview's resources to be set on the command line.
+An example of how the xosview*memFreeColor could be set using this option is
+shown below (Note the use of " to prevent the shell from expanding
+\'*\' or from creating two separate arguments, \'xosview*memfreeColor:\'
+and \'purple\'):
+.RS
+-xrm "xosview*memFreeColor: purple"
+.RE
+.RE
+
+.SH X RESOURCES
+
+The following is a list of X resources supported by \fIxosview\fP.  Each has
+a default value assigned to it.  These values can be found in the file 
+defaultstring.h which can be obtained in the source distribution of xosview.
+They can be overridden in the usual places (/usr/lib/X11/app-defaults/XOsview,
+$HOME/.Xdefaults, etc..).
+
+It should be noted that it is OK to have a resource defined for a port of 
+xosview that does not support the feature the resource configures.  Xosview
+will simply ignore the resources that are set for it but not supported on
+a given platform.
+
+\fBGeneral Resources\fP
+
+xosview*display: \fIname\fP
+.RS
+The name of the display where xosview will contact the X server for drawing
+its window.
+.RE
+
+xosview*title: \fIname\fP
+.RS
+The string that xosview will use for the X window title.  Normally xosview
+will use 'xosview@machine_name' for a title.  This resource overrides the
+default behavior.
+.RE
+
+xosview*labels: (True or False)
+.RS
+If True then xosview will display meter labels.
+.RE
+
+xosview*meterLabelColor: \fIcolor\fP
+.RS
+The color to use for the meter labels.
+.RE
+
+xosview*usedlabels: (True or False)
+.RS
+If True then xosview will display labels that show the percentage of the
+resource being used.  This option requires that the labels option also be
+set to True.
+.RE
+
+xosview*usedLabelColor: \fIcolor\fP
+.RS
+The color to use for "used" labels.
+.RE
+
+xosview*font: \fIfont\fP
+.RS
+This is the font that xosview will use.
+.RE
+
+xosview*background: \fIcolor\fP
+.RS
+This is the color that will be used for the background.
+.RE
+
+xosview*foreground: \fIcolor\fP
+.RS
+This is the color that will be used for the foreground.
+.RE
+
+xosview*geometry: \fIgeometry_string\fP
+.RS
+This is a standard X geometry string that defines the size and location of
+the X window used by xosview.
+.RE
+
+\fBLoad Meter Resources\fP
+
+xosview*load: (True or False)
+.RS
+If True then xosview will display a load meter.
+.RE
+
+xosview*loadWarnColor: \fIcolor\fP
+.RS
+This is the color that the load meter will use once the load average is
+greater than 1.
+.RE
+
+xosview*loadProcColor: \fIcolor\fP
+.RS
+This is the color that the load meter will use to display the load average
+when it is less than or equal to 1.
+.RE
+
+xosview*loadIdleColor: \fIcolor\fP
+.RS
+This is the color that the load meter will use to display its "idle" field.
+.RE
+
+xosview*loadPriority: \fIpriority\fP
+.RS
+This number (which must be an integer >= 1) sets the number of tenths of
+a second that the meter waits between updates.  A value of 1 has xosview
+update the meter 10 times per second (the fastest).  A value of 600 would
+cause xosview to update the meter once a minute.
+.RE
+
+xosview*loadAlarmThreshold: \fIint\fP
+.RS
+This number (which must be an integer >= 1) sets the value at which
+the loadmeter changes its status and color from "normal" to "alarm".
+The default value is 2.
+.RE
+
+\fBCPU Meter Resources\fP
+
+xosview*cpu: (True or False)
+.RS
+If True then xosview will display a cpu meter.
+.RE
+
+xosview*cpuUserColor: \fIcolor\fP
+.RS
+The color to use for user time in the cpu meter.
+.RE
+
+xosview*cpuNiceColor: \fIcolor\fP
+.RS
+The color to use for nice time in the cpu meter.
+.RE
+
+xosview*cpuSystemColor: \fIcolor\fP
+.RS
+The color to use for system time in the cpu meter.
+.RE
+
+xosview*cpuInterruptColor \fIcolor\fP
+.RS
+The color used to display interrupt time in the cpu meter.
+.RE
+
+xosview*cpuFreeColor: \fIcolor\fP
+.RS
+The color to use for free time in the cpu meter.
+.RE
+
+xosview*cpuPriority: \fIpriority\fP
+.RS
+This number (which must be an integer >= 1) sets the number of times the 
+cpu meter will update per second.  The number of times this meter will update 
+per second is calculated as follows :  updates per sec = 10 / \fIpriority\fP.  It can of couse be greater than 10.
+.RE
+
+xosview*cpuDecay: (True or False)
+.RS
+If True then the cpu meter will be split in two.  One half will show the
+instantaneous state and the other will display a decaying average of the
+state.
+.RE
+
+\fBMemory Meter Resources\fP
+
+xosview*mem: (True or False)
+.RS
+If True then xosview will display a memory meter.
+.RE
+
+xosview*memUsedColor: \fIcolor\fP
+.RS
+This is the color that the memory meter will use to display the used memory
+field.
+.RE
+
+xosview*memSharedColor: \fIcolor\fP
+.RS
+This is the color that the memory meter will use to display the shared memory
+field.
+.RE
+
+xosview*memBufferColor: \fIcolor\fP
+.RS
+This is the color that the memory meter will use to display the buffer field.
+.RE
+
+xosview*memFreeColor: \fIcolor\fP
+.RS
+This is the color that the memory meter will use to display the free memory
+field.
+.RE
+
+xosview*memTextColor: \fIcolor\fP
+.RS
+The color used by the HP memory meter for text segments.
+.RE
+
+xosview*memOtherColor: \fIcolor\fP
+.RS
+The color used by the HP memory meter for the "other" category of memory usage.
+.RE
+
+xosview*memActiveColor: \fIcolor\fP
+.RS
+The color used by the NetBSD memory meter for active pages.
+.RE
+
+xosview*memInactiveColor: \fIcolor\fP
+.RS
+The color used by the NetBSD memory meter for inactive pages.
+.RE
+
+xosview*memPriority: \fIpriority\fP
+.RS
+This number (which must be an integer >= 1) sets the number of times the 
+memory meter will update per second.  The number of times this meter will 
+update per second is calculated as follows :  updates per sec = 10 / 
+\fIpriority\fP.  It can of couse be greater than 10.
+.RE
+
+xosview*memDecay: (True or False)
+.RS
+If True then the memory meter will be split in two.  One half will show the
+instantaneous state and the other will display a decaying average of the
+state.
+.RE
+
+\fBSwap Meter Resources\fP
+
+xosview*swap: (True or False)
+.RS
+If True then xosview will display a swap space meter.
+.RE
+
+xosview*swapUsedColor: \fIcolor\fP
+.RS
+This is the color that the swap meter will use for "used" swap space.
+.RE
+
+xosview*swapFreeColor: \fIcolor\fP
+.RS
+This is the color that the swap meter will use for free swap space.
+.RE
+
+xosview*swapPriority: \fIpriority\fP
+.RS
+This number (which must be an integer >= 1) sets the number of times the 
+serial meter will update per second.  The number of times this meter will 
+update per second is calculated as follows :  updates per sec = 10 / 
+\fIpriority\fP.  It can of couse be greater than 10.
+.RE
+
+xosview*swapDecay: (True or False)
+.RS
+If True then the swap meter will be split in two.  One half will show the
+instantaneous state and the other will display a decaying average of the
+state.
+.RE
+
+\fBNetwork Meter Resources\fP
+
+xosview*network: \fImaxBytes\fP
+.RS
+If this number is 0, a netmeter will not be displayed.  Otherwise, this
+number is used to specify the expected maximum bandwidth (in bytes / sec) for
+the meter.  When the expected maximum bandwidth (\fImaxBytes\fP) is exceeded
+then the network meter will display the relative percentage of network usage 
+(25% incomming, 75% outgoing).
+.RE
+
+xosview*netInColor: \fIcolor\fP
+.RS
+This is the color that the network meter will use for the incoming field.
+.RE
+
+xosview*netOutColor: \fIcolor\fP
+.RS
+This is the color that the network meter will use for the outgoing field.
+.RE
+
+xosview*netBackground: \fIcolor\fP
+.RS
+This is the color that the network meter will use for the "idle" field.
+.RE
+
+xosview*netPriority: \fIpriority\fP
+.RS
+This number (which must be an integer >= 1) sets the number of times the 
+network meter will update per second.  The number of times this meter will 
+update per second is calculated as follows :  updates per sec = 10 / 
+\fIpriority\fP.  It can of couse be greater than 10.
+.RE
+
+xosview*netDecay: (True or False)
+.RS
+If True then the network meter will be split in two.  One half will show the
+instantaneous state and the other will display a decaying average of the
+state.
+.RE
+
+\fBSerial Meter Resources\fP
+
+xosview*serial1: (True or False)
+.RS
+If True then xosview will display a serial meter for cua0.
+.RE
+
+xosview*serial2: (True or False)
+.RS
+If True then xosview will display a serial meter for cua1.
+.RE
+
+xosview*serial3: (True or False)
+.RS
+If True then xosview will display a serial meter for cua2.
+.RE
+
+xosview*serial4: (True or False)
+.RS
+If True then xosview will display a serial meter for cua3.
+.RE
+
+xosview*serialOnColor: \fIcolor\fP
+.RS
+This is the color the serial meter will use for bits that are set.
+.RE
+
+xosview*serialOffColor: \fIcolor\fP
+.RS
+This is the color the serial meter will use for bits that are not set.
+.RE
+
+xosview*serialPriority: \fIpriority\fP
+.RS
+This number (which must be an integer >= 1) sets the number of times the 
+serial meter will update per second.  The number of times this meter will 
+update per second is calculated as follows :  updates per sec = 10 / 
+\fIpriority\fP.  It can of couse be greater than 10.
+.RE
+
+\fBInterrupt Meter Resources\fP
+
+xosview*interrupts: (True or False)
+.RS
+If True then xosview will display an interrupt meter.
+.RE
+
+xosview*intOnColor: \fIcolor\fP
+.RS
+This is the color that will be used to show "active" interrupts.
+.RE
+
+xosview*intOffColor: \fIcolor\fP
+.RS
+This is the color that will be used to show "inactive" interrupts.
+.RE
+
+.SH BUGS
+
+Here is a list of known bugs in xosview-1.4.  Reports of unknown bugs are
+appreciated and should be directed to:
+
+.RS
+Mike Romberg (romberg@fsl.noaa.gov)
+.RS
+General xosview bugs and bugs related to the Linux and HPUX ports.
+.RE
+.RE
+
+.RS
+Brian Grayson (bgrayson@pine.ece.utexas.edu)
+.RS
+Bugs related to the NetBSD port.
+.RE
+.RE
+
+The memory meter does not make much sense at times under Linux.  This is due
+to my ignorance as to what exactly the fields in /proc/meminfo mean.  Perhaps
+someone who understands the entries in this file could enlighten me as to
+their meaning and this bug could go away :).
+
+Occasionally (and unrepeatably), the NetBSD xosview will clobber the NET text
+in the netmeter with horizontal black bars and the used-label numbers. 
+I'm guessing this has something to do with the net numbers reaching some
+unusual number (like 0 or maximum), but have not been able to pinpoint it
+further.  BCG
+
+.SH OBTAINING
+
+The most current version of xosview can be found at the following site:
+
+.RS
+sunsite.unc.edu /pub/Linux/X11/xutils/status/
+.RE
+
+.SH AUTHORS
+
+Mike Romberg  (romberg@fsl.noaa.gov)
+.RS
+Original author, Linux and HPUX ports.
+.RE
+
+Brian Grayson (bgrayson@pine.ece.utexas.edu)
+.RS
+NetBSD port and most of the nice enhancements for version 1.4
+.RE
+
+Werner Fink (werner@suse.de)
+.RS
+Originator of the loadmeter.
+.RE
+
+And many others who have sent in small fixes and improvements.

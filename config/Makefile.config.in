@@ -1,0 +1,52 @@
+#
+# Common rules and values used by all xosview Makefiles.
+#
+# The configure script should set up this file for most all cases.
+# One can override compile / link options here if needed.
+#
+
+#-----------------------------------------------------------------
+# C++ compiler
+#-----------------------------------------------------------------
+CXX           = @CXX@
+
+#-----------------------------------------------------------------
+# Compiler flags
+#-----------------------------------------------------------------
+
+# Optimized CXXFLAGS
+#CXXFLAGS      = -Wall -O4 -pipe -I@x_includes@ \
+#                -I@top_srcdir@ -I./@host_os@ @DEFINES@
+# DEBUG CXXFLAGS
+CXXFLAGS      = -Wall -ggdb -pipe -I@x_includes@ \
+                -I@top_srcdir@ -I./@host_os@ @DEFINES@
+# PROFILE CXXFLAGS
+#CXXFLAGS      = -Wall -ggdb -pg -pipe -I@x_includes@ \
+#                -I@top_srcdir@ -I./@host_os@ @DEFINES@
+
+#-----------------------------------------------------------------
+# Link flags and libraries
+#-----------------------------------------------------------------
+
+# NORMAL LIBS
+LFLAGS        = -L./@host_os@ -L@x_libraries@
+LIBS          = -lmeter -lX11 @EXTRALIBS@
+
+# DEBUG LIBS
+#LFLAGS        = -L./@host_os@ -L@x_libraries@ -static
+#LIBS          = -lmeter -lX11 @EXTRALIBS@
+
+# PROFILE LIBS
+#LFLAGS        = -L./@host_os@ -L@x_libraries@ -pg
+#LIBS          = -lmeter -lX11 @EXTRALIBS@ -lgmon
+
+#-----------------------------------------------------------------
+# Rules
+#-----------------------------------------------------------------
+%.o : %.cc
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+.%.o.d : %.cc
+	@echo building dependencies for $<
+	@$(SHELL) -ec '$(CXX) -MM $(CXXFLAGS) $< \
+          | sed '\''s/$*.o/$*.o $@/'\'' > $@'

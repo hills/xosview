@@ -1,0 +1,87 @@
+!
+!  xosview resources (override into your .Xdefaults file)
+!
+
+! General Resources
+
+! xosview*title:
+! xosview*geometry:         +5+5
+! xosview*display:
+xosview*labels: True
+xosview*meterLabelColor:  wheat
+xosview*usedlabels:       True
+xosview*usedLabelColor:   orange
+xosview*borderwidth:      0
+xosview*font:             7x13bold
+xosview*background:       navy
+xosview*foreground:       wheat
+
+
+! Load Meter Resources
+
+xosview*load: True
+xosview*loadWarnColor:    orange
+xosview*loadProcColor:    seagreen
+xosview*loadIdleColor:    aquamarine
+xosview*loadPriority:     50
+xosview*loadAlarmThreshold: 2
+
+! CPU Meter Resources
+
+xosview*cpu: True
+xosview*cpuUserColor:       seagreen
+xosview*cpuNiceColor:       yellow
+xosview*cpuSystemColor:     orange
+xosview*cpuInterruptColor : red
+xosview*cpuFreeColor:       aquamarine
+xosview*cpuPriority:        1
+xosview*cpuDecay:           True
+
+! Memory Meter Resources
+!  Not all of these are used by a specific platform.
+
+xosview*mem: True
+xosview*memUsedColor:     seagreen
+xosview*memSharedColor:   SkyBlue
+xosview*memBufferColor:   orange
+xosview*memCacheColor:    red
+xosview*memFreeColor:     aquamarine
+xosview*memTextColor:     blue
+xosview*memOtherColor:    orange
+xosview*memActiveColor:	  blue
+xosview*memInactiveColor: lightblue
+xosview*memPriority:      10
+xosview*memDecay:         False
+
+! Swap Meter Resources
+
+xosview*swap: True
+xosview*swapUsedColor:    seagreen
+xosview*swapFreeColor:    aquamarine
+xosview*swapPriority:     10
+xosview*swapDecay:        False
+
+! Network Meter Resources
+
+xosview*network: 2000
+xosview*netInColor:       SkyBlue
+xosview*netOutColor:      SlateBlue1
+xosview*netBackground:    aquamarine
+xosview*netPriority:      2
+xosview*netDecay:         True
+
+! Serial Meter Resources
+
+xosview*serial1: False
+xosview*serial2: False
+xosview*serial3: False
+xosview*serial4: False
+xosview*serialOnColor:    red
+xosview*serialOffColor:   aquamarine
+xosview*serialPriority:   1
+
+! Interrupt Meter Resources
+
+xosview*interrupts:       True
+xosview*intOnColor:       red
+xosview*intOffColor:      aquamarine

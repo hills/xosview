@@ -1,0 +1,42 @@
+#
+# HPUX Makefile template
+#
+include ../Makefile.config
+
+CXXFLAGS += -I@top_srcdir@
+
+OBJS = \
+MeterMaker.o \
+cpumeter.o \
+memmeter.o \
+swapmeter.o
+
+CFILES := $(OBJS:.o=.cc)
+DEPFILES := $(OBJS:%=.%.d)
+
+vpath %.h $(TOP)
+vpath %.cc $(TOP)
+
+#-----------------------------------------------------------------------
+
+all : libmeter.a
+
+clean :
+	rm -f $(OBJS) $(DEPFILES) libmeter.a *~
+
+libmeter.a : $(OBJS)
+	ar cvr libmeter.a $(OBJS)
+
+dependfile: $(CFILES)
+	gcc -MM $(CXXFLAGS) $(CFILES) | sed -e 's:'$(TOP)'/::g' > dependfile
+
+#  The following is the depend-magic that modifies the Makefile.  BCG
+concatdepend: cleandepend
+	sed -e '/^#DEPENDENCIES/r dependfile' Makefile > Makefile.new
+	mv Makefile.new Makefile
+cleandepend: Makefile
+	sed -e '/^#DEPENDENCIES/,9999d' Makefile > Makefile.clean
+	echo "#DEPENDENCIES" >> Makefile.clean
+	mv Makefile.clean Makefile
+
+@AUTODEPEND@

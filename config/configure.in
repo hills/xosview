@@ -1,0 +1,54 @@
+AC_INIT(xosview.1)
+AC_CONFIG_AUX_DIR(config)
+AC_CANONICAL_HOST
+AC_PROG_CXX
+AC_PATH_X
+AC_PREFIX_DEFAULT(/usr/local)
+AC_SUBST(x_includes)
+AC_SUBST(x_libraries)
+AC_PROG_INSTALL
+AC_PROG_AWK
+
+dnl
+dnl Add an option which will enable or disable automatic dependencies.
+dnl
+AC_ARG_ENABLE([auto-depend],
+[  --enable-auto-depend    enable automatic dependencies],
+
+if test "$enableval" = "no"
+then
+        AUTODEPEND=
+        echo "disabled automatic dependencies"
+else
+        AUTODEPEND='-include $(DEPFILES)'
+        echo "enabled  automatic dependencies"
+fi
+,
+AUTODEPEND=
+echo "disabled automatic dependencies by default"
+)
+AC_SUBST(AUTODEPEND)
+
+dnl
+dnl Call each ports macro so that it can set up its own 
+dnl options / configuration.
+dnl
+case $host_os in
+linux)   AC_XOSV_LINUX  ;;
+nethsd)  AC_XOSV_NETBSD ;;
+hpux)    AC_XOSV_HPUX   ;;
+*)       AC_MSG_ERROR([xosview has not been ported to $host_os :(.  Sorry.]) ;;
+esac
+
+dnl
+dnl The nethsd and linux ports modify these variables which
+dnl are exported by AC_OUTPUT.
+dnl
+AC_SUBST(EXTRALIBS)
+AC_SUBST(DEFINES)
+
+AC_OUTPUT(\
+  Makefile:config/Makefile.top.in \
+  $host_os/Makefile:config/Makefile.$host_os.in \
+  Makefile.config:config/Makefile.config.in)
+

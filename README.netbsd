@@ -1,0 +1,113 @@
+	README file for xosview version 1.4.0, NetBSD-specific.
+	CVS Id:  (CVS not yet enabled) $Id$
+
+  Written by Brian Grayson.  Please direct all comments, criticisms, etc.
+to me at bgrayson@ece.utexas.edu.
+
+  Note:  xosview needs to run 'setgid kmem' in order to access some of the
+    kernel information (at least until some more statistics are added to
+    the /kern or /proc file systems).  If you do not have root or kmem
+    permission on the machine, xosview will not run.
+
+  Note:  The default Makefiles used by the xosview distribution require
+    GNU make, rather than BSD make.  I've tried to make a parallel set of
+    Makefiles for BSD make, but it's not easy trying to keep them
+    completely the same.  If you don't already have GNU make, try "make -f
+    Makefile.bsd".  If that doesn't work, I guess you'll have to bite the
+    bullet and install GNU make (available from your favorite GNU site)!
+
+  To make xosview:
+
+    Edit the Makefile.config to use METERDIR = netbsd (this variable
+      controls which operating-system subdirectory is used for
+      platform-dependent code).  Since xosview started out as a Linux
+      application, the default configuration is usually for Linux.
+
+
+    Make sure CXX and CXXFLAGS are set up properly for your version of gcc
+      (gcc 2.6.3 or higher is required.  The code development was done using
+      gcc 2.7.2).  Only profiling (-p, -pg, -a) and debugging (-g, -ggdb)
+      options should usually be modified in the CXXFLAGS definitions.
+
+    The Makefile.config should have a section (using an 'ifeq') that adds
+      -lkvm to the LIBS variable.  If not, or if you are trying to hand-link,
+      make sure -lkvm is passed to the linker.
+
+     Run "make" with no options.  (Since most people shouldn't need to mess
+       with the source code, we haven't enabled automatic dependence
+       checking.  If you plan on modifying bits and pieces and recompiling,
+       just modify the "include dependfile" lines appopriately, or mail
+       one of us (Mike or I) for the appropriate lines to uncomment.)
+  
+     It should start compiling the netbsd directory files, create a library
+       (libmeter.a) out of all the .o files, and then compile the
+       main directory.   Finally, it should link. 
+
+    Test the executable to make sure it works.  You need to be root, or a
+      member of group 'kmem', to test it at this stage.  xosview will come up
+      with the default compile-time resources.  If there are no problems,
+      then you can use 'gmake install' (run while 'root') to install a
+      stripped, setgid copy of xosview into /usr/bin/X11 (aka
+      /usr/local/X11R6/bin), and install the Xdefaults into the
+      /usr/lib/X11/app-defaults/XOsview file.  An Imakefile is going to be
+      constructed for the next release, to avoid having specific paths
+      written into the Makefile.  (Any volunteers?  Mike and I are newbies
+      when it comes to xmkmf and company...)
+
+    The man page can be installed by "gmake install-man".
+
+    If you have /usr/local NFS-mounted from another computer, you may need
+      to make sure that the mount has maproot=0 and is suid (or something
+      like that.  I'm not an NFS expert, but if I copy an xosview
+      executable into my home directory, which is mounted nosuid, it does
+      not run suid/sgid, whereas if I copy it into /usr/local/bin, which is
+      mounted suid, it runs with no problem).
+
+
+  Congratulations -- xosview has been installed on your system!  If you
+    wish, you may change the site-wide /usr/lib/X11/app-defaults/XOsview
+    file, or you can use your local .Xdefaults file to change xosview's
+    appearance.
+
+  I personally use a set of resources such that the idle field of each
+    meter is black, and the other colors used for fields are fairly constant
+    from one meter to the next.  If you'd like a copy of our local .Xdefaults
+    file (rather than modifying the 50 resources yourself), just mail me!
+    This setup is the one that is viewable on my xosview web page
+    (http://lore.ece.utexas.edu/~bgrayson/xosview.html).
+
+
+  If this README was incomplete, or you feel an additional comment or two
+    would be helpful to other users, please Email me -- I want this to be as
+    complete and idiot-proof as possible!
+
+  Enjoy!
+
+  Brian Grayson (bgrayson@ece.utexas.edu)
+
+  Further information:
+
+    1.  Why does xosview need to be setgid kmem, i.e., why doesn't it use
+      user-level system calls, and the optional-but-recommended /kern and
+      /proc filesystems?
+
+      Information such as the amount of swap space that is being used, or
+	the breakdown of CPU usage, is not yet available (or not
+	available in the kind of detail xosview desires/requires) through
+	any system calls, sysctl, /kern, or /proc (at least not that I
+	know!  If not, let me know.)  Thus, xosview occasionally needs to
+	munge through the kernel's data structures to get its information.
+
+    2.  Why does the cpumeter show user, nice, system, and idle/free, but
+      not show interrupts?
+
+      As far as I can tell (from looking at the kernel source code) the
+	interrupt field is always 0, and is never set up properly for
+	statistics (Look at the output from 'top' -- have you ever seen the
+	%interrupt field be anything besides 0?).  I decided that putting a
+	field label for 'INTR' would imply that these statistics were
+	correct, and that the interrupts were being correctly charged, which
+	they are not.
+      If anyone knows of an easy patch to the kernel source (ha ha) that
+	would make the interrupt field in _cp_time be correct, let me know.
+
