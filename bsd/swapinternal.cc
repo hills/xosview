@@ -333,7 +333,12 @@ BSDGetSwapInfo(int* total, int* free)
                  * The first dmmax is never allocated to avoid trashing of
                  * disklabels
                  */
-                xsize = sw[i].sw_nblks - dmmax;
+                /*xsize = sw[i].sw_nblks - dmmax;*/
+		/*  Actually, count those dmmax blocks -- pstat,
+		 *  top, etc. do.  It is swap space that is not
+		 *  free for use.  bgrayson, on suggestion from
+		 *  Andrew Sharp.  */
+                xsize = sw[i].sw_nblks;
 #else
                 xsize = sw[i].sw_nblks;
 #endif /* XOSVIEW_FREEBSD */
