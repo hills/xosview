@@ -83,6 +83,16 @@ void MemMeter::getmeminfo (void) {
   fields_[0] = 4096*meminfo.t_arm;
 #endif
 
+#if defined(UVM) & defined(XOSVIEW_NETBSD)
+  struct uvmexp kvm_uvm_exp;
+  BSDGetUVMPageStats(&kvm_uvm_exp);
+  int pgsize = kvm_uvm_exp.pagesize;
+  fields_[0] = kvm_uvm_exp.active*pgsize;
+  fields_[1] = kvm_uvm_exp.inactive*pgsize;
+  fields_[2] = kvm_uvm_exp.wired*pgsize;
+  fields_[FREE_INDEX] = kvm_uvm_exp.free*pgsize;
+  /*  XXX  Should we also look at the kernel or paging pages?  */
+#else
   // New code.  Use the cnt structure:
   struct vmmeter kvm_cnt;
   BSDGetPageStats (&kvm_cnt);
@@ -93,7 +103,7 @@ void MemMeter::getmeminfo (void) {
   fields_[0] = kvm_cnt.v_active_count * pgsize;
   fields_[1] = kvm_cnt.v_inactive_count * pgsize;
   fields_[2] = kvm_cnt.v_wire_count * pgsize;
-#ifdef XOSVIEW_FREEBSD
+# ifdef XOSVIEW_FREEBSD
   /* I believe v_cache_count is the right answer here, rather than the
      bufspace variable.  I think that bufspace is a subset of "cache" space
      that is used for filesystem io, and I think that "cache" pages also
@@ -103,12 +113,11 @@ void MemMeter::getmeminfo (void) {
      be to subtract bufspace from v_cache_count, and add that difference to
      v_inactive_count.  (pavel 21-Jan-1998) */
   fields_[3] = kvm_cnt.v_cache_count * pgsize;
+  /*total_ = kvm_cnt.v_page_count * pgsize;*/
+# endif	/*  FreeBSD  */
   fields_[FREE_INDEX] = kvm_cnt.v_free_count * pgsize;
-  total_ = kvm_cnt.v_page_count * pgsize;
-#else
-  fields_[FREE_INDEX] = kvm_cnt.v_free_count * pgsize;
+#endif /*  UVM && NetBSD */
   total_ = fields_[0] + fields_[1] + fields_[2] + fields_[FREE_INDEX];
-#endif
 
 //  End *BSD-specific code...
 
