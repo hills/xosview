@@ -119,13 +119,9 @@ int CPUMeter::countCPUs(void){
 
   int cpuCount = 0;
   std::string buf;
-  while (!stats.eof()){
-    getline(stats, buf);
-    if (!stats.eof()){
+  while (getline(stats, buf))
       if (!strncmp(buf.data(), "cpu", 3) && buf[3] != ' ')
           cpuCount++;
-    }
-  }
 
   return cpuCount;
 }
