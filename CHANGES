@@ -12,7 +12,8 @@ Changes since xosview-1.5.1, in no particular order:
   
   Found 32-bit-wrap case that was also causing the netmeter grief.
 
-  Bitmeter class drawing routine tweaked.
+  Bitmeter class drawing routine tweaked, usedLabel color changed
+    to be the same as the `on' color for the bits.
 
 Changes since xosview-1.5.0, in no particular order:
 
