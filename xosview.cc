@@ -312,6 +312,12 @@ void XOSView::checkArgs (int argc, char** argv) const
 		}
 		break;
 #endif
+      case '-':  /*  Check for --version argument.  */
+              if (!strcmp(*argv, "--version")) {
+	        cerr << versionString << endl;
+		exit(0);
+	      }
+	      /*  Fall through to default/error case.  */
       default:
       		cerr << "Ignoring unknown option '" << argv[0] << "'.\n";
 	  	break;
