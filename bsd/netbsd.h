@@ -35,6 +35,12 @@ void
 SetKernelName(const char* const kernelName);
 
 void
+NetBSDPageInit();
+
+void
+NetBSDGetPageStats(struct vmmeter* vmp);
+
+void
 NetBSDCPUInit();
 
 void

@@ -27,6 +27,7 @@
 
 #include <sys/socket.h>         /*  These two are needed for the  */
 #include <net/if.h>             /*    NetMeter helper functions.  */
+#include <sys/vmmeter.h>	/*  For struct vmmeter.  */
 #include "netbsd.h"		/*  To grab CVSID stuff.  */
 
 CVSID("$Id$");
@@ -46,6 +47,8 @@ static struct nlist nlst[] =
 #define IFNET_SYM_INDEX 1
 { "_disklist" },
 #define DISKLIST_SYM_INDEX	2
+{ "_cnt" },
+#define VMMETER_SYM_INDEX	3
   {NULL}
   };
 
@@ -131,6 +134,16 @@ OpenKDIfNeeded()
   }
 }
 
+
+// ------------------------  PageMeter functions  -----------------
+void
+NetBSDPageInit() { OpenKDIfNeeded(); }
+
+void
+NetBSDGetPageStats(struct vmmeter* vmp) {
+  if (!vmp) errx(-1, "NetBSDGetPageStats():  passed pointer was null!\n");
+  safe_kvm_read_symbol(VMMETER_SYM_INDEX, vmp, sizeof(struct vmmeter));
+}
 
 // ------------------------  CPUMeter functions  ------------------
 
