@@ -30,7 +30,7 @@ protected:
 private:
   u_int64_t prevBytes;
   int kernelHasStats_;
-  long	maxBandwidth_;
+  float	maxBandwidth_;
 };
 
 #endif
