@@ -31,23 +31,23 @@ MeterMaker::MeterMaker(XOSView *xos){
 
 void MeterMaker::makeMeters(void){
   //  check for the loadmeter
-  if (!strcasecmp(_xos->getResource("load"), "True"))
+  if (_xos->isResourceTrue("load"))
     push(new LoadMeter(_xos));
 
   // Standard meters (usually added, but users could turn them off)
-  if (!strcasecmp(_xos->getResource("cpu"), "True"))
+  if (_xos->isResourceTrue("cpu"))
     push(new CPUMeter(_xos));
-  if (!strcasecmp(_xos->getResource("mem"), "True"))
+  if (_xos->isResourceTrue("mem"))
     push(new MemMeter(_xos));
-  if (!strcasecmp(_xos->getResource("swap"), "True"))
+  if (_xos->isResourceTrue("swap"))
     push(new SwapMeter(_xos));
 
   // check for the net meter
-  if (!strcasecmp(_xos->getResource("net"), "True"))
-    push(new NetMeter(_xos, atof(_xos->getResource("networkBandwidth"))));
+  if (_xos->isResourceTrue("net"))
+    push(new NetMeter(_xos, atof(_xos->getResource("netBandwidth"))));
 
-  if (!strcasecmp(_xos->getResource("disk"), "True"))
-    push(new DiskMeter (_xos));
+  if (_xos->isResourceTrue("disk"))
+    push(new DiskMeter (_xos, atof(_xos->getResource("diskBandwidth"))));
 
   //  The serial meters and the interrupt meter are not yet
   //  available for NetBSD.  BCG
