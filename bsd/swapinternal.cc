@@ -46,13 +46,12 @@
  * SUCH DAMAGE.
  */
 
-//---------------------  For xosview, we need to include <err.h>.  BCG
-#include <err.h>
-
 //---------------------  The remainder of this file is based/borrowed
 //                       from /usr/src/bin/systat/swap.c in the NetBSD
-//                       distribution.  Modifications will be
-//                       bracketed by comment markers like these.  BCG
+//                       distribution.  Modifications are _no
+//                       longer_ all marked appropriately via
+//                       //------------:
+//                       there are too many of them.  BCG
 
 /*
  * swapinfo - based on a program of the same name by Kevin Lahey
@@ -64,30 +63,22 @@
 //		       some may be removed, since lots of the swap
 //		       code has been removed.  BCG  FIXME SOMEDAY
 
-#include <sys/param.h>
-//---------------------  It appears buf.h is not needed, and
-//			causes breakage on FreeBSD.
-/*#include <sys/buf.h>*/
-#include <sys/conf.h>
-#include <sys/ioctl.h>
-#include <sys/stat.h>
+#include <sys/param.h>		/*  For things in sys/conf.h.  */
+#include <sys/conf.h>		/*  For struct swdevt.  */
 #ifdef XOSVIEW_FREEBSD
 #include <sys/rlist.h>
 #else
-#include <sys/map.h>
+#include <sys/map.h>		/*  For struct mapent.  */
 #endif
 
-#include <kvm.h>
-#include <nlist.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
+#include <kvm.h>		/*  For all sorts of stuff.  */
+#ifndef HAVE_SWAPCTL
+# include <stdio.h>		/*  For error messages.  */
+#endif
+#include <stdlib.h>		/*  For malloc().  */
+#include <string.h>		/*  For bzero().  */
 
 
-
-#include <sys/cdefs.h>
-#include <fcntl.h>
 
 extern char *getbsize __P((int *headerlenp, long *printoutblocksizep));
 
