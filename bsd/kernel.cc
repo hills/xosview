@@ -157,8 +157,7 @@ static char kernelFileName[_POSIX2_LINE_MAX];
 //  Since this is C++, it's an inline function rather than a macro.
 
 static inline void
-safe_kvm_read (u_long kernel_addr, void* user_addr, size_t nbytes)
-{
+safe_kvm_read (u_long kernel_addr, void* user_addr, size_t nbytes) {
     /*  Check for obvious bad symbols (i.e., from /netbsd when we
      *  booted off of /netbsd.old), such as symbols that reference
      *  0x00000000 (or anywhere in the first 256 bytes of memory).  */
@@ -180,30 +179,25 @@ safe_kvm_read (u_long kernel_addr, void* user_addr, size_t nbytes)
 //  This version uses the symbol offset in the nlst variable, to make it
 //  a little more convenient.  BCG
 static inline void
-safe_kvm_read_symbol (int nlstOffset, void* user_addr, size_t nbytes)
-{
+safe_kvm_read_symbol (int nlstOffset, void* user_addr, size_t nbytes) {
   safe_kvm_read (nlst[nlstOffset].n_value, user_addr, nbytes);
 }
 
 
 int
-ValidSymbol (int index)
-{
+ValidSymbol (int index) {
   return ((nlst[index].n_value & 0xffffff00) != 0);
 }
 
 
 void
-BSDInit()
-{
+BSDInit() {
   kernelFileName[0] = '\0';
 }
 
 void
-SetKernelName(const char* const kernelName)
-{
-  if (strlen(kernelName)>=_POSIX2_LINE_MAX)
-  {
+SetKernelName(const char* const kernelName) {
+  if (strlen(kernelName)>=_POSIX2_LINE_MAX) {
     fprintf (stderr, "Error:  kernel file name of '%s' is too long!\n",
       kernelName);
     exit(1);
@@ -212,8 +206,7 @@ SetKernelName(const char* const kernelName)
 }
 
 void
-OpenKDIfNeeded()
-{
+OpenKDIfNeeded() {
   char unusederrorstring[_POSIX2_LINE_MAX];
 
   if (kd) return; //  kd is non-NULL, so it has been initialized.  BCG
@@ -282,8 +275,7 @@ BSDGetPageStats(struct vmmeter* vmp) {
 #ifdef XOSVIEW_FREEBSD
 // This function returns the num bytes devoted to buffer cache
 void
-FreeBSDGetBufspace(int* bfsp)
-{
+FreeBSDGetBufspace(int* bfsp) {
     if (! bfsp) errx (-1, "FreeBSDGetBufspace(): passed null ptr argument\n");
     safe_kvm_read_symbol (BUFSPACE_SYM_INDEX, bfsp, sizeof(int));
 }
@@ -292,14 +284,12 @@ FreeBSDGetBufspace(int* bfsp)
 // ------------------------  CPUMeter functions  ------------------
 
 void
-BSDCPUInit()
-{
+BSDCPUInit() {
   OpenKDIfNeeded();
 }
 
 void
-BSDGetCPUTimes (long* timeArray)
-{
+BSDGetCPUTimes (long* timeArray) {
   if (!timeArray) errx (-1, "BSDGetCPUTimes():  passed pointer was null!\n");
   if (CPUSTATES != 5)
     errx (-1, "Error:  xosview for *BSD expects 5 cpu states!\n");
@@ -309,14 +299,12 @@ BSDGetCPUTimes (long* timeArray)
 
 // ------------------------  NetMeter functions  ------------------
 void
-BSDNetInit()
-{
+BSDNetInit() {
   OpenKDIfNeeded();
 }
 
 void
-BSDGetNetInOut (long long * inbytes, long long * outbytes)
-{
+BSDGetNetInOut (long long * inbytes, long long * outbytes) {
 
 #if (__FreeBSD_version < 300000) //werner May/29/98 quick hack for current
 
@@ -394,8 +382,7 @@ BSDSwapInit() {
 //
 
 void
-BSDGetSwapCtlInfo(int *totalp, int *freep)
-{
+BSDGetSwapCtlInfo(int *totalp, int *freep) {
   int	totalinuse, totalsize;
   int rnswap, nswap = swapctl(SWAP_NSWAP, 0, 0);
   struct swapent *swapiter;
@@ -453,8 +440,8 @@ BSDGetSwapCtlInfo(int *totalp, int *freep)
   struct device_selection *dev_select;
   char nodisk;
 
-void DevStat_Init(void)
-{
+void
+DevStat_Init(void) {
 	/*
 	 * Make sure that the userland devstat version matches the kernel
 	 * devstat version.
@@ -517,8 +504,7 @@ void DevStat_Init(void)
 }
 
 int
-DevStat_Get(void)
-{
+DevStat_Get(void) {
 	register int dn;
 	long double busy_seconds;
 	u_int64_t total_transfers;
@@ -630,8 +616,7 @@ BSDDiskInit() {
 }
 
 void
-BSDGetDiskXFerBytes (unsigned long long *bytesXferred)
-{
+BSDGetDiskXFerBytes (unsigned long long *bytesXferred) {
 #ifdef XOSVIEW_FREEBSD
 #ifdef HAVE_DEVSTAT
   *bytesXferred = DevStat_Get();
@@ -663,8 +648,7 @@ BSDGetDiskXFerBytes (unsigned long long *bytesXferred)
   safe_kvm_read_symbol (DISKLIST_SYM_INDEX, &kvmdisklist, sizeof(kvmdisklist));
   kvmdiskptr = kvmdisklist.tqh_first;
   *bytesXferred = 0;
-  while (kvmdiskptr != NULL)
-  {
+  while (kvmdiskptr != NULL) {
     safe_kvm_read ((u_long)kvmdiskptr, &kvmcurrdisk, sizeof(kvmcurrdisk));
       /*  Add up the contribution from this disk.  */
     *bytesXferred += kvmcurrdisk.dk_bytes;
@@ -698,7 +682,8 @@ BSDIntrInit() {
 }
 
 #if !defined(XOSVIEW_OPENBSD) || !(defined(pc532) || defined(i386))
-int BSDNumInts() {
+int
+BSDNumInts() {
   int nintr;
   OpenKDIfNeeded(); 
   nintr = (nlst[EINTRCNT_SYM_INDEX].n_value -
@@ -720,8 +705,7 @@ int BSDNumInts() {
 #endif /* XOSVIEW_OPENBSD */
 
 void
-BSDGetIntrStats (unsigned long intrCount[NUM_INTR])
-{
+BSDGetIntrStats (unsigned long intrCount[NUM_INTR]) {
 #ifdef XOSVIEW_FREEBSD
     /* FreeBSD has an array of interrupt counts, indexed by device number.
        These are also indirected by IRQ num with intr_countp: */
