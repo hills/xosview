@@ -2,6 +2,8 @@
 
 Changes since xosview-1.7.3
 
+- Linux port (and maybe others) now works with gcc-3.0.4
+
 - added IRIX 6.5 support
 
 - Updated NetBSD support, based on patches from Bernd Ernesti, to
@@ -44,31 +46,31 @@ Changes since xosview-1.7.1
 
 - New feature: load meter now has not only a warning color (and threshold),
   but also a (higher) critical color (and threshold).
-          
+
 - Added info to disk meter problem documentation (see source):
   on my system, it showed only the half of the correct values, factor
   for SW-RAID5 md devices seems to be 2048 (md0), while standard ext2fs
   factor is 1024 on my system, too (hda).
 
   So there is a problem. Solution ???
-  
+
 - Fixed bitmeter to calculate graphics coordinates like fieldmeter
 
 - MemMeter showed strange values when starting vmware (and having memstat
   module loaded): "used" memory got negative !! Looking at the values, I had
   the impression that "shared" memory is also counted as cache memory.
   I hopefully fixed that by subtracting shared from cache - looks better now.
-  
+
 Changes since xosview-1.7.0
   Optimised scrolling graph to use XCopyArea.
   Fixes to linux diskmeter.
-  Fixed all (I hope) linux code which parsed /proc/stat with too 
+  Fixed all (I hope) linux code which parsed /proc/stat with too
     small a buffer.
-  
+
 Changes since xosview-1.6.2
   Added a linux diskmeter which *should* be similar to the BSD version
-    but which also differentiates between reading and writing. Linux 
-    looks like it actually has more stats (per disk input/output) so 
+    but which also differentiates between reading and writing. Linux
+    looks like it actually has more stats (per disk input/output) so
     this could be expanded upon.
   Better *BSD support:  OpenBSD intmeter, FreeBSD diskmeter,
     NetBSD battery meter.
@@ -103,7 +105,7 @@ Changes since xosview-1.5.1, in no particular order:
 
   Finally found the missing 'else' that was causing the net meter
     in particular to occasionally overwrite the label.
-  
+
   Found 32-bit-wrap case that was also causing the netmeter grief.
 
   Bitmeter class drawing routine tweaked, usedLabel color changed
@@ -111,7 +113,7 @@ Changes since xosview-1.5.1, in no particular order:
 
 Changes since xosview-1.5.0, in no particular order:
 
-  On Linux the cpu meters will now show a seperate meter per cpu if 
+  On Linux the cpu meters will now show a seperate meter per cpu if
     Jerome Forissier's kernel patch has been applied.
 
   Linux should now work out of the box with GNU libc (untested).

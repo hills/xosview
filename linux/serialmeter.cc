@@ -1,4 +1,4 @@
-//  
+//
 //  Copyright (c) 1994, 1995 by Mike Romberg ( romberg@fsl.noaa.gov )
 //
 //  This file may be distributed under terms of the GPL
@@ -9,7 +9,7 @@
 
 //
 //  In order to use this new serial meter, xosview needs to be suid root.
-//  
+//
 #include "serialmeter.h"
 #include "xosview.h"
 #include <fcntl.h>
@@ -17,6 +17,7 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <strstream.h>
+#include <iomanip.h>
 
 // This should go away after types.h gets fixed in the kernel.
 #ifdef __alpha__
@@ -92,9 +93,9 @@ const char *SerialMeter::getTitle(Device dev) const {
 }
 
 const char *SerialMeter::getResourceName(Device dev){
-  static const char *names[] = { "serial0", "serial1", 
+  static const char *names[] = { "serial0", "serial1",
                                  "serial2", "serial3",
-                                 "serial4", "serial5", 
+                                 "serial4", "serial5",
                                  "serial6", "serial7",
                                  "serial8", "serial9" };
 

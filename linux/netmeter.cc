@@ -1,5 +1,5 @@
-//  
-//  Copyright (c) 1994, 1995 by Mike Romberg ( romberg@fsl.noaa.gov )
+//
+//  Copyright (c) 1994, 1995, 2002 by Mike Romberg ( romberg@fsl.noaa.gov )
 //
 //  Modifications to support dynamic addresses by:
 //    Michael N. Lipp (mnl@dtro.e-technik.th-darmstadt.de)
@@ -16,7 +16,7 @@
 // accounting needs to be set up.  Here are a couple of lines from my
 // rc.local which add ip accounting on all packets to and from my ip
 // address (192.168.0.3):
-// 
+//
 // /sbin/ipfw add accounting all iface 192.168.0.3 from 192.168.0.3 to 0/0
 // /sbin/ipfw add accounting all iface 192.168.0.3 from 0/0 to 192.168.0.3
 //
@@ -41,6 +41,8 @@
 #endif
 #include <netinet/in.h>
 #include <errno.h>
+#include <iostream.h>
+#include <iomanip.h>
 
 NetMeter::NetMeter( XOSView *parent, float max )
   : FieldMeterGraph( parent, 3, "NET", "IN/OUT/IDLE" ){
@@ -64,26 +66,26 @@ void NetMeter::checkOSVersion(void)
         cerr <<"Can not open file : " << "/proc/sys/kernel/osrelease" <<endl;
         exit(1);
         }
-    
+
     int major, minor;
     _bytesInDev = 0;
     ifs >> major;
     ifs.ignore(1);
     ifs >> minor;
     ifs.ignore(1);
-    
+
     if (major > 2 || (major == 2 && minor >= 1))
         {
 	// check presence of iacct and oacct chains
         ifstream chains("/proc/net/ip_fwchains");
 	int n = 0;
 	char buf[1024];
-        
+
         while (chains && !chains.eof())
             {
             chains >> buf;
             chains.ignore(1024, '\n');
-            
+
             if (!strncmp(buf, "iacct", 5))
                 n |= 1;
             if (!strncmp(buf, "oacct", 5))
@@ -145,7 +147,7 @@ void NetMeter::checkeventNew(void)
     unsigned long in, out, ig;
     unsigned long totin = 0, totout = 0;
     char buf[1024];
-    
+
     fields_[2] = maxpackets_;     // assume no
     fields_[0] = fields_[1] = 0;  // network activity
 
@@ -156,9 +158,9 @@ void NetMeter::checkeventNew(void)
         {
 	ifs >> buf;
 
-	if (!strncmp(buf, "iacct", 5)) 
+	if (!strncmp(buf, "iacct", 5))
 	  ifs >> buf >> buf >> ig >> ig >> ig >> ig >> ig >> ig >> totin;
-	else if (!strncmp(buf, "oacct", 5)) 
+	else if (!strncmp(buf, "oacct", 5))
 	  ifs >> buf >> buf >> ig >> ig >> ig >> ig >> ig >> ig >> totout;
 
 	ifs.ignore(1024, '\n');
@@ -207,7 +209,7 @@ void NetMeter::checkeventOld(void)
     _timer.stop();
     fields_[2] = maxpackets_;     // assume no
     fields_[0] = fields_[1] = 0;  // network activity
-    
+
     ifstream ifs(_netfilename);
     if (!ifs)
         {
@@ -220,7 +222,7 @@ void NetMeter::checkeventOld(void)
     char buff[1024];
     ifc.ifc_len = sizeof(buff);
     ifc.ifc_buf = buff;
-    if (ioctl(_ipsock, SIOCGIFCONF, &ifc) < 0) 
+    if (ioctl(_ipsock, SIOCGIFCONF, &ifc) < 0)
         {
         cerr <<"Can not get interface list : " <<strerror( errno ) <<endl;
         parent_->done(1);
@@ -230,9 +232,9 @@ void NetMeter::checkeventOld(void)
     char c;
     unsigned long sa, da, sm, dm, bytes;
     unsigned long tot_in = 0, tot_out = 0;
-    
+
     ifs.ignore(1024, '\n');
-    
+
     while (!ifs.eof())
         {
         ifs >> hex >> sa >> c >> sm >> c >> c >> da >> c >> dm;
@@ -246,16 +248,16 @@ void NetMeter::checkeventOld(void)
             {
             struct ifreq *ifr = ifc.ifc_req;
             for (int i = ifc.ifc_len / sizeof(struct ifreq);
-                 --i >= 0; ifr++) 
+                 --i >= 0; ifr++)
                 {
                 unsigned long adr = ntohl(
                   ((struct sockaddr_in *)&ifr->ifr_addr)->sin_addr.s_addr);
-                if (sm == 0 && da == adr) 
+                if (sm == 0 && da == adr)
                     {
                     tot_in += bytes;
                     break;
                     }
-                if (dm == 0 && sa == adr) 
+                if (dm == 0 && sa == adr)
                     {
                     tot_out += bytes;
                     break;
@@ -271,8 +273,8 @@ void NetMeter::checkeventOld(void)
         _lastBytesIn = tot_in;
         _lastBytesOut = tot_out;
         }
-    else 
-        {  
+    else
+        {
         float t = 1000000.0 / _timer.report_usecs();
 
         if (t < 0)  // can happen when system clock is reset. (ntp, timed, etc)
@@ -298,10 +300,9 @@ void NetMeter::adjust(void)
 
     if (total_ > maxpackets_)
         fields_[2] = 0;
-    else 
+    else
         {
         total_ = maxpackets_;
         fields_[2] = total_ - fields_[0] - fields_[1];
         }
     }
-
