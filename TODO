@@ -42,4 +42,10 @@ Revision: $Id$
   Change the names on all NetBSD* functions to just be BSD*,
     since they are shared across multiple *BSD ports.
 
-  Merge in NetBSD interrupt support.
+* Merge in NetBSD interrupt support.
+
+  Add auto-detect for number of interrupts for NetBSD.
+
+  Add in support and auto-detect for new NetBSD UVM stuff.
+
+  Merge in Tom's Xt stuff.
