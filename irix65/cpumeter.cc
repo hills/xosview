@@ -1,4 +1,4 @@
-//  
+//
 // $Id$
 //  Initial port performed by Stefan Eilemann (eile@sgi.com)
 //
@@ -63,10 +63,10 @@ void CPUMeter::getcputime(void)
 
     tsp.cpu[CPU_WAIT] -= (tsp.wait[W_GFXF] + tsp.wait[W_GFXC]);
 
-    cputime_[cpuindex_][0] = tsp.cpu[CPU_USER];  
+    cputime_[cpuindex_][0] = tsp.cpu[CPU_USER];
     cputime_[cpuindex_][1] = tsp.cpu[CPU_KERNEL];
-    cputime_[cpuindex_][2] = tsp.cpu[CPU_INTR];  
-    cputime_[cpuindex_][3] = tsp.cpu[CPU_WAIT];  
+    cputime_[cpuindex_][2] = tsp.cpu[CPU_INTR];
+    cputime_[cpuindex_][3] = tsp.cpu[CPU_WAIT];
     cputime_[cpuindex_][4] = tsp.cpu[CPU_IDLE] + tsp.cpu[CPU_SXBRK];
 
     int oldindex = (cpuindex_ + 1) % 2;
@@ -78,7 +78,7 @@ void CPUMeter::getcputime(void)
 
     if (total_)
         setUsed(total_ - fields_[3] - fields_[4], total_); // wait doesn't count
-    // as used 
+    // as used
 }
 
 const char *CPUMeter::toUpper(const char *str)
@@ -97,23 +97,23 @@ const char *CPUMeter::cpuStr(int num)
 
     if( CPUMeter::countCPUs()==1 || num==-1 )
     {
-        sprintf(buffer, "CPU");
+        snprintf(buffer, 32, "CPU");
     }
     else if( CPUMeter::countCPUs()<=10 )
     {
-        sprintf(buffer, "#%d", num);
+        snprintf(buffer, 32, "#%d", num);
     }
     else if ( CPUMeter::countCPUs()<=100 )
     {
-        sprintf(buffer, "#%02d", num);
+        snprintf(buffer, 32, "#%02d", num);
     }
     else if ( CPUMeter::countCPUs()<=1000 )
     {
-        sprintf(buffer, "#%03d", num);
+        snprintf(buffer, 32, "#%03d", num);
     }
     else
     {
-        sprintf(buffer, "%4.1d", num);
+        snprintf(buffer, 32, "%4.1d", num);
     }
     return buffer;
 }
