@@ -29,9 +29,10 @@
 #include <sys/disk.h>		/*  For disk statistics.  */
 #endif
 
-#ifndef XOSVIEW_FREEBSD
 #include <sys/socket.h>         /*  These two are needed for the  */
 #include <net/if.h>             /*    NetMeter helper functions.  */
+#if defined(XOSVIEW_FREEBSD) && (__FreeBSD_version >= 300000)
+#include <net/if_var.h>
 #endif
 #include <sys/vmmeter.h>	/*  For struct vmmeter.  */
 #ifdef HAVE_SWAPCTL
@@ -57,12 +58,24 @@ static struct nlist nlst[] =
 #define IFNET_SYM_INDEX 1
 { "_cnt" },
 #define VMMETER_SYM_INDEX	2
+
 #ifndef XOSVIEW_FREEBSD	/*  FreeBSD doesn't have a diskmeter yet.  */
+
 { "_disklist" },
 #define DISKLIST_SYM_INDEX	3
-#endif
+
+#else                   // but FreeBSD has unified buffer cache...
+
+{ "_bufspace" },
+#define BUFSPACE_SYM_INDEX      3
+{ "_dk_ndrive" },
+#define DK_NDRIVE_SYM_INDEX     4
+{ "_dk_wds" },
+#define DK_WDS_SYM_INDEX        5
+
+#endif /* XOSVIEW_FREEBSD */
   {NULL}
-  };
+};
 
 static char kernelFileName[_POSIX2_LINE_MAX];
 
@@ -132,7 +145,12 @@ OpenKDIfNeeded()
 			    NULL, NULL, O_RDONLY, unusederrorstring))
       == NULL)
 	  err (-1, "OpenKDIfNeeded():kvm-open()");
-    /*  Now grab the symbol offsets for the symbols that we want.  */
+  // Parenthetical note:  FreeBSD kvm_openfiles() uses getbootfile() to get
+  // the correct kernel file if the 1st arg is NULL.  As far as I can see,
+  // one should always use NULL in FreeBSD, but I suppose control is never a
+  // bad thing... (pavel 21-Jan-1998)
+
+  /*  Now grab the symbol offsets for the symbols that we want.  */
   kvm_nlist (kd, nlst);
 
   //  Look at all of the returned symbols, and check for bad lookups.
@@ -156,6 +174,16 @@ NetBSDGetPageStats(struct vmmeter* vmp) {
   if (!vmp) errx(-1, "NetBSDGetPageStats():  passed pointer was null!\n");
   safe_kvm_read_symbol(VMMETER_SYM_INDEX, vmp, sizeof(struct vmmeter));
 }
+
+#ifdef XOSVIEW_FREEBSD
+// This function returns the num bytes devoted to buffer cache
+void
+FreeBSDGetBufspace(int* bfsp)
+{
+    if (! bfsp) errx (-1, "FreeBSDGetBufspace(): passed null ptr argument\n");
+    safe_kvm_read_symbol (BUFSPACE_SYM_INDEX, bfsp, sizeof(int));
+}
+#endif
 
 // ------------------------  CPUMeter functions  ------------------
 
@@ -185,13 +213,6 @@ NetBSDNetInit()
 void
 NetBSDGetNetInOut (long long * inbytes, long long * outbytes)
 {
-#ifdef XOSVIEW_FREEBSD
-  /*  This is a temporary hack, to just have a meter that
-   *  updates.  It is not enabled in FreeBSD version of MeterMaker.cc  */
-  static int i = 0;
-  i+= 1000;
-  *inbytes = *outbytes = i;
-#else
   struct ifnet * ifnetp;
   struct ifnet ifnet;
   //char ifname[256];
@@ -216,9 +237,16 @@ NetBSDGetNetInOut (long long * inbytes, long long * outbytes)
     *outbytes += ifnet.if_obytes;
 
     //  Linked-list step taken from if.c in netstat source, line 120.
-    ifnetp = (struct ifnet*) ifnet.if_list.tqe_next;
-  }
+#ifdef XOSVIEW_FREEBSD
+#if (__FreeBSD_version >= 300000) 
+    ifnetp = (struct ifnet*) ifnet.if_link.tqe_next; 
+#else 
+    ifnetp = (struct ifnet*) ifnet.if_next;
 #endif
+#else /* XOSVIEW_NETBSD */
+    ifnetp = (struct ifnet*) ifnet.if_list.tqe_next;
+#endif
+  }
 }
 
 
@@ -279,10 +307,10 @@ NetBSDGetSwapCtlInfo(int *total, int *free)
 /*  ---------------------- Disk Meter stuff  -----------------  */
 int
 NetBSDDiskInit() {
-#ifdef XOSVIEW_FREEBSD	/*  Broken for FreeBSD  */
-  return 0;
-#else
   OpenKDIfNeeded(); 
+#ifdef XOSVIEW_FREEBSD
+  return ValidSymbol(DK_NDRIVE_SYM_INDEX);
+#else
   return ValidSymbol(DISKLIST_SYM_INDEX);
 #endif
 }
@@ -291,12 +319,19 @@ void
 NetBSDGetDiskXFerBytes (unsigned long long *bytesXferred)
 {
 #ifdef XOSVIEW_FREEBSD
-  /*  This also does not work in FreeBSD-land, so I just added a
-   *  dummy stat function that keeps incrementing.  Meter is disabled in
-   *  FreeBSD MeterMaker.cc.  */
-  static int i = 0;
-i+= 1000;
-*bytesXferred = i;
+  /* FreeBSD still has the old-style disk statistics in global arrays
+     indexed by the disk number (defs are in <sys/dkstat.h> */
+
+  long kvm_dk_wds[DK_NDRIVE];  /* # blocks of 32*16-bit words transferred */
+  int kvm_dk_ndrive;           /* number of installed drives */
+
+  safe_kvm_read_symbol (DK_NDRIVE_SYM_INDEX, &kvm_dk_ndrive, sizeof(int));
+  safe_kvm_read_symbol (DK_WDS_SYM_INDEX, &kvm_dk_wds,
+			sizeof(long)*DK_NDRIVE);
+
+  for (int i=0; i < kvm_dk_ndrive; i++)
+      *bytesXferred += kvm_dk_wds[i] * 64;
+
 #else
   /*  This function is a little tricky -- we have to iterate over a
    *  list in kernel land.  To make things simpler, data structures

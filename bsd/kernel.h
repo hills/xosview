@@ -65,4 +65,10 @@ NetBSDDiskInit();
 
 void
 NetBSDGetDiskXFerBytes (unsigned long long * bytes);
+
+#ifdef XOSVIEW_FREEBSD
+void
+FreeBSDGetBufspace(int* bfsp);
+#endif
+
 #endif
