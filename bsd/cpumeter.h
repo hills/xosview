@@ -31,7 +31,7 @@ public:
 
   void checkResources( void );
 protected:
-  float cputime_[2][5];
+  long cputime_[2][5];
   int cpuindex_;
 
   void getcputime( void );
