@@ -186,15 +186,15 @@ void XOSView::checkOverallResources() {
   setFont();
   
   // use captions
-  if ( !strcmp( getResource("captions"), "True" ) )
+  if ( isResourceTrue("captions") )
       caption_ = 1;
 
   // use labels
-  if ( !strncasecmp( getResource("labels"), "True", 5 ) )
+  if ( isResourceTrue("labels") )
       legend_ = 1;
 
   // use "free" labels
-  if ( !strncasecmp( getResource("usedlabels"), "True", 5 ) )
+  if ( isResourceTrue("usedlabels") )
     usedlabels_ = 1;
 }
 
