@@ -198,7 +198,7 @@ BSDInitSwapInfo()
 
 #ifdef XOSVIEW_FREEBSD
 /* Taken verbatim from /usr/src/usr.bin/systat/swap.c (pavel 24-Jan-1998) */
-void
+int
 fetchswap()
 {
 	struct rlist head;
@@ -243,6 +243,7 @@ fetchswap()
 
 		swapptr = head.rl_next;
 	}
+	return 0;
 
 }
 #else /* XOSVIEW_FREEBSD */
