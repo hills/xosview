@@ -16,8 +16,6 @@
 #include <X11/Xlib.h>
 #include <X11/Xresource.h>
 
-class ostream;
-
 class Xrm {
 public:
   Xrm(const char *className, const char *instanceName);
@@ -31,7 +29,7 @@ public:
   const char* getDisplayName (int argc, char** argv);
   void loadAndMergeResources(int& argc, char** argv, Display* display);
 
-  ostream &dump(ostream &os) const;
+  std::ostream &dump(std::ostream &os) const;
 
 private:
   XrmDatabase _db;
@@ -47,7 +45,7 @@ private:
   static bool _initialized;
 };
 
-inline ostream &operator<<(ostream &os, const Xrm &xrm){
+inline std::ostream &operator<<(std::ostream &os, const Xrm &xrm){
   return xrm.dump(os);
 }
 
