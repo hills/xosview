@@ -241,9 +241,15 @@ xosview*NFSDStatBadCallsColor: red
 xosview*NFSDStatUDPColor:       yellow
 xosview*NFSDStatTCPColor:       orange
 xosview*NFSDStatIdleColor:      aquamarine
+xosview*NFSDStatDecay:		True
+xosview*NFSDStatGraph:		False
+xosview*NFSDStatUsedFormat:	percent
 
-xosview*NFSStats:	False
-xosview*NFSStatReTransColor:	aquamarine
-xosview*NFSStatAuthRefrshColor:	seagreen
-xosview*NFSStatCallsColor:	green
-xosview*NFSStatIdleColor:	aquamarine
+xosview*NFSStats:       False
+xosview*NFSStatReTransColor:    red
+xosview*NFSStatAuthRefrshColor: yellow
+xosview*NFSStatCallsColor:      SkyBlue
+xosview*NFSStatIdleColor:       aquamarine
+xosview*NFSStatDecay:		True
+xosview*NFSStatGraph:		False
+xosview*NFSStatUsedFormat:	percent

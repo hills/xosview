@@ -65,9 +65,12 @@ void NFSDStats::checkResources( void ){
   setfieldcolor( 2, parent_->getResource( "NFSDStatTCPColor" ) );
   setfieldcolor( 3, parent_->getResource( "NFSDStatIdleColor" ) );
 
-  useGraph_ = 1;
-  dodecay_ = 1;
-  SetUsedFormat ("autoscale");
+  useGraph_ = parent_->isResourceTrue( "NFSDStatGraph" );
+  dodecay_ = parent_->isResourceTrue( "NFSDStatDecay" );
+  SetUsedFormat (parent_->getResource("NFSDStatUsedFormat"));
+  //useGraph_ = 1;
+  //dodecay_ = 1;
+  //SetUsedFormat ("autoscale");
   //SetUsedFormat ("percent");
 }
 void NFSDStats::checkevent(void)
@@ -153,10 +156,11 @@ void NFSStats::checkResources( void ){
   setfieldcolor( 2, parent_->getResource( "NFSStatCallsColor" ) );
   setfieldcolor( 3, parent_->getResource( "NFSStatIdleColor" ) );
 
-  useGraph_ = 1;
-  dodecay_ = 1;
-  SetUsedFormat ("autoscale");
-  // SetUsedFormat ("percent");
+  useGraph_ = parent_->isResourceTrue( "NFSStatGraph" );
+  dodecay_ = parent_->isResourceTrue( "NFSStatDecay" );
+  SetUsedFormat (parent_->getResource("NFSStatUsedFormat"));
+  //SetUsedFormat ("autoscale");
+  //SetUsedFormat ("percent");
 }
 
 void NFSStats::checkevent(void)

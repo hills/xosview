@@ -43,14 +43,15 @@ void MeterMaker::makeMeters(void)
   if (_xos->isResourceTrue("mem"))
     push(new MemMeter(_xos, kc));
 
+  if (_xos->isResourceTrue("disk"))
+    push(new DiskMeter(_xos, kc, atof(_xos->getResource("diskBandwidth"))));
+
   if (_xos->isResourceTrue("swap"))
     push(new SwapMeter(_xos, kc));
 
   if (_xos->isResourceTrue("page"))
     push(new PageMeter(_xos, kc,
 		       atof(_xos->getResource("pageBandwidth"))));
-  if (_xos->isResourceTrue("disk"))
-    push(new DiskMeter(_xos, kc, atof(_xos->getResource("diskBandwidth"))));
 
   if (_xos->isResourceTrue("net"))
     push(new NetMeter(_xos, kc, atof(_xos->getResource("netBandwidth"))));

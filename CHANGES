@@ -1,5 +1,10 @@
   /*  $Id$  */
 
+Changes since xosview-1.8.2
+ - NFSDStats ans NFSStats Graph, Decay and UsedMode are now configurable
+
+ - SunOS updates, compiles now cleanly with gcc 3.3.2
+
 Changes since xosview-1.8.1
  - Applied sourceforge patch 927112 from Russell Reed which fixes
    the swapmeter when USESYSCALLS is defined.

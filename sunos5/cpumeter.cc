@@ -91,13 +91,16 @@ const char *CPUMeter::toUpper(const char *str)
 
 const char *CPUMeter::cpuStr(int num)
 {
-	static char buffer[32];
-	ostrstream str(buffer, 32);
+        static char buffer[32];
+	std::ostringstream str;
 
-	str << "cpu";
-	if (num != 0)
-		str << (num - 1);
-	str << ends;
+	        str << "cpu";
+	        if (num != 0)
+	                  str << (num - 1);
+	str << std::ends;
+
+	        strncpy(buffer, str.str().c_str(), 32);
+	        buffer[31] = '\0';
 
 	return buffer;
 }

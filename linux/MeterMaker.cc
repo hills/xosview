@@ -44,6 +44,15 @@ void MeterMaker::makeMeters(void){
   }
   if (_xos->isResourceTrue("mem"))
     push(new MemMeter(_xos));
+  if (_xos->isResourceTrue("disk"))
+      push(new DiskMeter(_xos, atof(_xos->getResource("diskBandwidth"))));
+  // check for the RAID meter
+  if (_xos->isResourceTrue("RAID")){
+    int RAIDCount = atoi(_xos->getResource("RAIDdevicecount"));
+    for (int i = 0 ; i < RAIDCount ; i++)
+      push(new RAIDMeter(_xos, i));
+  }
+
   if (_xos->isResourceTrue("swap"))
     push(new SwapMeter(_xos));
 
@@ -54,8 +63,14 @@ void MeterMaker::makeMeters(void){
   if (_xos->isResourceTrue("net"))
     push(new NetMeter(_xos, atof(_xos->getResource("netBandwidth"))));
 
-  if (_xos->isResourceTrue("disk"))
-      push(new DiskMeter(_xos, atof(_xos->getResource("diskBandwidth"))));
+  // check for the NFS mesters
+  if (_xos->isResourceTrue("NFSDStats")){
+      push(new NFSDStats(_xos));
+  }
+  if (_xos->isResourceTrue("NFSStats")){
+      push(new NFSStats(_xos));
+  }
+
 
   // check for the serial meters.
 #if defined (__arm__) || defined(__mc68000__) || defined(__powerpc__) || defined(__sparc__) || defined(__s390__) || defined(__s390x__)
@@ -79,13 +94,6 @@ void MeterMaker::makeMeters(void){
   if (_xos->isResourceTrue("battery"))
     push(new BtryMeter(_xos));
 
-  // check for the RAID meter
-  if (_xos->isResourceTrue("RAID")){
-    int RAIDCount = atoi(_xos->getResource("RAIDdevicecount"));
-    for (int i = 0 ; i < RAIDCount ; i++)
-      push(new RAIDMeter(_xos, i));
-  }
-
   // check for the LmsTemp meter
   if (_xos->isResourceTrue("lmstemp")){
     char caption[80];
@@ -101,12 +109,5 @@ void MeterMaker::makeMeters(void){
       const char *lab = _xos->getResourceOrUseDefault(s, "TMP");
       push(new LmsTemp(_xos, res, lab, caption));
     }
-  }
-  // check for the NFS mesters
-  if (_xos->isResourceTrue("NFSDStats")){
-      push(new NFSDStats(_xos));
-  }
-  if (_xos->isResourceTrue("NFSStats")){
-      push(new NFSStats(_xos));
   }
 }
