@@ -12,7 +12,16 @@
 CVSID("$Id$");
 
 main( int argc, char *argv[] ) {
-  XOSView xosview( argc, argv );
+  /*  Icky.  Need to check for -name option here.  */
+  char** argp = argv;
+  char* instanceName = "xosview";	// Default value.
+  while (argp && *argp)
+  {
+    if (!strcmp(*argp, "-name"))
+      instanceName = argp[1];
+    argp++;
+  }  //  instanceName will end up pointing to the last such -name option.
+  XOSView xosview( instanceName, argc, argv );
 
   xosview.run();
 }
