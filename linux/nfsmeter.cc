@@ -14,7 +14,7 @@
 #include "xosview.h"
 
 #include <unistd.h>
-#include <fstream.h>
+#include <fstream>
 #include <stdlib.h>
 #include <sys/socket.h>
 #include <sys/ioctl.h>
@@ -25,8 +25,8 @@
 #endif
 #include <netinet/in.h>
 #include <errno.h>
-#include <iostream.h>
-#include <iomanip.h>
+#include <iostream>
+#include <iomanip>
 
 #ifndef MAX
 #define MAX(_a, _b) ((_a) > (_b) ? (_a) : (_b))
@@ -35,10 +35,10 @@
 #define NFSSVCSTAT  "/proc/net/rpc/nfsd"
 #define NFSCLTSTAT  "/proc/net/rpc/nfs"
 
-NFSMeter::NFSMeter(XOSView *parent, const char *name, int nfields, 
+NFSMeter::NFSMeter(XOSView *parent, const char *name, int nfields,
 		char *fields, const char *statfile)
   : FieldMeterGraph( parent, nfields, name, fields ){
-	_statfile = statfile; 
+	_statfile = statfile;
 	_statname = name;
 }
 
@@ -77,7 +77,7 @@ void NFSDStats::checkevent(void)
 	unsigned long calls, badcalls;
 	int found;
 
-    ifstream ifs(_statfile);
+    std::ifstream ifs(_statfile);
 
     if (!ifs) {
         // cerr <<"Can not open file : " <<_statfile <<endl;
@@ -93,7 +93,7 @@ void NFSDStats::checkevent(void)
 	while (!ifs.eof() && found != 2) {
 		ifs.getline(buf, 4096, '\n');
 		if (strncmp("net", buf, strlen("net")) == 0) {
-			sscanf(buf, "%s %lu %lu %lu %lu\n", name, 
+			sscanf(buf, "%s %lu %lu %lu %lu\n", name,
 				&netcnt, &netudpcnt, &nettcpcnt, &nettcpconn);
 			found++;
 		}
@@ -163,8 +163,8 @@ void NFSStats::checkevent(void)
 {
 	char buf[4096], name[64];
 	unsigned long calls, retrns, authrefresh, maxpackets_;
-	
-    ifstream ifs(_statfile);
+
+    std::ifstream ifs(_statfile);
 
     if (!ifs) {
         // cerr <<"Can not open file : " <<_statfile <<endl;
