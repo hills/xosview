@@ -75,6 +75,7 @@ dnl Netbsd needs to link with libkvm
 dnl
         EXTRALIBS=-lkvm
         INSTALL_ARGS='-s -g kmem -m 02555'
+	AC_DEFINE(XOSVIEW_NETBSD)
 ])
 
 
