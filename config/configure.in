@@ -58,6 +58,7 @@ dnl options / configuration.
 dnl
 case $host_os in
 linux*)   AC_XOSV_LINUX  
+	  host_dir=linux
           host_os=linux ;;
 ##  Check for known versions of NetBSD...
 dnl  Notice that we need to use [] to 'quote' the brackets --
@@ -96,6 +97,7 @@ EOF
   the autoconf script did not work properly.
   ])
   fi
+  host_dir=bsd
 
 ;;
 ##  Also check for versions that have not been tested.
@@ -115,17 +117,22 @@ to autoconf!
   Thanks!
 *******************************************
 ]); AC_XOSV_NETBSD 
+    host_dir=bsd
+    echo host_dir is $host_dir
     host_os=netbsd ;;
 
 freebsd*) AC_XOSV_FREEBSD
 	dnl AC_MSG_WARN([
 	dnl ])
+	host_dir=bsd
 	host_os=freebsd ;;
 openbsd*) AC_XOSV_OPENBSD
 	dnl AC_MSG_WARN([
 	dnl ])
+	host_dir=bsd
 	host_os=openbsd ;;
 hpux*)    AC_XOSV_HPUX   
+	  host_dir=hpux
           host_os=hpux ;;
 *)       AC_MSG_ERROR([xosview has not been ported to $host_os :(.  Sorry.]) ;;
 esac
@@ -167,9 +174,10 @@ then
 fi
 
 
+AC_SUBST(host_dir)
 AC_OUTPUT(\
   Makefile:config/Makefile.top.in \
-  $host_os/Makefile:config/Makefile.$host_os.in \
+  $host_dir/Makefile:config/Makefile.$host_dir.in \
   Makefile.config:config/Makefile.config.in \
   Makefile.GNU.autodep:config/Makefile.GNU.autodep.in \
   $EXTRA_OUT_FILES)

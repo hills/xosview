@@ -32,15 +32,11 @@ defaultstring.cc: Xdefaults defresources.awk
 	@AWK@ -f defresources.awk Xdefaults > defaultstring.cc
 
 meterlib:
-	@if [ @host_os@ = freebsd ]; then \
-	  echo "Creating symlinks in freebsd dir to netbsd dir..."; \
-	  cd @top_srcdir@/@host_os@ && $(MAKE) makelinks; \
-	fi
-	cd @top_srcdir@/@host_os@ && $(MAKE)
+	cd @top_srcdir@/@host_dir@ && $(MAKE)
 
-@top_srcdir@/@host_os@/libmeter.a: meterlib
+@top_srcdir@/@host_dir@/libmeter.a: meterlib
 
-xosview: $(OBJS) @top_srcdir@/@host_os@/libmeter.a
+xosview: $(OBJS) @top_srcdir@/@host_dir@/libmeter.a
 	$(CXX) $(LFLAGS) -o xosview $(OBJS) $(LIBS)
 
 ##  If for some reason (such as permissions) you wish to change where
@@ -93,7 +89,7 @@ distrib-and-copy: distrib
 	scp ../`basename $(PWD)`.tar.gz omni:~bgrayson/public_html/xosview
 
 clean :
-	cd @host_os@ && $(MAKE) clean
+	cd @host_dir@ && $(MAKE) clean
 	@#  Only clean the config directory if it exists...
 	sh -c 'if [ -d config ]; then \
 	    cd config && $(MAKE) clean; fi'
@@ -101,7 +97,7 @@ clean :
 
 distclean: clean
 	rm -f Makefile Makefile.config Makefile.GNU.autodep \
-           @host_os@/Makefile config.cache config.log config.status
+           @host_dir@/Makefile config.cache config.log config.status
 
 maintainer-clean: distclean
 	rm -f configure
