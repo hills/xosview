@@ -121,12 +121,12 @@ to me at bgrayson@ece.utexas.edu.
       user-level system calls, and the optional-but-recommended /kern and
       /proc filesystems?
 
-      Information such as the amount of swap space that is being used, or
-	the breakdown of CPU usage, is not yet available (or not
-	available in the kind of detail xosview desires/requires) through
-	any system calls, sysctl, /kern, or /proc (at least not that I
-	know!  If not, let me know.)  Thus, xosview occasionally needs to
-	munge through the kernel's data structures to get its information.
+      Information such as the breakdown of CPU usage is not yet
+	available (or not available in the kind of detail xosview
+	desires/requires) through any system calls, sysctl,
+	/kern, or /proc (at least not that I know!  If not, let
+	me know.)  Thus, xosview occasionally needs to munge
+	through the kernel's data structures to get its information.
 
     2.  Why does the cpumeter show user, nice, system, and idle/free, but
       not show interrupts?
@@ -140,4 +140,39 @@ to me at bgrayson@ece.utexas.edu.
 	they are not.
       If anyone knows of an easy patch to the kernel source (ha ha) that
 	would make the interrupt field in _cp_time be correct, let me know.
+
+    3.  The swap meter doesn't seem to be working.
+
+      When NetBSD went from 1.2F to 1.2G, the swap system was
+	revamped.  This means two things:  the old xosview method of
+	looking at kernel data structures no longer works, because
+	the symbols have changed too much, and a new handy function
+	swapctl() was added to make such munging unnecessary.
+
+      This is all good.  However, in order to be backwards
+	compatible, xosview still needs to know how to do its
+	munging.  This way, an xosview compiled on a 1.2G or later
+	system will still get correct swap values on pre-1.2G
+	systems.  In addition, new xosview's compiled on 1.2F or
+	earlier systems have no way of adding support for a
+	syscall that they don't even know about.  I probably
+	could have hacked up something, but it would have been
+	ugly, so if xosview compiled on a pre-1.2G system is run
+	on a system that it suspects may be 1.2G or later, it
+	prints a helpful message saying a recompilation is
+	needed.
+
+      Doing the coding to do the above took me a little while,
+	and occurred at a busy time for me, so unfortunately it
+	took me two weeks to get the final version ready.  Sorry!
+
+      So, if swap isn't working, either:
+        a)  You aren't using /netbsd as the kernel, and forgot to
+	  use the -N option.
+	b)  You compiled xosview on a pre-1.2G system and are now
+	  running it on a 1.2G or later system.  In this case, you
+	  should get a helpful message, if you are running
+	  1.4.3beta or later, or no useful message if you are
+	  running 1.4.3alpha or earlier.
+	c)  Anything else is a bug, I think.
 
