@@ -24,7 +24,7 @@ CVSID("$Id$");
 CVSID_DOT_H(CPUMETER_H_CVSID);
 
 CPUMeter::CPUMeter( XOSView *parent )
-#ifdef XOSVIEW_FREEBSD
+#if defined(XOSVIEW_FREEBSD) || defined(XOSVIEW_BSDI)
 : FieldMeterGraph( parent, 5, "CPU", "USR/NICE/SYS/INT/FREE" ){
 #define FREE_INDEX 4
 #else
@@ -50,7 +50,7 @@ void CPUMeter::checkResources( void ){
   setfieldcolor( 0, parent_->getResource("cpuUserColor") );
   setfieldcolor( 1, parent_->getResource("cpuNiceColor") );
   setfieldcolor( 2, parent_->getResource("cpuSystemColor") );
-#ifdef XOSVIEW_FREEBSD
+#if defined(XOSVIEW_FREEBSD) || defined(XOSVIEW_BSDI)
   setfieldcolor( 3, parent_->getResource("cpuInterruptColor") );
   setfieldcolor( 4, parent_->getResource("cpuFreeColor") );
 #else
@@ -78,7 +78,7 @@ void CPUMeter::getcputime( void ){
 
   cputime_[cpuindex_][0] = tempCPU[0];
   cputime_[cpuindex_][1] = tempCPU[1];
-#ifdef XOSVIEW_FREEBSD
+#if defined(XOSVIEW_FREEBSD) || defined(XOSVIEW_BSDI)
   // FreeBSD seems at least to be filling cp_time[CP_INTR].  So, we add that
   // as another field. (pavel 25-Jan-1998)
   cputime_[cpuindex_][2] = tempCPU[2];
