@@ -26,10 +26,11 @@ public:
   void dolegends( int val ) { dolegends_ = val; }
   void dousedlegends( int val ) { dousedlegends_ = val; }
   void reset( void );
-  void setUsed (float val) { used_ = val; }
+    /*  These next two are deprecated -- use setUsed instead.  bgrayson  */
   void used( int val ) { print_ = PERCENT; used_ = val; }
   void absolute( float val ) { print_ = FLOAT; used_ = val; }
-  void absoluteK( float val ) { print_ = KBYTES; used_ = val; }
+
+  void setUsed (float val, float total);
   void draw( void );
   void checkevent( void );
   void disableMeter ( void );
@@ -37,7 +38,7 @@ public:
   virtual void checkResources( void );
 
 protected:
-  enum UsedType { FLOAT, PERCENT, KBYTES };
+  enum UsedType { INVALID_0, FLOAT, PERCENT, AUTOSCALE, INVALID_TAIL };
 
   int numfields_;
   float *fields_, total_, used_, lastused_;
