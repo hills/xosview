@@ -8,18 +8,11 @@
 #include "memmeter.h"
 #include "xosview.h"
 #include <fstream.h>
+#include <strstream.h>
 #include <stdlib.h>
-
-// DISABLED (see MemMeter::getmemstat())
-#ifdef USESYSCALLS_DISABLED
-#include <syscall.h>
-#include <linux/kernel.h>
-#endif
-
 
 static const char MEMFILENAME[] = "/proc/meminfo";
 static const char MEMSTATFNAME[] = "/proc/memstat";
-
 
 MemMeter::MemMeter( XOSView *parent )
 : FieldMeterDecay( parent, 4, "MEM", "USED+SHAR/BUFF/CACHE/FREE" ){
@@ -76,47 +69,50 @@ void MemMeter::getmeminfo( void ){
 }
 
 void MemMeter::getmemstat(MemStat *mstat){
-  // This has been disabled because cached ram is not in
-  // struct sysinfo so we will have to read meminfo anyway.
-#ifdef USESYSCALLS_DISABLED
-
-  struct sysinfo sinfo;
-
-  syscall( SYS_sysinfo, &sinfo );
-
-  mstat->total = sinfo.totalram;
-  mstat.free = sinfo.freeram;
-  mstat.shared = sinfo.sharedram;
-  mstat.buff = sinfo.bufferram;
-
-#else
-
-  ifstream meminfo( MEMFILENAME );
-  if ( !meminfo ){
-    cerr <<"Can not open file : " <<MEMFILENAME <<endl;
-    exit( 1 );
+  ifstream meminfo(MEMFILENAME);
+  if (!meminfo){
+    cerr << "Can not open file : " << MEMFILENAME << endl;
+    exit(1);
   }
+ 
+  bzero(mstat, sizeof(MemStat));
 
   char buf[256];
-  meminfo.getline( buf, 256 );
+  char ignore[256];
 
-  meminfo >>buf >>mstat->total >>mstat->used >>mstat->free
-          >>mstat->shared >>mstat->buff >>mstat->cache;
+  // Get the info from the "standard" meminfo file.
+  while (!meminfo.eof()){
+    meminfo.getline(buf, 256);
+    istrstream line(buf, 256);
 
-#endif
+    if(!strncmp("MemTotal", buf, strlen("MemTotal")))
+      line >> ignore >> mstat->total;
 
+    if(!strncmp("MemFree", buf, strlen("MemFree")))
+      line >> ignore >> mstat->free;
+
+    if(!strncmp("Buffers", buf, strlen("Buffers")))
+      line >> ignore >> mstat->buff;
+
+    if(!strncmp("Cached", buf, strlen("Cached")))
+      line >> ignore >> mstat->cache;
+  }
+
+  // If the xosview memstat module is here then we
+  // can look for shared memory stats.
   if (_shAdj == 0){
     ifstream memstat(MEMSTATFNAME);
     if ( !memstat ){
       cerr <<"Can not open file : " <<MEMSTATFNAME <<endl;
       exit( 1 );
     }
-
+    
     while (!memstat.eof()){
-      memstat >> buf >> mstat->shared;
-      mstat->shared *= 1024;
-      if (memstat.eof() || !strcmp("Shared:", buf))
-        break;
+      memstat.getline(buf, 256);
+      istrstream line(buf, 256);
+    
+      if(!strncmp("Shared", buf, strlen("Shared")))
+        line >> ignore >> mstat->shared;
     }
   }
 }
