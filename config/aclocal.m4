@@ -181,6 +181,8 @@ dnl  The BSD versions need to link with libkvm, and have the BSD install flags.
 ])
 
 AC_DEFUN(AC_XOSV_NETBSD, [
+dnl  Remember the full version in host_os_full
+	host_os_full=$host_os
 dnl  We need to strip the version numbers off the $host_os string (netbsd1.1)
 dnl  Let's just be lazy -- set host_os to be netbsd.  
 	host_os=netbsd

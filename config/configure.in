@@ -102,6 +102,12 @@ dnl    quote characters.
 dnl  This check is ugly.  Maybe it should be hidden away in aclocal?
 dnl    bgrayson 9/96
 netbsd1.[[012345]]*)  AC_XOSV_NETBSD
+  ## Check if the network interface supports 64-bit counters.  This
+  ## support was committed around 11/19/1999, for 1.4P.
+  if test $host_os_full '>' netbsd1.4O ; then
+    AC_DEFINE(NETBSD_64BIT_IFACE_CTRS)
+  fi
+
   ## Also check for the existence of UVM.  This is a nasty,
   ## complicated check.  This could be avoided by having the *BSD
   ## platform-specific Makefiles include <bsd.own.mk> on their own.
@@ -110,9 +116,11 @@ netbsd1.[[012345]]*)  AC_XOSV_NETBSD
 all:
 .if defined(UVM)
 	@echo UVMyes
+.else
+	#
 .endif
 EOF
-  uvmstring=`make -f confmkfile`
+  uvmstring=`make -f confmkfile 2>/dev/null`
   rm confmkfile
   if test x$uvmstring != x ; then
     AC_DEFINE(UVM)
@@ -127,7 +135,7 @@ EOF
     dnl  Before choosing non-UVM, check for some uvm-only symbols
     dnl  in the currently-running kernel.
     AC_MSG_WARN(['UVM=' not found in /etc/mk.conf.  Checking /netbsd for uvm symbols...])
-    if test x`nm /netbsd | grep uvm_sysctl` != x ; then
+    if test x"`nm /netbsd | grep uvm_sysctl`" != x ; then
       AC_DEFINE(UVM)
       AC_MSG_WARN([*Enabling* UVM -- 'uvm_sysctl' symbol found in /netbsd.
   If this is in error, remove the define of UVM=1 from CXXFLAGS
