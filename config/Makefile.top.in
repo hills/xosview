@@ -36,8 +36,9 @@ meterlib:
 
 @top_srcdir@/@host_dir@/libmeter.a: meterlib
 
+##  Also use LDFLAGS, which is inherited from the system.
 xosview: $(OBJS) @top_srcdir@/@host_dir@/libmeter.a
-	$(CXX) $(LFLAGS) -o xosview $(OBJS) $(LIBS)
+	$(CXX) $(LDFLAGS) $(LFLAGS) -o xosview $(OBJS) $(LIBS)
 
 ##  If for some reason (such as permissions) you wish to change where
 ##    xosview is installed, re-run configure with
