@@ -57,11 +57,13 @@ void PageMeter::getpageinfo (void) {
 
   NetBSDGetPageStats(&vm);
 #ifdef XOSVIEW_FREEBSD
-#warning "FreeBSD hack"
-/*  I'm not completely sure these are the right statistics, but
- *  they'll work for now.  */
-  fields_[0] = vm.v_vnodein - prev_.v_vnodein;
-  fields_[1] = vm.v_vnodeout - prev_.v_vnodeout;
+  /* It depends, of course on what you want to measure.  I think, howver,
+     that you want the sum of pages paged to swap (i.e. dirty pages) and
+     pages paged to vnodes (i.e. mmap-ed files). (pavel 21-Jan-1998) */
+  fields_[0] = vm.v_vnodepgsin - prev_.v_vnodepgsin +
+      				vm.v_swappgsin - prev_.v_swappgsin;
+  fields_[1] = vm.v_vnodepgsout - prev_.v_vnodepgsout +
+      				vm.v_swappgsout - prev_.v_swappgsout;
 #else
   fields_[0] = vm.v_pgpgin - prev_.v_pgpgin;
   fields_[1] = vm.v_pgpgout - prev_.v_pgpgout;
