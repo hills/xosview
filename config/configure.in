@@ -13,6 +13,7 @@ AC_SUBST(x_includes)
 AC_SUBST(x_libraries)
 AC_PROG_INSTALL
 AC_PROG_AWK
+AC_PROG_RANLIB
 
 dnl
 dnl Add an option which will enable or disable automatic dependencies.
