@@ -183,7 +183,7 @@ void FieldMeter::drawused( int manditory ){
        *  999.5 needs to be bumped up.  */
     if (used_ >= 999.5*1000*1000)
 	{scale='G'; scaled_used = used_/1024/1024/1024;}
-    if (used_ >= 999.5*1000)
+    else if (used_ >= 999.5*1000)
 	{scale='M'; scaled_used = used_/1024/1024;}
     else if (used_ >= 999.5)
 	{scale='K'; scaled_used = used_/1024;}
