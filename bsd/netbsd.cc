@@ -33,9 +33,9 @@ kvm_t* kd = NULL;	//  This single kvm_t is shared by all
 static struct nlist nlst[] =
 {
 { "_cp_time" },
-#define CP_TIME 0
+#define CP_TIME_SYM_INDEX 0
 { "_ifnet" },
-#define IFNET 1
+#define IFNET_SYM_INDEX 1
 { "_disklist" },
 #define DISKLIST_SYM_INDEX	2
   {NULL}
@@ -138,7 +138,7 @@ NetBSDGetCPUTimes (long* timeArray)
   if (!timeArray) errx (-1, "NetBSDGetCPUTimes():  passed pointer was null!\n");
   if (CPUSTATES != 5)
     errx (-1, "Error:  xosview for NetBSD expects 5 cpu states!\n");
-  safe_kvm_read_symbol (CP_TIME, timeArray, sizeof (long) * CPUSTATES);
+  safe_kvm_read_symbol (CP_TIME_SYM_INDEX, timeArray, sizeof (long) * CPUSTATES);
 }
 
 
@@ -157,7 +157,7 @@ NetBSDGetNetInOut (long long * inbytes, long long * outbytes)
   //char ifname[256];
 
   //  The "ifnet" symbol in the kernel points to a 'struct ifnet' pointer.
-  safe_kvm_read (nlst[IFNET].n_value, &ifnetp, sizeof(ifnetp));
+  safe_kvm_read (nlst[IFNET_SYM_INDEX].n_value, &ifnetp, sizeof(ifnetp));
 
   *inbytes = 0;
   *outbytes = 0;
@@ -181,6 +181,17 @@ NetBSDGetNetInOut (long long * inbytes, long long * outbytes)
 }
 
 
+/*  ---------------------- Swap Meter stuff  -----------------  */
+int
+NetBSDSwapInit() {
+  OpenKDIfNeeded();
+  /*  Need to merge some of swapinteral.cc here, to be smart about
+   *  missing kvm symbols (due to OS version mismatch, for example).
+   *  */
+  /*return ValidSymbol(*/
+  return 1;
+}
+
 /*  ---------------------- Disk Meter stuff  -----------------  */
 int
 NetBSDDiskInit() {
@@ -203,6 +214,7 @@ NetBSDGetDiskXFerBytes (unsigned long long *bytesXferred)
   struct disk kvmcurrdisk;
   safe_kvm_read_symbol (DISKLIST_SYM_INDEX, &kvmdisklist, sizeof(kvmdisklist));
   kvmdiskptr = kvmdisklist.tqh_first;
+  *bytesXferred = 0;
   while (kvmdiskptr != NULL)
   {
     safe_kvm_read ((unsigned int)kvmdiskptr, &kvmcurrdisk, sizeof(kvmcurrdisk));
