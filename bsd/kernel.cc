@@ -412,7 +412,6 @@ NetBSDGetIntrStats (unsigned long intrCount[NUM_INTR])
     int nintr;
     nintr = (nlst[EINTRCNT_SYM_INDEX].n_value -
 	     nlst[INTRCNT_SYM_INDEX].n_value)   / sizeof(int);
-    long kvm_intrcnt[nintr];
 #  if 0
     if (nintr/sizeof(int) != NUM_INTR*2) {
       static int firsttime=1;

@@ -148,6 +148,7 @@ NetBSDInitSwapInfo()
         static int once = 0;
         u_long ptr;
 
+	(void) ptr;	//  Avoid gcc warnings.
         if (once)
                 return (1);
         if (kvm_nlist(swap_kd, syms)) {
