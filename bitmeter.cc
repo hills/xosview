@@ -65,7 +65,7 @@ void BitMeter::drawBits( int manditory ){
       else
 	parent_->setForeground( offColor_ );
 
-      parent_->drawFilledRectangle( x1, y_, x2 - x1, height_ - 1 );
+      parent_->drawFilledRectangle( x1, y_, x2 - x1, height_);
     }
     
     lastbits_[i] = bits_[i];
@@ -77,7 +77,7 @@ void BitMeter::drawBits( int manditory ){
 void BitMeter::draw( void ){
   parent_->lineWidth( 1 );
   parent_->setForeground( parent_->foreground() );
-  parent_->drawFilledRectangle( x_ -1, y_ - 1, width_ + 2, height_ + 1 );
+  parent_->drawFilledRectangle( x_ -1, y_ - 1, width_ + 2, height_ + 2 );
 
   parent_->lineWidth( 0 );
 
@@ -90,7 +90,7 @@ void BitMeter::draw( void ){
     else
       offset = parent_->textWidth( "XXXXX" );
     
-    parent_->drawString( x_ - offset, y_ + height_, title_ );
+    parent_->drawString( x_ - offset + 1, y_ + height_, title_ );
     parent_->setForeground( onColor_ );
     if(docaptions_)
       parent_->drawString( x_, y_ - 5, legend_ );

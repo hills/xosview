@@ -27,9 +27,9 @@ public:
 protected:
 
   void getloadinfo( void );
-  unsigned long procloadcol_, warnloadcol_;
+  unsigned long procloadcol_, warnloadcol_, critloadcol_;
 private:
-  int alarmThreshold;
+  int warnThreshold, critThreshold, alarmstate, lastalarmstate;
 };
 
 

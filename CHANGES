@@ -1,7 +1,47 @@
   /*  $Id$  */
 Changes since xosview-1.7.1
   BSDI support, courtesy of Tomer Klainer.
+  Fixed memstat module for linux-2.2
 
+  Changes from Thomas Waldmann (ThomasWaldmann@t-online.de)
+- Fixed cosmetical bug in xosview:
+  if you tried to make the xosview window height too small, it looked quite
+  strange (because the height value for the meters got negative)
+
+- Fixed cosmetical bug in disk meter:
+  at first call, it displayed negative values, overwriting the "DISK" label
+
+- Cosmetical fix:
+  The titles were at x=0 - directly at the window border.
+  Fixed it to show 1 pixel background between window border and title texts.
+  Also moved "used" displays 2 pixels to the right, so that there is also 1
+  pixel between the titles and the used display texts.
+
+- Cosmetical fix: Xdefaults and Xdefaults.stipple file now looks nicer.
+
+- Cosmetical fix: load meter sometimes went beyond the right border (I think
+  when showing values >>20). Changed load meter scaling to be really dynamic
+  (no upper bound for total, but total doesn't become less than 1.0).
+  Changed "used" display to show load relative to 1.0 (so it now just shows
+  the load value ;-).
+
+- New feature: load meter now has not only a warning color (and threshold),
+  but also a (higher) critical color (and threshold).
+          
+- Added info to disk meter problem documentation (see source):
+  on my system, it showed only the half of the correct values, factor
+  for SW-RAID5 md devices seems to be 2048 (md0), while standard ext2fs
+  factor is 1024 on my system, too (hda).
+
+  So there is a problem. Solution ???
+  
+- Fixed bitmeter to calculate graphics coordinates like fieldmeter
+
+- MemMeter showed strange values when starting vmware (and having memstat
+  module loaded): "used" memory got negative !! Looking at the values, I had
+  the impression that "shared" memory is also counted as cache memory.
+  I hopefully fixed that by subtracting shared from cache - looks better now.
+  
 Changes since xosview-1.7.0
   Optimised scrolling graph to use XCopyArea.
   Fixes to linux diskmeter.

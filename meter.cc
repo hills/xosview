@@ -56,8 +56,8 @@ void Meter::legend( const char *legend ){
 void Meter::resize( int x, int y, int width, int height ){
   x_ = x;
   y_ = y;
-  width_ = width;
-  height_ = height;
+  width_ = (width>=0) ? width : 0;    // fix for cosmetical bug:
+  height_ = (height>=0) ? height : 0; // beware of values < 0 !
 }
 
 

@@ -17,7 +17,8 @@ static const char LOADFILENAME[] = "/proc/loadavg";
 
 LoadMeter::LoadMeter( XOSView *parent )
   : FieldMeterGraph( parent, 2, "LOAD", "PROCS/MIN", 1, 1, 0 ){
-
+  lastalarmstate = -1;
+  total_ = 2.0;
 }
 
 LoadMeter::~LoadMeter( void ){
@@ -26,8 +27,9 @@ LoadMeter::~LoadMeter( void ){
 void LoadMeter::checkResources( void ){
   FieldMeterGraph::checkResources();
 
-  warnloadcol_ = parent_->allocColor(parent_->getResource( "loadWarnColor" ));
   procloadcol_ = parent_->allocColor(parent_->getResource( "loadProcColor" ));
+  warnloadcol_ = parent_->allocColor(parent_->getResource( "loadWarnColor" ));
+  critloadcol_ = parent_->allocColor(parent_->getResource( "loadCritColor" ));
 
   setfieldcolor( 0, procloadcol_ );
   setfieldcolor( 1, parent_->getResource( "loadIdleColor" ) );
@@ -36,7 +38,8 @@ void LoadMeter::checkResources( void ){
   dodecay_ = parent_->isResourceTrue( "loadDecay" );
   SetUsedFormat (parent_->getResource("loadUsedFormat"));
 
-  alarmThreshold = atoi (parent_->getResource("loadAlarmThreshold"));
+  warnThreshold = atoi (parent_->getResource("loadWarnThreshold"));
+  critThreshold = atoi (parent_->getResource("loadCritThreshold"));
 
 
   if (dodecay_){
@@ -55,7 +58,6 @@ void LoadMeter::checkResources( void ){
 
 void LoadMeter::checkevent( void ){
   getloadinfo();
-
   drawfields();
 }
 
@@ -69,21 +71,34 @@ void LoadMeter::getloadinfo( void ){
     return;
   }
 
-  loadinfo >>fields_[0];
+  loadinfo >> fields_[0];
 
-  if ( fields_[0] > alarmThreshold ) {
-    if (total_ == alarmThreshold ) {
-      setfieldcolor( 0, warnloadcol_ );
-      if (dolegends_) drawlegend();
-    }
-    total_ = fields_[1] = 20;
-  } else {
-    if (total_ == 20 ) {
-      setfieldcolor( 0, procloadcol_ );
-      if (dolegends_) drawlegend();
-    }
-    total_ = fields_[1] = alarmThreshold;
+  if ( fields_[0] <  warnThreshold ) alarmstate = 0;
+  else
+  if ( fields_[0] >= critThreshold ) alarmstate = 2;
+  else
+  /* if fields_[0] >= warnThreshold */ alarmstate = 1;
+  
+  if ( alarmstate != lastalarmstate ){
+    if ( alarmstate == 0 ) setfieldcolor( 0, procloadcol_ );
+    else
+    if ( alarmstate == 1 ) setfieldcolor( 0, warnloadcol_ );
+    else
+    /* if alarmstate == 2 */ setfieldcolor( 0, critloadcol_ );
+    if (dolegends_) drawlegend();
+    lastalarmstate = alarmstate;
   }
+  
+  if ( fields_[0]*5.0<total_ )
+    total_ = fields_[0];
+  else
+  if ( fields_[0]>total_ )
+    total_ = fields_[0]*5.0;
+      
+  if ( total_ < 1.0)
+    total_ = 1.0;
+    
+  fields_[1] = (float) (total_ - fields_[0]);
 
-  setUsed(fields_[0], total_);
+  setUsed(fields_[0], (float) 1.0);
 }

@@ -53,18 +53,31 @@ void MemMeter::checkResources( void ){
 
 void MemMeter::checkevent( void ){
   getmeminfo();
+  /* for debugging (see below) 
+  printf("t %4.1f used %4.1f share %4.1f buffer %4.1f cache %4.1f free %4.1f\n",
+         total_/1024.0/1024.0,
+         fields_[0]/1024.0/1024.0, fields_[1]/1024.0/1024.0,
+	 fields_[2]/1024.0/1024.0, fields_[3]/1024.0/1024.0,
+	 fields_[4]/1024.0/1024.0);
+  */
   drawfields();
 }
+
+// FIXME: /proc/memstat and /proc/meminfo don't seem to correspond
+// maybe it is time to fix this in the kernel and get real infos ...
 
 void MemMeter::getmeminfo( void ){
   getmemstat(MEMFILENAME, _MIlineInfos, _numMIlineInfos);
   if (_shAdj == 0)
     getmemstat(MEMSTATFNAME, _MSlineInfos, _numMSlineInfos);
 
-  fields_[0] = total_ - fields_[4 + _shAdj] - fields_[3 + _shAdj] 
-    - fields_[2 + _shAdj];
-  if (_shAdj == 0)
-    fields_[0] -= fields_[1];
+  if (_shAdj == 0){
+    fields_[3] -= fields_[1]; // cache size seems to contain shared size !?
+                              // without this fix "used" sometimes gets < 0 !
+    fields_[0] = total_ - fields_[4] - fields_[3] - fields_[2] - fields_[1];
+  }else{
+    fields_[0] = total_ - fields_[3] - fields_[2] - fields_[1];
+  }
 
   if (total_)
     FieldMeterDecay::setUsed (total_ - fields_[4 + _shAdj], total_);
