@@ -91,6 +91,7 @@ void BitMeter::draw( void ){
       offset = parent_->textWidth( "XXXXX" );
     
     parent_->drawString( x_ - offset, y_ + height_, title_ );
+    parent_->setForeground( onColor_ );
     parent_->drawString( x_, y_ - 5, legend_ );
   }
 
