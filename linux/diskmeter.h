@@ -23,7 +23,8 @@ class DiskMeter : public FieldMeterGraph
 
         void getdiskinfo( void );
     private:
-        unsigned long int prev_;
+        unsigned long int read_prev_;
+        unsigned long int write_prev_;
         float maxspeed_;
     };
 
