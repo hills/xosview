@@ -79,6 +79,12 @@ distrib: distclean
 	cd @top_srcdir@/..;tar cf `basename $(PWD)`.tar `basename $(PWD)`; \
         gzip -9 `basename $(PWD)`.tar
 
+#  The next one is only used by bgrayson to set up the local
+#  mirrors of the xosview distributions.
+distrib-and-copy: distrib
+	cp ../`basename $(PWD)`.tar.gz ~bgrayson/public_html/xosview
+	scp ../`basename $(PWD)`.tar.gz omni:~bgrayson/public_html/xosview
+
 clean :
 	cd @host_os@ && $(MAKE) clean
 	@#  Only clean the config directory if it exists...
