@@ -23,8 +23,8 @@ BtryMeter::~BtryMeter( void ){
 void BtryMeter::checkResources( void ){
   FieldMeter::checkResources();
 
-  setfieldcolor( 0, parent_->getResource( "batteryUsedColor" ) );
-  setfieldcolor( 1, parent_->getResource( "batteryLeftColor" ) );
+  setfieldcolor( 0, parent_->getResource( "batteryLeftColor" ) );
+  setfieldcolor( 1, parent_->getResource( "batteryUsedColor" ) );
 
   priority_ = atoi (parent_->getResource( "batteryPriority" ) );
   SetUsedFormat(parent_->getResource( "batteryUsedFormat" ) );
