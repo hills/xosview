@@ -5,6 +5,8 @@
 #ifndef _Xrmcommandline_h
 #define _Xrmcommandline_h
 
+#define XRMCOMMANDLINE_H_CVSID "$Id$"
+
 #include <X11/Xresource.h>
 
 static XrmOptionDescRec options[] = {

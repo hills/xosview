@@ -9,6 +9,8 @@
 #ifndef _FIELDMETERDECAY_H_
 #define _FIELDMETERDECAY_H_
 
+#define FIELDMETERDECAY_H_CVSID "$Id$"
+
 #include "meter.h"
 #include "fieldmeter.h"
 
