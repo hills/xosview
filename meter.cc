@@ -6,8 +6,12 @@
 //
 // $Id$
 //
+#include "general.h"
 #include "meter.h"
 #include "xosview.h"
+
+CVSID("$Id$");
+CVSID_DOT_H(METER_H_CVSID);
 
 Meter::Meter( XOSView *parent, const char *title, const char *legend, 
               int dolegends, int dousedlegends ) {
