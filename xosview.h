@@ -9,8 +9,13 @@
 #ifndef _XOSVIEW_H_
 #define _XOSVIEW_H_
 
+#define XOSVIEW_H_CVSID	"$Id$"
+
 #include "xwin.h"
 #include "Xrm.h"  //  For Xrm resource manager class.
+
+#define SAMPLE_MSECS	100	/*  Take samples every 100 millisecs,
+				    i.e., 10 times per second.  */
 
 class Meter;
 
@@ -19,6 +24,7 @@ public:
   XOSView( int argc, char *argv[] );
   ~XOSView( void );
 
+  void figureSize ( void );
   void resize( void );
   void draw( void );
   void run( void );
@@ -45,7 +51,7 @@ protected:
   
   int legend_, xoff_, yoff_, nummeters_, usedlabels_;
 
-  void usleep( unsigned long usec );
+  void usleep_via_select( unsigned long usec );
   void addmeter( Meter *fm );
   void checkMeterResources( void );
 
