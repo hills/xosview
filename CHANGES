@@ -1,4 +1,8 @@
   /*  $Id$  */
+Changes since xosview-1.5.0, in no particular order:
+
+Linux should now work out of the box with GNU libc (untested).
+
 Changes since xosview-1.4.*, in no particular order:
 
 Linux memory and swap meters now will work with linux 2.0 or 2.1
