@@ -9,6 +9,7 @@
 //
 // $Id$
 //
+#include "general.h"
 #include "cpumeter.h"
 #include "xosview.h"
 #include <sys/dkstat.h>         //  For CPUSTATES #define.  BCG
@@ -16,6 +17,8 @@
 #include "netbsd.h"             //  For NetBSD-specific icky kvm_ code.  BCG
 #include <stdlib.h>		//  For use of atoi  BCG
 
+CVSID("$Id: ");
+CVSID_DOT_H(CPUMETER_H_CVSID);
 
 CPUMeter::CPUMeter( XOSView *parent )
 : FieldMeterDecay( parent, 4, "CPU", "USR/NICE/SYS/FREE" ){

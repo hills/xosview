@@ -9,10 +9,14 @@
 //
 // $Id$
 //
+#include "general.h"
 #include "loadmeter.h"
 #include "xosview.h"
 #include <stdlib.h>  //  for getloadavg()
 #include <stdio.h>
+
+CVSID("$Id: ");
+CVSID_DOT_H(LOADMETER_H_CVSID);
 
 LoadMeter::LoadMeter( XOSView *parent )
   : FieldMeterDecay( parent, 2, "LOAD", "PROCS per MIN/IDLE", 1, 0 ){
