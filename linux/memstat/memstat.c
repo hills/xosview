@@ -10,6 +10,9 @@
 #undef SHOW_BUFFERS
 
 /* Kernel includes */
+#ifdef MODVERSIONS
+#include <linux/modversions.h>
+#endif
 #include <linux/module.h>
 #include <asm/page.h>
 #include <linux/proc_fs.h>

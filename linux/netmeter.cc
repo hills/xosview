@@ -119,13 +119,26 @@ void NetMeter::checkevent( void ){
     }
   }
 
-  float t = 1000000.0 / _timer.report();
+  // I'm not sure why this happens but
+  // this should fix it when it does....
+  if ((tot_in < _lastBytesIn) || (tot_out < _lastBytesOut)){
+    cerr <<"*** TOTAL < LAST ***" <<endl;
+    fields_[0] = fields_[1] = 0;
+  }
+  else {  
+    // This should be what happens every time
+    // why it does not is still a mystery.
+    float t = 1000000.0 / _timer.report();
 
-  fields_[0] = (tot_in - _lastBytesIn) * t;
-  fields_[1] = (tot_out - _lastBytesOut) * t;
+    if (t < 0)  // can happen when system clock is reset.
+      t = 0.1;
 
-  _lastBytesIn = tot_in;
-  _lastBytesOut = tot_out;
+    fields_[0] = (tot_in - _lastBytesIn) * t;
+    fields_[1] = (tot_out - _lastBytesOut) * t;
+
+    _lastBytesIn = tot_in;
+    _lastBytesOut = tot_out;
+  }
 
   adjust();
   if (total_)

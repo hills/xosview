@@ -1,6 +1,6 @@
 CC     = gcc
-CFLAGS = -D__KERNEL__ -I/usr/include/linux -Wall -Wstrict-prototypes \
-         -O2 -fomit-frame-pointer -pipe -DMODULE
+CFLAGS = -D__KERNEL__ -Wall -Wstrict-prototypes \
+         -O2 -fomit-frame-pointer -pipe -DMODULE -DMODVERSIONS
 FEXT   = c
 
 

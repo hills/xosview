@@ -24,6 +24,18 @@ protected:
 
   void getmeminfo( void );
 private:
+  int _shAdj;
+
+  struct MemStat {
+    unsigned long total;
+    unsigned long used;
+    unsigned long shared;
+    unsigned long buff;
+    unsigned long cache;
+    unsigned long free;
+  };
+
+  void getmemstat(MemStat *mstat);
 };
 
 

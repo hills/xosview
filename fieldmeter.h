@@ -42,7 +42,9 @@ protected:
 
   void drawlegend( void );
   void drawused( int manditory );
+  bool checkX(int x, int width) const;
 
+  void setNumFields(int n);
 
 private:
 };

@@ -235,16 +235,23 @@ void XWin::getGeometry( void ){
 
   // Process the geometry specification
   bitmask =  XGeometry(display_, DefaultScreen(display_), 
-		       getResourceOrUseDefault("geometry", geometry_), default_geometry,
+		       getResourceOrUseDefault("geometry", geometry_), 
+                       default_geometry,
 		       0, 
 		       1, 1, 0, 0, &(sizehints_->x), &(sizehints_->y),
 		       &(sizehints_->width), &(sizehints_->height));
 
   // Check bitmask and set flags in XSizeHints structure
-  if (bitmask & (XValue | YValue)){
+  if (bitmask & (WidthValue | HeightValue)){
     sizehints_->flags |= PPosition;
     width_ = sizehints_->width;
     height_ = sizehints_->height;
+  }
+
+  if (bitmask & (XValue | YValue)){
+    sizehints_->flags |= USPosition;
+    x_ = sizehints_->x;
+    y_ = sizehints_->y;
   }
 }
 //-----------------------------------------------------------------------------

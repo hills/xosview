@@ -17,15 +17,11 @@ FieldMeter::FieldMeter( XOSView *parent, int numfields, const char *title,
   print_ = PERCENT;
   used_ = 0;
   lastused_ = -1;
-  numfields_ = numfields;
-  fields_ = new float[numfields_];
-  colors_ = new unsigned long[numfields_];
-  lastvals_ = new int[numfields_];
-  lastx_ = new int[numfields_];
-  total_ = 0;
-
-  for ( int i = 0 ; i < numfields_ ; i++ )
-    fields_[i] = lastvals_[i] = lastx_[i] = 0;
+  fields_ = NULL;
+  colors_ = NULL;
+  lastvals_ = NULL;
+  lastx_ = NULL;
+  setNumFields(numfields);
 }
 
 FieldMeter::~FieldMeter( void ){
@@ -154,4 +150,38 @@ void FieldMeter::drawfields( int manditory ){
 
 void FieldMeter::checkevent( void ){
   drawfields();
+}
+
+void FieldMeter::setNumFields(int n){
+  numfields_ = n;
+  delete[] fields_;
+  delete[] colors_;
+  delete[] lastvals_;
+  delete[] lastx_;
+  fields_ = new float[numfields_];
+  colors_ = new unsigned long[numfields_];
+  lastvals_ = new int[numfields_];
+  lastx_ = new int[numfields_];
+
+  total_ = 0;
+  for ( int i = 0 ; i < numfields_ ; i++ )
+    fields_[i] = lastvals_[i] = lastx_[i] = 0;
+}
+
+bool FieldMeter::checkX(int x, int width) const {
+  if ((x < x_) || (x + width < x_)
+      || (x > x_ + width_) || (x + width > x_ + width_)){
+    cerr << "FieldMeter::checkX() : bad horiz values for meter : "
+         << name() << endl;
+
+    cerr <<"total_ = " <<total_ <<endl;
+
+    for (int i = 0 ; i < numfields_ ; i++)
+      cerr <<"fields_[" <<i <<"] = " <<fields_[i] <<",";
+    cerr <<endl;
+
+    return false;
+  }
+
+  return true;
 }
