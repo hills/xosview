@@ -19,9 +19,6 @@
 #include "pagemeter.h"
 #include "xosview.h"
 
-#include <sys/param.h>
-#include <sys/sysctl.h>
-#include <vm/vm_param.h>
 #include <stdlib.h>		//  For atoi().  BCG
 #include "kernel.h"		//  For NetBSD Page functions.
 

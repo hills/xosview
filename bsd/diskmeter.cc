@@ -14,7 +14,6 @@
 #include "general.h"
 #include "diskmeter.h"
 #include "xosview.h"
-#include <sys/dkstat.h>
 #include <err.h>        //  For err() and warn(), etc.  BCG
 #include "kernel.h"     //  For NetBSD-specific icky (but handy) kvm_ code.  BCG
 #include <stdlib.h>	//  For use of atoi  BCG

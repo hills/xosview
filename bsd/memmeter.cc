@@ -23,7 +23,6 @@
 
 #include <sys/param.h>
 #include <sys/sysctl.h>
-#include <vm/vm_param.h>
 #ifdef XOSVIEW_FREEBSD
 #include <sys/vmmeter.h>
 #endif
