@@ -102,9 +102,6 @@ void DiskMeter::getstats( void ){
     /*  For bytes/sec, we need to scale by our priority and the
      *  sampling time.  */
     
-    /*  So, if priority is 2, we take a sample every 2*SAMPLE_MSECS
-     *  milliseconds (with SAMPLE_MSECS=100, this corresponds to samples
-     *  every 200 ms, or 5 per second).  */
-  setUsed ( fields_[0]*1e3/(SAMPLE_MSECS*priority_), total_);
+  setUsed ( fields_[0]*samplesPerSecond(), total_);
   prevBytes = currBytes;
 }
