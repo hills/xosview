@@ -20,6 +20,9 @@ xosview*foreground:       wheat
 ! Load Meter Resources
 
 xosview*load: True
+!  We don't need to enable the Decay option for the load -- the load
+!    is already a time-averaged value!
+xosview*loadDecay: False
 xosview*loadWarnColor:    orange
 xosview*loadProcColor:    seagreen
 xosview*loadIdleColor:    aquamarine
@@ -53,6 +56,7 @@ xosview*memActiveColor:	  blue
 xosview*memInactiveColor: lightblue
 xosview*memPriority:      10
 xosview*memDecay:         False
+xosview*memUsedFormat:	  bytes
 
 ! Swap Meter Resources
 
@@ -61,6 +65,8 @@ xosview*swapUsedColor:    seagreen
 xosview*swapFreeColor:    aquamarine
 xosview*swapPriority:     10
 xosview*swapDecay:        False
+xosview*swapUsedFormat:	  bytes
+
 
 ! Page Meter Resources
 
@@ -82,6 +88,9 @@ xosview*netBackground:    aquamarine
 xosview*netPriority:      2
 xosview*netDecay:         True
 
+!!!
+!!!  Linux-only meters
+!!!
 ! Serial Meter Resources
 
 xosview*serial1: False
@@ -97,3 +106,14 @@ xosview*serialPriority:   1
 xosview*interrupts:       True
 xosview*intOnColor:       red
 xosview*intOffColor:      aquamarine
+
+!!!
+!!!  NetBSD-only meters
+!!!
+! Disk Meter Resources
+
+xosview*diskUsedColor:	yellow
+xosview*diskIdleColor:	black
+xosview*diskPriority:	10
+xosview*diskDecay:	True
+xosview*diskUsedFormat: bytes
