@@ -67,6 +67,13 @@ static XrmOptionDescRec options[] = {
 { "-disk", "*disk", XrmoptionNoArg, "False" },
 { "+disk", "*disk", XrmoptionNoArg, "True" },
 #endif
+// Interrupt meter resources  --  all sorts of aliases.
+{ "-int", "*interrupts", XrmoptionNoArg, "False" },
+{ "+int", "*interrupts", XrmoptionNoArg, "True" },
+{ "-ints", "*interrupts", XrmoptionNoArg, "False" },
+{ "+ints", "*interrupts", XrmoptionNoArg, "True" },
+{ "-interrupts", "*interrupts", XrmoptionNoArg, "False" },
+{ "+interrupts", "*interrupts", XrmoptionNoArg, "True" },
 //  Special, catch-all option here --
 //    xosview -xrm "*memFreeColor: purple" should work, for example.
 { "-xrm", "*xrm", XrmoptionResArg, (caddr_t) NULL },
