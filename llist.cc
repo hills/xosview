@@ -266,9 +266,9 @@ int LList::restore( int size, FILE *fp ){
 }
 
 void LList::kill( void ){
-  while ( n_ ) {
-    delete pop();
-  }
+//  while ( n_ ) {
+//    delete pop();
+//  }
 }
 
 

@@ -5,7 +5,9 @@
 # $Id$
 #
 CC     = gcc
-CFLAGS = -D__KERNEL__ -Wall -Wstrict-prototypes \
+# For some reason (which I am not sure of now), /usr/src/linux/include
+# needs to be added to the search patch or things break.
+CFLAGS = -D__KERNEL__ -Wall -Wstrict-prototypes -I/usr/src/linux/include \
          -O2 -fomit-frame-pointer -pipe -DMODULE @USE_MOD_VERSIONS@ @LINUX_SMP@
 FEXT   = c
 

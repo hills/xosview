@@ -11,7 +11,7 @@
 
 CVSID("$Id$");
 
-main( int argc, char *argv[] ) {
+int main( int argc, char *argv[] ) {
   /*  Icky.  Need to check for -name option here.  */
   char** argp = argv;
   char* instanceName = "xosview";	// Default value.
@@ -24,4 +24,6 @@ main( int argc, char *argv[] ) {
   XOSView xosview( instanceName, argc, argv );
 
   xosview.run();
+
+  return 0;
 }
