@@ -13,11 +13,23 @@ CXXFLAGS="$CXXFLAGS -I$x_includes"
 LIBS="$LIBS -L$x_libraries"
 dnl AC_PREFIX_DEFAULT(/usr/X11)	dnl No longer needed with our
 dnl 				x_includes magic in Makefile.top.in.
+dnl  Check for /usr/X11R6.  If it exists, make that the default prefix.
+dnl  Otherwise, use /usr/X11.  I believe most sane places have /usr/X11R6.
+dnl
+dnl  This is _very_ ugly.  First, we set it to /usr/X11, and then
+dnl if /usr/X11R6 exists, we change ac_default_prefix BEHIND
+dnl autoconf's BACK!
 AC_PREFIX_DEFAULT(/usr/X11)
+if test -e /usr/X11R6 ; then
+  dnl echo "Using /usr/X11R6 as default base for install."
+  ac_default_prefix=/usr/X11R6
+fi
+
 dnl  Ack.  It is needed again, after all.  By default, we
 dnl want to stuff things into /usr/X11.  If we don't specify this,
 dnl configure will shove things into /usr/local by default.
 dnl AC_PREFIX_PROGRAM(X)
+
 AC_SUBST(x_includes)
 AC_SUBST(x_libraries)
 AC_PROG_INSTALL
@@ -109,13 +121,25 @@ EOF
   the autoconf script didn't work properly.
     ])
   else
-    AC_MSG_WARN([
-
-  *Disabling* UVM -- 'UVM=' not found in /etc/mk.conf.
-  If this is in error, add -DUVM=1 to CXXFLAGS in
-  Makefile.config, and please mail bgrayson@ece.utexas.edu that
-  the autoconf script did not work properly.
+    dnl  Before choosing non-UVM, check for some uvm-only symbols
+    dnl  in the currently-running kernel.
+    AC_MSG_WARN(['UVM=' not found in /etc/mk.conf.  Checking /netbsd for uvm symbols...])
+    if test x`nm /netbsd | grep uvm_sysctl` != x ; then
+      AC_DEFINE(UVM)
+      AC_MSG_WARN([*Enabling* UVM -- 'uvm_sysctl' symbol found in /netbsd.
+  If this is in error, remove the define of UVM=1 from CXXFLAGS
+  in Makefile.config, and mail bgrayson@ece.utexas.edu that
+  the autoconf script didn't work properly.
   ])
+    else
+      AC_MSG_WARN([
+
+    *Disabling* UVM -- 'UVM=' not found in /etc/mk.conf.
+    If this is in error, add -DUVM=1 to CXXFLAGS in
+    Makefile.config, and please mail bgrayson@ece.utexas.edu that
+    the autoconf script did not work properly.
+    ])
+    fi
   fi
   host_dir=bsd
 
