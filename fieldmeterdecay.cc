@@ -20,11 +20,16 @@
 //   4.  Make the checkResources () function in the meter set the 
 //	 dodecay_ variable according to the, e.g., xosview*cpuDecay resource.
 
+#include <fstream.h>
+#include <stdio.h>
+#include <math.h>		//  For fabs()
+#include "general.h"
 #include "fieldmeter.h"
 #include "fieldmeterdecay.h"
 #include "xosview.h"
-#include <fstream.h>
-#include <stdio.h>
+
+CVSID("$Id$");
+CVSID_DOT_H(FIELDMETERDECAY_H_CVSID);
 
 FieldMeterDecay::FieldMeterDecay( XOSView *parent,
                 int numfields, const char *title,
@@ -87,6 +92,14 @@ void FieldMeterDecay::drawfields( int manditory ){
   //  just played with it until I thought it looked good!  :)  BCG
 #define ALPHA 0.97
 
+    /*  This is majorly ugly code.  It needs a rewrite.  BCG  */
+    /*  I think one good way to do it may be to normalize all of the
+     *  fields_ in a temporary array into the range 0.0 .. 1.0,
+     *  calculate the shifted starting positions and ending positions
+     *  for coloring, multiply by the pixel width of the meter, and
+     *  then turn to ints.  I think this will solve a whole bunch of
+     *  our problems with rounding that before we tackled at a whole
+     *  lot of places.  BCG */
   if (total_ != 0.0)
     for ( int i = 0 ; i < numfields_ ; i++ ){
       decay_[i] = ALPHA*decay_[i] + (1-ALPHA)*(fields_[i]*1.0/total_);
@@ -114,17 +127,19 @@ void FieldMeterDecay::drawfields( int manditory ){
 
     parent_->setForeground( colors_[i] );
 
+      //  drawFilledRectangle() adds one to its width and height.
+      //    Let's correct for that here.
     if ( manditory || (twidth != lastvals_[i]) || (x != lastx_[i]) ){
       if (!checkX(x, twidth))
         cerr <<"ONE" <<endl;
-      parent_->drawFilledRectangle( x, y_, twidth, halfheight );
+      parent_->drawFilledRectangle( x, y_, twidth-1, halfheight );
     }
 
     if ( manditory || (decay_[i] != lastDecayval_[i]) ){
-      if (!checkX(x, twidth))
+      if (!checkX(decayx, decaytwidth))
         cerr <<"ONE" <<endl;
-      parent_->drawFilledRectangle( decayx, y_+halfheight,
-            decaytwidth, height_ - halfheight);
+      parent_->drawFilledRectangle( decayx, y_+halfheight+1,
+            decaytwidth-1, height_ - halfheight-1);
     }
 
     lastvals_[i] = twidth;
