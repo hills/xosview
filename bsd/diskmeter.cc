@@ -35,6 +35,7 @@ DiskMeter::DiskMeter( XOSView *parent, float max )
     disableMeter ();
   }
   prevBytes = 0;
+  maxBandwidth_ = max;
   total_ = max;
   getstats();
     /*  Since at the first call, it will look like we transferred a
@@ -77,6 +78,9 @@ void DiskMeter::checkevent( void ){
 
 void DiskMeter::getstats( void ){
   u_int64_t currBytes = 0;
+//  Reset to desired full-scale settings.
+  total_ = maxBandwidth_;
+
   if (kernelHasStats_) {
     NetBSDGetDiskXFerBytes (&currBytes);
 #if DEBUG
@@ -85,6 +89,7 @@ void DiskMeter::getstats( void ){
 #endif
   }
   fields_[0] = (currBytes-prevBytes)/1.0;
+//  Adjust total_ if needed.
   if (fields_[0] > total_)
     total_ = fields_[0];
 
