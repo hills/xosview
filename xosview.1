@@ -49,46 +49,57 @@ these is displayed as a horizontal bar which is separated into color coded
 regions.  Each region represents a percentage of the resource which is being 
 put to a particular use.  Typing a 'q' in the window will terminate xosview.
 
-At the moment \fIxosview\fP runs on three platforms (Linux, NetBSD, and HPUX).
+At the moment \fIxosview\fP runs on four platforms (Linux,
+NetBSD, FreeBSD, and HPUX).
 Not all of the meters described below are supported on all 
 platforms.  Some of the meters may appear different depending upon the 
 platform \fIxosview\fP is running on.
 
+\fBLoad\fP
+   all platforms  :  load
+
 \fBCPU Usage\fP
    Linux  : user | nice | system | idle
    NetBSD : user | nice | system | idle
+   FreeBSD: user | nice | system | idle
    HPUX   : user | nice | system | interrupt | idle
 
 \fBMemory Usage\fP
    Linux  : used | shared | buffers | free
    NetBSD : active | inactive | shared | free
+   FreeBSD: active | inactive | shared | free
    HPUX   : text | used   | other   | free
 
 \fBSwap Usage\fP
    Linux  : used | free
    NetBSD : used | free
+   FreeBSD: < Not Supported >
    HPUX   : used | free
 
 \fBDisk Usage (bytes/sec)\fP
    Linux  : < Not Supported >
    NetBSD : transferred | idle
+   FreeBSD: < Not Supported >
    HPUX   : < Not Supported >
 
 \fBPage Swapping from/to disk\fP
    Linux  : in | out | idle
    NetBSD : in | out | idle
+   FreeBSD: in | out | idle
    HPUX   : in | out | idle
 
 \fBNET Usage\fP
     bytes/sec
     Linux  : in | out | idle
     NetBSD : in | out | idle
+    FreeBSD: < Not Supported >
     HPUX   : < Not Supported >
 
 \fBInterrupts\fP
     "leds" which blink when an interrupt occurs.
     Linux  : IRQs 0 - 15
     NetBSD : < Not Supported >
+    FreeBSD: < Not Supported >
     HPUX   : < Not Supported >
 
 \fBSerial Port Status\fP
@@ -97,6 +108,7 @@ platform \fIxosview\fP is running on.
              (LSR) and Modem Status Register 
              (MSR) are displayed.
     NetBSD : < Not Supported >
+    FreeBSD: < Not Supported >
     HPUX   : < Not Supported >
 
 \fBBattery Level\fP
@@ -104,6 +116,7 @@ platform \fIxosview\fP is running on.
     battery (for laptops).
     Linux  : %left | %used
     NetBSD : < Not Supported >
+    FreeBSD: < Not Supported >
     HPUX   : < Not Supported >
 
 .SH OPTIONS
@@ -641,19 +654,10 @@ This is the color that the swap meter will use for free swap space.
 .RE
 
 xosview*swapPriority: \fIpriority\fP
-.RS
-This number (which must be an integer >= 1) sets the number of times the 
-serial meter will update per second.  The number of times this meter will 
-update per second is calculated as follows :  updates per sec = 10 / 
-\fIpriority\fP.  It can of couse be greater than 10.
-.RE
+.pp swap
 
 xosview*swapDecay: (True or False)
-.RS
-If True then the swap meter will be split in two.  One half will show the
-instantaneous state and the other will display a decaying average of the
-state.
-.RE
+.dc swap
 
 xosview*swapUsedFormat:	  (float, percent or autoscale)
 .RS
@@ -710,19 +714,10 @@ This is the color that the page meter will use to display the idle field.
 .RE
 
 xosview*pagePriority: \fIpriority\fP
-.RS
-This number (which must be an integer >= 1) sets the interval between updates
-of the page meter in tenths of second.  The number of times this meter will 
-update per second is thus :  updates per sec = 10 / \fIpriority\fP.  It can 
-of couse be greater than 10.
-.RE
+.pp page
 
 xosview*pageDecay: (True or False)
-.RS
-If True then the page meter will be split in two.  One half will show the
-instantaneous state and the other will display a decaying average of the
-state.
-.RE
+.dc page
 
 xosview*pageUsedFormat:	  (float, percent or autoscale)
 .RS
@@ -832,12 +827,7 @@ This is the color the serial meter will use for bits that are not set.
 .RE
 
 xosview*serialPriority: \fIpriority\fP
-.RS
-This number (which must be an integer >= 1) sets the number of times the 
-serial meter will update per second.  The number of times this meter will 
-update per second is calculated as follows :  updates per sec = 10 / 
-\fIpriority\fP.  It can of couse be greater than 10.
-.RE
+.pp serial
 
 
 \fBInterrupt Meter Resources\fP
@@ -880,12 +870,7 @@ This is the color that will be used to show the amount of battery power used.
 .RE
 
 xosview*batteryPriority: \fIpriority\fP
-.RS
-This number (which must be an integer >= 1) sets the number of times the 
-battery meter will update per second.  The number of times this meter will 
-update per second is calculated as follows :  updates per sec = 10 / 
-\fIpriority\fP.  It can of couse be greater than 10.
-.RE
+.pp battery
 
 
 \fBDisk Meter Resources\fP
@@ -915,19 +900,10 @@ per second for the disk meter.
 .RE
 
 xosview*diskPriority: \fIpriority\fP
-.RS
-This number (which must be an integer >= 1) sets the interval between updates
-of the disk meter in tenths of a second.  Thus, with a value of 1 the
-meter will update ten times per second, while with a value of 600 the
-meter will update once per minute.
-.RE
+.pp disk
 
 xosview*diskDecay: (True or False)
-.RS
-If True then the disk meter will be split vertically in two.  The top
-half will show the instantaneous state, while the bottom half will
-display a decaying average of the state.
-.RE
+.dc disk
 
 xosview*diskUsedFormat:	  (float, percent or autoscale)
 .RS
@@ -995,9 +971,10 @@ Mike Romberg  (romberg@fsl.noaa.gov)
 Original author, Linux and HPUX ports.
 .RE
 
-Brian Grayson (bgrayson@pine.ece.utexas.edu)
+Brian Grayson (bgrayson@ece.utexas.edu)
 .RS
-NetBSD port and most of the nice enhancements for version 1.4
+NetBSD port and most of the nice enhancements for version 1.4,
+initial work on FreeBSD port.
 .RE
 
 Werner Fink (werner@suse.de)
