@@ -19,6 +19,10 @@ changequote(<<, >>)
 <<
 LVERSION=`uname -r`
 LVERSION=`expr $LVERSION : '\([0-9]*\.[0-9]*\)'`
+if test "$LVERSION" = "2.2"
+then
+    LVERSION=2.1
+fi
 >>
 changequote([, ])
 ]])
