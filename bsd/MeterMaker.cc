@@ -22,6 +22,7 @@
 #include "netmeter.h"
 #include "loadmeter.h"
 #include "diskmeter.h"
+#include "pagemeter.h"
 //#include "intmeter.h"  //  These two are not yet supported under NetBSD.
 //#include "serialmeter.h"
 
@@ -52,6 +53,9 @@ void MeterMaker::makeMeters(void){
 
   if (_xos->isResourceTrue("disk"))
     push(new DiskMeter (_xos, atof(_xos->getResource("diskBandwidth"))));
+
+  if (_xos->isResourceTrue("page"))
+    push(new PageMeter (_xos, atof(_xos->getResource("pageBandwidth"))));
 
   //  The serial meters and the interrupt meter are not yet
   //  available for NetBSD.  BCG
