@@ -23,10 +23,18 @@
 #include <err.h>                /*  For err(), warn(), etc.  BCG  */
 #include <sys/dkstat.h>         /*  For CPUSTATES, which tells us how
                                       many cpu states there are.  */
+#ifdef XOSVIEW_FREEBSD
+#warning "FreeBSD hack here."
+#else
+#include <sys/device.h>
+#include <sys/disklabel.h>
 #include <sys/disk.h>		/*  For disk statistics.  */
+#endif
 
+#ifndef XOSVIEW_FREEBSD
 #include <sys/socket.h>         /*  These two are needed for the  */
 #include <net/if.h>             /*    NetMeter helper functions.  */
+#endif
 #include <sys/vmmeter.h>	/*  For struct vmmeter.  */
 #include "kernel.h"		/*  To grab CVSID stuff.  */
 
@@ -45,10 +53,12 @@ static struct nlist nlst[] =
 #define CP_TIME_SYM_INDEX 0
 { "_ifnet" },
 #define IFNET_SYM_INDEX 1
-{ "_disklist" },
-#define DISKLIST_SYM_INDEX	2
 { "_cnt" },
-#define VMMETER_SYM_INDEX	3
+#define VMMETER_SYM_INDEX	2
+#ifndef XOSVIEW_FREEBSD	/*  FreeBSD doesn't have a diskmeter yet.  */
+{ "_disklist" },
+#define DISKLIST_SYM_INDEX	3
+#endif
   {NULL}
   };
 
@@ -173,6 +183,11 @@ NetBSDNetInit()
 void
 NetBSDGetNetInOut (long long * inbytes, long long * outbytes)
 {
+#ifdef XOSVIEW_FREEBSD
+  static int i = 0;
+  i+= 1000;
+  *inbytes = *outbytes = i;
+#else
   struct ifnet * ifnetp;
   struct ifnet ifnet;
   //char ifname[256];
@@ -199,6 +214,7 @@ NetBSDGetNetInOut (long long * inbytes, long long * outbytes)
     //  Linked-list step taken from if.c in netstat source, line 120.
     ifnetp = (struct ifnet*) ifnet.if_list.tqe_next;
   }
+#endif
 }
 
 
@@ -259,13 +275,22 @@ NetBSDGetSwapCtlInfo(int *total, int *free)
 /*  ---------------------- Disk Meter stuff  -----------------  */
 int
 NetBSDDiskInit() {
+#ifdef XOSVIEW_FREEBSD	/*  Broken for FreeBSD  */
+  return 0;
+#else
   OpenKDIfNeeded(); 
   return ValidSymbol(DISKLIST_SYM_INDEX);
+#endif
 }
 
 void
 NetBSDGetDiskXFerBytes (unsigned long long *bytesXferred)
 {
+#ifdef XOSVIEW_FREEBSD
+  static int i = 0;
+i+= 1000;
+*bytesXferred = i;
+#else
   /*  This function is a little tricky -- we have to iterate over a
    *  list in kernel land.  To make things simpler, data structures
    *  and pointers for objects in kernel-land have kvm tacked on front
@@ -289,5 +314,6 @@ NetBSDGetDiskXFerBytes (unsigned long long *bytesXferred)
 #endif
     kvmdiskptr = kvmcurrdisk.dk_link.tqe_next;
   }
+#endif
 }
   

@@ -59,8 +59,14 @@ void PageMeter::getpageinfo (void) {
   struct vmmeter vm;
 
   NetBSDGetPageStats(&vm);
+#ifdef XOSVIEW_FREEBSD
+#warning "FreeBSD hack"
+  fields_[0] = vm.v_vnodein - prev_.v_vnodein;
+  fields_[1] = vm.v_vnodeout - prev_.v_vnodeout;
+#else
   fields_[0] = vm.v_pageins - prev_.v_pageins;
   fields_[1] = vm.v_pageouts - prev_.v_pageouts;
+#endif
   prev_ = vm;
 //  End NetBSD-specific code...
   if (total_ < fields_[0] + fields_[1])

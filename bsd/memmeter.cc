@@ -24,6 +24,10 @@
 #include <sys/param.h>
 #include <sys/sysctl.h>
 #include <vm/vm_param.h>
+#ifdef XOSVIEW_FREEBSD
+#warning "Quick hack for FreeBSD -- fix later."
+#include <sys/vmmeter.h>
+#endif
 #include <stdlib.h>		//  For atoi().  BCG
 
 CVSID("$Id$");
