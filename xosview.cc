@@ -1,5 +1,5 @@
-//  
-//  Copyright (c) 1994, 1995 by Mike Romberg ( romberg@fsl.noaa.gov )
+//
+//  Copyright (c) 1994, 1995, 2002 by Mike Romberg ( romberg@fsl.noaa.gov )
 //
 //  This file may be distributed under terms of the GPL
 //
@@ -20,8 +20,9 @@
 #include "kernel.h"
 #endif
 
+static const char * const versionString = "xosview version: " XOSVIEW_VERSION;
+
 static const char NAME[] = "xosview@";
-#include "version.cc"
 
 double MAX_SAMPLES_PER_SECOND = 10;
 
@@ -36,7 +37,7 @@ XOSView::XOSView( char * instName, int argc, char *argv[] ) : XWin(),
 		  //  default values.
   //  The resources need to be initialized before calling XWinInit, because
   //  XWinInit looks at the geometry resource for its geometry.  BCG
-  xrm.loadAndMergeResources (argc, argv, display_); 
+  xrm.loadAndMergeResources (argc, argv, display_);
   XWinInit (argc, argv, NULL, &xrm);
 #if 1	//  Don't enable this yet.
   MAX_SAMPLES_PER_SECOND = atof(getResource("samplesPerSec"));
@@ -67,11 +68,11 @@ XOSView::XOSView( char * instName, int argc, char *argv[] ) : XWin(),
   expose_flag_ = 1;
 
   //  set up the X events
-  addEvent( new Event( this, ConfigureNotify, 
+  addEvent( new Event( this, ConfigureNotify,
 		      (EventCallBack)&XOSView::resizeEvent ) );
-  addEvent( new Event( this, Expose, 
+  addEvent( new Event( this, Expose,
 		      (EventCallBack)&XOSView::exposeEvent ) );
-  addEvent( new Event( this, KeyPress, 
+  addEvent( new Event( this, KeyPress,
 		      (EventCallBack)&XOSView::keyPressEvent ) );
   addEvent( new Event( this, VisibilityNotify,
                       (EventCallBack)&XOSView::visibilityEvent ) );
@@ -83,7 +84,7 @@ XOSView::XOSView( char * instName, int argc, char *argv[] ) : XWin(),
 
   // see if legends are to be used
   checkOverallResources ();
-  
+
   // add in the meters
   mm.makeMeters();
   for (int i = 1 ; i <= mm.n() ; i++)
@@ -188,15 +189,15 @@ void XOSView::checkOverallResources() {
   usedlabels_ = legend_ = caption_ = 0;
 
   setFont();
-  
+
    // use captions
   if ( isResourceTrue("captions") )
       caption_ = 1;
-  
+
   // use labels
   if ( isResourceTrue("labels") )
       legend_ = 1;
-  
+
   // use "free" labels
   if ( isResourceTrue("usedlabels") )
       usedlabels_ = 1;
@@ -215,7 +216,7 @@ const char *XOSView::winname( void ){
 void  XOSView::resize( void ){
   int rightmargin = 5;
   int newwidth = width_ - xoff_ - rightmargin;
-  int newheight = (height_ - (10 + 5 * (nummeters_ - 1) + 
+  int newheight = (height_ - (10 + 5 * (nummeters_ - 1) +
 			      nummeters_ * yoff_)) / nummeters_;
 
   int counter = 1;
@@ -292,7 +293,7 @@ void XOSView::run( void ){
 #else
     usleep_via_select ( usleeptime_ );
 #endif
-    counter = (counter + 1) % 5;    
+    counter = (counter + 1) % 5;
   }
 }
 
@@ -367,9 +368,9 @@ void XOSView::checkArgs (int argc, char** argv) const
   }
 }
 
-void XOSView::exposeEvent( XExposeEvent &event ) { 
+void XOSView::exposeEvent( XExposeEvent &event ) {
   _isvisible = true;
-  if ( event.count == 0 ) 
+  if ( event.count == 0 )
   {
     expose_flag_++;
     draw();
@@ -379,7 +380,7 @@ void XOSView::exposeEvent( XExposeEvent &event ) {
 }
 
 void XOSView::resizeEvent( XEvent & ) {
-  resize(); 
+  resize();
   expose_flag_++;
   draw();
 }
