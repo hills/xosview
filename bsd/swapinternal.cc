@@ -240,8 +240,10 @@ NetBSDGetSwapInfo(int* total, int* free)
                  * yet been activated via swapon(8).
                  */
                 if (!sw[i].sw_freed) {
-                        printf ("Device %d not available for swapping.\n",
-                        i);
+			/* -----  Originally, this printed a
+			 * warning.  However, for xosview, we
+			 * don't want the warning printed.
+			 * bgrayson  */
                         continue;
                 }
                 xsize = sw[i].sw_nblks;
