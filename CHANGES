@@ -2,6 +2,8 @@
 
 Changes since xosview-1.8.1
 
+ - Merge in the fedora-2 strip patch.
+
  - Merge in the fedora-2 proc patch.
 
  - Merge in the fedora-2 s390 patch.

@@ -139,7 +139,7 @@ yes
 #endif
 ], [USE_MOD_VERSIONS=-DMODVERSIONS] AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
 SMP_LINUX
-INSTALL_ARGS='-s -m 4755'
+INSTALL_ARGS='-m 755'
 fi
 ,
 AC_SYS_LINUX_VERS
@@ -165,7 +165,7 @@ else
         echo "disabled the Linux $LVERSION memstat module by default"
 fi
 )
-INSTALL_ARGS='-s -m 4755'
+INSTALL_ARGS='-m 755'
 if test "$smp" = "yes"
 then
 LINUX_SMP="-D__SMP__"
