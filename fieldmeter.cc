@@ -18,6 +18,9 @@ CVSID_DOT_H(FIELDMETER_H_CVSID);
 FieldMeter::FieldMeter( XOSView *parent, int numfields, const char *title, 
                         const char *legend, int dolegends, int dousedlegends )
 : Meter(parent, title, legend, dolegends, dousedlegends){
+    /*  We need to set print_ to something valid -- the meters
+     *  apparently get drawn before the meters have a chance to call
+     *  CheckResources() themselves.  */
   print_ = PERCENT;
   used_ = 0;
   lastused_ = -1;
@@ -54,8 +57,8 @@ void FieldMeter::SetUsedFormat ( const char * const fmt ) {
     /*  Do case-insensitive compares.  */
   if (!strcasecmp (fmt, "percent"))
     print_ = PERCENT;
-  else if (!strcasecmp (fmt, "bytes"))
-    print_ = KBYTES;
+  else if (!strcasecmp (fmt, "autoscale"))
+    print_ = AUTOSCALE;
   else if (!strcasecmp (fmt, "float"))
     print_ = FLOAT;
   else
@@ -63,6 +66,21 @@ void FieldMeter::SetUsedFormat ( const char * const fmt ) {
     fprintf (stderr, "Error:  could not parse format of '%s'\n", fmt);
     fprintf (stderr, "  I expected one of 'percent', 'bytes', or 'float'\n");
     fprintf (stderr, "  (Case-insensitive)\n");
+    exit(1);
+  }
+}
+
+void FieldMeter::setUsed (float val, float total)
+{
+  if (print_ == FLOAT)
+    used_ = val;
+  else if (print_ == PERCENT)
+    used_ = val / total * 100.0;
+  else if (print_ == AUTOSCALE)
+    used_ = val;
+  else {
+    fprintf (stderr, "Error in %s:  I can't handle a "
+		     "UsedType enum value of %d!\n", name(), print_);
     exit(1);
   }
 }
@@ -114,6 +132,7 @@ void FieldMeter::drawlegend( void ){
     tmp2++;
     strncpy( buff, tmp1, n );
     buff[n] = '\0';
+    parent_->setStippleN(i%4);
     parent_->setForeground( colors_[i] );
     parent_->drawString( x, y_ - 5, buff );
     x += parent_->textWidth( buff, n );
@@ -123,6 +142,7 @@ void FieldMeter::drawlegend( void ){
     x += parent_->textWidth( "/", 1 );
     tmp1 = tmp2;
   }
+  parent_->setStippleN(0);	/*  Restore default all-bits stipple.  */
 }
 
 void FieldMeter::drawused( int manditory ){
@@ -130,6 +150,7 @@ void FieldMeter::drawused( int manditory ){
     if ( (lastused_ == used_) )
       return;
 
+  parent_->setStippleN(0);	/*  Use all-bits stipple.  */
   static const int onechar = parent_->textWidth( "X" );
   static int xoffset = parent_->textWidth( "XXXXX" );
 
@@ -139,11 +160,20 @@ void FieldMeter::drawused( int manditory ){
     sprintf( buf, "%d", (int)used_ );
     strcat( buf, "%" );
   }
-  else if (print_ == KBYTES){
+  else if (print_ == AUTOSCALE){
     char scale;
     float scaled_used;
-    if (used_ > 1024*1024) {scale='M'; scaled_used = used_/1024/1024;}
-    else if (used_ > 1024) {scale='K'; scaled_used = used_/1024;}
+      /*  Unfortunately, we have to do our comparisons by 1000s (otherwise
+       *  a value of 1020, which is smaller than 1K, could end up
+       *  being printed as 1020, which is wider than what can fit)  */
+      /*  However, we do divide by 1024, so a K really is a K, and not
+       *  1000.  */
+    if (used_ > 1000*1000*1000)
+	{scale='G'; scaled_used = used_/1024/1024/1024;}
+    if (used_ > 1000*1000)
+	{scale='M'; scaled_used = used_/1024/1024;}
+    else if (used_ > 1000)
+	{scale='K'; scaled_used = used_/1024;}
     else {scale=' '; scaled_used = used_;}
       /*  For now, we can only print 2 digits without overprinting the
        *  legends.  */
@@ -183,7 +213,9 @@ void FieldMeter::drawfields( int manditory ){
 
     if ( manditory || (twidth != lastvals_[i]) || (x != lastx_[i]) ){
       parent_->setForeground( colors_[i] );
+      parent_->setStippleN(i%4);
       parent_->drawFilledRectangle( x, y_, twidth, height_ );
+      parent_->setStippleN(0);	/*  Restore all-bits stipple.  */
       lastvals_[i] = twidth;
       lastx_[i] = x;
 
