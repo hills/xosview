@@ -12,6 +12,7 @@
 #define FIELDMETER_H_CVSID "$Id$"
 
 #include "meter.h"
+#include "timer.h"
 
 class FieldMeter : public Meter {
 public:
@@ -53,7 +54,13 @@ protected:
 
   void setNumFields(int n);
 
+
 private:
+  Timer _timer;
+protected:
+  void IntervalTimerStart() { _timer.start(); }
+  void IntervalTimerStop() { _timer.stop(); }
+  long long IntervalTimeInMicrosecs() { return _timer.report(); }
 };
 
 #endif
