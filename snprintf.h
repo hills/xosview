@@ -3,6 +3,8 @@
 
 #ifndef HAVE_SNPRINTF
 extern "C" int snprintf ( char *str, int n, const char *format, ...);
+#else
+#include <stdio.h>
 #endif
 
 #endif
