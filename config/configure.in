@@ -67,23 +67,17 @@ dnl  This check is ugly.  Maybe it should be hidden away in aclocal?
 dnl    bgrayson 9/96
 netbsd1.[[0123]]*)  AC_XOSV_NETBSD
   ## Also check for the existence of UVM.  This is a nasty,
-  ## complicated check.
-  ## UVM is enabled by a line in /etc/mk.conf of the form UVM=.
-  ## Note that there may be text after the =, or there might not.
-  ## In addition, people may put spaces
-  ## in places, so I believe the safest thing is, grep any lines
-  ## containing UVM out of /etc/mk.conf, do some substitutions to
-  ## remove comments and whitespace, and then check if the
-  ## contents are still nonnull.
-  #  First, grab the UVM string out of /etc/mk.conf (and silently
-  #  ignore if /etc/mk.conf doesn't exist.)
-  uvmstring=`grep UVM /etc/mk.conf 2>/dev/null`
-  #  Now, replace any whitespace around the =.
-  uvmstring=`echo $uvmstring | sed -e 's/ *= */=/'`
-  #  Now, remove any trailing whitespace, and strip comments.
-  uvmstring=`echo $uvmstring | sed -e 's/[ 	]*$//;s/#.*$//'`
-  #  At this point, we should have either the empty string or
-  #  UVM=string, where string may be empty.
+  ## complicated check.  This could be avoided by having the *BSD
+  ## platform-specific Makefiles include <bsd.own.mk> on their own.
+  cat > confmkfile <<\EOF
+.include <bsd.own.mk>
+all:
+.if defined(UVM)
+	@echo UVMyes
+.endif
+EOF
+  uvmstring=`make -f confmkfile`
+  rm confmkfile
   if test x$uvmstring != x ; then
     AC_DEFINE(UVM)
     AC_MSG_WARN([
