@@ -71,6 +71,7 @@ void CPUMeter::checkevent( void ){
 
 void CPUMeter::getcputime( void ){
   total_ = 0;
+  static double lastTotal = 0, lastLastTotal = -1;
 
   //  Begin NetBSD-specific code...  BCG
   long tempCPU[CPUSTATES];
@@ -101,6 +102,27 @@ void CPUMeter::getcputime( void ){
     total_ += fields_[i];
   }
   setUsed (total_ - fields_[FREE_INDEX], total_);
+
+  /*  Check for an incorrect kernel.  The CPU tick count should
+   *  change 100 times per second, so if there have been three
+   *  samples where there was no change, then that's a problem.  */
+  if (lastTotal == 0 && lastLastTotal == 0 && total_ == 0)
+  {
+    static int firstTime = 1;
+    if (firstTime) {
+      fprintf(stderr,
+"  Warning:  the CPU tick counters are not changing.  This could
+be due to running a kernel besides /netbsd (or the equivalent for FreeBSD).
+  If this is the case, re-run xosview with the -N kernel-name option.
+  If not, then this is a bug.  Please send a message to
+bgrayson@ece.utexas.edu, in addition to any send-pr bug reports
+(or in lieu of -- it ought to get fixed faster if you contact me
+directly).  Thanks!\n");
+      firstTime = 0;
+    }
+  }
+  lastLastTotal = lastTotal;
+  lastTotal = total_;
 
   cpuindex_ = (cpuindex_ + 1) % 2;
 }
