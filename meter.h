@@ -11,6 +11,7 @@
 
 #define METER_H_CVSID "$Id$"
 
+#include <stdio.h>
 #include "xosview.h"	//  To grab MAX_SAMPLES_PER_SECOND.
 
 class XOSView;
@@ -32,6 +33,11 @@ public:
   void dolegends( int val ) { dolegends_ = val; }
   void dousedlegends( int val ) { dousedlegends_ = val; }
   int requestevent( void ){ 
+    if (priority_ == 0) {
+      fprintf(stderr, "Warning:  meter %s had an invalid priority "
+	      "of 0.  Resetting to 1...\n", name());
+      priority_ = 1;
+    }
     int rval = counter_ % priority_;
     counter_ = (counter_ + 1) % priority_;
     return !rval;
