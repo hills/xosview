@@ -45,10 +45,11 @@ LIBS          += -lmeter -lX11 @EXTRALIBS@
 #-----------------------------------------------------------------
 # Rules
 #-----------------------------------------------------------------
-%.o : %.cc
+##  The GNU-style rule of %.o: %.cc is not as portable as .cc.o.
+.cc.o:
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 .%.o.d : %.cc
 	@echo building dependencies for $<
 	@$(SHELL) -ec '$(CXX) -MM $(CXXFLAGS) $< \
-          | sed '\''s/$*.o/$*.o $@/'\'' > $@'
+	   | sed '\''s/$*.o/$*.o $@/'\'' > $@'
