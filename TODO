@@ -63,3 +63,6 @@ x Add in support and auto-detect for new NetBSD UVM stuff.
     counter in the kernel is 32 bits, so once we receive 4G of
     traffic, we wrap, and it looks like we received a lot of
     negative traffic?  (I _think_ this is the cause).
+
+* Optimise graphing meter to use XCopyArea (or similar) and expose
+    events to reduce X traffic.
