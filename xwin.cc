@@ -156,8 +156,9 @@ void XWin::setHints( int argc, char *argv[] ){
     cerr <<"Error allocating class hint!" <<endl;
     exit(1);
   }
-  classhints_->res_name = xrmptr_->instanceName();
-  classhints_->res_class = xrmptr_->className();
+  //  We have to cast away the const's.
+  classhints_->res_name = (char*) xrmptr_->instanceName();
+  classhints_->res_class = (char*) xrmptr_->className();
 
   // Set up the window manager hints
   if((wmhints_ = XAllocWMHints()) == NULL){
