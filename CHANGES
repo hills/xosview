@@ -2,6 +2,8 @@
 Changes since xosview-1.7.0
   Optimised scrolling graph to use XCopyArea.
   Fixes to linux diskmeter.
+  Fixed all (I hope) linux code which parsed /proc/stat with too 
+    small a buffer.
   
 Changes since xosview-1.6.2
   Added a linux diskmeter which *should* be similar to the BSD version
