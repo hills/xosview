@@ -44,6 +44,7 @@ FieldMeterGraph::FieldMeterGraph( XOSView *parent,
 
 	useGraph_ = 0;
 	heightfield_ = NULL;
+	firstTimeDrawn_ = 1;
 	
 	// set number of columns to a reasonable default in case we can't
 	// find the resource
@@ -117,7 +118,11 @@ void FieldMeterGraph::drawfields( int manditory )
 		heightfield_[graphpos_*numfields_+i] = a;
 	}
 
-	if( !parent_->isExposed() && parent_->isFullyVisible() )
+	/*  For the first time, we need to draw everything, so
+	 *  skip the optimized copyArea case.  Also, if we are
+	 *  not fully visible, then the copy-area won't work
+	 *  properly.  */
+	if( !firstTimeDrawn_ && parent_->hasBeenExposedAtLeastOnce() && !parent_->isExposed() && parent_->isFullyVisible() )
 	{
 		// scroll area
 		int col_width = width_/graphNumCols_;
@@ -132,12 +137,19 @@ void FieldMeterGraph::drawfields( int manditory )
 		if( sx > x_ && swidth > 0 && sheight > 0 )
 			parent_->copyArea( sx, y_, swidth, sheight, x_, y_ );
 		drawBar( graphNumCols_ - 1 );
-	}
-	else
-	{
+	} else {
+		if (firstTimeDrawn_ &&
+		    parent_->isAtLeastPartiallyVisible() &&
+		    parent_->hasBeenExposedAtLeastOnce()) {
+			XOSDEBUG("True exposure! %d\n", firstTimeDrawn_);
+			firstTimeDrawn_ = 0;
+		}
+		else XOSDEBUG("Full draw:  isPart %d, isAtLeastPart %d, hasBeenExposed %d\n",
+			parent_->isPartiallyVisible(),
+			parent_->isAtLeastPartiallyVisible(),
+			parent_->hasBeenExposedAtLeastOnce());
 		// need to draw entire graph on expose event
-		for( i = 0; i < graphNumCols_; i++ )
-		{
+		for( i = 0; i < graphNumCols_; i++ ) {
 			drawBar( i );
 		}
 	}
