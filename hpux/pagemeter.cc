@@ -32,7 +32,7 @@ void PageMeter::checkResources( void ){
   setfieldcolor( 2, parent_->getResource( "pageIdleColor" ) );
   priority_ = atoi (parent_->getResource( "pagePriority" ) );
   maxspeed_ *= priority_ / 10.0;
-  dodecay_ = !strncasecmp (parent_->getResource( "pageDecay" ), "True", 5 );
+  dodecay_ = parent_->isResourceTrue( "pageDecay" );
   SetUsedFormat( parent_->getResource( "pageUsedFormat" ) );
 }
 

@@ -45,8 +45,8 @@ void LoadMeter::checkResources( void ){
       parent_->getResource("loadIdleColor") );
 
   priority_ = atoi (parent_->getResource("loadPriority"));
-  dodecay_ = !strncasecmp (parent_->getResource("loadDecay"),"True", 5);
-  useGraph_ = !strncasecmp (parent_->getResource("loadGraph"),"True", 5);
+  dodecay_ = parent_->isResourceTrue("loadDecay");
+  useGraph_ = parent_->isResourceTrue("loadGraph");
   SetUsedFormat (parent_->getResource("loadUsedFormat"));
 
   alarmThreshold = atoi (parent_->getResource("loadAlarmThreshold"));

@@ -27,7 +27,7 @@ void LoadMeter::checkResources( void ){
   setfieldcolor( 0, procloadcol_ );
   setfieldcolor( 1, parent_->getResource( "loadIdleColor" ) );
   priority_ = atoi (parent_->getResource( "loadPriority" ) );
-  dodecay_ = !strncasecmp (parent_->getResource( "loadDecay" ), "True", 5 );
+  dodecay_ = parent_->isResourceTrue( "loadDecay" );
   SetUsedFormat( parent_->getResource( "loadUsedFormat" ));
 
   alarmThreshold = atoi (parent_->getResource("loadAlarmThreshold"));

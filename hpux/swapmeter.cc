@@ -26,7 +26,7 @@ void SwapMeter::checkResources( void ){
   setfieldcolor( 0, parent_->getResource( "swapUsedColor" ) );
   setfieldcolor( 1, parent_->getResource( "swapFreeColor" ) );
   priority_ = atoi (parent_->getResource( "swapPriority" ) );
-  dodecay_ = !strncasecmp (parent_->getResource( "swapDecay" ), "True", 5 );
+  dodecay_ = parent_->isResourceTrue( "swapDecay" );
   SetUsedFormat( parent_->getResource( "swapUsedFormat" ) );
 }
 

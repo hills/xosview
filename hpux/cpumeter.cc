@@ -31,8 +31,8 @@ void CPUMeter::checkResources( void ){
   setfieldcolor( 3, parent_->getResource( "cpuInterruptColor" ) );
   setfieldcolor( 4, parent_->getResource( "cpuFreeColor" ) );
   priority_ = atoi (parent_->getResource( "cpuPriority" ) );
-  dodecay_ = !strncasecmp (parent_->getResource( "cpuDecay" ), "True", 5 );
-  useGraph_ = !strncasecmp (parent_->getResource( "pageGraph" ), "True", 5 );
+  dodecay_ = parent_->isResourceTrue( "cpuDecay" );
+  useGraph_ = parent_->isResourceTrue( "pageGraph" );
   SetUsedFormat( parent_->getResource( "cpuUsedFormat" ) );
 }
 
