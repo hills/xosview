@@ -11,7 +11,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <sys/time.h>
-#include <strstream.h>
+#include "snprintf.h"
 #include "general.h"
 #include "xosview.h"
 #include "meter.h"
@@ -186,25 +186,23 @@ void XOSView::checkOverallResources() {
   setFont();
   
   // use captions
-  if ( isResourceTrue("captions") )
+  if ( !strcmp( getResource("captions"), "True" ) )
       caption_ = 1;
 
   // use labels
-  if ( isResourceTrue("labels") )
+  if ( !strncasecmp( getResource("labels"), "True", 5 ) )
       legend_ = 1;
 
   // use "free" labels
-  if ( isResourceTrue("usedlabels") )
+  if ( !strncasecmp( getResource("usedlabels"), "True", 5 ) )
     usedlabels_ = 1;
 }
 
 const char *XOSView::winname( void ){
-  static char name[100];
-  ostrstream os(name, 99);
   char host[100];
   gethostname( host, 99 );
-  os << NAME << host << ends;
-//  snprintf( name, 100, "%s%s", NAME, host);
+  char name[101];
+  snprintf( name, 100, "%s%s", NAME, host);
   //  Allow overriding of this name through the -title option.
   return getResourceOrUseDefault ("title", name);
 }
@@ -290,9 +288,8 @@ void XOSView::usleep_via_select( unsigned long usec ){
 void XOSView::keyPressEvent( XKeyEvent &event ){
   char c = 0;
   KeySym key;
-  XComposeStatus cs;
 
-  XLookupString( &event, &c, 1, &key, &cs );
+  XLookupString( &event, &c, 1, &key, NULL );
 
   if ( (c == 'q') || (c == 'Q') )
     done_ = 1;

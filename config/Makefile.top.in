@@ -18,6 +18,7 @@ fieldmeterdecay.o \
 fieldmetergraph.o \
 bitmeter.o \
 xosview.o \
+snprintf.o \
 main.o
 
 CFILES := $(OBJS:.o=.cc)

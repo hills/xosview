@@ -9,7 +9,6 @@
 #include "general.h"
 #include "meter.h"
 #include "xosview.h"
-#include <strstream.h>
 
 CVSID("$Id$");
 CVSID_DOT_H(METER_H_CVSID);
@@ -40,16 +39,18 @@ void Meter::checkResources( void ){
 
 void Meter::title( const char *title ){
   delete[] title_;
-  ostrstream os;
-  os << title << ends;
-  title_ = os.str();
+  int len = strlen(title);
+  title_ = new char[len + 1];
+  strncpy( title_, title, len );
+  title_[len] = '\0'; // strncpy() will not null terminate if s2 > len
 }
 
 void Meter::legend( const char *legend ){
   delete[] legend_;
-  ostrstream os;
-  os << legend << ends;
-  legend_ = os.str();
+  int len = strlen(legend);
+  legend_ = new char[len + 1];
+  strncpy( legend_, legend, len );
+  legend_[len] = '\0'; // strncpy() will not null terminate if s2 > len
 }
 
 void Meter::resize( int x, int y, int width, int height ){

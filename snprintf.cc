@@ -5,6 +5,8 @@
 
 extern "C" int snprintf ( char *str, int n, const char *format, ...)
     {
+    /* punt the warning */
+    n++;
     va_list ap;
     va_start(ap, format);
     int rval = vsprintf(str, format, ap);

@@ -7,9 +7,8 @@
 // $Id$
 //
 #include <fstream.h>
-#include <strstream.h>
-#include <iomanip.h>
 #include <stdlib.h>
+#include "snprintf.h"
 #include "general.h"
 #include "fieldmeter.h"
 #include "xosview.h"
@@ -173,12 +172,9 @@ void FieldMeter::drawused( int manditory ){
   static int xoffset = parent_->textWidth( "XXXXX" );
 
   char buf[10];
-  buf[0] = '\0';
-  ostrstream bufs(buf, 10);
-  bufs.setf(ios::fixed);
 
   if (print_ == PERCENT){
-  bufs << (int)used_ << "%" << ends;
+    snprintf( buf, 10, "%d%%", (int)used_ );
   }
   else if (print_ == AUTOSCALE){
     char scale;
@@ -210,23 +206,18 @@ void FieldMeter::drawused( int manditory ){
        *  print 965, or we can print 34, but we can't print 34.7 (the
        *  decimal point takes up one character).  bgrayson   */
     if (scaled_used == 0.0)
-        {
-        bufs << "0" << ends;
-        }
+      snprintf (buf, 10, "0");
     else if (scaled_used < 9.95)  //  9.95 or above would get
 				  //  rounded to 10.0, which is too wide.
-        {
-        bufs << setprecision(1) << scaled_used << scale << ends;
-        }
+      snprintf (buf, 10, "%.1f%c", scaled_used, scale);
     /*  We don't need to check against 99.5 -- it all gets %.0f.  */
     /*else if (scaled_used < 99.5)*/
+      /*snprintf (buf, 10, "%.0f%c", scaled_used, scale);*/
     else 
-        {
-        bufs << setprecision(0) << scaled_used << scale << ends;
-        }
+      snprintf (buf, 10, "%.0f%c", scaled_used, scale);
   }
   else {
-  bufs << setprecision(1) << used_ << ends;
+    snprintf( buf, 10, "%.1f", used_ );
   }
 
   parent_->clear( x_ - xoffset, y_ + height_ - parent_->textHeight(), 
