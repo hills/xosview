@@ -12,6 +12,7 @@
 #ifndef _SWAPMETER_H_
 #define _SWAPMETER_H_
 
+#define SWAPMETER_H_CVSID "$Id: "
 
 #include "fieldmeterdecay.h"
 

@@ -12,6 +12,8 @@
 #ifndef _CPUMETER_H_
 #define _CPUMETER_H_
 
+#define CPUMETER_H_CVSID "$Id: "
+
 #include "fieldmeterdecay.h"
 
 class CPUMeter : public FieldMeterDecay {
