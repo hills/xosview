@@ -1,3 +1,33 @@
+! **********************************************************************
+! **********************************************************************
+! **  DO NOT EDIT Xdefaults!!!!
+! **
+! **  Only make changes to the file Xdefaults.in, and re-run ./configure
+! **  to regenerate Xdefaults.
+! **
+! **  Thanks, 
+! **    the Management :)    (bgrayson)
+! **
+! **********************************************************************
+! **********************************************************************
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 !
 !  xosview resources (override into your .Xdefaults file)
 !  $Id$
@@ -93,7 +123,7 @@ xosview*pageUsedFormat:     autoscale
 
 ! Network Meter Resources
 
-xosview*net:		    False
+xosview*net:		    @NetMeter_Default_Setting@
 xosview*netBandwidth:       7500  ! for 64kbps ISDN
 !xosview*netBandwidth:       5000  ! for up to 57.6kbps modems
 !xosview*netBandwidth:       2000  ! for 28.8kbps modems (no compression)

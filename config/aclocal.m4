@@ -166,13 +166,20 @@ then
 LINUX_SMP="-D__SMP__"
 fi
 AC_SUBST(LINUX_SMP)
-])
+]
+	NetMeter_Default_Setting=False
+)
 
+
+dnl  ***  Below this line are the *BSD/BSDI and HPUX macros.  ***
+
+dnl  ***  This one isn't actually used yet.  - bgrayson  ***
 AC_DEFUN(AC_XOSV_BSD_COMMON, [
 dnl  The BSD versions need to link with libkvm, and have the BSD install flags.
 	EXTRALIBS="-lkvm $XPMLIB"
 	INSTALL_ARGS='-s -g kmem -m 02555'
 ])
+
 AC_DEFUN(AC_XOSV_NETBSD, [
 dnl  We need to strip the version numbers off the $host_os string (netbsd1.1)
 dnl  Let's just be lazy -- set host_os to be netbsd.  
@@ -182,6 +189,7 @@ dnl Netbsd needs to link with libkvm
 dnl
         EXTRALIBS="-lkvm $XPMLIB"
         INSTALL_ARGS='-s -g kmem -m 02555'
+	NetMeter_Default_Setting=True
 	AC_DEFINE(XOSVIEW_NETBSD)
 ])
 
@@ -191,6 +199,7 @@ dnl FreeBSD also needs to link with libkvm
 dnl
         EXTRALIBS="-lkvm $XPMLIB $DEVSTATLIB"
         INSTALL_ARGS='-s -g kmem -m 02555'
+	NetMeter_Default_Setting=True
 	AC_DEFINE(XOSVIEW_FREEBSD)
 ])
 
@@ -200,6 +209,7 @@ dnl OpenBSD also needs to link with libkvm
 dnl
         EXTRALIBS="-lkvm $XPMLIB"
         INSTALL_ARGS='-s -g kmem -m 02555'
+	NetMeter_Default_Setting=True
 	AC_DEFINE(XOSVIEW_OPENBSD)
 ])
 
@@ -211,8 +221,10 @@ dnl gmake CXX=shlicc++ on bsdi [23].x
 dnl
 	EXTRALIBS="-lkvm $XPMLIB"
 	INSTALL_ARGS='-s -g kmem -m 02555'
+	NetMeter_Default_Setting=True
 	AC_DEFINE(XOSVIEW_BSDI)
 ])
+
 AC_DEFUN(AC_XOSV_HPUX, [
 dnl
 dnl No special config options for HPUX.
