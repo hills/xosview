@@ -68,12 +68,14 @@ hpux*)    AC_XOSV_HPUX
 esac
 
 dnl
-dnl The nethsd and linux ports modify these variables which
+dnl The netbsd and linux ports modify these variables which
 dnl are exported by AC_OUTPUT.
 dnl
 AC_SUBST(EXTRALIBS)
 AC_SUBST(INSTALL_ARGS)
 AC_SUBST(USE_MOD_VERSIONS)
+dnl  Check for usleep().  Currently, only HP-UX doesn't have it.
+AC_CHECK_FUNCS(usleep)
 
 AC_OUTPUT(\
   Makefile:config/Makefile.top.in \
