@@ -44,6 +44,8 @@ void CPUMeter::checkResources( void ){
   setfieldcolor( 3, parent_->getResource("cpuFreeColor") );
   priority_ = atoi (parent_->getResource("cpuPriority"));
   dodecay_ = !strcmp (parent_->getResource("cpuDecay"),"True");
+  SetUsedFormat (parent_->getResource("cpuUsedFormat"));
+
 }
 
 void CPUMeter::checkevent( void ){
@@ -53,7 +55,6 @@ void CPUMeter::checkevent( void ){
 
 void CPUMeter::getcputime( void ){
   total_ = 0;
-
 
   //  Begin NetBSD-specific code...  BCG
   long tempCPU[CPUSTATES];
@@ -69,13 +70,12 @@ void CPUMeter::getcputime( void ){
   cputime_[cpuindex_][3] = tempCPU[4];
   //  End NetBSD-specific code...  BCG
   
-
   int oldindex = (cpuindex_+1)%2;
   for ( int i = 0 ; i < 4 ; i++ ){
     fields_[i] = cputime_[cpuindex_][i] - cputime_[oldindex][i];
     total_ += fields_[i];
   }
-  used( (int)((100 * (total_ - fields_[3])) / total_) );
+  setUsed (total_ - fields_[3], total_);
 
   cpuindex_ = (cpuindex_ + 1) % 2;
 }
