@@ -286,7 +286,7 @@ BSDGetNetInOut (long long * inbytes, long long * outbytes)
     safe_kvm_read ((unsigned long) ifnetp, &ifnet, sizeof(ifnet));
 #ifdef NET_DEBUG
     safe_kvm_read ((unsigned long) ifnet.if_name, ifname, 256);
-    sprintf (ifname, "%s%d", ifname, ifnet.if_unit);
+    snprintf (ifname, 256, "%s%d", ifname, ifnet.if_unit);
     printf ("Interface name is %s\n", ifname);
     printf ("Ibytes: %8ld Obytes %8ld\n", ifnet.if_ibytes, ifnet.if_obytes);
     printf ("Ipackets:  %8ld\n", ifnet.if_ipackets);

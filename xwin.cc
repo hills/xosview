@@ -241,7 +241,7 @@ void XWin::getGeometry( void ){
   sizehints_->y = y_;
 
   // Construct a default geometry string
-  sprintf(default_geometry, "%dx%d+%d+%d", sizehints_->width,
+  snprintf(default_geometry, 80, "%dx%d+%d+%d", sizehints_->width,
 	  sizehints_->height, sizehints_->x, sizehints_->y);
 
   // Process the geometry specification
