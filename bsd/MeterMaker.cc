@@ -60,11 +60,8 @@ void MeterMaker::makeMeters(void){
   if (_xos->isResourceTrue("disk"))
     push(new DiskMeter (_xos, atof(_xos->getResource("diskBandwidth"))));
 
-  push(new IntMeter (_xos));
-  //  The serial meters and the interrupt meter are not yet
-  //  available for NetBSD.  BCG
-#ifdef XOSVIEW_FREEBSD
   if (_xos->isResourceTrue("interrupts"))
       push(new IntMeter(_xos));
-#endif
+
+  //  The serial meters are not yet available for the BSDs.  BCG
 }
