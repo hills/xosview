@@ -72,7 +72,7 @@ float IntMeter::getLinuxVersion(void) {
 }
 
 int IntMeter::countCPUs(void) {
- return CPUMeter::countCPUs();
+ return CPUMeter::countCPUs() + 1;
 }
 
 void IntMeter::getirqs( void ){
