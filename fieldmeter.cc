@@ -21,7 +21,7 @@ FieldMeter::FieldMeter( XOSView *parent, int numfields, const char *title,
     /*  We need to set print_ to something valid -- the meters
      *  apparently get drawn before the meters have a chance to call
      *  CheckResources() themselves.  */
-  printedZeroTotalMesg_ = 0;
+  numWarnings_ = printedZeroTotalMesg_ = 0;
   print_ = PERCENT;
   used_ = 0;
   lastused_ = -1;
@@ -234,6 +234,19 @@ void FieldMeter::drawfields( int manditory ){
     return;
   
   for ( int i = 0 ; i < numfields_ ; i++ ){
+    /*  Look for bogus values.  */
+    if (fields_[i] < 0.0) {
+      /*  Only print a warning 5 times per meter, followed by a
+       *  message about no more warnings.  */
+      numWarnings_ ++;
+      if (numWarnings_ < 5)
+	fprintf(stderr, "Warning:  meter %s had a negative "
+	  "value of %f for field %d\n", name(), fields_[i], i);
+      if (numWarnings_ == 5)
+        fprintf(stderr, "Future warnings from the %s meter "
+	  "will not be displayed.\n", name());
+    }
+
     twidth = (int) ((width_ * (float) fields_[i]) / total_); 
 //    twidth = (int)((fields_[i] * width_) / total_);
     if ( (i == numfields_ - 1) && ((x + twidth) != (x_ + width_)) )
