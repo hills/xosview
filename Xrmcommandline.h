@@ -61,9 +61,11 @@ static XrmOptionDescRec options[] = {
 { "+page", "*page", XrmoptionNoArg, "True" },
 { "-pagespeed", "*pageBandWidth", XrmoptionSepArg, (caddr_t) NULL },
 
+#if !defined(__hpux__) && !defined(__hpux)
 //  Disk Meter Options
 { "-disk", "*disk", XrmoptionNoArg, "False" },
 { "+disk", "*disk", XrmoptionNoArg, "True" },
+#endif
 
 // Interrupt meter resources  --  all sorts of aliases.
 { "-int", "*interrupts", XrmoptionNoArg, "False" },
