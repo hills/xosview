@@ -103,9 +103,9 @@ distclean: clean
            @host_dir@/Makefile config.cache config.log config.status
 	@#  Also check _all_ subdirs, not just the configured one, for
 	@#  object files.
-	sh -c 'objects=`find . -name "*.o" -print`; if [ x$objects != x ]; then \
+	sh -c 'objects=`find . -name "*.o" -print`; if [ x$$objects != x ]; then \
 	  echo "The following object files still need to be removed:";\
-	  echo $objects; fi'
+	  echo $$objects; fi'
 
 
 maintainer-clean: distclean
