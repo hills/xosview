@@ -267,6 +267,11 @@ BSDGetNetInOut (long long * inbytes, long long * outbytes)
 
 
 /*  ---------------------- Swap Meter stuff  -----------------  */
+#if defined(HAVE_SWAPCTL)
+struct swapent *sep;
+int nswapAllocd = 0;
+#endif
+
 int
 BSDSwapInit() {
   OpenKDIfNeeded();
@@ -274,6 +279,12 @@ BSDSwapInit() {
    *  missing kvm symbols (due to OS version mismatch, for example).
    *  */
   /*return ValidSymbol(*/
+#if defined(HAVE_SWAPCTL)
+  nswapAllocd = 32;	/*  Add buffering, beyond nswap...  */
+  int nswap = swapctl(SWAP_NSWAP, 0, 0);
+  if (nswap >= 0) nswapAllocd += nswap;
+  sep = (struct swapent *) malloc(nswapAllocd * sizeof(*sep));
+#endif
   return 1;
 }
 
@@ -288,7 +299,6 @@ BSDSwapInit() {
 void
 BSDGetSwapCtlInfo(int *totalp, int *freep)
 {
-  struct swapent *sep;
   int	totalinuse, totalsize;
   int rnswap, nswap = swapctl(SWAP_NSWAP, 0, 0);
 
@@ -297,7 +307,12 @@ BSDGetSwapCtlInfo(int *totalp, int *freep)
     return;
   }
 
-  sep = (struct swapent *)malloc(nswap * sizeof(*sep));
+  /*  We did a malloc in the Init routine.  Only realloc if nswap has grown.  */
+  if (nswap > nswapAllocd) {
+    free(sep);
+    nswapAllocd = nswap+32;	/*  Extra space, so we can avoid mallocs.  */
+    sep = (struct swapent *)malloc(nswapAllocd * sizeof(*sep));
+  }
   if (sep == NULL)
     err(1, "malloc");
   rnswap = swapctl(SWAP_STATS, (void *)sep, nswap);
