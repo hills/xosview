@@ -16,6 +16,7 @@ meter.o \
 fieldmeter.o \
 fieldmeterdecay.o \
 fieldmetergraph.o \
+bitfieldmeter.o \
 bitmeter.o \
 xosview.o \
 snprintf.o \

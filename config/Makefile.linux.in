@@ -19,6 +19,7 @@ intmeter.o \
 loadmeter.o \
 btrymeter.o \
 diskmeter.o \
+raidmeter.o \
 MeterMaker.o
 
 ifeq (@host_cpu@, m68k)

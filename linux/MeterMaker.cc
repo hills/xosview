@@ -19,6 +19,7 @@
 #include "loadmeter.h"
 #include "btrymeter.h"
 #include "diskmeter.h"
+#include "raidmeter.h"
 
 #include <stdlib.h>
 
@@ -70,6 +71,14 @@ void MeterMaker::makeMeters(void){
       push(new IntMeter(_xos, i));
   }
 
+  // check for the battery meter
   if (_xos->isResourceTrue("battery"))
     push(new BtryMeter(_xos));
+
+  // check for the RAID meter
+  if (_xos->isResourceTrue("RAID")){
+    int RAIDCount = atoi(_xos->getResource("RAIDdevicecount"));
+    for (int i = 0 ; i < RAIDCount ; i++)
+      push(new RAIDMeter(_xos, i));
+  }
 }

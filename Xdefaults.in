@@ -18,7 +18,7 @@ xosview*background:         navy
 xosview*foreground:         wheat
 xosview*enableStipple:	    False ! Change to true to try beta stipple support.
 xosview*samplesPerSec:      10    ! not yet supported
-xosview*graphNumCols:       64    ! number of samples shown in a graph
+xosview*graphNumCols:       128   ! number of samples shown in a graph
 
 ! Load Meter Resources
 ! We don't need to enable the Decay option, as it is already time-averaged.
@@ -163,3 +163,13 @@ xosview*diskDecay:	    True
 xosview*diskUsedFormat:     autoscale
 xosview*diskGraph:	    True
 
+
+xosview*RAID:                 False
+xosview*RAIDdevicecount:      1
+xosview*RAIDdiskOnlineColor:  green
+xosview*RAIDdiskFailureColor: red
+xosview*RAIDresyncdoneColor:  yellow
+xosview*RAIDresynctodoColor:  red
+xosview*RAIDresynccompleteColor:  green
+xosview*RAIDPriority:         20
+xosview*RAIDUsedFormat:       percent

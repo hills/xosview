@@ -123,6 +123,81 @@ ipchains -A output -j oacct
 
         http://www-isia.cma.fr/~forissie/smp_kernel_patch/
 
+
+      - Raidmeter notes from Thomas Waldmann:
+
+        Linux now supports a RAID meter.  This meter is disabled by default
+        since a couple of kernel patches are currently required to get
+        it working.  It can be enabled via an X resource.
+
+        You need a kernel patched with raid0145-19990824 stuff AND 
+        mdstat-tw1.diff.  xosview RAID display won't work without 
+        mdstat-tw1.diff applied!
+  
+        Because I didn't find out the kernel variable which holds the md device
+        count, you have to set it in the Xdefaults file (you don't need to 
+        change it if you have 1 md device). If you know how to modify the 
+        kernel to make this obsolete, please tell me!
+
+        Also there might be some redundant values in /proc/mdstat - I just 
+        included everything that was there in old format.
+
+        linux/mdstat-tw1.diff
+          change /proc/mdstat to be more easily readable and parseable
+
+        RAID1 and RAID5 arrays will give a nice "working disk map" and 
+        "resync status" display. When using a RAID1 or RAID5 array it is 
+        very important to NOTICE a disk failure. If you don't notice it 
+        because your system continues to work normally, you'll have a bad 
+        day if the next disk fails...
+   
+        RAID0 won't give a senseful display because there is no "working 
+        disk map" and there is no "resync status" at all. As RAID0 has no 
+        redundancy you will for sure notice a disk failure (that's the 
+        moment when all your data is gone and you need a backup tape), so 
+        you maybe won't need xosview for that.
+
+
+        The usual disclaimer
+        ====================
+
+        The patches work on my machine, but there's no guarantee at all.
+        Use on your OWN risk. If it breaks your RAID array, you own the parts.
+
+        What you need
+        =============
+
+        kernel source 2.2.11 or 2.2.12 or 2.2.13
+        (ftp.kernel.org/pub/linux/kernel/...)
+
+        kernel RAID patch raid0145-19990824-2.2.11 + corresponding raidtools
+        (ftp.kernel.org/pub/linux/daemons/raid/alpha/...)
+
+        Installation
+        ============
+
+        Kernel
+        ------
+
+        Unpack kernel source, patch it with the RAID patch (if you are using 
+        kernel 2.2.12 or 2.2.13 you will get some warnings. Answer "n" for 
+        any question.  You can ignore the warnings safely, you get them 
+        because some stuff in the patch already IS in the kernel source).
+
+        Patch your kernel source with the mdstat-tw1.diff:
+
+        cd /usr/src/linux
+        patch -p1 <mdstat-tw1.diff
+
+        Compile / install kernel as usual.
+
+        Install raidtools source, compile it and install binaries.
+
+        Reboot.
+
+        cat /proc/mdstat to see new layout.
+
+
 Other notes:
        
         Xosview should work for 2.0, 2.1 and 2.2 kernels.  The memory meters
