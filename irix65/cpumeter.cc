@@ -77,7 +77,8 @@ void CPUMeter::getcputime(void)
 	cpuindex_ = (cpuindex_ + 1) % 2;
 
 	if (total_)
-		setUsed(total_ - fields_[3], total_);
+		setUsed(total_ - fields_[3] - fields_[4], total_); // wait doesn't count
+    // as used 
 }
 
 const char *CPUMeter::toUpper(const char *str)
