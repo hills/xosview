@@ -31,7 +31,7 @@ void DiskMeter::checkResources( void )
     setfieldcolor( 0, parent_->getResource("diskUsedColor") );
     setfieldcolor( 1, parent_->getResource("diskIdleColor") );
     priority_ = atoi (parent_->getResource( "diskPriority" ) );
-    dodecay_ = !strcmp (parent_->getResource( "diskDecay" ), "True" );
+    dodecay_ = !strncasecmp(parent_->getResource("diskDecay" ), "True", 5);
     useGraph_ = !strncasecmp(parent_->getResource( "diskGraph" ), "True", 5 );
     SetUsedFormat(parent_->getResource("diskUsedFormat"));
     }
