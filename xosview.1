@@ -1,6 +1,6 @@
 '\" t
 .\" @(#)xosview.1	1.3 7/17/97 "
-.TH XOSVIEW 1.5.1 "$Date$"
+.TH XOSVIEW 1.6.0 "$Date$"
 .UC
 .SH NAME
 xosview \- X based system monitor
@@ -134,40 +134,34 @@ platform \fIxosview\fP is running on.
 
 \fBMemory Usage\fP
    Linux  : used | shared | buffers | free
-   NetBSD : active | inactive | shared | free
-   FreeBSD: active | inactive | shared | free
+   NetBSD : active | inactive | wired | free
+   FreeBSD: active | inactive | wired | buffer | free
    HPUX   : text | used   | other   | free
 
 \fBSwap Usage\fP
-   Linux  : used | free
-   NetBSD : used | free
-   FreeBSD: < Not Supported >
-   HPUX   : used | free
+   all platforms: used | free
 
 \fBDisk Usage (bytes/sec)\fP
    Linux  : < Not Supported >
    NetBSD : transferred | idle
-   FreeBSD: < Not Supported >
+   FreeBSD: transferred | idle
    HPUX   : < Not Supported >
 
 \fBPage Swapping from/to disk\fP
-   Linux  : in | out | idle
-   NetBSD : in | out | idle
-   FreeBSD: in | out | idle
-   HPUX   : in | out | idle
+   all platforms  : in | out | idle
 
 \fBNET Usage\fP
     bytes/sec
     Linux  : in | out | idle
     NetBSD : in | out | idle
-    FreeBSD: < Not Supported >
+    FreeBSD: in | out | idle
     HPUX   : < Not Supported >
 
 \fBInterrupts\fP
     "leds" which blink when an interrupt occurs.
     Linux  : IRQs 0 - 15
-    NetBSD : < Not Supported >
-    FreeBSD: < Not Supported >
+    NetBSD : IRQs 0 - 15 (or fewer, depending on architecture)
+    FreeBSD: IRQs 0 - 15
     HPUX   : < Not Supported >
 
 \fBSerial Port Status\fP
@@ -651,7 +645,7 @@ per second for the disk meter.
 .SH BUGS
 
 
-Here is a list of known bugs in xosview-1.5.  Reports of unknown bugs are
+Here is a list of known bugs in xosview-1.6.  Reports of unknown bugs are
 appreciated and should be directed to:
 
 .RS
@@ -668,7 +662,7 @@ Bugs related to the NetBSD port.
 .RE
 .RE
 
-Occasionally (and unrepeatably), the NetBSD xosview will clobber the NET text
+Occasionally (and unrepeatably?), the NetBSD xosview will clobber the NET text
 in the netmeter with horizontal black bars and the used-label numbers. 
 I'm guessing this has something to do with the net numbers reaching some
 unusual number (like 0 or maximum), but have not been able to pinpoint it
@@ -681,6 +675,10 @@ The most current version of xosview can be found at the following site:
 .RS
 sunsite.unc.edu /pub/Linux/X11/xutils/status/
 .RE
+
+For *BSD users with the ports/package system, the
+sysutils/xosview tree ought to also have a version that is just
+as up-to-date.
 
 .SH MAN PAGE REVISION
 
@@ -697,6 +695,11 @@ Brian Grayson (bgrayson@ece.utexas.edu)
 .RS
 NetBSD port and most of the nice enhancements for version 1.4,
 initial work on FreeBSD port.
+.RE
+
+Tom Pavel (pavel@slac.stanford.edu)
+.RS
+Most of the FreeBSD support, more resource-handling improvements.
 .RE
 
 Werner Fink (werner@suse.de)
