@@ -3,7 +3,9 @@
 //
 //  This file may be distributed under terms of the GPL
 //
-
+//
+// $Id$
+//
 #ifndef _FIELDMETER_H_
 #define _FIELDMETER_H_
 

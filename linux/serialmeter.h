@@ -3,7 +3,9 @@
 //
 //  This file may be distributed under terms of the GPL
 //
-
+//
+// $Id$
+//
 #ifndef _SERIALMETER_H_
 #define _SERIALMETER_H_
 

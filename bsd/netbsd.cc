@@ -6,7 +6,9 @@
 //
 //  This file may be distributed under terms of the GPL
 //
-
+//
+// $Id$
+//
 #include <stdio.h>
 #include <fcntl.h>
 #include <kvm.h>

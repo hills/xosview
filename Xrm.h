@@ -3,6 +3,9 @@
 //
 //  This file may be distributed under terms of the GPL
 //
+//
+// $Id$
+//
 #ifndef _Xrm_h
 #define _Xrm_h
 

@@ -5,6 +5,9 @@
 //  applies to most of this code.  The disclaimer, along with the CVS
 //  header from the version from which this file was created, are included
 //  below:
+//
+// $Id$
+//
 
 /*      $NetBSD: swap.c,v 1.4 1995/08/31 22:20:19 jtc Exp $     */
 

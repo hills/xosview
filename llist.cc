@@ -3,7 +3,9 @@
 //
 //  This file may be distributed under terms of the GPL
 //
-
+//
+// $Id$
+//
 #include <iostream.h>
 #include "llist.h"
 

@@ -1,3 +1,7 @@
+//
+// $Id$
+//
+
 #include "xwin.h"
 #include "Xrm.h"
 #include <X11/Xatom.h>

@@ -3,7 +3,9 @@
 //
 //  This file may be distributed under terms of the GPL
 //
-
+//
+// $Id$
+//
 #ifndef _METER_H_
 #define _METER_H_
 

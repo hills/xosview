@@ -1,3 +1,6 @@
+//
+// $Id$
+//
 #ifndef _XWIN_H_
 #define _XWIN_H_
 

@@ -6,7 +6,9 @@
 //
 //  This file may be distributed under terms of the GPL
 //
-
+//
+// $Id$
+//
 #ifndef _NETMETER_H_
 #define _NETMETER_H_
 

@@ -2,6 +2,9 @@
 # This is a simple awk program which will generate defaultstring.cc
 # from an X resource file.
 #
+#
+# "$Id$"
+#
 
 #
 # insert the "header" for defaultstring.cc
@@ -14,6 +17,9 @@ BEGIN {
   print "// This file is generated automagically from Xdefaults";
   print "// using the awk program found in defresources.awk.";
   print "// This file will be rebuilt when Xdefaults is modified.";
+  print "//";
+  print "// $Id$";
+  print "//";
   print "//\n\n";
   print "char *defaultXResourceString = \"\n";
 }

@@ -3,11 +3,12 @@
 //
 //  This file may be distributed under terms of the GPL
 //
-
+//
+// $Id$
+//
 #include "Host.h"
 #include <stdlib.h>
 #include <string.h>
-
 
 #ifdef __hpux__
 extern int h_errno;

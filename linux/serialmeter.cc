@@ -3,6 +3,9 @@
 //
 //  This file may be distributed under terms of the GPL
 //
+//
+// $Id$
+//
 
 //
 //  In order to use this new serial meter, xosview needs to be suid root.

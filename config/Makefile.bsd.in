@@ -1,6 +1,9 @@
 #
 # NetBSD Makefile template
 #
+#
+# $Id$
+#
 include ../Makefile.config
 
 CXXFLAGS += -I@top_srcdir@

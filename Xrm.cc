@@ -3,6 +3,9 @@
 //
 //  This file may be distributed under terms of the GPL
 //
+//
+// $Id$
+//
 #include "Xrm.h"
 //#include "defaultstring.h"
 #include "Xrmcommandline.h"

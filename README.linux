@@ -64,5 +64,4 @@ To install xosview:
      can change the permissions to whatever you like.  The X defaults for
      xosview (Xdefaults) are copied to /usr/lib/X11/app-defaults/XOsview.
 
-
-
+Revision: $Id$

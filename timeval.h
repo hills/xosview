@@ -3,7 +3,9 @@
 //
 //  This file may be distributed under terms of the GPL
 //
-
+//
+// $Id$
+//
 #ifndef _TIMEVAL_H_
 #define _TIMEVAL_H_
 

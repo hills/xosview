@@ -8,7 +8,9 @@
 //
 //  The NetBSD memmeter was improved by Tom Pavel (pavel@slac.stanford.edu)
 //    to provide active and inactive values, rather than just "used."
-
+//
+// $Id$
+//
 #include "memmeter.h"
 #include "xosview.h"
 

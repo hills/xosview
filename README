@@ -30,3 +30,5 @@ file?  Read the window-manager's man page to see how these variables
 should be set.  Fvwm, and other window managers, use flags like this to
 throw out the position part of the geometry string that an application
 passes to it.
+
+Revision: $Id$

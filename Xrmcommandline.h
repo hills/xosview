@@ -1,3 +1,7 @@
+//
+// $Id$
+//
+
 #ifndef _Xrmcommandline_h
 #define _Xrmcommandline_h
 

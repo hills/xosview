@@ -7,3 +7,4 @@
   Fix MeterMaker in the other ports to check for all meters, not 
     just load and serial.
 
+Revision: $Id$

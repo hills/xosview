@@ -1,6 +1,9 @@
 #
 # Top level Makefile Template for xosview.
-# 
+#
+#
+# $Id$
+#
 include Makefile.config
 
 OBJS = \
@@ -23,15 +26,17 @@ INSTALL            = @INSTALL@
 
 #-----------------------------------------------------------------------
 
-all : xosview
+all : meterlib xosview
 
 defaultstring.cc: Xdefaults defresources.awk
 	@AWK@ -f defresources.awk Xdefaults > defaultstring.cc
 
-@host_os@/libmeter.a :
+meterlib:
 	$(MAKE) -C @top_srcdir@/@host_os@
 
-xosview: @host_os@/libmeter.a $(OBJS) 
+@top_srcdir@/@host_os@/libmeter.a: meterlib
+
+xosview: $(OBJS) @top_srcdir@/@host_os@/libmeter.a
 	$(CXX) $(LFLAGS) -o xosview $(OBJS) $(LIBS)
 
 install: xosview
