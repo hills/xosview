@@ -73,8 +73,8 @@ xosview*gfxWarnColor:      orange
 xosview*gfxSwapColor:      seagreen
 xosview*gfxIdleColor:      aquamarine
 xosview*gfxPriority:       1    ! dont change, until you know what you do
-xosview*gfxCritThreshold:  120
-xosview*gfxWarnThreshold:  60
+xosview*gfxCritThreshold:  120  ! swapbuffers/s per pipe
+xosview*gfxWarnThreshold:  60   ! swapbuffers/s per pipe
 xosview*gfxDecay:          False
 xosview*gfxGraph:          False
 xosview*gfxUsedFormat:	   autoscale
