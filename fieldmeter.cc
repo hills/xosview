@@ -205,7 +205,11 @@ void FieldMeter::drawused( int manditory ){
        *  suffix, without overprinting the legends.  Thus, we can
        *  print 965, or we can print 34, but we can't print 34.7 (the
        *  decimal point takes up one character).  bgrayson   */
-    if (scaled_used == 0.0)
+      /*  Also check for negative values, and just print "-" for
+       *  them.  */
+    if (scaled_used < 0)
+      snprintf (buf, 10, "-");
+    else if (scaled_used == 0.0)
       snprintf (buf, 10, "0");
     else if (scaled_used < 9.95)  //  9.95 or above would get
 				  //  rounded to 10.0, which is too wide.
