@@ -1,5 +1,5 @@
 //
-//  Copyright (c) 1996 by Massimiliano Ghilardi ( ghilardi@cibs.sns.it )
+//  Copyright (c) 1996, 2004 by Massimiliano Ghilardi ( ghilardi@cibs.sns.it )
 //
 //  This file may be distributed under terms of the GPL
 //
@@ -59,7 +59,7 @@ void PageMeter::getpageinfo( void ){
 
   do {
     stats >>buf;
-  } while (strncasecmp(buf, "swap", 5));
+  } while (!stats.eof() && strncasecmp(buf, "swap", 5));
 
   stats >>pageinfo_[pageindex_][0] >>pageinfo_[pageindex_][1];
 

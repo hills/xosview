@@ -60,8 +60,11 @@ void CPUMeter::getcputime( void ){
   }
 
   // read until we are at the right line.
-  for (int i = 0 ; i < _lineNum ; i++)
+  for (int i = 0 ; i < _lineNum ; i++) {
+    if (stats.eof())
+      break;
     getline(stats, tmp);
+  }
 
   stats >>tmp >>cputime_[cpuindex_][0]
 	      >>cputime_[cpuindex_][1]

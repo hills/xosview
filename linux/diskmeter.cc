@@ -65,6 +65,8 @@ void DiskMeter::getdiskinfo( void )
         {
         stats.ignore(MAX_PROCSTAT_LENGTH, '\n');
         stats >> buf;
+        if (stats.eof())
+            break;
         }
 
 	// read values
