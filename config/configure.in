@@ -168,7 +168,13 @@ to autoconf!
     echo host_dir is $host_dir
     host_os=netbsd ;;
 
-freebsd*) AC_XOSV_FREEBSD
+freebsd[[0123]]*) AC_XOSV_FREEBSD
+	dnl AC_MSG_WARN([
+	dnl ])
+	host_dir=bsd
+	host_os=freebsd ;;
+freebsd[[4]]*) AC_XOSV_FREEBSD
+	AC_DEFINE(USE_KVM_GETSWAPINFO)
 	dnl AC_MSG_WARN([
 	dnl ])
 	host_dir=bsd

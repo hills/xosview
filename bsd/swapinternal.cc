@@ -66,9 +66,15 @@
 #include <sys/param.h>		/*  For things in sys/conf.h.  */
 #include <sys/conf.h>		/*  For struct swdevt.  */
 #ifdef XOSVIEW_FREEBSD
+# ifndef USE_KVM_GETSWAPINFO
 #include <sys/rlist.h>
+# endif
 #else
 #include <sys/map.h>		/*  For struct mapent.  */
+#endif
+
+#ifdef USE_KVM_GETSWAPINFO
+#include <unistd.h>		/*  For getpagesize().  */
 #endif
 
 #include <kvm.h>		/*  For all sorts of stuff.  */
@@ -98,6 +104,11 @@ extern char *getbsize __P((int *headerlenp, long *printoutblocksizep));
 #define swap_kd kd
 extern kvm_t*	swap_kd;
 
+#ifdef USE_KVM_GETSWAPINFO
+static struct kvm_swap kvmsw[16];
+static int kvnsw;
+static int pagesize;
+#else /* USE_KVM_GETSWAPINFO */
 struct nlist syms[] = {
         { "_swdevt" },  /* list of swap devices and sizes */
 #define VM_SWDEVT       0
@@ -160,6 +171,7 @@ static int nfree;
                 printf("cannot read %s: %s", msg, kvm_geterr(swap_kd)); \
                 return (0); \
         }
+#endif /* USE_KVM_GETSWAPINFO */
 
 int
 BSDInitSwapInfo()
@@ -169,6 +181,16 @@ BSDInitSwapInfo()
         int i;
 #endif
         static int once = 0;
+#ifdef USE_KVM_GETSWAPINFO
+	char msgbuf[BUFSIZ];
+	struct kvm_swap dummy;
+ 
+	if (kvm_getswapinfo(kd, &dummy, 1, 0) < 0) {
+		snprintf(msgbuf, sizeof(msgbuf),
+		    "xosview: swap: kvm_getswapinfo failed");
+	}
+	pagesize = getpagesize();
+#else /* USE_KVM_GETSWAPINFO */
         u_long ptr;
 
 	(void) ptr;	//  Avoid gcc warnings.
@@ -239,6 +261,7 @@ BSDInitSwapInfo()
         }
 #endif
 #endif /* XOSVIEW_FREEBSD */
+#endif /* USE_KVM_GETSWAPINFO */
         once = 1;
         return (1);
 }
@@ -248,6 +271,7 @@ BSDInitSwapInfo()
 int
 fetchswap()
 {
+#ifndef USE_KVM_GETSWAPINFO
 	struct rlist head;
 	struct rlist *swapptr;
 
@@ -290,6 +314,9 @@ fetchswap()
 
 		swapptr = head.rl_next;
 	}
+#else /* USE_KVM_GETSWAPINFO */
+	kvnsw = kvm_getswapinfo(kd, kvmsw, 1, 0);
+#endif /* USE_KVM_GETSWAPINFO */
 	return 0;
 
 }
@@ -415,6 +442,15 @@ BSDGetSwapInfo(int* total, int* free)
         int i, avail, npfree, used=0, xsize, xfree;
 
 	fetchswap();
+#ifdef USE_KVM_GETSWAPINFO
+	avail = used = 0;
+	if (kvnsw == 0) {
+		avail += pagesize * kvmsw[0].ksw_total;
+		used += pagesize * kvmsw[0].ksw_used;
+	}
+	*total = avail;
+	*free = avail - used;
+#else /* USE_KVM_GETSWAPINFO */
         avail = npfree = 0;
 #ifdef XOSVIEW_BSDI
         for (i = 0; i < swapstats.swap_nswdev; i++) {
@@ -461,4 +497,5 @@ BSDGetSwapInfo(int* total, int* free)
 	  /*  Convert from 512-byte blocks to bytes.  */
         *total = 512*avail;
         *free = 512*(avail-used);
+#endif /* USE_KVM_GETSWAPINFO */
 }
