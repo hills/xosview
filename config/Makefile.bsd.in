@@ -5,7 +5,7 @@
 # $Id$
 #
 include ../Makefile.config
--include ../Makefile.GNU.autodep
+@AUTODEPRULE_SUBDIR@
 
 CXXFLAGS += -I@top_srcdir@
 

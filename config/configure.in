@@ -27,10 +27,14 @@ then
 	AUTODEPRULE='\
 ##  Autodepend rule defaults to disabled.\
 #-include Makefile.GNU.autodep'
+	AUTODEPRULE_SUBDIR='\
+##  Autodepend rule defaults to disabled.\
+#-include ../Makefile.GNU.autodep'
         echo "disabled automatic dependencies"
 else
         AUTODEPEND='-include $(DEPFILES)'
 	AUTODEPRULE='-include Makefile.GNU.autodep'
+	AUTODEPRULE_SUBDIR='-include ../Makefile.GNU.autodep'
         echo "enabled  automatic dependencies"
 fi
 ,
@@ -38,9 +42,13 @@ AUTODEPEND=
 AUTODEPRULE='\
 ##  Autodepend rule defaults to disabled.\
 #-include Makefile.GNU.autodep'
+AUTODEPRULE_SUBDIR='\
+##  Autodepend rule defaults to disabled.\
+#-include ../Makefile.GNU.autodep'
 echo "disabled automatic dependencies by default"
 )
 AC_SUBST(AUTODEPRULE)
+AC_SUBST(AUTODEPRULE_SUBDIR)
 AC_SUBST(AUTODEPEND)
 
 dnl
