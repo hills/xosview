@@ -9,7 +9,7 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include <stdio.h>	//  For sprintf().
+#include <stdio.h>	//  For snprintf().
 #include <ctype.h>
 #include <iostream.h>
 #include <unistd.h>  //  for access(), etc.  BCG
@@ -71,13 +71,8 @@ Xrm::getDisplayName (int argc, char** argv)
 
 const char *Xrm::getResource(const char *rname) const{
   char frn[1024], fcn[1024];
-  strcpy(frn, instanceName());
-  strcat(frn, ".");
-  strcat(frn, rname);
-  
-  strcpy(fcn, className());
-  strcat(fcn, ".");
-  strcat(fcn, rname);
+  snprintf(frn, 1024, "%s.%s", instanceName(), rname);
+  snprintf(fcn, 1024, "%s.%s", className(), rname);
 
   XrmValue val;
   val.addr = NULL;
@@ -91,11 +86,11 @@ const char *Xrm::getResource(const char *rname) const{
   if (!val.addr)
   {
     //  Let's try with a non-uppercased class name.
-    strcpy (fcn, className());
-    char* p = fcn;
+    char fcn_lower[1024];
+    strncpy(fcn_lower, className(), 1024);
+    char* p = fcn_lower;
     while (p && *p)  *p++ = tolower(*p);
-    strcat (fcn, ".");
-    strcat (fcn, rname);
+    snprintf(fcn, 1024, "%s.%s", fcn_lower, rname);
     XrmGetResource(_db, frn, fcn, &type, &val);
   }
 
@@ -146,8 +141,8 @@ Listed from weakest to strongest:
   char rfilename[2048];
 
   // Get the app-defaults
-  strcpy(rfilename, "/usr/X11R6/lib/X11/app-defaults/");
-  strcat(rfilename, XrmQuarkToString(_class));
+  snprintf(rfilename, 2048, "/usr/X11R6/lib/X11/app-defaults/%s",
+      XrmQuarkToString(_class));
   if (rfilename != NULL)
     XrmCombineFileDatabase (rfilename, &_db, 1);
 
