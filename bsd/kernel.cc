@@ -533,8 +533,8 @@ BSDSwapInit() {
 //
 
 void
-BSDGetSwapCtlInfo(int *totalp, int *freep) {
-  int	totalinuse, totalsize;
+BSDGetSwapCtlInfo(unsigned long long *totalp, unsigned long long *freep) {
+  unsigned long long	totalinuse, totalsize;
   int rnswap, nswap = swapctl(SWAP_NSWAP, 0, 0);
   struct swapent *swapiter;
 

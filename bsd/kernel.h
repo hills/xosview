@@ -57,7 +57,7 @@ BSDSwapInit();
 
 #ifdef HAVE_SWAPCTL
 void
-BSDGetSwapCtlInfo(int* total, int* free);
+BSDGetSwapCtlInfo(unsigned long long* total, unsigned long long* free);
 #endif
 
 int

@@ -76,7 +76,7 @@ void SwapMeter::checkevent( void ){
 }
 
 void SwapMeter::getswapinfo( void ){
-  int total_int, free_int;
+  unsigned long long total_int, free_int;
 
   if (doSwap) {
 #ifdef HAVE_SWAPCTL
