@@ -6,7 +6,7 @@ Changes since xosview-1.7.1
   BSDI support, courtesy of Tomer Klainer.
   Fixed memstat module for linux-2.2
 
-  Changes from Thomas Waldmann (ThomasWaldmann@t-online.de)
+  Changes from Thomas Waldmann (ThomasWaldmann@gmx.de)
 - Fixed cosmetical bug in xosview:
   if you tried to make the xosview window height too small, it looked quite
   strange (because the height value for the meters got negative)
