@@ -1,4 +1,5 @@
 xosview
+.*.swp
 
 ##  Auto-generated stuff:
 configure
@@ -9,6 +10,7 @@ Makefile
 Makefile.config
 Makefile.GNU.autodep
 defaultstring.cc
+Xdefaults
 
 ##  Autodepend stuff:
 .main.o.d
