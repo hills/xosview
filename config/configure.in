@@ -126,50 +126,8 @@ netbsd1.[[0123456]]*|netbsdelf1.[[56]]*)
     AC_DEFINE(NETBSD_64BIT_IFACE_CTRS)
   fi
 
-  ## Also check for the existence of UVM.  This is a nasty,
-  ## complicated check.  This could be avoided by having the *BSD
-  ## platform-specific Makefiles include <bsd.own.mk> on their own.
-  cat > confmkfile <<\EOF
-.include <bsd.own.mk>
-all:
-.if defined(UVM)
-	@echo UVMyes
-.else
-	#
-.endif
-EOF
-  uvmstring=`make -f confmkfile 2>/dev/null`
-  rm confmkfile
-  if test x$uvmstring != x ; then
-    AC_DEFINE(UVM)
-    AC_MSG_WARN([
-
-  *Enabling* UVM -- 'UVM=' found in /etc/mk.conf.
-  If this is in error, remove the define of UVM=1 from CXXFLAGS
-  in Makefile.config, and mail bgrayson@netbsd.org that
-  the autoconf script didn't work properly.
-    ])
-  else
-    dnl  Before choosing non-UVM, check for some uvm-only symbols
-    dnl  in the currently-running kernel.
-    AC_MSG_WARN(['UVM=' not found in /etc/mk.conf.  Checking /netbsd for uvm symbols...])
-    if test x"`nm /netbsd | grep uvm_sysctl`" != x ; then
-      AC_DEFINE(UVM)
-      AC_MSG_WARN([*Enabling* UVM -- 'uvm_sysctl' symbol found in /netbsd.
-  If this is in error, remove the define of UVM=1 from CXXFLAGS
-  in Makefile.config, and mail bgrayson@netbsd.org that
-  the autoconf script didn't work properly.
-  ])
-    else
-      AC_MSG_WARN([
-
-    *Disabling* UVM -- 'UVM=' not found in /etc/mk.conf.
-    If this is in error, add -DUVM=1 to CXXFLAGS in
-    Makefile.config, and please mail bgrayson@netbsd.org that
-    the autoconf script did not work properly.
-    ])
-    fi
-  fi
+  ## We'll assume the existence of UVM now -- it's been around a long time.
+  AC_DEFINE(UVM)
   host_dir=bsd
 
 ;;
@@ -312,9 +270,6 @@ netbsd)
   if test -e /dev/apm ; then
     BTRYMETER=btrymeter.o
     AC_DEFINE(HAVE_BATTERY_METER)
-    AC_MSG_WARN([/dev/apm detected -- enabling the battery meter!])
-  else
-    AC_MSG_WARN([no /dev/apm -- disabling the battery meter.])
   fi
   ;;
 esac
