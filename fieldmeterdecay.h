@@ -25,7 +25,7 @@ class FieldMeterDecay : public FieldMeter {
 public:
   FieldMeterDecay( XOSView *parent, int numfields,
               const char *title = "", const char *legend = "", 
-              int dolegends = 0, int dousedlegends = 0 );
+              int docaptions = 0, int dolegends = 0, int dousedlegends = 0 );
   virtual ~FieldMeterDecay( void );
   
   virtual void drawfields( int manditory = 0 );

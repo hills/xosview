@@ -243,6 +243,9 @@ Sets the X geometry to \fIgeometry_string\fP.  This option overrides the
 xosview*geometry resource.
 .RE
 
+.\"  Handle -/+captions
+.pm captions
+
 .\"  Handle -/+labels
 .pm labels
 
@@ -356,6 +359,11 @@ xosview*display: \fIname\fP
 .RS
 The name of the display where xosview will contact the X server for drawing
 its window.
+.RE
+
+xosview*captions: (True or False)
+.RS
+If True then xosview will display meter captions.
 .RE
 
 xosview*labels: (True or False)

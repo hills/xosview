@@ -38,8 +38,10 @@ CVSID_DOT_H(FIELDMETERDECAY_H_CVSID);
 
 FieldMeterDecay::FieldMeterDecay( XOSView *parent,
                 int numfields, const char *title,
-                const char *legend, int dolegends, int dousedlegends )
-: FieldMeter (parent, numfields, title, legend, dolegends, dousedlegends)
+                const char *legend, int docaptions, int dolegends,
+                int dousedlegends )
+: FieldMeter (parent, numfields, title, legend, docaptions, dolegends,
+              dousedlegends)
 {
   decay_ = new float[numfields];
   lastDecayval_ = new float[numfields];

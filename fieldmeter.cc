@@ -17,8 +17,9 @@ CVSID("$Id$");
 CVSID_DOT_H(FIELDMETER_H_CVSID);
 
 FieldMeter::FieldMeter( XOSView *parent, int numfields, const char *title, 
-                        const char *legend, int dolegends, int dousedlegends )
-: Meter(parent, title, legend, dolegends, dousedlegends){
+                        const char *legend, int docaptions, int dolegends,
+                        int dousedlegends )
+: Meter(parent, title, legend, docaptions, dolegends, dousedlegends){
     /*  We need to set print_ to something valid -- the meters
      *  apparently get drawn before the meters have a chance to call
      *  CheckResources() themselves.  */
@@ -127,7 +128,8 @@ void FieldMeter::draw( void ){
       offset = parent_->textWidth( "XXXXX" );
     
     parent_->drawString( x_ - offset, y_ + height_, title_ );
-    drawlegend();
+    if(docaptions_)
+      drawlegend();
   }
 
   drawfields( 1 );

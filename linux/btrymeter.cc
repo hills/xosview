@@ -14,7 +14,7 @@
 static const char APMFILENAME[] = "/proc/apm";
 
 BtryMeter::BtryMeter( XOSView *parent )
-  : FieldMeter( parent, 2, "BTRY", "AVAIL/USED", 1, 0 ){
+  : FieldMeter( parent, 2, "BTRY", "AVAIL/USED", 1, 1, 0 ){
 }
 
 BtryMeter::~BtryMeter( void ){

@@ -110,7 +110,7 @@ void XOSView::figureSize ( void ) {
     else
       xoff_ = textWidth( "XXXXXXXXX" );
 
-    yoff_ = textHeight() + textHeight() / 4;
+    yoff_ = caption_ ? textHeight() + textHeight() / 4 : 0;
   }
   static int firsttime = 1;
   if (firsttime) {
@@ -139,6 +139,7 @@ int XOSView::newypos( void ){
 void XOSView::dolegends( void ){
   MeterNode *tmp = meters_;
   while ( tmp != NULL ){
+    tmp->meter_->docaptions( caption_ );
     tmp->meter_->dolegends( legend_ );
     tmp->meter_->dousedlegends( usedlabels_ );
     tmp = tmp->next_;
@@ -170,7 +171,7 @@ int XOSView::findx( void ){
 
 int XOSView::findy( void ){
   if ( legend_ )
-    return 10 + textHeight() * nummeters_ * 2;
+    return 10 + textHeight() * nummeters_ * ( caption_ ? 2 : 1 );
 
   return 15 * nummeters_;
 }
@@ -180,10 +181,14 @@ void XOSView::checkOverallResources() {
 
   //  Set 'off' value.  This is not necessarily a default value --
   //    the value in the defaultXResourceString is the default value.
-  usedlabels_ = legend_ = 0;
+  usedlabels_ = legend_ = caption_ = 0;
 
   setFont();
   
+  // use captions
+  if ( !strcmp( getResource("captions"), "True" ) )
+      caption_ = 1;
+
   // use labels
   if ( !strncasecmp( getResource("labels"), "True", 5 ) )
       legend_ = 1;

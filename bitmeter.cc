@@ -15,8 +15,8 @@ CVSID_DOT_H(BITMETER_H_CVSID);
 
 BitMeter::BitMeter( XOSView *parent,
 		    const char *title, const char *legend, int numBits,
-		    int, int dousedlegends)
-  : Meter( parent, title, legend, dousedlegends, dousedlegends ),
+		    int docaptions, int, int dousedlegends)
+  : Meter( parent, title, legend, docaptions, dousedlegends, dousedlegends ),
   bits_(NULL), lastbits_(NULL)  {
   setNumBits(numBits); 
 }
@@ -92,7 +92,8 @@ void BitMeter::draw( void ){
     
     parent_->drawString( x_ - offset, y_ + height_, title_ );
     parent_->setForeground( onColor_ );
-    parent_->drawString( x_, y_ - 5, legend_ );
+    if(docaptions_)
+      parent_->drawString( x_, y_ - 5, legend_ );
   }
 
   drawBits( 1 );

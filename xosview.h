@@ -50,7 +50,7 @@ protected:
 
   MeterNode *meters_;
   
-  int legend_, xoff_, yoff_, nummeters_, usedlabels_;
+  int caption_, legend_, xoff_, yoff_, nummeters_, usedlabels_;
   unsigned long sleeptime_, usleeptime_;
 
   void usleep_via_select( unsigned long usec );

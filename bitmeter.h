@@ -19,7 +19,7 @@ class BitMeter : public Meter {
 public:
   BitMeter( XOSView *parent,  
 	    const char *title = "", const char *legend ="",
-	    int numBits = 1, int dolegends = 0, int dousedlegends = 0 );
+	    int numBits = 1, int docaptions = 0, int dolegends = 0, int dousedlegends = 0 );
   virtual ~BitMeter( void );
 
   void checkevent( void );

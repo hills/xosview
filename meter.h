@@ -19,7 +19,7 @@ class XOSView;
 class Meter {
 public:
   Meter( XOSView *parent, const char *title = "", const char *legend ="", 
-	 int dolegends = 0, int dousedlegends = 0 );
+	 int docaptions = 0, int dolegends = 0, int dousedlegends = 0 );
   virtual ~Meter( void );
 
   virtual const char *name( void ) const { return "Meter"; }
@@ -30,6 +30,7 @@ public:
   const char *title( void ) { return title_; }
   void legend( const char *legend );
   const char *legend( void ) { return legend_; }
+  void docaptions( int val ) { docaptions_ = val; }
   void dolegends( int val ) { dolegends_ = val; }
   void dousedlegends( int val ) { dousedlegends_ = val; }
   int requestevent( void ){ 
@@ -47,7 +48,7 @@ public:
 
 protected:
   XOSView *parent_;
-  int x_, y_, width_, height_, dolegends_, dousedlegends_;
+  int x_, y_, width_, height_, docaptions_, dolegends_, dousedlegends_;
   int priority_, counter_;
   char *title_, *legend_;
   unsigned long textcolor_;

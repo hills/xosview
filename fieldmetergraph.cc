@@ -34,8 +34,10 @@ CVSID_DOT_H(FIELDMETERGRAPH_H_CVSID);
 
 FieldMeterGraph::FieldMeterGraph( XOSView *parent,
                 int numfields, const char *title,
-                const char *legend, int dolegends, int dousedlegends )
-: FieldMeterDecay (parent, numfields, title, legend, dolegends, dousedlegends)
+                const char *legend, int docaptions, int dolegends, 
+  int dousedlegends )
+: FieldMeterDecay (parent, numfields, title, legend, docaptions, 
+  dolegends, dousedlegends)
 {
 
 	useGraph_ = 0;

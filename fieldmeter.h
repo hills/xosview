@@ -18,12 +18,13 @@ class FieldMeter : public Meter {
 public:
   FieldMeter( XOSView *parent, int numfields,
 	      const char *title = "", const char *legend = "", 
-	      int dolegends = 0, int dousedlegends = 0 );
+	      int docaptions = 0, int dolegends = 0, int dousedlegends = 0 );
   virtual ~FieldMeter( void );
   
   virtual void drawfields( int manditory = 0 );
   void setfieldcolor( int field, const char *color );
   void setfieldcolor( int field, unsigned long color);
+  void docaptions( int val ) { docaptions_ = val; }
   void dolegends( int val ) { dolegends_ = val; }
   void dousedlegends( int val ) { dousedlegends_ = val; }
   void reset( void );

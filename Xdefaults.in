@@ -7,6 +7,7 @@
 ! xosview*title:
 ! xosview*geometry:         +5+5
 ! xosview*display:
+xosview*captions: True
 xosview*labels: True
 xosview*meterLabelColor:  wheat
 xosview*usedlabels:       True

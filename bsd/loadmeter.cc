@@ -24,7 +24,7 @@ CVSID("$Id$");
 CVSID_DOT_H(LOADMETER_H_CVSID);
 
 LoadMeter::LoadMeter( XOSView *parent )
-  : FieldMeterGraph( parent, 2, "LOAD", "PROCS per MIN/IDLE", 1, 0 ){
+  : FieldMeterGraph( parent, 2, "LOAD", "PROCS per MIN/IDLE", 1, 1, 0 ){
 }
 
 LoadMeter::~LoadMeter( void ){

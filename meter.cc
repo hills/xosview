@@ -15,11 +15,12 @@ CVSID("$Id$");
 CVSID_DOT_H(METER_H_CVSID);
 
 Meter::Meter( XOSView *parent, const char *title, const char *legend, 
-              int dolegends, int dousedlegends ) {
+              int docaptions, int dolegends, int dousedlegends ) {
   title_ = legend_ = NULL;
   Meter::title( title );
   Meter::legend( legend );
   parent_ = parent;
+  docaptions_ = docaptions;
   dolegends_ = dolegends;
   dousedlegends_ = dousedlegends;
   priority_ = 1;

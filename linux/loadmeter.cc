@@ -16,7 +16,7 @@
 static const char LOADFILENAME[] = "/proc/loadavg";
 
 LoadMeter::LoadMeter( XOSView *parent )
-  : FieldMeterGraph( parent, 2, "LOAD", "PROCS/MIN", 1, 0 ){
+  : FieldMeterGraph( parent, 2, "LOAD", "PROCS/MIN", 1, 1, 0 ){
 
 }
 

@@ -24,6 +24,8 @@ static XrmOptionDescRec options[] = {
 //  XOSView-specific resources:
 { "-labels", "*labels", XrmoptionNoArg, "False" },
 { "+labels", "*labels", XrmoptionNoArg, "True" },
+{ "-captions", "*captions", XrmoptionNoArg, "False" },
+{ "+captions", "*captions", XrmoptionNoArg, "True" },
 { "-usedlabels", "*usedlabels", XrmoptionNoArg, "False" },
 { "+usedlabels", "*usedlabels", XrmoptionNoArg, "True" },
 { "-samplesPerSec", "*samplesPerSec", XrmoptionSepArg, (caddr_t) NULL },
