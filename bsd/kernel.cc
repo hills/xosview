@@ -63,6 +63,12 @@ static struct nlist nlst[] =
 
 { "_disklist" },
 #define DISKLIST_SYM_INDEX	3
+{ "_disklist" },
+#define DUMMY_4			4
+{ "_disklist" },
+#define DUMMY_5			5
+{ "_disklist" },
+#define DUMMY_6			6
 
 #else                   // but FreeBSD has unified buffer cache...
 
@@ -72,14 +78,16 @@ static struct nlist nlst[] =
 #define DK_NDRIVE_SYM_INDEX     4
 { "_dk_wds" },
 #define DK_WDS_SYM_INDEX        5
-{ "_intrcnt" },
-#define INTRCNT_SYM_INDEX 	6
-{ "_eintrcnt" },
-#define EINTRCNT_SYM_INDEX 	7
 { "_intr_countp" },
-#define INTRCOUNTP_SYM_INDEX 	8
+#define INTRCOUNTP_SYM_INDEX 	6
 
 #endif /* XOSVIEW_FREEBSD */
+
+{ "_intrcnt" },
+#define INTRCNT_SYM_INDEX 	7
+{ "_eintrcnt" },
+#define EINTRCNT_SYM_INDEX 	8
+
   {NULL}
 };
 
@@ -364,20 +372,17 @@ NetBSDGetDiskXFerBytes (unsigned long long *bytesXferred)
   }
 #endif
 }
-  
 
 /*  ---------------------- Interrupt Meter stuff  -----------------  */
-static unsigned long kvm_intrcnt[100];// guess at space needed
+static unsigned long kvm_intrcnt[128];// guess at space needed
+#ifdef XOSVIEW_FREEBSD
 static unsigned long kvm_intrptrs[NUM_INTR];
+#endif
 
 int
 NetBSDIntrInit() {
-#ifdef XOSVIEW_FREEBSD
     OpenKDIfNeeded(); 
     return ValidSymbol(INTRCNT_SYM_INDEX) && ValidSymbol(EINTRCNT_SYM_INDEX);
-#else
-    return 0;
-#endif
 }
 
 void
@@ -398,6 +403,36 @@ NetBSDGetIntrStats (unsigned long intrCount[NUM_INTR])
 	intrCount[i] = kvm_intrcnt[idx];
     }
 #else /* XOSVIEW_FREEBSD */
+  //  NetBSD version, mostly from vmstat.c:
+# if defined(pc532)
+#  warning "The interrupt meter for pc532 is not yet supported --
+	    it'll be added in a few weeks, hopefully."
+# else /* pc532 */
+  {
+    int nintr;
+    nintr = (nlst[EINTRCNT_SYM_INDEX].n_value -
+	     nlst[INTRCNT_SYM_INDEX].n_value)   / sizeof(int);
+    long kvm_intrcnt[nintr];
+#  if 0
+    if (nintr/sizeof(int) != NUM_INTR*2) {
+      static int firsttime=1;
+      if (firsttime)
+	fprintf(stderr, "Confusion with interrupts: I expected there"
+	" to be %d interrupt counters, and I found %d.\n", NUM_INTR, nintr);
+      firsttime=0;
+      /*exit(-1);*/
+    }
+#  endif
+    safe_kvm_read(nlst[INTRCNT_SYM_INDEX].n_value, kvm_intrcnt, sizeof(long)*nintr);
+    /*  On the i386, for example, there are two arrays back to back
+     *  --- the actual interrupt count, followed by the
+     *  stray-interrupt count.  So, only look at the first nintr or
+     *  NUM_INTR, whichever is less.  */
+    for (int i=0;i<nintr && i<NUM_INTR;i++) {
+      intrCount[i] = kvm_intrcnt[i];
+    }
+  }
+# endif /* pc532 */
     return;
 #endif
 }

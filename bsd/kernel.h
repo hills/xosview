@@ -28,6 +28,7 @@
 //#include <net/if.h>
 
 #define KERNEL_H_CVSID	"$Id$"
+
 void
 NetBSDInit();
 
@@ -72,7 +73,7 @@ FreeBSDGetBufspace(int* bfsp);
 #endif
 
 
-#define NUM_INTR 16
+#define NUM_INTR	16
 
 int
 NetBSDIntrInit();
