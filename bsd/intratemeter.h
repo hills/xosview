@@ -32,5 +32,6 @@ protected:
 
   void getinfo( void );
   unsigned long oncol_, idlecol_;
+  bool kernelHasStats_;
 };
 #endif

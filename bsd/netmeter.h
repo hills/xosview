@@ -41,6 +41,9 @@ private:
   //  has been transferred over the net!
   long long _lastBytesIn, _lastBytesOut;
 
+  //  Did the meter initialize properly?
+  bool kernelHasStats_;
+
   void adjust(void);
 };
 
