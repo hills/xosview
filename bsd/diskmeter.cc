@@ -114,6 +114,12 @@ void DiskMeter::getstats( void ){
      *  sampling time.  */
     
   setUsed ( fields_[0]*IntervalTimeInMicrosecs()/1e6, total_);
+#ifdef HAVE_DEVSTAT
+  /*  The devstat library provides a differential value already,
+   *  so we should compare against 0 each time.  */
+  prevBytes = currBytes = 0;
+#else
   prevBytes = currBytes;
+#endif
   IntervalTimerStart();
 }

@@ -41,6 +41,13 @@
 # endif
 #endif
 
+#ifdef HAVE_DEVSTAT
+#include <devstat.h>
+#include <stdlib.h>	/*  For malloc().  */
+void DevStat_Init();
+int DevStat_Get();
+#endif
+
 #include <sys/param.h>	/*  Needed by both UVM and swapctl stuff.  */
 #if defined(UVM)
 #include <string.h>
@@ -92,24 +99,32 @@ static struct nlist nlst[] =
 #define DUMMY_5			5
 { "_disklist" },
 #define DUMMY_6			6
+{ "_intrcnt" },
+#define INTRCNT_SYM_INDEX 	7
+{ "_eintrcnt" },
+#define EINTRCNT_SYM_INDEX 	8
 
 #else                   // but FreeBSD has unified buffer cache...
 
 { "_bufspace" },
 #define BUFSPACE_SYM_INDEX      3
-{ "_dk_ndrive" },
-#define DK_NDRIVE_SYM_INDEX     4
-{ "_dk_wds" },
-#define DK_WDS_SYM_INDEX        5
 { "_intr_countp" },
-#define INTRCOUNTP_SYM_INDEX 	6
+#define INTRCOUNTP_SYM_INDEX 	4
+{ "_intrcnt" },
+#define INTRCNT_SYM_INDEX 	5
+{ "_eintrcnt" },
+#define EINTRCNT_SYM_INDEX 	6
+
+#ifndef HAVE_DEVSTAT
+
+{ "_dk_ndrive" },
+#define DK_NDRIVE_SYM_INDEX     7
+{ "_dk_wds" },
+#define DK_WDS_SYM_INDEX        8
+
+#endif /*HAVE_DEVSTAT */
 
 #endif /* XOSVIEW_FREEBSD */
-
-{ "_intrcnt" },
-#define INTRCNT_SYM_INDEX 	7
-{ "_eintrcnt" },
-#define EINTRCNT_SYM_INDEX 	8
 
   {NULL}
 };
@@ -208,6 +223,9 @@ OpenKDIfNeeded()
       warnx ("kvm_nlist() lookup failed for symbol '%s'.", nlp->n_name);
     nlp++;
   }
+#ifdef HAVE_DEVSTAT
+  DevStat_Init();
+#endif
 }
 
 
@@ -279,6 +297,9 @@ BSDNetInit()
 void
 BSDGetNetInOut (long long * inbytes, long long * outbytes)
 {
+
+#if (__FreeBSD_version < 300000) //werner May/29/98 quick hack for current
+
   struct ifnet * ifnetp;
   struct ifnet ifnet;
   //char ifname[256];
@@ -313,6 +334,12 @@ BSDGetNetInOut (long long * inbytes, long long * outbytes)
     ifnetp = (struct ifnet*) ifnet.if_list.tqe_next;
 #endif
   }
+
+#else
+  (void) inbytes;
+  (void) outbytes;
+#endif	//werner
+
 }
 
 
@@ -388,11 +415,195 @@ BSDGetSwapCtlInfo(int *totalp, int *freep)
 #endif	/*  Swapctl info retrieval  */
 
 /*  ---------------------- Disk Meter stuff  -----------------  */
+
+#ifdef HAVE_DEVSTAT
+  /*
+   * Make use of the new FreeBSD kernel device statistics library using
+   * code shamelessly borrowed from xsysinfo, which borrowed shamelessly
+   * from FreeBSD's iostat(8).
+   */
+  long generation;
+  devstat_select_mode select_mode;
+  struct devstat_match *matches;
+  int num_matches;
+  int num_selected, num_selections;
+  long select_generation;
+  static struct statinfo cur, last;
+  int num_devices;
+  struct device_selection *dev_select;
+  char nodisk;
+
+void DevStat_Init(void)
+{
+	/*
+	 * Make sure that the userland devstat version matches the kernel
+	 * devstat version.
+	 */
+	if (checkversion() < 0) {
+		nodisk++;
+		return;
+	}
+
+	/* find out how many devices we have */
+	if ((num_devices = getnumdevs()) < 0) {
+		nodisk++;
+		return;
+	}
+
+	cur.dinfo = (struct devinfo *)malloc(sizeof(struct devinfo));
+	last.dinfo = (struct devinfo *)malloc(sizeof(struct devinfo));
+	bzero(cur.dinfo, sizeof(struct devinfo));
+	bzero(last.dinfo, sizeof(struct devinfo));
+
+	/*
+	 * Grab all the devices.  We don't look to see if the list has
+	 * changed here, since it almost certainly has.  We only look for
+	 * errors.
+	 */
+	if (getdevs(&cur) == -1) {
+		nodisk++;
+		return;
+	}
+
+	num_devices = cur.dinfo->numdevs;
+	generation = cur.dinfo->generation;
+
+	dev_select = NULL;
+
+	/* only interested in disks */
+	matches = NULL;
+	if (buildmatch("da", &matches, &num_matches) != 0) {
+		nodisk++;
+		return;
+	}
+
+	if (num_matches == 0)
+		select_mode = DS_SELECT_ADD;
+	else
+		select_mode = DS_SELECT_ONLY;
+
+	/*
+	 * At this point, selectdevs will almost surely indicate that the
+	 * device list has changed, so we don't look for return values of 0
+	 * or 1.  If we get back -1, though, there is an error.
+	 */
+	if (selectdevs(&dev_select, &num_selected,
+		       &num_selections, &select_generation,
+		       generation, cur.dinfo->devices, num_devices,
+		       matches, num_matches,
+		       NULL, 0,
+		       select_mode, 10, 0) == -1)
+		nodisk++;
+}
+
+int
+DevStat_Get(void)
+{
+	register int dn;
+	long double busy_seconds;
+	u_int64_t total_transfers;
+	u_int64_t total_bytes;
+	struct devinfo *tmp_dinfo;
+	int total_xfers = 0;
+	int total_xbytes = 0;
+
+	if (nodisk == 0) {
+		/*
+		 * Here what we want to do is refresh our device stats.
+		 * getdevs() returns 1 when the device list has changed.
+		 * If the device list has changed, we want to go through
+		 * the selection process again, in case a device that we
+		 * were previously displaying has gone away.
+		 */
+		switch (getdevs(&cur)) {
+		case -1:
+			return (0);
+		case 1: {
+			int retval;
+
+			num_devices = cur.dinfo->numdevs;
+			generation = cur.dinfo->generation;
+			retval = selectdevs(&dev_select, &num_selected,
+					    &num_selections, &select_generation,
+					    generation, cur.dinfo->devices,
+					    num_devices, matches, num_matches,
+					    NULL, 0,
+					    select_mode, 10, 0);
+			switch(retval) {
+			case -1:
+				return (0);
+			case 1:
+				break;
+			default:
+				break;
+			}
+			break;
+		}
+		default:
+			break;
+		}
+
+		/*
+		 * Calculate elapsed time up front, since it's the same for all
+		 * devices.
+		 */
+		busy_seconds = compute_etime(cur.busy_time, last.busy_time);
+
+		/* this is the first time thru so just copy cur to last */
+		if (last.dinfo->numdevs == 0) {
+			tmp_dinfo = last.dinfo;
+			last.dinfo = cur.dinfo;
+			cur.dinfo = tmp_dinfo;
+			last.busy_time = cur.busy_time;
+			return (0);
+		}
+
+
+		for (dn = 0; dn < num_devices; dn++) {
+			int di;
+
+			if ((dev_select[dn].selected == 0)
+			 || (dev_select[dn].selected > 10))
+				continue;
+
+			di = dev_select[dn].position;
+
+			if (compute_stats(&cur.dinfo->devices[di],
+				  &last.dinfo->devices[di], busy_seconds,
+				  &total_bytes, &total_transfers,
+				  NULL, NULL,
+				  NULL, NULL, 
+				  NULL, NULL)!= 0)
+				  break;
+			total_xfers += (int)total_transfers;
+			total_xbytes += (int)total_bytes;
+		}
+
+		tmp_dinfo = last.dinfo;
+		last.dinfo = cur.dinfo;
+		cur.dinfo = tmp_dinfo;
+
+		last.busy_time = cur.busy_time;
+
+	} else {
+		/* no disks found ? */
+		total_xfers = 0;
+		total_xbytes = 0;
+	}
+
+	return (total_xbytes);
+}
+#endif /* HAVE_DEVSTAT */
+
 int
 BSDDiskInit() {
   OpenKDIfNeeded(); 
 #ifdef XOSVIEW_FREEBSD
+#ifdef HAVE_DEVSTAT
+  return 1;
+#else
   return ValidSymbol(DK_NDRIVE_SYM_INDEX);
+#endif
 #else
   return ValidSymbol(DISKLIST_SYM_INDEX);
 #endif
@@ -402,6 +613,9 @@ void
 BSDGetDiskXFerBytes (unsigned long long *bytesXferred)
 {
 #ifdef XOSVIEW_FREEBSD
+#ifdef HAVE_DEVSTAT
+  *bytesXferred = DevStat_Get();
+#else
   /* FreeBSD still has the old-style disk statistics in global arrays
      indexed by the disk number (defs are in <sys/dkstat.h> */
 
@@ -414,7 +628,7 @@ BSDGetDiskXFerBytes (unsigned long long *bytesXferred)
 
   for (int i=0; i < kvm_dk_ndrive; i++)
       *bytesXferred += kvm_dk_wds[i] * 64;
-
+#endif
 #else
   /*  This function is a little tricky -- we have to iterate over a
    *  list in kernel land.  To make things simpler, data structures
@@ -450,7 +664,7 @@ static unsigned long kvm_intrptrs[NUM_INTR];
 
 int
 BSDIntrInit() {
-    OpenKDIfNeeded(); 
+    OpenKDIfNeeded();
     return ValidSymbol(INTRCNT_SYM_INDEX) && ValidSymbol(EINTRCNT_SYM_INDEX);
 }
 
