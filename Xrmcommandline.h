@@ -26,6 +26,10 @@ static XrmOptionDescRec options[] = {
 { "+labels", "*labels", XrmoptionNoArg, "True" },
 { "-usedlabels", "*usedlabels", XrmoptionNoArg, "False" },
 { "+usedlabels", "*usedlabels", XrmoptionNoArg, "True" },
+//  This next one is not yet supported.
+#if 0
+{ "-samplesPerSec", "*samplesPerSec", XrmoptionSepArg, (caddr_t) NULL },
+#endif
 //  CPU resources
 { "-cpu", "*cpu", XrmoptionNoArg, "False" },
 { "+cpu", "*cpu", XrmoptionNoArg, "True" },
