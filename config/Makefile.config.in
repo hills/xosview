@@ -52,6 +52,6 @@ LIBS          += -lmeter @EXTRALIBS@ -lX11
 #-----------------------------------------------------------------
 ##  The GNU-style rule of %.o: %.cc is not as portable as .cc.o.
 .cc.o:
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	$(CXX) $(CXXFLAGS) @CPP_DEP@ -c $< -o $@
 
 @AUTODEPRULE@

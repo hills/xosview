@@ -11,7 +11,7 @@ ICE_CXX_LONG_LONG
 AC_PATH_X
 CXXFLAGS="$CXXFLAGS -I$x_includes"
 case $host_os in
-linux*) 
+linux*)
   LIBS="-L$x_libraries $LIBS"
   ELF_LINK_FLAGS="" ;;
 *)
@@ -52,9 +52,19 @@ dnl
 AC_ARG_ENABLE([auto-depend],
 [  --enable-auto-depend    enable automatic dependencies],
 
+CPP_DEP=""
+dnl Check to see if we are using a gcc which
+dnl can make dependencies as a side effect of compilation.
+MY_CXX_SWITCH([[-Wp,-MD,depfile]])
+rm -f depfile
+if test "$my_cxx_switch" = "yes"
+then
+        CPP_DEP=['-Wp,-MD,.$@.d']
+fi
+
 if test "$enableval" = "no"
 then
-        AUTODEPEND=
+        AUTODEPEND=""
 	AUTODEPRULE='\
 ##  Autodepend rule defaults to disabled.\
 #-include Makefile.GNU.autodep'
@@ -64,9 +74,16 @@ then
         echo "disabled automatic dependencies"
 else
         AUTODEPEND='-include $(DEPFILES)'
+    if test "$my_cxx_switch" = "no"
+    then
 	AUTODEPRULE='-include Makefile.GNU.autodep'
 	AUTODEPRULE_SUBDIR='-include ../Makefile.GNU.autodep'
         echo "enabled  automatic dependencies"
+    else
+        AUTODEPRULE=""
+        AUTODEPRULE_SUBDIR=""
+        echo "enabled automatic dependencies"
+    fi
 fi
 ,
 AUTODEPEND=
@@ -81,6 +98,7 @@ echo "disabled automatic dependencies by default"
 AC_SUBST(AUTODEPRULE)
 AC_SUBST(AUTODEPRULE_SUBDIR)
 AC_SUBST(AUTODEPEND)
+AC_SUBST(CPP_DEP)
 
 AC_CHECK_FUNCS(snprintf)
 
@@ -101,11 +119,11 @@ freebsd*)
 esac
 
 dnl
-dnl Call each ports macro so that it can set up its own 
+dnl Call each ports macro so that it can set up its own
 dnl options / configuration.
 dnl
 case $host_os in
-linux*)   AC_XOSV_LINUX  
+linux*)   AC_XOSV_LINUX
 	  AC_GCC_EXTRA_CXXFLAGS
 	  host_dir=linux
           host_os=linux ;;
@@ -148,7 +166,7 @@ netbsd*)  AC_MSG_WARN([
 to autoconf!
   Thanks!
 *******************************************
-]); AC_XOSV_NETBSD 
+]); AC_XOSV_NETBSD
     host_dir=bsd
     echo host_dir is $host_dir
     host_os=netbsd ;;
@@ -242,7 +260,7 @@ bsdi*) AC_XOSV_BSDI
 	AC_GCC_EXTRA_CXXFLAGS
 	host_dir=bsd
 	host_os=bsdi ;;
-hpux*)    AC_XOSV_HPUX   
+hpux*)    AC_XOSV_HPUX
 	  AC_GCC_EXTRA_CXXFLAGS
 	  host_dir=hpux
           host_os=hpux ;;
@@ -265,7 +283,7 @@ dnl  Also look for battery-meter support.
 dnl
 case $host_os in
 netbsd)
-  AC_CHECK_FUNCS(swapctl) 
+  AC_CHECK_FUNCS(swapctl)
   #  Only enable the battery meter if it appears we support it.
   if test -e /dev/apm ; then
     BTRYMETER=btrymeter.o
@@ -313,4 +331,3 @@ AC_OUTPUT(\
   Makefile.GNU.autodep:config/Makefile.GNU.autodep.in \
   Xdefaults:Xdefaults.in \
   $EXTRA_OUT_FILES)
-
