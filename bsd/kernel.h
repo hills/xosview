@@ -38,8 +38,13 @@ BSDGetPageStats(struct vmmeter* vmp);
 void
 BSDCPUInit();
 
+#if defined(XOSVIEW_NETBSD) && (__NetBSD_Version__ >= 104260000)
+void
+BSDGetCPUTimes(u_int64_t* timesArray);
+#else
 void
 BSDGetCPUTimes(long* timesArray);
+#endif
 
 void
 BSDNetInit();

@@ -28,8 +28,6 @@
 
 #include <err.h>                /*  For err(), warn(), etc.  BCG  */
 #include <errno.h>
-#include <sys/dkstat.h>         /*  For CPUSTATES, which tells us how
-                                      many cpu states there are.  */
 #ifndef XOSVIEW_FREEBSD
 #include <sys/disk.h>		/*  For disk statistics.  */
 #endif
@@ -60,9 +58,20 @@ int DevStat_Get();
 #include <sys/malloc.h>
 #include <sys/sysctl.h>
 #include <sys/device.h>
-#include <vm/vm.h>	/* XXX  Is this needed?  */
+#if defined(XOSVIEW_NETBSD) && defined(__NetBSD_Version__) && (__NetBSD_Version__ <= 105010000)
+#include <vm/vm.h>	/* This should only be needed for older versions
+			   of NetBSD, and even then I'm not sure it
+			   was truly necessary.  bgrayson */
+#endif
 #else
 #include <sys/vmmeter.h>	/*  For struct vmmeter.  */
+#endif
+
+/*  For CPUSTATES, which tells us how many cpu states there are.  */
+#if defined(XOSVIEW_NETBSD) && defined(__NetBSD_Version__) && (__NetBSD_Version__ >= 104260000)
+#include <sys/sched.h>
+#else
+#include <sys/dkstat.h>
 #endif
 
 #ifdef HAVE_SWAPCTL
@@ -104,8 +113,8 @@ kvm_t* kd = NULL;	//  This single kvm_t is shared by all
 //  This struct has the list of all the symbols we want from the kernel.
 static struct nlist nlst[] =
 {
-#ifdef XOSVIEW_BSDI
-// BSDI reads cp_time through sysctl
+#if defined(XOSVIEW_BSDI) || (defined(XOSVIEW_NETBSD) && (__NetBSD_Version__ >= 104260000))
+// BSDI and __NetBSD_Version__ >= 104260000 reads cp_time through sysctl
 { "_ifnet" },
 #define DUMMY_0
 #else
@@ -348,11 +357,20 @@ BSDCPUInit() {
 }
 
 void
+#if defined(XOSVIEW_NETBSD) && (__NetBSD_Version__ >= 104260000)
+BSDGetCPUTimes (u_int64_t* timeArray) {
+#else
 BSDGetCPUTimes (long* timeArray) {
-#ifdef XOSVIEW_BSDI
+#endif
+#if defined(XOSVIEW_BSDI)
   struct cpustats cpu;
   size_t size = sizeof(cpu);
   static int mib[] = { CTL_KERN, KERN_CPUSTATS };
+#endif
+#if defined(XOSVIEW_NETBSD) && (__NetBSD_Version__ >= 104260000)
+  u_int64_t cp_time[CPUSTATES];
+  size_t ssize = sizeof(cp_time);
+  static int mib[] = { CTL_KERN, KERN_CP_TIME };
 #endif
 
   if (!timeArray) errx (-1, "BSDGetCPUTimes():  passed pointer was null!\n");
@@ -364,6 +382,12 @@ BSDGetCPUTimes (long* timeArray) {
     bzero(&cpu, sizeof(cpu));
   }
   bcopy (cpu.cp_time,timeArray,sizeof (long) * CPUSTATES);
+#elif (defined(XOSVIEW_NETBSD) && (__NetBSD_Version__ >= 104260000))
+  if (sysctl(mib, 2, cp_time, &ssize, NULL, 0) < 0) {
+    fprintf(stderr, "xosview: sysctl failed: %s\n", strerror(errno));
+    bzero(cp_time, ssize);
+  }
+  bcopy (cp_time,timeArray,sizeof (u_int64_t) * CPUSTATES);
 #else
   safe_kvm_read_symbol (CP_TIME_SYM_INDEX, timeArray, sizeof (long) * CPUSTATES);
 #endif
@@ -404,12 +428,13 @@ BSDGetNetInOut (long long * inbytes, long long * outbytes) {
     safe_kvm_read ((u_long) ifnetp, &ifnet, sizeof(ifnet));
 #ifdef NET_DEBUG
     char ifname[256];
-#ifdef NETBSD_64BIT_IFACE_CTRS
-    safe_kvm_read ((u_long) (((char*)ifnetp) + (&ifnet.if_xname[0] - (char*)&ifnet)), ifname, 256);
-    snprintf (ifname, 256, "%s", ifname);
-#else
+#ifdef NETBSD_OLD_IFACE
+    //  In pre-1.2A, getting the interface name was more complicated.
     safe_kvm_read ((u_long) ifnet.if_name, ifname, 256);
     snprintf (ifname, 256, "%s%d", ifname, ifnet.if_unit);
+#else
+    safe_kvm_read ((u_long) (((char*)ifnetp) + (&ifnet.if_xname[0] - (char*)&ifnet)), ifname, 256);
+    snprintf (ifname, 256, "%s", ifname);
 #endif
     printf ("Interface name is %s\n", ifname);
     printf ("Ibytes: %8llu Obytes %8llu\n",
