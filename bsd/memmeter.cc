@@ -34,7 +34,7 @@ CVSID_DOT_H(MEMMETER_H_CVSID);
 
 MemMeter::MemMeter( XOSView *parent )
 #ifdef  XOSVIEW_FREEBSD
-: FieldMeterGraph( parent, 5, "MEM", "ACT/INACT/WRD/BUF/FR" ) {
+: FieldMeterGraph( parent, 5, "MEM", "ACT/INACT/WRD/CA/FRE" ) {
 #define FREE_INDEX 4
 #else
   //  Once we figure out how to get the buffers field for NetBSD,
