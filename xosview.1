@@ -1,6 +1,6 @@
 '\" t
-.\" @(#)xosview.1	1.3 1/17/96 "
-.TH XOSVIEW 1.4 "January 17, 1996"
+.\" @(#)xosview.1	1.3 7/17/97 "
+.TH XOSVIEW 1.4.4beta "July 17, 1997"
 .UC
 .SH NAME
 xosview \- X based system monitor
@@ -12,7 +12,7 @@ xosview [options]
 parameters.  These include CPU usage, load average, memory usage, swap 
 space usage, network usage, interrupts, and serial port status.  Each of 
 these is displayed as a horizontal bar which is separated into color coded 
-regions.  Each region represents a percentage of the resource which is begin 
+regions.  Each region represents a percentage of the resource which is being 
 put to a particular use.  Typing a 'q' in the window will terminate xosview.
 
 At the moment \fIxosview\fP runs on three platforms (Linux, NetBSD, and HPUX).
@@ -35,9 +35,14 @@ platform \fIxosview\fP is running on.
    NetBSD : used | free
    HPUX   : used | free
 
+\fBDisk Usage (bytes/sec)\fP
+   Linux  : < Not Supported >
+   NetBSD : transferred | idle
+   HPUX   : < Not Supported >
+
 \fBPage Swapping from/to disk\fP
    Linux  : in | out | idle
-   NetBSD : < Not Supported >
+   NetBSD : in | out | idle
    HPUX   : in | out | idle
 
 \fBNET Usage\fP
@@ -121,6 +126,18 @@ This option overrides the xosview*load resource.  It is equivalent to setting
 xosview*load to "True".
 .RE
 
+-disk
+.RS
+This option overrides the xosview*disk resource.  It is equivalent to setting
+xosview*disk to "False".
+.RE
+
++disk
+.RS
+This option overrides the xosview*disk resource.  It is equivalent to setting
+xosview*disk to "True".
+.RE
+
 -page
 .RS
 This option overrides the xosview*page resource.  It is equivalent to setting
@@ -151,14 +168,30 @@ This option overrides the xosview*battery resource.  It is equivalent to
 setting xosview*battery to "False".
 .RE
 
++net
+.RS
+This option overrides the xosview*net resource.  It is equivalent
+to setting xosview*net to "True".
+.RE
+
+-net
+.RS
+This option overrides the xosview*net resource.  It is equivalent
+to setting xosview*net to "False".
+.RE
+
+
 -network \fImaxbandwidth\fP 
 .RE
--net     \fImaxbandwidth\fP
+-networkBW \fImaxbandwidth\fP 
+.RE
+-networkBandWidth \fImaxbandwidth\fP 
 .RS
-These options override the xosview*network resource.  They cause xosview to
-display a meter that will shows network usage, with a maximum bandwidth of
-\fBmaxbandwidth\fP.  If \fBmaxbandwidth\fP is 0 then the network meter will
-not be displayed.
+These options override the xosview*networkBandwidth resource.  They cause
+xosview to display a meter that will shows network usage, with a maximum
+bandwidth of \fBmaxbandwidth\fP.  Notice that setting the bandwidth to
+0 no longer disables the meter -- use the ``-net'' option instead.
+
 .RE
 
 -xrm \fIresource_string\fP
@@ -179,7 +212,7 @@ The following is a list of X resources supported by \fIxosview\fP.  Each has
 a default value assigned to it.  These values can be found in the file 
 defaultstring.h which can be obtained in the source distribution of xosview.
 They can be overridden in the usual places (/usr/lib/X11/app-defaults/XOsview,
-$HOME/.Xdefaults, etc..).
+$HOME/.Xdefaults, etc.).
 
 It should be noted that it is OK to have a resource defined for a port of 
 xosview that does not support the feature the resource configures.  Xosview
@@ -214,8 +247,8 @@ The color to use for the meter labels.
 xosview*usedlabels: (True or False)
 .RS
 If True then xosview will display labels that show the percentage of the
-resource being used.  This option requires that the labels option also be
-set to True.
+resource (or absolute amount, depending on the meter) being used.  This
+option requires that the labels option also be set to True.
 .RE
 
 xosview*usedLabelColor: \fIcolor\fP
@@ -425,6 +458,47 @@ If True then the swap meter will be split in two.  One half will show the
 instantaneous state and the other will display a decaying average of the
 state.
 .RE
+
+\fBDisk Meter Resources\fP
+
+xosview*disk: (True or False)
+.RS
+If True xosview will display the DiskMeter.
+.RE
+
+xosview*diskUsedColor: \fIcolor\fP
+.RS
+This is the color that the disk meter will use for bytes transferred
+(in or out).
+.RE
+
+xosview*diskIdleColor: \fIcolor\fP
+.RS
+This is the color that the disk meter will use to display the idle
+field.
+.RE
+
+xosview*diskBandwidth: \fIbandwidth\fP
+.RS
+This number is used to specify the expected maximum bandwidth in bytes
+per second for the disk meter.
+.RE
+
+xosview*diskPriority: \fIpriority\fP
+.RS
+This number (which must be an integer >= 1) sets the interval between updates
+of the disk meter in tenths of a second.  Thus, with a value of 1 the
+meter will update ten times per second, while with a value of 600 the
+meter will update once per minute.
+.RE
+
+xosview*diskDecay: (True or False)
+.RS
+If True then the disk meter will be split vertically in two.  The top
+half will show the instantaneous state, while the bottom half will
+display a decaying average of the state.
+.RE
+
 
 \fBPage Swapping Meter Resources\fP
 
