@@ -1,4 +1,5 @@
 #undef SHOW_BUFFERS
+#define __KERNEL__
 
 /* Kernel includes */
 #ifdef MODVERSIONS
