@@ -630,6 +630,9 @@ case $basic_machine in
 		basic_machine=mips-sony
 		os=-newsos
 		;;
+	newsmips*)
+		basic_machine=mips-sony
+		;;
 	necv70)
 		basic_machine=v70-nec
 		os=-sysv
@@ -758,6 +761,9 @@ case $basic_machine in
 		;;
 	sequent)
 		basic_machine=i386-sequent
+		;;
+	sgimips*)
+		basic_machine=mips-sgi
 		;;
 	sh)
 		basic_machine=sh-hitachi
