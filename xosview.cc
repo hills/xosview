@@ -11,6 +11,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <sys/time.h>
+#include <strstream.h>
 #include "general.h"
 #include "xosview.h"
 #include "meter.h"
@@ -194,9 +195,11 @@ void XOSView::checkOverallResources() {
 
 const char *XOSView::winname( void ){
   static char name[100];
+  ostrstream os(name, 99);
   char host[100];
   gethostname( host, 99 );
-  snprintf( name, 100, "%s%s", NAME, host);
+  os << NAME << host << ends;
+//  snprintf( name, 100, "%s%s", NAME, host);
   //  Allow overriding of this name through the -title option.
   return getResourceOrUseDefault ("title", name);
 }

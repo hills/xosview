@@ -9,9 +9,9 @@
 #ifndef _CPUMETER_H_
 #define _CPUMETER_H_
 
-#include "fieldmeterdecay.h"
+#include "fieldmetergraph.h"
 
-class CPUMeter : public FieldMeterDecay {
+class CPUMeter : public FieldMeterGraph {
 public:
   CPUMeter( XOSView *parent );
   ~CPUMeter( void );

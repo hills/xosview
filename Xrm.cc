@@ -9,7 +9,7 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include <stdio.h>	//  For snprintf().
+#include <strstream.h>
 #include <ctype.h>
 #include <iostream.h>
 #include <unistd.h>  //  for access(), etc.  BCG
@@ -71,9 +71,11 @@ Xrm::getDisplayName (int argc, char** argv)
 }
 
 const char *Xrm::getResource(const char *rname) const{
-  char frn[1024], fcn[1024];
-  snprintf(frn, 1024, "%s.%s", instanceName(), rname);
-  snprintf(fcn, 1024, "%s.%s", className(), rname);
+  ostrstream frns, fcns; 
+  frns << instanceName() << "." << rname << ends;
+  fcns << className() << "." << rname << ends;
+  char *frn = frns.str();
+  char *fcn = fcns.str();
 
   XrmValue val;
   val.addr = NULL;
@@ -91,9 +93,14 @@ const char *Xrm::getResource(const char *rname) const{
     strncpy(fcn_lower, className(), 1024);
     char* p = fcn_lower;
     while (p && *p)  *p++ = tolower(*p);
-    snprintf(fcn, 1024, "%s.%s", fcn_lower, rname);
-    XrmGetResource(_db, frn, fcn, &type, &val);
+    ostrstream tmp;
+    tmp << fcn_lower << "." << rname << ends;
+    XrmGetResource(_db, tmp.str(), fcn, &type, &val);
+    delete[] tmp.str();
   }
+
+  delete[] frn;
+  delete[] fcn;
 
   return val.addr;
 }
@@ -139,11 +146,13 @@ Listed from weakest to strongest:
   _db = XrmGetStringDatabase (defaultXResourceString);
 
   //  Merge in the system resource database.
-  char rfilename[2048];
+//  char rfilename[2048];
 
   // Get the app-defaults
-  snprintf(rfilename, 2048, "/usr/X11R6/lib/X11/app-defaults/%s",
-      XrmQuarkToString(_class));
+  ostrstream rfilenames;
+  rfilenames << "/usr/X11R6/lib/X11/app-defaults/" << XrmQuarkToString(_class)
+    << ends;
+  char *rfilename = rfilenames.str();
   if (rfilename != NULL)
     XrmCombineFileDatabase (rfilename, &_db, 1);
 
@@ -151,14 +160,16 @@ Listed from weakest to strongest:
   char* xappdir = getenv ("XAPPLRESDIR");
   if (xappdir != NULL)
   {
-    char xappfile[1024];
-    snprintf (xappfile, 1024, "%s/%s", xappdir, className());
+    ostrstream xappfiles;
+    xappfiles << xappdir << "/" << className() << ends;
+    char *xappfile = xappfiles.str();
     // this did not work for XAPPLRESDIR
     //if (!access (xappfile, X_OK | R_OK))  
     if (!access (xappfile, R_OK))
     {
       XrmCombineFileDatabase (xappfile, &_db, 1);
       }
+    delete[] xappfiles.str();
   }
 
   //  Now, check the display's RESOURCE_MANAGER property...
@@ -180,11 +191,12 @@ Listed from weakest to strongest:
 
   //  Now, check for a user resource file, and merge it in if there is one...
   if ( getenv( "HOME" ) != NULL ){
-    char userrfilename[1024];
-    char *home = getenv("HOME");
-    snprintf(userrfilename, 1024, "%s/.Xdefaults", home);
+    ostrstream userrfilenames;
+    userrfilenames << getenv("HOME") << "/.Xdefaults" << ends;
+    char *userrfilename = userrfilenames.str();
     //  User file overrides system (_db).
     XrmCombineFileDatabase (userrfilename, &_db, 1);
+    delete[] userrfilenames.str();
   }
 
   //  Second-to-last, parse any resource file specified in the
@@ -201,6 +213,8 @@ Listed from weakest to strongest:
 		    &argc, argv);
   XrmCombineDatabase (cmdlineRdb_, &_db, 1);  //  Keeps cmdlineRdb_ around.
 //  =========== END X Resource lookup and merging ==========
+
+  delete[] rfilenames.str();
 }
 
 void Xrm::initClassName(const char* name){

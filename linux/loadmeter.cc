@@ -16,7 +16,7 @@
 static const char LOADFILENAME[] = "/proc/loadavg";
 
 LoadMeter::LoadMeter( XOSView *parent )
-  : FieldMeterDecay( parent, 2, "LOAD", "PROCS/MIN", 1, 0 ){
+  : FieldMeterGraph( parent, 2, "LOAD", "PROCS/MIN", 1, 0 ){
 
 }
 
@@ -24,7 +24,7 @@ LoadMeter::~LoadMeter( void ){
 }
 
 void LoadMeter::checkResources( void ){
-  FieldMeterDecay::checkResources();
+  FieldMeterGraph::checkResources();
 
   warnloadcol_ = parent_->allocColor(parent_->getResource( "loadWarnColor" ));
   procloadcol_ = parent_->allocColor(parent_->getResource( "loadProcColor" ));
@@ -32,6 +32,7 @@ void LoadMeter::checkResources( void ){
   setfieldcolor( 0, procloadcol_ );
   setfieldcolor( 1, parent_->getResource( "loadIdleColor" ) );
   priority_ = atoi (parent_->getResource( "loadPriority" ) );
+  useGraph_ = !strncasecmp (parent_->getResource( "loadGraph" ), "True", 5 );
   dodecay_ = !strncasecmp (parent_->getResource( "loadDecay" ), "True", 5 );
   SetUsedFormat (parent_->getResource("loadUsedFormat"));
 

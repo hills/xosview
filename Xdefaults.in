@@ -17,6 +17,8 @@ xosview*background:       navy
 xosview*foreground:       wheat
 xosview*enableStipple:	  False !  Change to true to try beta stipple support.
 xosview*samplesPerSec:    10    !  This resource is not yet supported.
+! This defines the number of samples shown in a graph
+xosview*graphNumCols:     64
 
 
 ! Load Meter Resources
@@ -30,6 +32,7 @@ xosview*loadIdleColor:    aquamarine
 xosview*loadPriority:     50
 xosview*loadAlarmThreshold: 2
 xosview*loadDecay: False
+xosview*loadGraph: False
 xosview*loadUsedFormat:	  float
 
 ! CPU Meter Resources
@@ -42,6 +45,7 @@ xosview*cpuInterruptColor : red
 xosview*cpuFreeColor:       aquamarine
 xosview*cpuPriority:        1
 xosview*cpuDecay:           True
+xosview*cpuGraph:           True
 xosview*cpuUsedFormat:	    percent
 
 ! Memory Meter Resources
@@ -59,6 +63,7 @@ xosview*memActiveColor:	  blue
 xosview*memInactiveColor: lightblue
 xosview*memPriority:      10
 xosview*memDecay:         False
+xosview*memGraph:         False
 xosview*memUsedFormat:	  autoscale
 
 ! Swap Meter Resources
@@ -69,6 +74,7 @@ xosview*swapFreeColor:    aquamarine
 xosview*swapReservedColor: yellow
 xosview*swapPriority:     10
 xosview*swapDecay:        False
+xosview*swapGraph:        False
 xosview*swapUsedFormat:	  autoscale
 
 
@@ -81,6 +87,7 @@ xosview*pageOutColor:   SlateBlue1
 xosview*pageIdleColor:  aquamarine
 xosview*pagePriority:   5
 xosview*pageDecay:      False
+xosview*pageGraph:      True
 xosview*pageUsedFormat: autoscale
 
 
@@ -101,6 +108,7 @@ xosview*netOutColor:      SlateBlue1
 xosview*netBackground:    aquamarine
 xosview*netPriority:      2
 xosview*netDecay:         True
+xosview*netGraph:         True
 xosview*netUsedFormat:	  autoscale
 
 !!!

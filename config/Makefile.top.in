@@ -15,6 +15,7 @@ defaultstring.o \
 meter.o \
 fieldmeter.o \
 fieldmeterdecay.o \
+fieldmetergraph.o \
 bitmeter.o \
 xosview.o \
 main.o

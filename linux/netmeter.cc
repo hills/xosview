@@ -43,7 +43,7 @@
 #include <errno.h>
 
 NetMeter::NetMeter( XOSView *parent, float max )
-  : FieldMeterDecay( parent, 3, "NET", "IN/OUT/IDLE" ){
+  : FieldMeterGraph( parent, 3, "NET", "IN/OUT/IDLE" ){
   _timer.start();
   maxpackets_ = max;
   _lastBytesIn = _lastBytesOut = 0;
@@ -81,12 +81,13 @@ void NetMeter::checkOSVersion(void)
     }
 
 void NetMeter::checkResources( void ){
-  FieldMeterDecay::checkResources();
+  FieldMeterGraph::checkResources();
 
   setfieldcolor( 0, parent_->getResource( "netInColor" ) );
   setfieldcolor( 1, parent_->getResource( "netOutColor" ) );
   setfieldcolor( 2, parent_->getResource( "netBackground" ) );
   priority_ = atoi (parent_->getResource( "netPriority" ) );
+  useGraph_ = !strncasecmp (parent_->getResource( "netGraph" ), "True", 5 );
   dodecay_ = !strncasecmp (parent_->getResource( "netDecay" ), "True", 5 );
   SetUsedFormat (parent_->getResource("netUsedFormat"));
 

@@ -3,9 +3,9 @@
 //
 
 #include <X11/Xatom.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <strstream.h>
 #include "general.h"
 #include "xwin.h"
 #include "Xrm.h"
@@ -241,8 +241,9 @@ void XWin::getGeometry( void ){
   sizehints_->y = y_;
 
   // Construct a default geometry string
-  snprintf(default_geometry, 80, "%dx%d+%d+%d", sizehints_->width,
-	  sizehints_->height, sizehints_->x, sizehints_->y);
+  ostrstream os(default_geometry, 79);
+  os << sizehints_->width << "x" << sizehints_->height << "+"
+    << sizehints_->x << "+" << sizehints_->y << ends;
 
   // Process the geometry specification
   bitmask =  XGeometry(display_, DefaultScreen(display_), 

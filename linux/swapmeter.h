@@ -10,10 +10,10 @@
 #define _SWAPMETER_H_
 
 
-#include "fieldmeterdecay.h"
+#include "fieldmetergraph.h"
 
 
-class SwapMeter : public FieldMeterDecay {
+class SwapMeter : public FieldMeterGraph {
 public:
   SwapMeter( XOSView *parent );
   ~SwapMeter( void );

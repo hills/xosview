@@ -16,7 +16,7 @@ static const char STATFILENAME[] = "/proc/stat";
 
 
 PageMeter::PageMeter( XOSView *parent, float max )
-  : FieldMeterDecay( parent, 3, "PAGE", "IN/OUT/IDLE" ){
+  : FieldMeterGraph( parent, 3, "PAGE", "IN/OUT/IDLE" ){
   for ( int i = 0 ; i < 2 ; i++ )
     for ( int j = 0 ; j < 2 ; j++ )
       pageinfo_[j][i] = 0;
@@ -29,7 +29,7 @@ PageMeter::~PageMeter( void ){
 }
 
 void PageMeter::checkResources( void ){
-  FieldMeterDecay::checkResources();
+  FieldMeterGraph::checkResources();
 
   setfieldcolor( 0, parent_->getResource( "pageInColor" ) );
   setfieldcolor( 1, parent_->getResource( "pageOutColor" ) );
@@ -37,6 +37,7 @@ void PageMeter::checkResources( void ){
   priority_ = atoi (parent_->getResource( "pagePriority" ) );
   maxspeed_ *= priority_ / 10.0;
   dodecay_ = !strncasecmp (parent_->getResource( "pageDecay" ), "True", 5 );
+  useGraph_ = !strncasecmp (parent_->getResource( "pageGraph" ), "True", 5 );
   SetUsedFormat (parent_->getResource("pageUsedFormat"));
 }
 

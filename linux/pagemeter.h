@@ -9,9 +9,9 @@
 #ifndef _PAGEMETER_H_
 #define _PAGEMETER_H_
 
-#include "fieldmeterdecay.h"
+#include "fieldmetergraph.h"
 
-class PageMeter : public FieldMeterDecay {
+class PageMeter : public FieldMeterGraph {
 public:
   PageMeter( XOSView *parent, float max );
   ~PageMeter( void );

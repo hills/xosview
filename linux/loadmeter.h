@@ -12,10 +12,10 @@
 #define _LOADMETER_H_
 
 
-#include "fieldmeterdecay.h"
+#include "fieldmetergraph.h"
 
 
-class LoadMeter : public FieldMeterDecay {
+class LoadMeter : public FieldMeterGraph {
 public:
   LoadMeter( XOSView *parent );
   ~LoadMeter( void );

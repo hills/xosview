@@ -27,7 +27,6 @@
 //	 dodecay_ variable according to the, e.g., xosview*cpuDecay resource.
 
 #include <fstream.h>
-#include <stdio.h>
 #include <math.h>		//  For fabs()
 #include "general.h"
 #include "fieldmeter.h"

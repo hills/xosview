@@ -1,5 +1,6 @@
   /*  $Id$  */
-Changes since xosview-1.6.1:
+Changes since xosview-1.6.1
+  New graphing meter display mode added.
   Fixes to work with linux/alpha.
   BSD directories merged -- now a single bsd subdir shared by
     NetBSD, FreeBSD, and OpenBSD.

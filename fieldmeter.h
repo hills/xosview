@@ -42,9 +42,11 @@ protected:
   enum UsedType { INVALID_0, FLOAT, PERCENT, AUTOSCALE, INVALID_TAIL };
 
   int numfields_;
-  float *fields_, total_, used_, lastused_;
+  float *fields_;
+  float total_, used_, lastused_;
   int *lastvals_, *lastx_;
-  unsigned long *colors_, usedcolor_;
+  unsigned long *colors_;
+  unsigned long usedcolor_;
   UsedType print_;
   int printedZeroTotalMesg_;
   int numWarnings_;

@@ -9,12 +9,12 @@
 #ifndef _NETMETER_H_
 #define _NETMETER_H_
 
-#include "fieldmeterdecay.h"
+#include "fieldmetergraph.h"
 #include "timer.h"
 
 class Host;
 
-class NetMeter : public FieldMeterDecay {
+class NetMeter : public FieldMeterGraph {
 public:
   NetMeter(XOSView *parent, float max);
   ~NetMeter( void );

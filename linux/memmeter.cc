@@ -15,7 +15,7 @@ static const char MEMFILENAME[] = "/proc/meminfo";
 static const char MEMSTATFNAME[] = "/proc/memstat";
 
 MemMeter::MemMeter( XOSView *parent )
-: FieldMeterDecay( parent, 4, "MEM", "USED+SHAR/BUFF/CACHE/FREE" ){
+: FieldMeterGraph( parent, 4, "MEM", "USED+SHAR/BUFF/CACHE/FREE" ){
   _shAdj = -1;
 
   // Check and see if the memstat module has been loaded
@@ -37,7 +37,7 @@ MemMeter::~MemMeter( void ){
 }
 
 void MemMeter::checkResources( void ){
-  FieldMeterDecay::checkResources();
+  FieldMeterGraph::checkResources();
 
   setfieldcolor( 0, parent_->getResource( "memUsedColor" ) );
   if (_shAdj == 0)
@@ -47,6 +47,7 @@ void MemMeter::checkResources( void ){
   setfieldcolor( 4 + _shAdj, parent_->getResource( "memFreeColor" ) );
   priority_ = atoi (parent_->getResource( "memPriority" ) );
   dodecay_ = !strncasecmp (parent_->getResource( "memDecay" ), "True", 5 );
+  useGraph_ = !strncasecmp (parent_->getResource( "memGraph" ), "True", 5 );
   SetUsedFormat (parent_->getResource("memUsedFormat"));
 }
 
