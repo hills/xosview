@@ -4,7 +4,7 @@ CVS Id:  Revision: $Id$
 
   NetBSD version written and maintained by Brian Grayson. 
 Please direct all comments, criticisms, etc. to me at
-bgrayson@ece.utexas.edu.
+bgrayson@netbsd.org.
 
   An FAQ section is at the end of this file.
 
@@ -82,8 +82,6 @@ this mumbo jumbo.
     meter is black, and the other colors used for fields are fairly constant
     from one meter to the next.  If you'd like a copy of our local .Xdefaults
     file (rather than modifying the 50 resources yourself), just mail me!
-    This setup is the one that is viewable on my xosview web page
-    (http://lore.ece.utexas.edu/~bgrayson/xosview.html).
 
   xosview is able to accept the -name option, for you XResource
     aficionados.  
@@ -113,7 +111,7 @@ this mumbo jumbo.
 
   Enjoy!
 
-  Brian Grayson (bgrayson@ece.utexas.edu)
+  Brian Grayson (bgrayson@netbsd.org)
 
   Further information/FAQs:
 
