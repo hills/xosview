@@ -16,6 +16,7 @@ swapmeter.o \
 swapinternal.o \
 netmeter.o \
 loadmeter.o \
+diskmeter.o \
 netbsd.o
 
 #  These next two are not yet supported in the NetBSD port.
