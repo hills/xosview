@@ -16,6 +16,9 @@
 #include "general.h"
 #include "MeterMaker.h"
 #include "xosview.h"
+#ifdef HAVE_BATTERY_METER
+#include "btrymeter.h"
+#endif
 #include "cpumeter.h"
 #include "memmeter.h"
 #include "swapmeter.h"
@@ -62,6 +65,12 @@ void MeterMaker::makeMeters(void){
 
   if (_xos->isResourceTrue("interrupts"))
       push(new IntMeter(_xos));
+
+#ifdef HAVE_BATTERY_METER
+  //  This one is done in its own file, not kernel.cc
+  if (_xos->isResourceTrue("battery"))
+      push(new BtryMeter(_xos));
+#endif
 
   //  The serial meters are not yet available for the BSDs.  BCG
 }
