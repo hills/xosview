@@ -73,6 +73,8 @@ void MeterMaker::makeMeters(void){
   }
 
 #ifdef HAVE_BATTERY_METER
+  //  NOTE:  Only xosview for NetBSD (out of all the BSDs) currently
+  //  supports the Battery Meter.
   //  This one is done in its own file, not kernel.cc
   if (_xos->isResourceTrue("battery"))
       push(new BtryMeter(_xos));
