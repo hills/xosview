@@ -24,6 +24,8 @@ static XrmOptionDescRec options[] = {
 //  XOSView-specific resources:
 { "-labels", "*labels", XrmoptionNoArg, "False" },
 { "+labels", "*labels", XrmoptionNoArg, "True" },
+{ "-usedlabels", "*usedlabels", XrmoptionNoArg, "False" },
+{ "+usedlabels", "*usedlabels", XrmoptionNoArg, "True" },
 //  CPU resources
 { "-cpu", "*cpu", XrmoptionNoArg, "False" },
 { "+cpu", "*cpu", XrmoptionNoArg, "True" },
