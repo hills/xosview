@@ -104,6 +104,9 @@ void MemMeter::getmeminfo (void) {
   fields_[0] = kvm_cnt.v_active_count * pgsize;
   fields_[1] = kvm_cnt.v_inactive_count * pgsize;
   fields_[2] = kvm_cnt.v_wire_count * pgsize;
+  /*  Initialize total_ to 0.0.  FreeBSD will then add some to
+   *  this, and later we'll add all the common fields to this.  */
+  total_ = 0.0;
 # ifdef XOSVIEW_FREEBSD
   /* I believe v_cache_count is the right answer here, rather than the
      bufspace variable.  I think that bufspace is a subset of "cache" space
@@ -113,12 +116,14 @@ void MemMeter::getmeminfo (void) {
      total memory.  Perhaps a better representation of what is going on would
      be to subtract bufspace from v_cache_count, and add that difference to
      v_inactive_count.  (pavel 21-Jan-1998) */
-  fields_[3] = kvm_cnt.v_cache_count * pgsize;
+  total_ = fields_[3] = kvm_cnt.v_cache_count * pgsize;
   /*total_ = kvm_cnt.v_page_count * pgsize;*/
 # endif	/*  FreeBSD  */
   fields_[FREE_INDEX] = kvm_cnt.v_free_count * pgsize;
 #endif /*  UVM && NetBSD */
-  total_ = fields_[0] + fields_[1] + fields_[2] + fields_[FREE_INDEX];
+  /*  Now add to total_ (the cache pages were counted for FreeBSD
+   *  above).  */
+  total_ += fields_[0] + fields_[1] + fields_[2] + fields_[FREE_INDEX];
 
 //  End *BSD-specific code...
 
