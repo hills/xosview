@@ -9,7 +9,7 @@
 /*#include <sys/loadavg.h>*/
 
 LoadMeter::LoadMeter(XOSView *parent, kstat_ctl_t *_kc)
-	: FieldMeterDecay(parent, 2, "LOAD", "PROCS/MIN", 1, 0)
+	: FieldMeterDecay(parent, 2, "LOAD", "PROCS/MIN", 1, 1, 0)
 {
 	kc = _kc;
 	ksp = kstat_lookup(kc, "unix", 0, "system_misc");
