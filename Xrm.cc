@@ -157,7 +157,9 @@ Listed from weakest to strongest:
   {
     char xappfile[1024];
     sprintf (xappfile, "%s/%s", xappdir, className());
-    if (!access (xappfile, X_OK | R_OK))
+    // this did not work for XAPPLRESDIR
+    //if (!access (xappfile, X_OK | R_OK))  
+    if (!access (xappfile, R_OK))
     {
       XrmCombineFileDatabase (xappfile, &_db, 1);
       }
