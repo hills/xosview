@@ -64,6 +64,7 @@ void NetMeter::checkResources( void ){
   setfieldcolor( 2, parent_->getResource( "netBackground" ) );
   priority_ = atoi (parent_->getResource( "netPriority" ) );
   dodecay_ = !strcmp (parent_->getResource( "netDecay" ), "True" );
+  SetUsedFormat (parent_->getResource("netUsedFormat"));
 
   _ipsock = socket(AF_INET, SOCK_DGRAM, 0);
   if (_ipsock == -1) {
@@ -147,7 +148,7 @@ void NetMeter::checkevent( void ){
 
   adjust();
   if (total_)
-    used( (int)((100 * (fields_[0] + fields_[1])) / total_) );
+    setUsed(fields_[0] + fields_[1], total_);
   _timer.start();
   drawfields();
 }

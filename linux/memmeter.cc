@@ -47,6 +47,7 @@ void MemMeter::checkResources( void ){
   setfieldcolor( 4 + _shAdj, parent_->getResource( "memFreeColor" ) );
   priority_ = atoi (parent_->getResource( "memPriority" ) );
   dodecay_ = !strcmp (parent_->getResource( "memDecay" ), "True" );
+  SetUsedFormat (parent_->getResource("memUsedFormat"));
 }
 
 void MemMeter::checkevent( void ){
@@ -65,8 +66,7 @@ void MemMeter::getmeminfo( void ){
     fields_[0] -= fields_[1];
 
   if (total_)
-    FieldMeterDecay::used( (int)((100 * (total_ - fields_[4 + _shAdj])) 
-                                 / total_) );
+    FieldMeterDecay::setUsed (total_ - fields_[4 + _shAdj], total_);
 }
 
 MemMeter::LineInfo *MemMeter::findLines(LineInfo *tmplate, int len, 
@@ -147,7 +147,8 @@ void MemMeter::getmemstat(const char *fname, LineInfo *infos, int ninfos){
 
     unsigned long val;
     line >> ignore >> val;
-    infos[inum].setVal(val);
+    /*  All stats are in KB.  */
+    infos[inum].setVal(val*1024);	/*  Multiply by 1024 bytes per K  */
 
     inum++;
     if (inum >= ninfos)

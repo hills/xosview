@@ -27,6 +27,7 @@ void BtryMeter::checkResources( void ){
   setfieldcolor( 1, parent_->getResource( "batteryLeftColor" ) );
 
   priority_ = atoi (parent_->getResource( "batteryPriority" ) );
+  SetUsedFormat(parent_->getResource( "batteryUsedFormat" ) );
 }
 
 void BtryMeter::checkevent( void ){
@@ -52,5 +53,5 @@ void BtryMeter::getpwrinfo( void ){
 
   fields_[1] = total_ - fields_[0];
 
-  absolute( fields_[0] );
+  setUsed (fields_[0], total_);
 }

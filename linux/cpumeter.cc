@@ -38,6 +38,7 @@ void CPUMeter::checkResources( void ){
   setfieldcolor( 3, parent_->getResource( "cpuFreeColor" ) );
   priority_ = atoi (parent_->getResource( "cpuPriority" ) );
   dodecay_ = !strcmp (parent_->getResource( "cpuDecay" ), "True" );
+  SetUsedFormat (parent_->getResource("cpuUsedFormat"));
 }
 
 void CPUMeter::checkevent( void ){
@@ -71,7 +72,7 @@ void CPUMeter::getcputime( void ){
   }
 
   if (total_){
-    used( (int)((100 * (total_ - fields_[3])) / total_) );
+    setUsed (total_ - fields_[3], total_);
     cpuindex_ = (cpuindex_ + 1) % 2;
   }
 }

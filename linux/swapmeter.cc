@@ -41,6 +41,7 @@ void SwapMeter::checkResources( void ){
   setfieldcolor( 1, parent_->getResource( "swapFreeColor" ) );
   priority_ = atoi (parent_->getResource( "swapPriority" ) );
   dodecay_ = !strcmp (parent_->getResource( "swapDecay" ), "True" );
+  SetUsedFormat (parent_->getResource("swapUsedFormat"));
 }
 
 void SwapMeter::checkevent( void ){
@@ -70,7 +71,7 @@ void SwapMeter::getswapinfo( void ){
   }
   
   if (total_)
-    used( (int)((100 * fields_[0]) / total_ ) );
+    setUsed (fields_[0], total_);
 }
 #else
 void SwapMeter::getswapinfo( void ){
@@ -106,7 +107,7 @@ void SwapMeter::getswapinfo( void ){
   }
 
   if (total_)
-    used( (int)((100 * fields_[0]) / total_ ) );
+    setUsed (fields_[0], total_);
 }
 #endif
 
