@@ -32,7 +32,8 @@ defaultstring.cc: Xdefaults defresources.awk
 	@AWK@ -f defresources.awk Xdefaults > defaultstring.cc
 
 meterlib:
-	if [ @host_os@ = freebsd ]; then \
+	@if [ @host_os@ = freebsd ]; then \
+	  echo "Creating symlinks in freebsd dir to netbsd dir..."; \
 	  cd @top_srcdir@/@host_os@ && $(MAKE) makelinks; \
 	fi
 	cd @top_srcdir@/@host_os@ && $(MAKE)
