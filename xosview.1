@@ -22,6 +22,7 @@ xosview [options]
 .\" addition to the .pp macro.
 .\"  Usage:   .pp load
 .de pp
+xosview*\\$1Priority: \fIpriority\fP
 .RS
 This number (which must be an integer >= 1) sets the number of tenths of
 a second that the \\$1 meter waits between updates.  A value of 1 has xosview
@@ -34,10 +35,59 @@ cause xosview to update the meter once a minute.
 .\" the decay resource paragraphs.
 .\"  Usage:  .dc net
 .de dc
+xosview*\\$1Decay: (True or False)
 .RS
 If True then the \\$1 meter will be split vertically in two.  The top
 half will show the instantaneous state, while the bottom half will
 display a decaying average of the state.
+.RE
+..
+
+.\"  The .pm macro is for ``plus/minus'' -- for the
+.\"  enable/disable command-line options.
+.de pm
+-\\$1
+.RS
+This option overrides the xosview*\\$1 resource.  It is
+equivalent to setting xosview*\\$1 to "False".
+.RE
+
++\\$1
+.RS
+This option overrides the xosview*\\$1 resource.  It is
+equivalent to setting xosview*\\$1 to "True".
+.RE
+..
+
+.\"  The .xt macro is for ``Xresource true'' -- for enabling a
+.\"  meter, like the .pm macro/-+foo.
+.de xt
+xosview*\\$1: (True or False)
+.RS
+If True then xosview will display a \\$1 meter.
+.RE
+..
+
+.\"  The .uf macro is for the ``used format'' stuff.
+.de uf
+xosview*\\$1UsedFormat:	  (float, percent or autoscale)
+.RS
+This resource tells xosview how to display "used" labels.  The formats work
+as follows:
+
+\fBfloat\fP:
+.RS
+Display the value as a floating point number.
+.RE
+\fBpercent\fP:
+.RS
+Display the value as a percentage of the total.
+.RE
+\fBautoscale\fP:
+.RS
+Display the absolute value and automatically print the units (K, M, or G) as
+appropriate.
+.RE
 .RE
 ..
 
@@ -169,17 +219,8 @@ Sets the X geometry to \fIgeometry_string\fP.  This option overrides the
 xosview*geometry resource.
 .RE
 
--labels
-.RS
-This option overrides the xosview*labels resource.  It is equivalent to setting
-xosview*labels to "False".
-.RE
-
-+labels
-.RS
-This option overrides the xosview*labels resource.  It is equivalent to setting
-xosview*labels to "True".
-.RE
+.\"  Handle -/+labels
+.pm labels
 
 -usedlabels
 .RS
@@ -193,77 +234,23 @@ This option overrides the xosview*usedlabels resource.  It is equivalent to
 setting xosview*usedlabels to "True".
 .RE
 
--cpu
-.RS
-This option overrides the xosview*cpu resource.  It is equivalent to
-setting xosview*cpu to "False".
-.RE
+.\"  Handle -/+cpu
+.pm cpu
 
-+cpu
-.RS
-This option overrides the xosview*cpu resource.  It is equivalent to
-setting xosview*cpu to "True".
-.RE
+.\"  Handle -/+load
+.pm load
 
--load
-.RS
-This option overrides the xosview*load resource.  It is equivalent to setting
-xosview*load to "False".
-.RE
+.\"  Handle -/+mem
+.pm mem
 
-+load
-.RS
-This option overrides the xosview*load resource.  It is equivalent to setting
-xosview*load to "True".
-.RE
+.\"  Handle -/+swap
+.pm swap
 
--mem
-.RS
-This option overrides the xosview*mem resource.  It is equivalent to setting
-xosview*mem to "False".
-.RE
+.\"  Handle -/+battery
+.pm battery
 
-+mem
-.RS
-This option overrides the xosview*mem resource.  It is equivalent to setting
-xosview*mem to "True".
-.RE
-
--swap
-.RS
-This option overrides the xosview*swap resource.  It is equivalent to setting
-xosview*swap to "False".
-.RE
-
-+swap
-.RS
-This option overrides the xosview*swap resource.  It is equivalent to setting
-xosview*swap to "True".
-.RE
-
--battery
-.RS
-This option overrides the xosview*battery resource.  It is equivalent to 
-setting xosview*battery to "False".
-.RE
-
-+battery
-.RS
-This option overrides the xosview*battery resource.  It is equivalent to 
-setting xosview*battery to "True".
-.RE
-
-+net
-.RS
-This option overrides the xosview*net resource.  It is equivalent
-to setting xosview*net to "True".
-.RE
-
--net
-.RS
-This option overrides the xosview*net resource.  It is equivalent
-to setting xosview*net to "False".
-.RE
+.\"  Handle -/+net
+.pm net
 
 -network \fImaxbandwidth\fP 
 .RE
@@ -277,17 +264,8 @@ bandwidth of \fBmaxbandwidth\fP.  Notice that setting the bandwidth to
 0 no longer disables the meter -- use the ``-net'' option instead.
 .RE
 
--page
-.RS
-This option overrides the xosview*page resource.  It is equivalent to setting
-xosview*page to "False".
-.RE
-
-+page
-.RS
-This option overrides the xosview*page resource.  It is equivalent to setting
-xosview*page to "True".
-.RE
+.\"  Handle -/+page
+.pm page
 
 -pagespeed \fIval\fP
 .RS
@@ -295,17 +273,8 @@ This option overrides the xosview*pageBandWidth resource.  The resource
 xosview*pageBandWidth will be set to \fIval\fP.
 .RE
 
--disk
-.RS
-This option overrides the xosview*disk resource.  It is equivalent to setting
-xosview*disk to "False".
-.RE
-
-+disk
-.RS
-This option overrides the xosview*disk resource.  It is equivalent to setting
-xosview*disk to "True".
-.RE
+.\"  Handle -/+disk
+.pm disk
 
 -xrm \fIresource_string\fP
 .RS
@@ -409,10 +378,8 @@ some more work.
 \fBLoad Meter Resources\fP
 
 
-xosview*load: (True or False)
-.RS
-If True then xosview will display a load meter.
-.RE
+.\"  Do the load: True resource.
+.xt load
 
 xosview*loadWarnColor: \fIcolor\fP
 .RS
@@ -431,13 +398,8 @@ xosview*loadIdleColor: \fIcolor\fP
 This is the color that the load meter will use to display its "idle" field.
 .RE
 
-xosview*loadPriority: \fIpriority\fP
-.RS
-This number (which must be an integer >= 1) sets the number of tenths of
-a second that the meter waits between updates.  A value of 1 has xosview
-update the meter 10 times per second (the fastest).  A value of 600 would
-cause xosview to update the meter once a minute.
-.RE
+.\"  Do the priority resource
+.pp load
 
 xosview*loadAlarmThreshold: \fIint\fP
 .RS
@@ -452,25 +414,8 @@ You should probably leave this at the default value (False).  The load
 is already a time-averaged value!
 .RE
 
-xosview*loadUsedFormat:	  (float, percent or autoscale)
-.RS
-This resource tells xosview how to display "used" labels.  The formats work
-as follows:
-
-\fBfloat\fP:
-.RS
-Display the value as a floating point number.
-.RE
-\fBpercent\fP:
-.RS
-Display the value as a percentage of the total.
-.RE
-\fBautoscale\fP:
-.RS
-Display the absolute value and automatically print the units (K, M, or G) as
-appropriate.
-.RE
-.RE
+.\"  loadUsedFormat resource
+.uf load
 
 
 \fBCPU Meter Resources\fP
@@ -508,48 +453,21 @@ xosview*cpuFreeColor: \fIcolor\fP
 The color to use for free time in the cpu meter.
 .RE
 
-xosview*cpuPriority: \fIpriority\fP
-.RS
-This number (which must be an integer >= 1) sets the number of times the 
-cpu meter will update per second.  The number of times this meter will update 
-per second is calculated as follows :  updates per sec = 10 / \fIpriority\fP.  It can of couse be greater than 10.
-.RE
+.\"  Do the priority resource
+.pp cpu
 
-xosview*cpuDecay: (True or False)
-.RS
-If True then the cpu meter will be split in two.  One half will show the
-instantaneous state and the other will display a decaying average of the
-state.
-.RE
+.\"  Do decay resource
+.dc cpu
 
-xosview*cpuUsedFormat:	  (float, percent or autoscale)
-.RS
-This resource tells xosview how to display "used" labels.  The formats work
-as follows:
-
-\fBfloat\fP:
-.RS
-Display the value as a floating point number.
-.RE
-\fBpercent\fP:
-.RS
-Display the value as a percentage of the total.
-.RE
-\fBautoscale\fP:
-.RS
-Display the absolute value and automatically print the units (K, M, or G) as
-appropriate.
-.RE
-.RE
+.\"  cpuUsedFormat resource
+.uf cpu
 
 
 \fBMemory Meter Resources\fP
 
 
-xosview*mem: (True or False)
-.RS
-If True then xosview will display a memory meter.
-.RE
+.\"  Do the mem: True resource.
+.xt mem
 
 xosview*memUsedColor: \fIcolor\fP
 .RS
@@ -599,49 +517,20 @@ xosview*memInactiveColor: \fIcolor\fP
 The color used by the NetBSD memory meter for inactive pages.
 .RE
 
-xosview*memPriority: \fIpriority\fP
-.RS
-This number (which must be an integer >= 1) sets the number of times the 
-memory meter will update per second.  The number of times this meter will 
-update per second is calculated as follows :  updates per sec = 10 / 
-\fIpriority\fP.  It can of couse be greater than 10.
-.RE
+.\"  Do the priority resource
+.pp mem
 
-xosview*memDecay: (True or False)
-.RS
-If True then the memory meter will be split in two.  One half will show the
-instantaneous state and the other will display a decaying average of the
-state.
-.RE
+.\"  Do decay resource
+.dc mem
 
-xosview*memUsedFormat:	  (float, percent or autoscale)
-.RS
-This resource tells xosview how to display "used" labels.  The formats work
-as follows:
-
-\fBfloat\fP:
-.RS
-Display the value as a floating point number.
-.RE
-\fBpercent\fP:
-.RS
-Display the value as a percentage of the total.
-.RE
-\fBautoscale\fP:
-.RS
-Display the absolute value and automatically print the units (K, M, or G) as
-appropriate.
-.RE
-.RE
+.\"  memUsedFormat resource
+.uf mem
 
 
 \fBSwap Meter Resources\fP
 
-
-xosview*swap: (True or False)
-.RS
-If True then xosview will display a swap space meter.
-.RE
+.\"  Do the swap: True resource.
+.xt swap
 
 xosview*swapUsedColor: \fIcolor\fP
 .RS
@@ -653,40 +542,20 @@ xosview*swapFreeColor: \fIcolor\fP
 This is the color that the swap meter will use for free swap space.
 .RE
 
-xosview*swapPriority: \fIpriority\fP
+.\"  Do the priority resource
 .pp swap
 
-xosview*swapDecay: (True or False)
+.\"  Do decay resource
 .dc swap
 
-xosview*swapUsedFormat:	  (float, percent or autoscale)
-.RS
-This resource tells xosview how to display "used" labels.  The formats work
-as follows:
-
-\fBfloat\fP:
-.RS
-Display the value as a floating point number.
-.RE
-\fBpercent\fP:
-.RS
-Display the value as a percentage of the total.
-.RE
-\fBautoscale\fP:
-.RS
-Display the absolute value and automatically print the units (K, M, or G) as
-appropriate.
-.RE
-.RE
+.\"  swapUsedFormat resource
+.uf swap
 
 
 \fBPage Swapping Meter Resources\fP
 
-
-xosview*page: (True or False)
-.RS
-If True xosview will display the PageMeter.
-.RE
+.\"  Do the page: True resource.
+.xt page
 
 xosview*pageBandWidth: \fImaxEvents\fP
 .RS
@@ -713,31 +582,14 @@ xosview*pageIdleColor: \fIcolor\fP
 This is the color that the page meter will use to display the idle field.
 .RE
 
-xosview*pagePriority: \fIpriority\fP
+.\"  Do the priority resource
 .pp page
 
-xosview*pageDecay: (True or False)
+.\"  Do decay resource
 .dc page
 
-xosview*pageUsedFormat:	  (float, percent or autoscale)
-.RS
-This resource tells xosview how to display "used" labels.  The formats work
-as follows:
-
-\fBfloat\fP:
-.RS
-Display the value as a floating point number.
-.RE
-\fBpercent\fP:
-.RS
-Display the value as a percentage of the total.
-.RE
-\fBautoscale\fP:
-.RS
-Display the absolute value and automatically print the units (K, M, or G) as
-appropriate.
-.RE
-.RE
+.\"  pageUsedFormat resource
+.uf page
 
 
 \fBNetwork Meter Resources\fP
@@ -746,7 +598,7 @@ appropriate.
 xosview*net:	(True or False)
 .RS
 If True xosview will display the NetMeter.  Linux users will have to configure
-there kernels and setup some ip accounting rules to make this work.  See the
+their kernels and setup some ip accounting rules to make this work.  See the
 file README.linux which comes with the xosview distribution for details.
 .RE
 
@@ -773,31 +625,14 @@ xosview*netBackground: \fIcolor\fP
 This is the color that the network meter will use for the "idle" field.
 .RE
 
-xosview*netPriority: \fIpriority\fP
+.\"  Do the priority resource
 .pp net
 
-xosview*netDecay: (True or False)
+.\"  Do decay resource
 .dc net
 
-xosview*netUsedFormat:	  (float, percent or autoscale)
-.RS
-This resource tells xosview how to display "used" labels.  The formats work
-as follows:
-
-\fBfloat\fP:
-.RS
-Display the value as a floating point number.
-.RE
-\fBpercent\fP:
-.RS
-Display the value as a percentage of the total.
-.RE
-\fBautoscale\fP:
-.RS
-Display the absolute value and automatically print the units (K, M, or G) as
-appropriate.
-.RE
-.RE
+.\"  netUsedFormat resource
+.uf net
 
 
 \fBSerial Meter Resources\fP
@@ -826,7 +661,7 @@ xosview*serialOffColor: \fIcolor\fP
 This is the color the serial meter will use for bits that are not set.
 .RE
 
-xosview*serialPriority: \fIpriority\fP
+.\"  Do the priority resource
 .pp serial
 
 
@@ -855,7 +690,7 @@ This is the color that will be used to show "inactive" interrupts.
 xosview*battery: (True or False)
 .RS
 If True then xosview will display a battery meter.  Linux users will need
-to have APM support in there kernels for this to work.  See the file
+to have APM support in their kernels for this to work.  See the file
 README.linux which comes with the xosview distribution for more details.
 .RE
 
@@ -869,17 +704,14 @@ xosview*batteryUsedColor: \fIcolor\fP
 This is the color that will be used to show the amount of battery power used.
 .RE
 
-xosview*batteryPriority: \fIpriority\fP
+.\"  Do the priority resource
 .pp battery
 
 
 \fBDisk Meter Resources\fP
 
-
-xosview*disk: (True or False)
-.RS
-If True xosview will display the DiskMeter.
-.RE
+.\"  Do the disk: True resource.
+.xt disk
 
 xosview*diskUsedColor: \fIcolor\fP
 .RS
@@ -899,31 +731,14 @@ This number is used to specify the expected maximum bandwidth in bytes
 per second for the disk meter.
 .RE
 
-xosview*diskPriority: \fIpriority\fP
+.\"  Do the priority resource
 .pp disk
 
-xosview*diskDecay: (True or False)
+.\"  Do decay resource
 .dc disk
 
-xosview*diskUsedFormat:	  (float, percent or autoscale)
-.RS
-This resource tells xosview how to display "used" labels.  The formats work
-as follows:
-
-\fBfloat\fP:
-.RS
-Display the value as a floating point number.
-.RE
-\fBpercent\fP:
-.RS
-Display the value as a percentage of the total.
-.RE
-\fBautoscale\fP:
-.RS
-Display the absolute value and automatically print the units (K, M, or G) as
-appropriate.
-.RE
-.RE
+.\"  diskUsedFormat resource
+.uf disk
 
 
 .SH BUGS
