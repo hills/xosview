@@ -37,7 +37,7 @@ PageMeter::PageMeter( XOSView *parent, double total )
 PageMeter::~PageMeter( void ){ }
 
 void PageMeter::checkResources( void ){
-  FieldMeter::checkResources();
+  FieldMeterGraph::checkResources();
 
   //  The Active and Inactive colors are new.
   setfieldcolor( 0, parent_->getResource("pageInColor") );

@@ -26,7 +26,7 @@ DiskMeter::~DiskMeter( void )
 
 void DiskMeter::checkResources( void )
     {
-    FieldMeterDecay::checkResources();
+    FieldMeterGraph::checkResources();
 
     setfieldcolor( 0, parent_->getResource("diskUsedColor") );
     setfieldcolor( 1, parent_->getResource("diskIdleColor") );

@@ -37,7 +37,7 @@ NetMeter::~NetMeter( void ){
 }
 
 void NetMeter::checkResources( void ){
-  FieldMeter::checkResources();
+  FieldMeterGraph::checkResources();
 
   setfieldcolor( 0, parent_->getResource("netInColor") );
   setfieldcolor( 1, parent_->getResource("netOutColor") );

@@ -31,7 +31,7 @@ LoadMeter::~LoadMeter( void ){
 }
 
 void LoadMeter::checkResources( void ){
-  FieldMeter::checkResources();
+  FieldMeterGraph::checkResources();
 
   warnloadcol_ = parent_->allocColor(parent_->getResource("loadWarnColor"));
   procloadcol_ = parent_->allocColor(parent_->getResource("loadProcColor"));

@@ -67,7 +67,7 @@ DiskMeter::~DiskMeter( void ){
 }
 
 void DiskMeter::checkResources( void ){
-  FieldMeter::checkResources();
+  FieldMeterGraph::checkResources();
 
   if (kernelHasStats_) {
     setfieldcolor( 0, parent_->getResource("diskUsedColor") );

@@ -58,7 +58,7 @@ SwapMeter::~SwapMeter( void ){
 }
 
 void SwapMeter::checkResources( void ){
-  FieldMeter::checkResources();
+  FieldMeterGraph::checkResources();
 
   setfieldcolor( 0, parent_->getResource("swapUsedColor") );
   setfieldcolor( 1, parent_->getResource("swapFreeColor") );

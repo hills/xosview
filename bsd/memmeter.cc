@@ -48,7 +48,7 @@ MemMeter::MemMeter( XOSView *parent )
 MemMeter::~MemMeter( void ){ }
 
 void MemMeter::checkResources( void ){
-  FieldMeter::checkResources();
+  FieldMeterGraph::checkResources();
 
   //  The Active and Inactive colors are new.
   setfieldcolor( 0, parent_->getResource("memActiveColor") );

@@ -45,7 +45,7 @@ CPUMeter::~CPUMeter( void ){
 }
 
 void CPUMeter::checkResources( void ){
-  FieldMeter::checkResources();
+  FieldMeterGraph::checkResources();
 
   setfieldcolor( 0, parent_->getResource("cpuUserColor") );
   setfieldcolor( 1, parent_->getResource("cpuNiceColor") );
