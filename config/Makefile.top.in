@@ -89,9 +89,11 @@ distrib-and-copy: distrib
 	scp ../$(PACKAGENAME).tar.gz omni:~bgrayson/public_html/xosview
 
 clean :
-	cd @host_dir@ && $(MAKE) clean
+	@echo "***  Cleaning..."
+	@cd @host_dir@ && $(MAKE) clean
 	@#  Only clean the config directory if it exists...
-	sh -c 'if [ -d config ]; then \
+	@sh -c 'if [ -d config ]; then \
+	    echo "***  Cleaning config directory..."; \
 	    cd config && $(MAKE) clean; fi'
 	rm -f xosview $(OBJS) $(DEPFILES) *~ defaultstring.cc
 
@@ -112,10 +114,12 @@ checksource:
 distclean: clean
 	@#  Also check _all_ subdirs, not just the configured one, for
 	@#  object files.
-	sh -c 'objects=`find . -name "*.o" -print`; if [ x"$$objects" != x ]; then \
+	@echo "***  Checking for any missed .o files..."
+	@sh -c 'objects=`find . -name "*.o" -print`; if [ x"$$objects" != x ]; then \
 	  echo "The following object files still need to be removed:";\
 	  echo $$objects; exit 1; fi'
-	rm -f Makefile Makefile.config Makefile.GNU.autodep \
+	@echo "***  Removing all Makefiles..."
+	@rm -f Makefile Makefile.config Makefile.GNU.autodep \
            @host_dir@/Makefile config.cache config.log config.status
 
 
