@@ -16,7 +16,7 @@ netmeter.o \
 loadmeter.o \
 diskmeter.o \
 pagemeter.o \
-netbsd.o
+kernel.o
 
 #  These next four are not yet supported in the FreeBSD port.
 #intmeter.o \
@@ -25,11 +25,13 @@ netbsd.o
 #swapinternal.o \
 
 CFILES := $(OBJS:.o=.cc)
+BSDCSRCS := MeterMaker.cc cpumeter.cc memmeter.cc netmeter.cc loadmeter.cc diskmeter.cc pagemeter.cc kernel.cc
+BSDHEADERS := $(BSDCSRCS:%.cc=%.h)
 DEPFILES := $(OBJS:%=.%.d)
 
 #-----------------------------------------------------------------------
 
-all : libmeter.a # concatdepend
+all : makelinks libmeter.a # concatdepend
 
 clean :
 	rm -f $(OBJS) $(DEPFILES) libmeter.a *~
@@ -37,5 +39,11 @@ clean :
 libmeter.a : $(OBJS)
 	ar cvr libmeter.a $(OBJS)
 	@RANLIB@ $@
+
+makelinks:
+	@echo "Checking that all common BSD source is up-to-date..."
+	for f in $(BSDCSRCS) $(BSDHEADERS); do \
+	  if [ ! -h $$f ]; then rm -f $$f && ln -s ../netbsd/$$f $$f; \
+	fi; done
 
 @AUTODEPEND@
