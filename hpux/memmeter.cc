@@ -12,7 +12,7 @@
 #include <stdlib.h>
 
 MemMeter::MemMeter( XOSView *parent )
-: FieldMeterDecay( parent, 4, "MEM", "TEXT/USED/OTHER/FREE" ){
+: FieldMeterDecay( parent, 5, "MEM", "TEXT/USED/BSTOR/OTHER/FREE" ){
   struct pst_static pststatic;
 
   pstat_getstatic( &pststatic, sizeof( struct pst_static ), 1, 0 );
@@ -26,8 +26,9 @@ void MemMeter::checkResources( void ){
 
   setfieldcolor( 0, parent_->getResource( "memTextColor" ) );
   setfieldcolor( 1, parent_->getResource( "memUsedColor" ) );
-  setfieldcolor( 2, parent_->getResource( "memOtherColor" ) );
-  setfieldcolor( 3, parent_->getResource( "memFreeColor" ) );
+  setfieldcolor( 2, parent_->getResource( "memCacheColor" ) );
+  setfieldcolor( 3, parent_->getResource( "memOtherColor" ) );
+  setfieldcolor( 4, parent_->getResource( "memFreeColor" ) );
   priority_ = atoi (parent_->getResource( "memPriority" ) );
   dodecay_ = !strcmp (parent_->getResource( "memDecay" ), "True" );
 }
@@ -50,12 +51,16 @@ void MemMeter::checkevent( void ){
 void MemMeter::getmeminfo( void ){
   struct pst_dynamic stats;
 
-  pstat_getdynamic( &stats, sizeof( pst_dynamic ), 128, 128 );
+  pstat_getdynamic(&stats, sizeof( pst_dynamic ), 1, 0);
 
-  fields_[0] = stats.psd_rmtxt;
+  struct pst_vminfo vmstats;
+  pstat_getvminfo(&vmstats, sizeof(vmstats), 1, 0);
+
+  fields_[0] = stats.psd_rmtxt + stats.psd_arm;
   fields_[1] = stats.psd_rm - stats.psd_rmtxt;
-  fields_[2] = total_ - fields_[0] - fields_[1] - stats.psd_free;
-  fields_[3] = stats.psd_free;
+  fields_[2] = vmstats.psv_swapmem_cnt; // + vmstats.psv_swapper_mem;
+  fields_[3] = total_ - fields_[0] - fields_[1] - fields_[2] - stats.psd_free;
+  fields_[4] = stats.psd_free;
 
   FieldMeterDecay::used( (int)((100 * (total_ - fields_[3])) / total_) );
 }
