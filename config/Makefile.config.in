@@ -17,11 +17,11 @@ CXX           = @CXX@
 #-----------------------------------------------------------------
 
 # Optimized CXXFLAGS
-#CXXFLAGS      += $(CFLAGS) -Wall -O4 -pipe -I@x_includes@ \
-#                -I@top_srcdir@ -I./@host_os@ @DEFS@
-# DEBUG CXXFLAGS
-CXXFLAGS      += $(CFLAGS) -Wall -ggdb -pipe -I@x_includes@ \
+CXXFLAGS      += $(CFLAGS) -Wall -O4 -pipe -I@x_includes@ \
                 -I@top_srcdir@ -I./@host_os@ @DEFS@
+# DEBUG CXXFLAGS
+#CXXFLAGS      += $(CFLAGS) -Wall -ggdb -pipe -I@x_includes@ \
+#                -I@top_srcdir@ -I./@host_os@ @DEFS@
 # PROFILE CXXFLAGS
 #CXXFLAGS      += $(CFLAGS) -Wall -ggdb -pg -pipe -I@x_includes@ \
 #                -I@top_srcdir@ -I./@host_os@ @DEFS@
