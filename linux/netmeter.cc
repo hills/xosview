@@ -95,16 +95,13 @@ void NetMeter::checkevent( void ){
   unsigned long tot_in = 0, tot_out = 0;
 
   ifs.ignore(1024, '\n');
-  //ifs.getline(buf, 256);
 
   while (!ifs.eof()){
     ifs >> hex >> sa >> c >> sm >> c >> c >> da >> c >> dm;
     for (int index = 0 ; index < 7 ; index++)
       ifs.ignore(9999, ' ');
     ifs >> dec >> bytes;
-//     ifs >> hex >> sa >> c >> sm >> c >> c >> da >> c >> dm
-//       >> ignore >> ignore >> ignore >> ignore
-//       >> dec >> packets >> bytes;
+
     ifs.ignore(9999, '\n');
 
     if (!ifs.eof()){

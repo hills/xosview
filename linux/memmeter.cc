@@ -25,9 +25,15 @@ MemMeter::MemMeter( XOSView *parent )
     legend("USED/SHAR/BUFF/CACHE/FREE");
     _shAdj = 0;
   }
+
+  _MSlineInfos = NULL;
+  _MIlineInfos = NULL;
+  initLineInfo();
 }
 
 MemMeter::~MemMeter( void ){
+  delete[] _MIlineInfos;
+  delete[] _MSlineInfos;
 }
 
 void MemMeter::checkResources( void ){
@@ -49,70 +55,102 @@ void MemMeter::checkevent( void ){
 }
 
 void MemMeter::getmeminfo( void ){
-  MemStat mstat;
-  getmemstat(&mstat);
+  getmemstat(MEMFILENAME, _MIlineInfos, _numMIlineInfos);
+  if (_shAdj == 0)
+    getmemstat(MEMSTATFNAME, _MSlineInfos, _numMSlineInfos);
 
-  total_ = mstat.total;
+  fields_[0] = total_ - fields_[4 + _shAdj] - fields_[3 + _shAdj] 
+    - fields_[2 + _shAdj];
+  if (_shAdj == 0)
+    fields_[0] -= fields_[1];
 
-  fields_[0] = total_ - mstat.free - mstat.cache - mstat.buff;
-  if (_shAdj == 0){
-    fields_[0] -= mstat.shared;
-    fields_[1] = mstat.shared;
-  }
-  fields_[2 + _shAdj] = mstat.buff;
-  fields_[3 + _shAdj] = mstat.cache;
-  fields_[4 + _shAdj] = mstat.free;
-  
   if (total_)
     FieldMeterDecay::used( (int)((100 * (total_ - fields_[4 + _shAdj])) 
                                  / total_) );
 }
 
-void MemMeter::getmemstat(MemStat *mstat){
-  ifstream meminfo(MEMFILENAME);
+MemMeter::LineInfo *MemMeter::findLines(LineInfo *tmplate, int len, 
+                                             const char *fname){
+  ifstream meminfo(fname);
   if (!meminfo){
-    cerr << "Can not open file : " << MEMFILENAME << endl;
+    cerr << "Can not open file : " << fname << endl;
     exit(1);
   }
- 
-  bzero(mstat, sizeof(MemStat));
+
+  LineInfo *rval = new LineInfo[len];
 
   char buf[256];
+  istrstream line(buf, 256);
+
+  // Get the info from the "standard" meminfo file.
+  int lineNum = 0;
+  int inum = 0;  // which info are we going to insert
+  while (!meminfo.eof()){
+    meminfo.getline(buf, 256);
+    line.seekg(0, ios::beg);
+    lineNum++;
+
+    for (int i = 0 ; i < len ; i++)
+      if(!strncmp(tmplate[i].id(), buf, tmplate[i].idlen())){
+        rval[inum] = tmplate[i];
+        rval[inum].line(lineNum);
+        inum++;
+      }
+  }
+
+  return rval;
+}
+
+void MemMeter::initLineInfo(void){
+  static LineInfo infos[] = { 
+    LineInfo("MemTotal", &total_), 
+    LineInfo("MemFree", &fields_[4 + _shAdj]),
+    LineInfo("Buffers", &fields_[2 + _shAdj]),
+    LineInfo("Cached", &fields_[3 + _shAdj])
+  };
+  _numMIlineInfos = sizeof(infos) / sizeof(LineInfo);
+
+  _MIlineInfos = findLines(infos, _numMIlineInfos, MEMFILENAME);
+
+  static LineInfo msinfos[] = {
+    LineInfo("Shared", &fields_[1])
+  };
+  _numMSlineInfos = sizeof(msinfos) / sizeof(LineInfo);
+
+  if (_shAdj == 0)
+    _MSlineInfos = findLines(msinfos, _numMSlineInfos, MEMSTATFNAME);
+}
+
+void MemMeter::getmemstat(const char *fname, LineInfo *infos, int ninfos){
+  ifstream meminfo(fname);
+  if (!meminfo){
+    cerr << "Can not open file : " << fname << endl;
+    exit(1);
+  }
+
+  char buf[256];
+  istrstream line(buf, 256);
+
   char ignore[256];
 
   // Get the info from the "standard" meminfo file.
+  int lineNum = 0;
+  int inum = 0;
   while (!meminfo.eof()){
     meminfo.getline(buf, 256);
-    istrstream line(buf, 256);
+    lineNum++;
 
-    if(!strncmp("MemTotal", buf, strlen("MemTotal")))
-      line >> ignore >> mstat->total;
+    if (lineNum != infos[inum].line())
+      continue;
 
-    if(!strncmp("MemFree", buf, strlen("MemFree")))
-      line >> ignore >> mstat->free;
+    line.seekg(0, ios::beg);
 
-    if(!strncmp("Buffers", buf, strlen("Buffers")))
-      line >> ignore >> mstat->buff;
+    unsigned long val;
+    line >> ignore >> val;
+    infos[inum].setVal(val);
 
-    if(!strncmp("Cached", buf, strlen("Cached")))
-      line >> ignore >> mstat->cache;
-  }
-
-  // If the xosview memstat module is here then we
-  // can look for shared memory stats.
-  if (_shAdj == 0){
-    ifstream memstat(MEMSTATFNAME);
-    if ( !memstat ){
-      cerr <<"Can not open file : " <<MEMSTATFNAME <<endl;
-      exit( 1 );
-    }
-    
-    while (!memstat.eof()){
-      memstat.getline(buf, 256);
-      istrstream line(buf, 256);
-    
-      if(!strncmp("Shared", buf, strlen("Shared")))
-        line >> ignore >> mstat->shared;
-    }
+    inum++;
+    if (inum >= ninfos)
+      break;
   }
 }
