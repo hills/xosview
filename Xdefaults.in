@@ -74,7 +74,7 @@ xosview*swapUsedFormat:	  autoscale
 ! Page Meter Resources
 
 xosview*page:           True
-xosview*pageBandWidth:  120
+xosview*pageBandwidth:  120
 xosview*pageInColor:    SkyBlue
 xosview*pageOutColor:   SlateBlue1
 xosview*pageIdleColor:  aquamarine

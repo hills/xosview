@@ -39,7 +39,7 @@ void MeterMaker::makeMeters(void){
     push(new SwapMeter(_xos));
   
   if (!strcmp(_xos->getResource("page"), "True"))
-      push(new PageMeter(_xos, atof(_xos->getResource("pageBandWidth"))));
+      push(new PageMeter(_xos, atof(_xos->getResource("pageBandwidth"))));
 
   // check for the net meter
   //  FIXME  This check should be changed to check for the "net" resource.  BCG
