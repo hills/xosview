@@ -54,3 +54,8 @@ x Add in support and auto-detect for new NetBSD UVM stuff.
     much for my taste.  bgrayson
   
   Add in the pixmap support.
+
+* The Netmeter under *BSD has wrap problems:  the internal
+    counter in the kernel is 32 bits, so once we receive 4G of
+    traffic, we wrap, and it looks like we received a lot of
+    negative traffic?  (I _think_ this is the cause).
