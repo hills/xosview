@@ -16,6 +16,7 @@
         one of these library combinations:
 
             libc.so.5.4.38, libstdc++.so.27.2.8
+            libc.so.5.3.12, libstdc++.so.27.1.4
 
       - The memory meter can now display shared memory correctly.
         Unfortunatly, it needs more information than a "stock" linux
@@ -24,9 +25,12 @@
         this release.  If this module is not loaded, then xosview will
         not provide a "shared" memory field in the memory meter.
 
-        The memstat module is now built by default thanks to Paal Beyer 
-        <pbeyer@online.no> who provided code to make it work under linux
-        2.1.  If you do not want to build the memstat modue you can run
+        The memstat module is now built by default if you are running a 2.0.?
+        kernel.  Paal Beyer <pbeyer@online.no> provided code to make it work 
+        under linux 2.1.  At the moment it seems that 2.1 is in a bit of a
+        transitory state as far as the proc filesystem goes.  So, the memstat
+        module is disabled by default for 2.1 kernels.  It has been built under
+        linux2.1.71.  If you do not want to build the memstat modue you can run
         configure with a '--disable-linux-memstat' switch.
 
 To install xosview:
