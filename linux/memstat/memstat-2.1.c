@@ -23,8 +23,7 @@
 /* 4K page size but our output routines use some slack for overruns */
 #define PROC_BLOCK_SIZE	(3*1024)  
 
-static long memstat_read(struct inode *, struct file *, 
-  char *, unsigned long);
+ssize_t memstat_read(struct file *, char *, size_t, loff_t *);
 int memstat_get_info(char *);
 
 /* The string labels for the contents of memstat */
@@ -171,11 +170,11 @@ int memstat_get_info(char *page)
 	return len;
 }
 /*
-static long memstat_read(struct file * file, char * buf, 
-	size_t count, loff_t *ppos)
-*/
-static long memstat_read(struct inode *inode, struct file *file, 
+  static long memstat_read(struct inode *inode, struct file *file, 
   char *buf, unsigned long count)
+*/
+ssize_t memstat_read(struct file * file, char * buf, 
+                         size_t count, loff_t *ppos_old)
 {
 	unsigned long page;
 	char *start;
@@ -183,6 +182,7 @@ static long memstat_read(struct inode *inode, struct file *file,
 	ssize_t end;
 	struct proc_dir_entry * dp;
         loff_t *ppos = &file->f_pos;
+	struct inode * inode = file->f_dentry->d_inode;
 	
 	if (count > PROC_BLOCK_SIZE)
 		count = PROC_BLOCK_SIZE;
