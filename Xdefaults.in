@@ -21,6 +21,7 @@
 !xosview*display:
 xosview*captions:           True
 xosview*labels:             True
+xosview*transparent:        False
 xosview*meterLabelColor:    wheat
 xosview*usedlabels:         True
 xosview*usedLabelColor:     wheat
