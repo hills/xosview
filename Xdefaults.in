@@ -15,6 +15,7 @@ xosview*borderwidth:      0
 xosview*font:             7x13bold
 xosview*background:       navy
 xosview*foreground:       wheat
+xosview*enableStipple:	  False !  Change to true to try beta stipple support.
 
 
 ! Load Meter Resources
