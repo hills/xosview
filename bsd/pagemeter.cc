@@ -64,8 +64,8 @@ void PageMeter::getpageinfo (void) {
   fields_[0] = vm.v_vnodein - prev_.v_vnodein;
   fields_[1] = vm.v_vnodeout - prev_.v_vnodeout;
 #else
-  fields_[0] = vm.v_pageins - prev_.v_pageins;
-  fields_[1] = vm.v_pageouts - prev_.v_pageouts;
+  fields_[0] = vm.v_pgpgin - prev_.v_pgpgin;
+  fields_[1] = vm.v_pgpgout - prev_.v_pgpgout;
 #endif
   prev_ = vm;
 //  End NetBSD-specific code...
