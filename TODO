@@ -10,9 +10,6 @@ Revision: $Id$
 * Optimise graphing meter to use XCopyArea (or similar) and expose
     events to reduce X traffic.
 
-* Fix linux diskmeter units (based on disk sector size rather than 
-  a fixed size).
-
 * Do if(dolegends_) fix for loadmeter.cc for all ports.
 
 * Make xosview re-check resources when the resources are changed, 

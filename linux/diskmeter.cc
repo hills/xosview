@@ -58,43 +58,28 @@ void DiskMeter::getdiskinfo( void )
         exit( 1 );
         }
 
-    // Find the line with the rblk
+    // Find the line with 'page'
     stats >> buf;
-    while (strncmp(buf, "disk_rblk", 9))
+    while (strncmp(buf, "page", 9))
         {
         stats.ignore(1024, '\n');
         stats >> buf;
         }
 
-    unsigned long rone, rtwo, rthree, rfour;
-    stats >>rone >> rtwo >> rthree >> rfour;
+	// read values
+    unsigned long one, two;
+    stats >> one >> two;
 
-    // assume each "unit" is 4k.  This could very well be wrong.
-    // SM: This is wrong. A quick look at the kernel shows that
-    // 'disk_rblk' and 'disk_wblk' are the number of disk sectors
-    // read/written. The 'disk' entry is the total number of R/W
-    // commands sent to the drive. We need a way of determining
-    // the sector size properly rather than just guessing.
-    unsigned long int read_curr = (rone + rtwo + rthree + rfour) * 4 * 1024;
+    // assume each "unit" is 1k. 
+    // This is true for ext2, but seems to be 512 bytes for vfat and 2k for cdroms
+    unsigned long int read_curr = one * 1024;
+    unsigned long int write_curr = two * 1024;
 
-    // Now get the writes
-    stats >> buf;
-    while (strncmp(buf, "disk_wblk", 9))
-        {
-        stats.ignore(1024, '\n');
-        stats >> buf;
-        }
-
-    unsigned long wone, wtwo, wthree, wfour;
-    stats >>wone >> wtwo >> wthree >> wfour;
-
-    unsigned long int write_curr = (wone + wtwo + wthree + wfour) * 4 * 1024;
-
-   	fields_[0] = ((read_curr - read_prev_) * 1e6) / IntervalTimeInMicrosecs();
+	fields_[0] = ((read_curr - read_prev_) * 1e6) / IntervalTimeInMicrosecs();
   	fields_[1] = ((write_curr - write_prev_) * 1e6) / IntervalTimeInMicrosecs();
 
   	if (fields_[0] + fields_[1] > total_)
-        total_ = fields_[0] + fields_[1];
+       	total_ = fields_[0] + fields_[1];
 
 	fields_[2] = total_ - (fields_[0] + fields_[1]);
     

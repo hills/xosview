@@ -159,11 +159,10 @@ xosview*diskUsedColor:	seagreen
 xosview*diskIdleColor:	aquamarine
 xosview*diskWriteColor: SlateBlue1
 xosview*diskReadColor:  SkyBlue
-!  Default to 5MB/s bandwidth -- I
-! think that's IDE's theoretical
-! peak?, and SCSI-II's peak (no fast, no
-! wide) bgrayson
-xosview*diskBandwidth:  5000000
+! Default to 10MB/s bandwidth
+! Should be reasonable given the speed of
+! most modern hard drives (both IDE & SCSI)
+xosview*diskBandwidth:  10000000
 xosview*diskPriority:	10
 xosview*diskDecay:	True
 xosview*diskUsedFormat: autoscale
