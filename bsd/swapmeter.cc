@@ -49,6 +49,7 @@ SwapMeter::SwapMeter( XOSView *parent )
   "an alternate kernel file.\n"
   "\nThe SwapMeter has been disabled.\n");
   doSwap = 0;
+  disableMeter();
 #endif
   }
 }
