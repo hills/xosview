@@ -22,8 +22,8 @@ XWin::XWin(){
 //-----------------------------------------------------------------------------
 
 XWin::XWin( int argc, char *argv[], int x, int y, int width, int height ){
-  fprintf (stderr, "This constructor call is not supported!  (%s:%d)\n",
-    __FILE__, __LINE__);
+  cerr << "This constructor call is not supported! (" << __FILE__
+       << ":" << __LINE__ << ")" << endl;
   exit (-1);
   //  FIXME BCG  This constructor needs to do much of the work of the above
   //  one.  Or, we need to drop this as a constructor.  As it is, it is
