@@ -238,7 +238,7 @@ XOSView::~XOSView( void ){
   }
 }
 
-void XOSView::draw( void ){
+void XOSView::reallydraw( void ){
   XOSDEBUG("Doing draw.\n");
   clear();
   MeterNode *tmp = meters_;
@@ -252,9 +252,9 @@ void XOSView::draw( void ){
   expose_flag_ = 0;
 }
 
-void XOSView::safedraw ( void ) {
+void XOSView::draw ( void ) {
   if (hasBeenExposedAtLeastOnce() && isAtLeastPartiallyVisible())
-    draw();
+    reallydraw();
   else {
     if (!hasBeenExposedAtLeastOnce()) {
       XOSDEBUG("Skipping draw:  not yet exposed.\n");
@@ -372,16 +372,16 @@ void XOSView::exposeEvent( XExposeEvent &event ) {
   if ( event.count == 0 ) 
   {
     expose_flag_++;
-    safedraw();
+    draw();
   }
   XOSDEBUG("Got expose event.\n");
-  if (!exposed_once_flag_) { exposed_once_flag_ = 1; safedraw(); }
+  if (!exposed_once_flag_) { exposed_once_flag_ = 1; draw(); }
 }
 
 void XOSView::resizeEvent( XEvent & ) {
   resize(); 
   expose_flag_++;
-  safedraw();
+  draw();
 }
 
 

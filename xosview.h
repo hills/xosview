@@ -27,8 +27,8 @@ public:
 
   void figureSize ( void );
   void resize( void );
-  void draw( void );
-  void safedraw ( void );
+  void reallydraw( void );
+  void draw ( void );
   void run( void );
   void keyrelease( char *ch );
   const char *winname( void );
