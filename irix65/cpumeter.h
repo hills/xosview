@@ -23,7 +23,7 @@ class CPUMeter : public FieldMeterGraph {
 
 	void checkResources(void);
 
-	static int countCPUs();
+	static int nCPUs();
 	static const char *cpuStr(int num);
 
  protected:

@@ -15,21 +15,10 @@
 GfxMeter::GfxMeter(XOSView *parent, int max)
         : FieldMeterGraph(parent, 2, "GFX","SWAPBUF/S", 1, 1, 0 )
 {
-    inventory_t *inv;
-
     lastalarmstate = -1;
     total_ = 0;
-    nPipes = 0;
-
-    setinvent();
-    for( inv = getinvent(); inv != NULL; inv = getinvent() )
-    {
-        if ( inv->inv_class==INV_GRAPHICS )
-        {
-            nPipes++;
-        }
-    }
-    total_ = nPipes * max;
+    _nPipes = nPipes();
+    total_ = _nPipes * max;
 
     if ( total_==0 ) {
         parent_->done(1);
@@ -39,6 +28,21 @@ GfxMeter::GfxMeter(XOSView *parent, int max)
 
 GfxMeter::~GfxMeter(void)
 {
+}
+
+int GfxMeter::nPipes(void)
+{
+    int _nPipes = 0;
+
+    setinvent();
+    for( inventory_t *inv = getinvent(); inv != NULL; inv = getinvent() )
+    {
+        if ( inv->inv_class==INV_GRAPHICS )
+        {
+            _nPipes++;
+        }
+    }
+    return _nPipes;
 }
 
 void GfxMeter::checkResources(void)
@@ -56,8 +60,8 @@ void GfxMeter::checkResources(void)
     dodecay_ = parent_->isResourceTrue( "gfxDecay" );
     SetUsedFormat(parent_->getResource("gfxUsedFormat"));
 
-    warnThreshold = atoi (parent_->getResource("gfxWarnThreshold")) * nPipes;
-    critThreshold = atoi (parent_->getResource("gfxCritThreshold")) * nPipes;
+    warnThreshold = atoi (parent_->getResource("gfxWarnThreshold")) * _nPipes;
+    critThreshold = atoi (parent_->getResource("gfxCritThreshold")) * _nPipes;
 
     if (dodecay_){
         //  Warning:  Since the gfxmeter changes scale occasionally, old
