@@ -1,0 +1,25 @@
+  The FreeBSD port has not gotten very far, as it relies upon me
+having free time to learn about FreeBSD.  If any FreeBSD hackers out
+there would like to help out, I basically need someone who knows a
+bit about the kernel to write the routines to get the statistics
+data from the kernel.  For some things, this is simply a sysctl()
+call, while for others it involves writing some routines that use
+libkvm to munge through the kernel's data structures.
+
+  Currently, the load, cpu, and mem meter (I _think_) work decently.
+Anything else CAN NOT BE TRUSTED.  For example, the current net meter
+fakes the statistics stuff, and just assumes that 1KB was transferred
+every update period.  This is of course quite bogus, but is helpful in
+getting xosview to work at all.
+
+  Anyway, the current code is a start.  
+
+  I'd like to keep the FreeBSD and NetBSD code merged, mostly due to
+the high degree of overlap, so please try to keep this in mind. 
+Also, do not rely upon __FreeBSD__ or any such defines -- only use
+XOSVIEW_FREEBSD or XOSVIEW_NETBSD in #ifdefs.
+
+  Feel free to contact me with any *BSD concerns, or Mike and/or me
+for any general xosview problems.
+
+  Brian Grayson, Oct 97	bgrayson@ece.utexas.edu
