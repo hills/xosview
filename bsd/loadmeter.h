@@ -1,6 +1,6 @@
 //  
 //  Copyright (c) 1994, 1995 by Mike Romberg ( romberg@fsl.noaa.gov )
-//  Copyright (c) 1995, 1996, 1997 by Brian Grayson (bgrayson@ece.utexas.edu)
+//  Copyright (c) 1995, 1996, 1997-2002 by Brian Grayson (bgrayson@netbsd.org)
 //
 //  Most of this code was written by Werner Fink <werner@suse.de>
 //  Only small changes were made on my part (M.R.)

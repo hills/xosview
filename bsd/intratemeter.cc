@@ -1,5 +1,5 @@
 //  
-//  Copyright (c) 1999 by Brian Grayson (bgrayson@ece.utexas.edu)
+//  Copyright (c) 1999 by Brian Grayson (bgrayson@netbsd.org)
 //
 //  This file may be distributed under terms of the GPL or of the BSD
 //    license, whichever you choose.  The full license notices are

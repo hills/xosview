@@ -1,6 +1,6 @@
 //  
 //  NetBSD port:  
-//  Copyright (c) 1995,1996,1997 Brian Grayson(bgrayson@ece.utexas.edu)
+//  Copyright (c) 1995,1996,1997 Brian Grayson(bgrayson@netbsd.org)
 //
 //  This file was written by Brian Grayson for the NetBSD and xosview
 //    projects.
