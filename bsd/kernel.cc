@@ -72,6 +72,12 @@ static struct nlist nlst[] =
 #define DK_NDRIVE_SYM_INDEX     4
 { "_dk_wds" },
 #define DK_WDS_SYM_INDEX        5
+{ "_intrcnt" },
+#define INTRCNT_SYM_INDEX 	6
+{ "_eintrcnt" },
+#define EINTRCNT_SYM_INDEX 	7
+{ "_intr_countp" },
+#define INTRCOUNTP_SYM_INDEX 	8
 
 #endif /* XOSVIEW_FREEBSD */
   {NULL}
@@ -359,3 +365,39 @@ NetBSDGetDiskXFerBytes (unsigned long long *bytesXferred)
 #endif
 }
   
+
+/*  ---------------------- Interrupt Meter stuff  -----------------  */
+static unsigned long kvm_intrcnt[100];// guess at space needed
+static unsigned long kvm_intrptrs[NUM_INTR];
+
+int
+NetBSDIntrInit() {
+#ifdef XOSVIEW_FREEBSD
+    OpenKDIfNeeded(); 
+    return ValidSymbol(INTRCNT_SYM_INDEX) && ValidSymbol(EINTRCNT_SYM_INDEX);
+#else
+    return 0;
+#endif
+}
+
+void
+NetBSDGetIntrStats (unsigned long intrCount[NUM_INTR])
+{
+#ifdef XOSVIEW_FREEBSD
+    /* FreeBSD has an array of interrupt counts, indexed by device number.
+       These are also indirected by IRQ num with intr_countp: */
+    safe_kvm_read (nlst[INTRCOUNTP_SYM_INDEX].n_value,
+		   kvm_intrptrs, sizeof(kvm_intrptrs));
+    size_t len =  
+	nlst[EINTRCNT_SYM_INDEX].n_value - nlst[INTRCNT_SYM_INDEX].n_value;
+    safe_kvm_read (nlst[INTRCNT_SYM_INDEX].n_value, kvm_intrcnt, len);
+
+    for (int i=0; i < NUM_INTR; i++) {
+	int idx = (kvm_intrptrs[i] - nlst[INTRCNT_SYM_INDEX].n_value) /
+	    sizeof(unsigned long);
+	intrCount[i] = kvm_intrcnt[idx];
+    }
+#else /* XOSVIEW_FREEBSD */
+    return;
+#endif
+}

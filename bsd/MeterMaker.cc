@@ -23,7 +23,8 @@
 #include "loadmeter.h"
 #include "diskmeter.h"
 #include "pagemeter.h"
-//#include "intmeter.h"  //  These two are not yet supported under NetBSD.
+//  These two are not yet supported under NetBSD.
+#include "intmeter.h"  
 //#include "serialmeter.h"
 
 CVSID_DOT_H2(PLLIST_H_CVSID);
@@ -61,4 +62,6 @@ void MeterMaker::makeMeters(void){
 
   //  The serial meters and the interrupt meter are not yet
   //  available for NetBSD.  BCG
+  if (_xos->isResourceTrue("interrupts"))
+      push(new IntMeter(_xos));
 }

@@ -71,4 +71,13 @@ void
 FreeBSDGetBufspace(int* bfsp);
 #endif
 
+
+#define NUM_INTR 16
+
+int
+NetBSDIntrInit();
+
+void
+NetBSDGetIntrStats (unsigned long intrCount[NUM_INTR]);
+
 #endif
