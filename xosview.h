@@ -21,7 +21,7 @@ class Meter;
 
 class XOSView : public XWin {
 public:
-  XOSView( int argc, char *argv[] );
+  XOSView( char* instName, int argc, char *argv[] );
   ~XOSView( void );
 
   void figureSize ( void );
