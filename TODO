@@ -1,10 +1,35 @@
+Revision: $Id$
+
 * Do if(dolegends_) fix for loadmeter.cc for all ports.
 * Add a version string, so that xosview -v prints out the version.
 
   Make xosview re-check resources when the resources are changed, 
     or when a signal is sent to it, or a key is pressed in it?
 
-  Fix MeterMaker in the other ports to check for all meters, not 
-    just load and serial.
+* Add command-line on/off switches for most, if not all, meters.
+  Fix MeterMaker in the other (non-NetBSD) ports to check for all meters,
+    not just load and serial.
 
-Revision: $Id$
+* Add command-line arg for specifying an instance name, so that we can
+    say "xosview -name xosview-stipple" and have the xosview-stipple*
+    resources read in also.
+  Redo the fieldmeter drawing code -- it (and the decayfieldmeter
+    code) is very ugly.
+
+* Add in stipple support for those stuck with 1-bit displays (black,
+    or white) (just MacBSD people?).
+  
+* Make a better resource for turning meters off/on.  Currently, we
+    overload other resources.
+
+* If all meters are disabled, either via resources or command-line
+    options, xosview dies from float-exception.  Probably, we're
+    dividing by the number of meters somewhere.  Fix this.
+
+  NetBSD:  Clean up symbol defs in netbsd.cc
+  NetBSD:  Merge swapinternal.cc (or at least a lot of it) into netbsd.cc
+  NetBSD, Linux, hp:  Instead of allowing each meter to figure out the
+    per-sec rate for a measurement (page, disk, net), add a fieldmeter
+    function that does the calculation, using SAMPLE_MSECS and
+    priority_.  See the netbsd/diskmeter.cc code for what I think is the
+    correct formula (it took me a few attempts to get it right!)
