@@ -16,7 +16,7 @@
 #include "meter.h"
 #include "MeterMaker.h"
 #ifdef XOSVIEW_NETBSD
-#include "netbsd.h"
+#include "kernel.h"
 #endif
 
 static const char NAME[] = "xosview@";
