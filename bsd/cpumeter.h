@@ -19,9 +19,9 @@
 
 #define CPUMETER_H_CVSID "$Id$"
 
-#include "fieldmeterdecay.h"
+#include "fieldmetergraph.h"
 
-class CPUMeter : public FieldMeterDecay {
+class CPUMeter : public FieldMeterGraph {
 public:
   CPUMeter( XOSView *parent );
   ~CPUMeter( void );

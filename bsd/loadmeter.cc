@@ -24,7 +24,7 @@ CVSID("$Id$");
 CVSID_DOT_H(LOADMETER_H_CVSID);
 
 LoadMeter::LoadMeter( XOSView *parent )
-  : FieldMeterDecay( parent, 2, "LOAD", "PROCS per MIN/IDLE", 1, 0 ){
+  : FieldMeterGraph( parent, 2, "LOAD", "PROCS per MIN/IDLE", 1, 0 ){
 }
 
 LoadMeter::~LoadMeter( void ){
@@ -46,6 +46,7 @@ void LoadMeter::checkResources( void ){
 
   priority_ = atoi (parent_->getResource("loadPriority"));
   dodecay_ = !strncasecmp (parent_->getResource("loadDecay"),"True", 5);
+  useGraph_ = !strncasecmp (parent_->getResource("loadGraph"),"True", 5);
   SetUsedFormat (parent_->getResource("loadUsedFormat"));
 
   alarmThreshold = atoi (parent_->getResource("loadAlarmThreshold"));

@@ -21,7 +21,7 @@ CVSID("$Id$");
 CVSID_DOT_H(DISKMETER_H_CVSID);
 
 DiskMeter::DiskMeter( XOSView *parent, float max )
-: FieldMeterDecay( parent, 2, "DISK", "XFER/IDLE" ){
+: FieldMeterGraph( parent, 2, "DISK", "XFER/IDLE" ){
   //  The setting of the priority will be done in checkResources().  BCG
   dodecay_ = 0;
 
@@ -74,6 +74,7 @@ void DiskMeter::checkResources( void ){
     setfieldcolor( 1, parent_->getResource("diskIdleColor") );
     priority_ = atoi (parent_->getResource("diskPriority"));
     dodecay_ = !strncasecmp (parent_->getResource("diskDecay"),"True", 5);
+    useGraph_ = !strncasecmp (parent_->getResource("diskGraph"),"True", 5);
     SetUsedFormat (parent_->getResource("diskUsedFormat"));
   }
   fields_[0] = 0.0;

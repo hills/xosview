@@ -19,12 +19,12 @@
 
 #define NETMETER_H_CVSID "$Id$"
 
-#include "fieldmeterdecay.h"
+#include "fieldmetergraph.h"
 #include "timer.h"
 
 class Host;
 
-class NetMeter : public FieldMeterDecay {
+class NetMeter : public FieldMeterGraph {
 public:
   NetMeter(XOSView *parent, float max);
   ~NetMeter( void );

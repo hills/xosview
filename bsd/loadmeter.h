@@ -19,10 +19,10 @@
 
 #define LOADMETER_H_CVSID "$Id$"
 
-#include "fieldmeterdecay.h"
+#include "fieldmetergraph.h"
 
 
-class LoadMeter : public FieldMeterDecay {
+class LoadMeter : public FieldMeterGraph {
 public:
   LoadMeter( XOSView *parent );
   ~LoadMeter( void );

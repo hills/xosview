@@ -16,10 +16,10 @@
 
 #define SWAPMETER_H_CVSID "$Id$"
 
-#include "fieldmeterdecay.h"
+#include "fieldmetergraph.h"
 
 
-class SwapMeter : public FieldMeterDecay {
+class SwapMeter : public FieldMeterGraph {
 public:
   SwapMeter( XOSView *parent );
   ~SwapMeter( void );

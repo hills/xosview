@@ -24,7 +24,7 @@ CVSID("$Id$");
 CVSID_DOT_H(PAGEMETER_H_CVSID);
 
 PageMeter::PageMeter( XOSView *parent, double total )
-: FieldMeterDecay( parent, 3, "PAGE", "IN/OUT/IDLE" ){
+: FieldMeterGraph( parent, 3, "PAGE", "IN/OUT/IDLE" ){
   total_ = total;
   BSDPageInit();
 #ifdef UVM
@@ -45,6 +45,7 @@ void PageMeter::checkResources( void ){
   setfieldcolor( 2, parent_->getResource("pageIdleColor") );
   priority_ = atoi (parent_->getResource("pagePriority"));
   dodecay_ = !strncasecmp (parent_->getResource("pageDecay"),"True", 5);
+  useGraph_ = !strncasecmp (parent_->getResource("pageGraph"),"True", 5);
   SetUsedFormat (parent_->getResource("pageUsedFormat"));
 }
 

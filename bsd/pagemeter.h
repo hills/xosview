@@ -19,7 +19,7 @@
 
 #define PAGEMETER_H_CVSID "$Id$"
 
-#include "fieldmeterdecay.h"
+#include "fieldmetergraph.h"
 #if defined(UVM)
 #include <sys/param.h>
 #include <vm/vm.h>
@@ -28,7 +28,7 @@
 #include <sys/vmmeter.h>
 #endif
 
-class PageMeter : public FieldMeterDecay {
+class PageMeter : public FieldMeterGraph {
 public:
   PageMeter( XOSView *parent, double total );
   ~PageMeter( void );

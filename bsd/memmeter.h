@@ -19,9 +19,9 @@
 
 #define MEMMETER_H_CVSID "$Id$"
 
-#include "fieldmeterdecay.h"
+#include "fieldmetergraph.h"
 
-class MemMeter : public FieldMeterDecay {
+class MemMeter : public FieldMeterGraph {
 public:
   MemMeter( XOSView *parent );
   ~MemMeter( void );

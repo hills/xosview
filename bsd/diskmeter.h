@@ -17,10 +17,10 @@
 
 #define DISKMETER_H_CVSID "$Id$"
 
-#include "fieldmeterdecay.h"
+#include "fieldmetergraph.h"
 #include <sys/types.h>		//  For u_int64_t
 
-class DiskMeter : public FieldMeterDecay {
+class DiskMeter : public FieldMeterGraph {
 public:
   DiskMeter( XOSView *parent, float max );
   ~DiskMeter( void );

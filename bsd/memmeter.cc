@@ -34,12 +34,12 @@ CVSID_DOT_H(MEMMETER_H_CVSID);
 
 MemMeter::MemMeter( XOSView *parent )
 #ifdef  XOSVIEW_FREEBSD
-: FieldMeterDecay( parent, 5, "MEM", "ACT/INACT/WRD/BUF/FR" ) {
+: FieldMeterGraph( parent, 5, "MEM", "ACT/INACT/WRD/BUF/FR" ) {
 #define FREE_INDEX 4
 #else
   //  Once we figure out how to get the buffers field for NetBSD,
   //  change the next line.
-: FieldMeterDecay( parent, 4, "MEM", "ACT/INACT/WIRE/FREE" ){
+: FieldMeterGraph( parent, 4, "MEM", "ACT/INACT/WIRE/FREE" ){
 #define FREE_INDEX 3
 #endif
   BSDPageInit();
@@ -61,6 +61,7 @@ void MemMeter::checkResources( void ){
   setfieldcolor( FREE_INDEX, parent_->getResource("memFreeColor") );
   priority_ = atoi (parent_->getResource("memPriority"));
   dodecay_ = !strncasecmp (parent_->getResource("memDecay"),"True", 5);
+  useGraph_ = !strncasecmp (parent_->getResource("memGraph"),"True", 5);
   SetUsedFormat (parent_->getResource("memUsedFormat"));
 }
 
