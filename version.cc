@@ -5,14 +5,16 @@
     1.  Make sure you catch all of these files:
       version.cc
       xosview.1
-      config/Makefile.top.in
+      config/Makefile.config.in
     2.  Make sure CHANGES, the man page, and the list below to
     all be roughly correct.
 */
 /*  *****  THIS FILE is included by xosview.cc, and is never used
  *  on its own.  */
-static const char * const versionString = "xosview version 1.7.1";
+static const char * const versionString = "xosview version 1.7.2";
 static const char * const version_cc_cvsID = "$Id$";
+
+/*  Version 1.7.2:  BSDI support from Tomer Klainer.  */
 
 /*  Version 1.7.0:  has pixmap support, OpenBSD interrupt meter,
  *  NetBSD battery meter, some more Solaris support,

@@ -1,4 +1,7 @@
   /*  $Id$  */
+Changes since xosview-1.7.1
+  BSDI support, courtesy of Tomer Klainer.
+
 Changes since xosview-1.7.0
   Optimised scrolling graph to use XCopyArea.
   Fixes to linux diskmeter.
