@@ -57,7 +57,8 @@ Xrm::getDisplayName (int argc, char** argv)
   //  See if '-display foo:0' is on the command line, and return it if it is.
   char** argp;
 
-  for (argp = argv; (*argp != NULL) && (strcmp (*argp, "-display")); argp++)
+  for (argp = argv; (*argp != NULL) &&
+      (strncasecmp (*argp, "-display", 9)); argp++)
     ;  //  Don't do anything.
 
   //  If we found -display and the next word exists...

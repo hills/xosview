@@ -184,11 +184,11 @@ void XOSView::checkOverallResources() {
   setFont();
   
   // use labels
-  if ( !strcmp( getResource("labels"), "True" ) )
+  if ( !strncasecmp( getResource("labels"), "True", 5 ) )
       legend_ = 1;
 
   // use "free" labels
-  if ( !strcmp( getResource("usedlabels"), "True" ) )
+  if ( !strncasecmp( getResource("usedlabels"), "True", 5 ) )
     usedlabels_ = 1;
 }
 
@@ -310,7 +310,7 @@ void XOSView::checkArgs (int argc, char** argv) const
 		exit(0);
       case 'n': //  Check for -name option that was already parsed
 		//  and acted upon by main().
-		if (!strcmp(*argv, "-name"))
+		if (!strncasecmp(*argv, "-name", 6))
 		{
 		  argv++;	//  Skip arg to -name.
 		  argc--;
@@ -328,7 +328,7 @@ void XOSView::checkArgs (int argc, char** argv) const
 		break;
 #endif
       case '-':  /*  Check for --version argument.  */
-              if (!strcmp(*argv, "--version")) {
+              if (!strncasecmp(*argv, "--version", 10)) {
 	        cerr << versionString << endl;
 		exit(0);
 	      }

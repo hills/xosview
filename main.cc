@@ -17,7 +17,7 @@ main( int argc, char *argv[] ) {
   char* instanceName = "xosview";	// Default value.
   while (argp && *argp)
   {
-    if (!strcmp(*argp, "-name"))
+    if (!strncmp(*argp, "-name", 6))
       instanceName = argp[1];
     argp++;
   }  //  instanceName will end up pointing to the last such -name option.
