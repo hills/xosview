@@ -1,10 +1,19 @@
   /*  $Id$  */
 Changes since xosview-1.5.0, in no particular order:
 
-On Linux the cpu meters will now show a seperate meter per cpu if 
-  Jerome Forissier's kernel patch has been applied.
+  On Linux the cpu meters will now show a seperate meter per cpu if 
+    Jerome Forissier's kernel patch has been applied.
 
-Linux should now work out of the box with GNU libc (untested).
+  Linux should now work out of the box with GNU libc (untested).
+
+  The autoscale labels now work under Linux and HPUX.
+
+  Early support for FreeBSD:  load, cpu, mem, and page meters.
+
+  Now compiles with either BSD or GNU make (BSD make can not handle
+    auto-depend with the current Makefile structure).
+
+  Man page source code now uses lots of macros to make modifications easier.
 
 Changes since xosview-1.4.*, in no particular order:
 
