@@ -99,7 +99,8 @@ void DiskMeter::getstats( void ){
 	    (currBytes & 0xffffffff));
 #endif
   }
-  fields_[0] = (currBytes-prevBytes)/1.0;
+  /*  Adjust this to bytes/second.  */
+  fields_[0] = (currBytes-prevBytes)/IntervalTimeInSecs();
 //  Adjust total_ if needed.
   if (fields_[0] > total_)
     total_ = fields_[0];
@@ -110,10 +111,8 @@ void DiskMeter::getstats( void ){
   if (fields_[1] < 0.0)
     fprintf (stderr, "fields[1] of %f is < 0!\n", fields_[1]);
 
-    /*  For bytes/sec, we need to scale by our priority and the
-     *  sampling time.  */
     
-  setUsed ( fields_[0]*IntervalTimeInMicrosecs()/1e6, total_);
+  setUsed ( fields_[0], total_);
 #ifdef HAVE_DEVSTAT
   /*  The devstat library provides a differential value already,
    *  so we should compare against 0 each time.  */
