@@ -14,13 +14,10 @@
 //
 // $Id$
 //
+#include <stdlib.h>		//  For atoi().  BCG
 #include "general.h"
 #include "netmeter.h"
-#include "xosview.h"
-#include "Host.h"
 #include "kernel.h"
-#include <stdlib.h>		//  For atoi().  BCG
-#include <unistd.h>  /*  For gethostname().  BCG */
 
 CVSID("$Id$");
 CVSID_DOT_H(NETMETER_H_CVSID);
@@ -34,14 +31,9 @@ NetMeter::NetMeter( XOSView *parent, float max )
   total_ = netBandwidth_;
   _lastBytesIn = _lastBytesOut = 0;
   BSDGetNetInOut (&_lastBytesIn, &_lastBytesOut);
-
-  char hostname[100];
-  gethostname(hostname, 99);
-  _thisHost = new Host(hostname);
 }
 
 NetMeter::~NetMeter( void ){
-  delete _thisHost;
 }
 
 void NetMeter::checkResources( void ){

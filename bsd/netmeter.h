@@ -37,7 +37,6 @@ protected:
   float netBandwidth_;
 
 private:
-  Host *_thisHost;
   //  NetBSD:  Use long long, so we won't run into problems after 4 GB
   //  has been transferred over the net!
   long long _lastBytesIn, _lastBytesOut;
