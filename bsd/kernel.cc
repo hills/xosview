@@ -114,7 +114,7 @@ __END_DECLS
 // Note that this has to be after the above includes, which will pull
 // in __NetBSD_Version__ for us if needed.
 #if defined(XOSVIEW_NETBSD) && defined(__NetBSD_Version__) && (__NetBSD_Version__ >= 106010000)
-#define NETBSD_1_6A_EV_IRQS
+#define NETBSD_1_6A
 #endif
 
 #include "general.h"
@@ -131,9 +131,13 @@ kvm_t* kd = NULL;	//  This single kvm_t is shared by all
 //  This struct has the list of all the symbols we want from the kernel.
 static struct nlist nlst[] =
 {
+// We put a dummy symbol for a don't care, and ignore warnings about
+// this later on.  This keeps the indices within the nlist constant.
+#define DUMMY_SYM "dummy_sym"
+
 #if defined(XOSVIEW_BSDI) || (defined(XOSVIEW_NETBSD) && (__NetBSD_Version__ >= 104260000))
 // BSDI and __NetBSD_Version__ >= 104260000 reads cp_time through sysctl
-{ "_ifnet" },
+{ DUMMY_SYM },
 #define DUMMY_0
 #else
 { "_cp_time" },
@@ -142,30 +146,30 @@ static struct nlist nlst[] =
 { "_ifnet" },
 #define IFNET_SYM_INDEX 1
 #if defined(UVM)
-{ "_disklist" },	/*  Keep UVM happy...  */
+{ DUMMY_SYM },	/*  Keep UVM happy...  */
 #else
 { "_cnt" },
 #endif
 #define VMMETER_SYM_INDEX	2
 
 #ifdef XOSVIEW_BSDI /* bsdi get disk statistics through sysctl */
-{ "_cnt" },
+{ DUMMY_SYM },
 #define DUMMY_3                 3
-{ "_cnt" },
+{ DUMMY_SYM },
 #define DUMMY_4                 4
-{ "_cnt" },
+{ DUMMY_SYM },
 #define DUMMY_5                 5
-{ "_cnt" },
+{ DUMMY_SYM },
 #define DUMMY_6                 6
 #if _BSDI_VERSION >= 199802  /* BSD/OS 4.x */
 { "inin" },
 #define ININ_SYM_INDEX          7
-{ "inin" },
+{ DUMMY_SYM },
 #define DUMMY_8                 8
 #else /* BSD/OS 3.x */
 { "_isa_intr" },
 #define ISAINTR_SYM_INDEX       7
-{ "_isa_intr" },
+{ DUMMY_SYM },
 #define DUMMY_8                 8
 #endif /* _BSDI_VERSION */
 
@@ -173,18 +177,18 @@ static struct nlist nlst[] =
 #ifndef XOSVIEW_FREEBSD	/*  NetBSD has a disklist, which FreeBSD doesn't...  */
 { "_disklist" },
 #define DISKLIST_SYM_INDEX	3
-{ "_disklist" },
+{ DUMMY_SYM },
 #define DUMMY_4			4
-{ "_disklist" },
+{ DUMMY_SYM },
 #define DUMMY_5			5
-{ "_disklist" },
+{ DUMMY_SYM },
 #define DUMMY_6			6
 { "_intrcnt" },
 #define INTRCNT_SYM_INDEX 	7
 { "_eintrcnt" },
 #define EINTRCNT_SYM_INDEX 	8
 
-#if defined(NETBSD_1_6A_EV_IRQS)
+#if defined(NETBSD_1_6A)
 {"_allevents" },
 #define ALLEVENTS_SYM_INDEX	9
 #endif
@@ -322,7 +326,7 @@ OpenKDIfNeeded() {
   //  Look at all of the returned symbols, and check for bad lookups.
   //  (This may be unnecessary, but better to check than not to...  )
   struct nlist * nlp = nlst;
-  while (nlp && nlp->n_name) {
+  while (nlp && nlp->n_name && strcmp(nlp->n_name, DUMMY_SYM)) {
     if ((nlp->n_type == 0) || (nlp->n_value == 0))
       /*errx (-1, "kvm_nlist() lookup failed for symbol '%s'.", nlp->n_name);*/
       warnx ("kvm_nlist() lookup failed for symbol '%s'.", nlp->n_name);
@@ -430,7 +434,7 @@ int
 BSDNetInit() {
   OpenKDIfNeeded();
 #ifdef XOSVIEW_NETBSD
-  return ValidSymbol(DISKLIST_SYM_INDEX);
+  return ValidSymbol(IFNET_SYM_INDEX);
 #else
   return 1;
 #endif
@@ -748,6 +752,8 @@ DevStat_Get(void) {
 }
 #endif /* HAVE_DEVSTAT */
 
+unsigned int NetBSD_N_Drives = 0;
+
 int
 BSDDiskInit() {
   OpenKDIfNeeded(); 
@@ -764,6 +770,18 @@ BSDDiskInit() {
   return ValidSymbol(DK_NDRIVE_SYM_INDEX);
 #endif
 #else
+#ifdef NETBSD_1_6A
+  // Do a sysctl with a NULL data pointer to get the size that would
+  // have been returned, and use that to figure out # drives.
+  int mib[3] = {CTL_HW, HW_DISKSTATS, sizeof(struct disk_sysctl)};
+  size_t size;
+  if (sysctl(mib, 3, NULL, &size, NULL, 0) < 0) {
+    warnx("!!! The DiskMeter sysctl failed.  Disabling DiskMeter.");
+    return 0;
+  }
+  NetBSD_N_Drives = size / sizeof(struct disk_sysctl);
+  return 1;
+#endif
   return ValidSymbol(DISKLIST_SYM_INDEX);
 #endif
 #endif /* BSDI */
@@ -796,6 +814,24 @@ BSDGetDiskXFerBytes (unsigned long long *bytesXferred) {
   for (i=0;i<n;i++)
     *bytesXferred += bsdi_dkp[i].dk_sectors * bsdi_dkp[i].dk_secsize;
 #else
+#if defined(NETBSD_1_6A)
+  // Use the new sysctl to do this for us.
+  int mib[3] = {CTL_HW, HW_DISKSTATS, sizeof(struct disk_sysctl)};
+  size_t sysctl_size = NetBSD_N_Drives * sizeof(struct disk_sysctl);
+  struct disk_sysctl drive_stats[NetBSD_N_Drives];
+
+  // Do the sysctl.
+  if (sysctl(mib, 3, drive_stats, &sysctl_size, NULL, 0) < 0) {
+    err(1, "sysctl hw.diskstats failed");
+  }
+
+  // Now accumulate the total.
+  unsigned long long xferred = 0;
+  for (unsigned int i = 0; i < NetBSD_N_Drives; i++) {
+    xferred += drive_stats[i].dk_rbytes + drive_stats[i].dk_wbytes;
+  }
+  *bytesXferred = xferred;
+#else
   /*  This function is a little tricky -- we have to iterate over a
    *  list in kernel land.  To make things simpler, data structures
    *  and pointers for objects in kernel-land have kvm tacked on front
@@ -823,11 +859,12 @@ BSDGetDiskXFerBytes (unsigned long long *bytesXferred) {
     kvmdiskptr = kvmcurrdisk.dk_link.tqe_next;
   }
 #endif
+#endif
 }
 
 /*  ---------------------- Interrupt Meter stuff  -----------------  */
 
-#if (!defined(XOSVIEW_OPENBSD) || !(defined(__pc532__) && defined(__i386__))) && !defined(XOSVIEW_BSDI) && !defined(NETBSD_1_6A_EV_IRQS)
+#if (!defined(XOSVIEW_OPENBSD) || !(defined(__pc532__) && defined(__i386__))) && !defined(XOSVIEW_BSDI) && !defined(NETBSD_1_6A)
 static unsigned long kvm_intrcnt[128];// guess at space needed
 #endif
 
@@ -859,7 +896,7 @@ BSDIntrInit() {
 #endif /* _BSDI_VERSION */
 #else
 
-#if defined(NETBSD_1_6A_EV_IRQS)
+#if defined(NETBSD_1_6A)
     return ValidSymbol(ALLEVENTS_SYM_INDEX);
 #else
     // Make sure the intr counter array is nonzero in size.
@@ -965,7 +1002,7 @@ BSDGetIntrStats (unsigned long intrCount[NUM_INTR]) {
 # endif /* pc532 */
 #else /* XOSVIEW_OPENBSD && (__pc532__ || __i386__) */
 // Now let's do the modern NetBSD way...
-#if defined(NETBSD_1_6A_EV_IRQS)
+#if defined(NETBSD_1_6A)
     // Shamelessly lifted from vmstat.c v1.119, with additional error
     // checking and ignoring of soft interrupts, etc.
 
