@@ -33,23 +33,21 @@ LoadMeter::~LoadMeter( void ){
 void LoadMeter::checkResources( void ){
   FieldMeterGraph::checkResources();
 
-  warnloadcol_ = parent_->allocColor(parent_->getResource("loadWarnColor"));
-  procloadcol_ = parent_->allocColor(parent_->getResource("loadProcColor"));
+  procloadcol_ = parent_->allocColor(parent_->getResource( "loadProcColor" ));
+  warnloadcol_ = parent_->allocColor(parent_->getResource( "loadWarnColor" ));
+  critloadcol_ = parent_->allocColor(parent_->getResource( "loadCritColor" ));
 
-  if (total_ == 20 )
-    setfieldcolor( 0, warnloadcol_ );
-  else
-    setfieldcolor( 0, procloadcol_ );
-
-  setfieldcolor( 1,
-      parent_->getResource("loadIdleColor") );
+  setfieldcolor( 0, procloadcol_ );
+  setfieldcolor( 1, parent_->getResource( "loadIdleColor" ) );
 
   priority_ = atoi (parent_->getResource("loadPriority"));
   dodecay_ = parent_->isResourceTrue("loadDecay");
   useGraph_ = parent_->isResourceTrue("loadGraph");
   SetUsedFormat (parent_->getResource("loadUsedFormat"));
+  warnThreshold = atoi (parent_->getResource("loadWarnThreshold"));
+  critThreshold = atoi (parent_->getResource("loadCritThreshold"));
 
-  alarmThreshold = atoi (parent_->getResource("loadAlarmThreshold"));
+  alarmstate = lastalarmstate = 0;
 
   if (dodecay_){
     //  Warning:  Since the loadmeter changes scale occasionally, old
@@ -63,9 +61,6 @@ void LoadMeter::checkResources( void ){
          << "  details.\n";
     dodecay_ = 0;
   }
-
-  //  Now, grab a sample.  I don't know if this is needed here.  BCG
-  getloadinfo();
 }
 
 void LoadMeter::checkevent( void ){
@@ -79,19 +74,37 @@ void LoadMeter::getloadinfo( void ){
   getloadavg (&oneMinLoad, 1);  //  Only get the 1-minute-average sample.
   fields_[0] = oneMinLoad;  //  Convert from double to float.
 
-  if ( fields_[0] > alarmThreshold ) {
-    if (total_ == alarmThreshold ) {
-      setfieldcolor( 0, warnloadcol_ );
-      if (dolegends_) drawlegend();
-    }
-    total_ = fields_[1] = 20;
-  } else {
-    if (total_ == 20 ) {
-      setfieldcolor( 0, procloadcol_ );
-      if (dolegends_) drawlegend();
-    }
-    total_ = fields_[1] = alarmThreshold;
+  if ( fields_[0] <  warnThreshold ) alarmstate = 0;
+  else
+  if ( fields_[0] >= critThreshold ) alarmstate = 2;
+  else
+  /* if fields_[0] >= warnThreshold */ alarmstate = 1;
+
+  if (alarmstate != lastalarmstate) {
+    if ( alarmstate == 0 ) setfieldcolor( 0, procloadcol_ );
+    else
+    if ( alarmstate == 1 ) setfieldcolor( 0, warnloadcol_ );
+    else
+    /* if alarmstate == 2 */ setfieldcolor( 0, critloadcol_ );
+    if (dolegends_) drawlegend();
+    lastalarmstate = alarmstate;
   }
+    
+
+  //  This method of auto-adjust is better than the old way.
+  //  If fields[0] is less than 20% of display, shrink display to be
+  //  full-width.  Then, if full-width < 1.0, set it to be 1.0.
+  if ( fields_[0]*5.0<total_ )
+    total_ = fields_[0];
+  else
+  //  If fields[0] is larger, then set it to be 1/5th of full.
+  if ( fields_[0]>total_ )
+    total_ = fields_[0]*5.0;
+      
+  if ( total_ < 1.0)
+    total_ = 1.0;
+    
+  fields_[1] = (float) (total_ - fields_[0]);
 
   /*  I don't see why anyone would want to use any format besides
    *  float, but just in case.... */
