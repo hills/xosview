@@ -124,6 +124,10 @@ safe_kvm_read (u_long kernel_addr, void* user_addr, size_t nbytes)
      *  0x00000000 (or anywhere in the first 256 bytes of memory).  */
   if ((kernel_addr&0xffffff00) == 0)
     errx(-1, "safe_kvm_read() was attempted on EA %#lx\n", kernel_addr);
+#if 0
+  if ((kernel_addr&0xf0000000) != 0xf0000000)
+    warnx("safe_kvm_read() was attempted on EA %#lx\n", kernel_addr);
+#endif
   if (kvm_read (kd, kernel_addr, user_addr, nbytes)==-1)
     err(-1, "kvm_read() of kernel address %#lx", kernel_addr);
 }
@@ -355,7 +359,8 @@ BSDGetSwapCtlInfo(int *totalp, int *freep)
   if (nswap < 0)
     errx(1, "SWAP_STATS");
   if (nswap != rnswap)
-    warnx("SWAP_STATS gave different value than SWAP_NSWAP");
+    warnx("SWAP_STATS gave different value than SWAP_NSWAP "
+    "(nswap=%d versus rnswap=%d)", nswap, rnswap);
 
   totalsize = totalinuse = 0;
   for (; rnswap-- > 0; sep++) {
@@ -365,7 +370,6 @@ BSDGetSwapCtlInfo(int *totalp, int *freep)
 #define BYTES_PER_SWAPBLOCK	512
   *totalp = totalsize * BYTES_PER_SWAPBLOCK;
   *freep = (totalsize - totalinuse) * BYTES_PER_SWAPBLOCK;
-  free(sep);
 }
 #endif	/*  Swapctl info retrieval  */
 
