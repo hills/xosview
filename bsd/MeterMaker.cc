@@ -50,7 +50,12 @@ void MeterMaker::makeMeters(void){
 #ifndef XOSVIEW_FREEBSD		/*  FreeBSD swap meter isn't done yet.  */
   if (_xos->isResourceTrue("swap"))
     push(new SwapMeter(_xos));
+#endif
 
+  if (_xos->isResourceTrue("page"))
+    push(new PageMeter (_xos, atof(_xos->getResource("pageBandwidth"))));
+
+#ifndef XOSVIEW_FREEBSD		/*  FreeBSD net meter isn't done yet.  */
   // check for the net meter
   if (_xos->isResourceTrue("net"))
     push(new NetMeter(_xos, atof(_xos->getResource("netBandwidth"))));
@@ -60,9 +65,6 @@ void MeterMaker::makeMeters(void){
   if (_xos->isResourceTrue("disk"))
     push(new DiskMeter (_xos, atof(_xos->getResource("diskBandwidth"))));
 #endif
-
-  if (_xos->isResourceTrue("page"))
-    push(new PageMeter (_xos, atof(_xos->getResource("pageBandwidth"))));
 
   //  The serial meters and the interrupt meter are not yet
   //  available for NetBSD.  BCG
