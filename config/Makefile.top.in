@@ -45,15 +45,29 @@ xosview: $(OBJS) @top_srcdir@/@host_os@/libmeter.a
 
 ##  If for some reason (such as permissions) you wish to change where
 ##    xosview is installed, modify X11BASEDIR here to point to your
-##    desired tree (i.e., "X11BASEDIR=/usr/local").
+##    desired tree (i.e., "X11BASEDIR=/usr/local"), or simply set the PREFIX
+##    variable.
 ##  The sed command strips off the last portion of the path.  Without
 ##    the double-quotes around the colons, the $: gets mis-parsed.
 ##  I think we can use the dirname program for this, but I don't know
 ##    how standard it is.  bgrayson
+X11INCLUDESDIR=@x_includes@ 
+##  If $(PREFIX) is already set, use that, otherwise do some 
+##  auto-detect based on the x_includes var provided via configure to
+##  X11INCLUDESDIR above.
+PREFIX_TO_USE=`if [ x"$(PREFIX)" != x ]; then echo $(PREFIX); \
+                else echo $(X11INCLUDESDIR) | sed -e 's:/[^/]*$$::'; \
+		fi`
+BINDIR=$(PREFIX_TO_USE)/bin
+MANDIR=$(PREFIX_TO_USE)/man/man1
+XAPPLOADDIR=$(PREFIX_TO_USE)/lib/X11/app-defaults
+
 X11BASEDIR=`echo @x_includes@ | sed -e 's:/[^/]*$$::'`
-BINDIR=$(X11BASEDIR)/bin
-MANDIR=$(X11BASEDIR)/man/man1
-XAPPLOADDIR=$(X11BASEDIR)/lib/X11/app-defaults
+##  If the variable PREFIX is _not_ set, use the X11 dir found above.
+PREFIX?=$(X11BASEDIR)
+BINDIR=$(PREFIX)/bin
+MANDIR=$(PREFIX)/man/man1
+XAPPLOADDIR=$(PREFIX)/lib/X11/app-defaults
 
 ##  These next lines look really ugly.  The echo statements are an
 ##    attempt to make the output look a little nicer.  The "echo -n"
