@@ -129,8 +129,8 @@ these is displayed as a horizontal bar which is separated into color coded
 regions.  Each region represents a percentage of the resource which is being 
 put to a particular use.  Typing a 'q' in the window will terminate xosview.
 
-At the moment \fIxosview\fP runs on six platforms (Linux,
-NetBSD, FreeBSD, OpenBSD, some Solaris systems, and HPUX).
+At the moment \fIxosview\fP runs on seven platforms (Linux,
+NetBSD, FreeBSD, OpenBSD, some Solaris systems, IRIX 6.5 and HPUX).
 Not all of the meters described below are supported on all 
 platforms.  Some of the meters may appear different depending upon the 
 platform \fIxosview\fP is running on.  Note that *BSD is used as
@@ -143,6 +143,7 @@ an abbreviation for all three of the free BSD operating systems
 \fBCPU Usage\fP
    Linux  : user | nice | system | idle
    *BSD   : user | nice | system | idle
+   IRIX   : user | system | interrupt | wait | idle
    HPUX   : user | nice | system | interrupt | idle
 
 \fBMemory Usage\fP
@@ -150,10 +151,11 @@ an abbreviation for all three of the free BSD operating systems
    NetBSD : active | inactive | wired | free
    FreeBSD: active | inactive | wired | buffer | free
    OpenBSD: active | inactive | wired | free
+   IRIX   : kernel | fs   | user    | free
    HPUX   : text | used   | other   | free
 
 \fBSwap Usage\fP
-   all platforms: used | free
+   all platforms except IRIX: used | free
 
 \fBDisk Usage (bytes/sec)\fP
    Linux  : in  |  out  | idle
@@ -161,13 +163,17 @@ an abbreviation for all three of the free BSD operating systems
    HPUX   : < Not Supported >
 
 \fBPage Swapping from/to disk\fP
-   all platforms  : in | out | idle
+   all platforms except IRIX  : in | out | idle
 
 \fBNET Usage\fP
     bytes/sec
     Linux  : in | out | idle
     *BSD   : in | out | idle
     HPUX   : < Not Supported >
+
+\fBGFX Usage\fP
+    swapbuffers/sec
+    IRIX   : number of swapbuffers
 
 \fBInterrupts\fP
     "leds" which blink when an interrupt occurs.
@@ -498,7 +504,9 @@ xosview*cpu: (True or False)
 .RS
 If True then xosview will display a cpu meter.  On linux SMP machines this
 will cause a seperate meter to be displayed for each cpu if Jerome Forissier's
-kernel patch has been applied.  See the 'README.linux' file for more details.
+kernel patch has been applied.  See the 'README.linux' file for more
+details. On IRIX 6.5, the resource cpuFormat decides which meters are
+created for multiple CPUs.
 .RE
 
 .\"  cpuUserColor, cpuNiceColor, cpuSystemColor, cpuInterruptColor, cpuFreeColor
@@ -513,6 +521,18 @@ kernel patch has been applied.  See the 'README.linux' file for more details.
 .dc cpu
 .dg cpu
 .uf cpu
+
+xosview*cpuFormat: (single, all, both or auto)
+.RS
+IRIX only.
+.RE
+.RS
+If single, only a cumulative meter for all CPU is created. All creates a
+meter for each CPU, but no cumulative meter. Both creates one cumulative
+meter and one per cpu. auto behaves like single on uniprocessor system,
+and like both on multiprocessor systems.
+.RE
+
 
 
 \fBMemory Meter Resources\fP
