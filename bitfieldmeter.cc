@@ -361,14 +361,14 @@ void BitFieldMeter::setNumFields(int n){
 bool BitFieldMeter::checkX(int x, int width) const {
   if ((x < x_) || (x + width < x_)
       || (x > x_ + width_) || (x + width > x_ + width_)){
-    cerr << "BitFieldMeter::checkX() : bad horiz values for meter : "
-         << name() << endl;
+    std::cerr << "BitFieldMeter::checkX() : bad horiz values for meter : "
+         << name() << std::endl;
 
-    cerr <<"value "<<x<<", width "<<width<<", total_ = "<<total_<<endl;
+    std::cerr <<"value "<<x<<", width "<<width<<", total_ = "<<total_<<std::endl;
 
     for (int i = 0 ; i < numfields_ ; i++)
-      cerr <<"fields_[" <<i <<"] = " <<fields_[i] <<",";
-    cerr <<endl;
+      std::cerr <<"fields_[" <<i <<"] = " <<fields_[i] <<",";
+    std::cerr <<std::endl;
 
     return false;
   }
