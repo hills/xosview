@@ -168,11 +168,11 @@ void FieldMeter::drawused( int manditory ){
        *  being printed as 1020, which is wider than what can fit)  */
       /*  However, we do divide by 1024, so a K really is a K, and not
        *  1000.  */
-    if (used_ > 1000*1000*1000)
+    if (used_ >= 1000*1000*1000)
 	{scale='G'; scaled_used = used_/1024/1024/1024;}
-    if (used_ > 1000*1000)
+    if (used_ >= 1000*1000)
 	{scale='M'; scaled_used = used_/1024/1024;}
-    else if (used_ > 1000)
+    else if (used_ >= 1000)
 	{scale='K'; scaled_used = used_/1024;}
     else {scale=' '; scaled_used = used_;}
       /*  For now, we can only print 2 digits without overprinting the
