@@ -67,7 +67,11 @@ int DevStat_Get();
 
 #ifdef HAVE_SWAPCTL
 #include <unistd.h>		/*  For swapctl proto.  */
-#include <vm/vm_swap.h>		/*  For swapent, SWAP_*.  */
+#if defined(XOSVIEW_NETBSD) && defined(__NetBSD_Version__) && __NetBSD_Version__ >= 104000000
+#include <sys/swap.h>		/*  For swapent, SWAP_*.  */
+#else
+#include <vm/vm_swap.h>		/* swapent, SWAP_*. */
+#endif
 #include <stdlib.h>		/*  For malloc(), free().  */
 #endif
 
