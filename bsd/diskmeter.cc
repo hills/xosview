@@ -44,6 +44,7 @@ DiskMeter::DiskMeter( XOSView *parent, float max )
 	gazillion bytes, let's reset total_ again and do another
 	call.  This will force total_ to be something reasonable.  */
   total_ = max;
+  IntervalTimerStart();
   getstats();
     /*  By doing this check, we eliminate the startup situation where
 	all fields are 0, and total is 0, leading to nothing being drawn
@@ -79,6 +80,7 @@ void DiskMeter::checkevent( void ){
 }
 
 void DiskMeter::getstats( void ){
+  IntervalTimerStop();
   u_int64_t currBytes = 0;
 //  Reset to desired full-scale settings.
   total_ = maxBandwidth_;
@@ -104,6 +106,7 @@ void DiskMeter::getstats( void ){
     /*  For bytes/sec, we need to scale by our priority and the
      *  sampling time.  */
     
-  setUsed ( fields_[0]*samplesPerSecond(), total_);
+  setUsed ( fields_[0]*IntervalTimeInMicrosecs()/1e6, total_);
   prevBytes = currBytes;
+  IntervalTimerStart();
 }
