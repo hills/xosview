@@ -19,7 +19,9 @@
 //       FieldMeter.
 //   3.  Change the constructor call to use FieldMeterGraph(), rather than
 //       FieldMeter().
-//   4.  Make the checkResources () function in the meter set the 
+//   4.  Make the meter call FieldMeterGraph::checkResources(),
+//       to pick up graphNumCols resource.
+//   5.  Make the checkResources () function in the meter set the 
 //	 useGraph_ variable according to the, e.g., xosview*cpuGraph resource.
 
 #include <fstream.h>
@@ -126,7 +128,9 @@ void FieldMeterGraph::drawfields( int manditory )
 			int barheight;
 			for( j = 0 ; j < numfields_; j++ )
 			{
-				barheight = (int)(heightfield_[i*numfields_+j]*height_);
+				/*  Round up, by adding 0.5 before
+				 *  converting to an int.  */
+				barheight = (int)((heightfield_[i*numfields_+j]*height_)+0.5);
 
     			parent_->setForeground( colors_[j] );
     			parent_->setStippleN(j%4);
