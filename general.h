@@ -1,7 +1,7 @@
 #ifndef General_h
 #define General_h
 
-//  Copyright (c) 1996, 1997 by Brian Grayson (bgrayson@ece.utexas.edu)
+//  Copyright (c) 1996, 1997-2002 by Brian Grayson (bgrayson@netbsd.org)
 //
 //  This file was written by Brian Grayson for the NetBSD and xosview
 //    projects.

@@ -3,7 +3,7 @@
 //    ( romberg@fsl.noaa.gov )
 //
 //  Modifications from FieldMeter class done in Oct. 1995
-//    by Brian Grayson ( bgrayson@ece.utexas.edu )
+//    by Brian Grayson ( bgrayson@netbsd.org )
 //
 //  Modifications from FieldMeterDecay class done in Oct. 1998
 //    by Scott McNab ( jedi@tartarus.uwa.edu.au )

@@ -2,7 +2,7 @@
 //  The original FieldMeter class is Copyright (c) 1994 by Mike Romberg 
 //    ( romberg@fsl.noaa.gov )
 //  Modifications from FieldMeter class done in Oct. 1995
-//    by Brian Grayson ( bgrayson@ece.utexas.edu )
+//    by Brian Grayson ( bgrayson@netbsd.org )
 //
 //  This file was written by Brian Grayson for the NetBSD and xosview
 //    projects.
