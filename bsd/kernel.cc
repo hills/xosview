@@ -28,6 +28,12 @@
 
 #include <err.h>                /*  For err(), warn(), etc.  BCG  */
 #include <errno.h>
+#include <sys/dkstat.h>         /*  For CPUSTATES, which tells us how
+                                      many cpu states there are.  */
+#if defined(XOSVIEW_NETBSD) && !defined(CPUSTATES)
+#include <sys/sched.h>
+#endif
+
 #ifndef XOSVIEW_FREEBSD
 #include <sys/disk.h>		/*  For disk statistics.  */
 #endif
@@ -58,7 +64,9 @@ int DevStat_Get();
 #include <sys/malloc.h>
 #include <sys/sysctl.h>
 #include <sys/device.h>
-#if defined(XOSVIEW_NETBSD) && defined(__NetBSD_Version__) && (__NetBSD_Version__ <= 105010000)
+#if defined(__NetBSD_Version__) && __NetBSD_Version__ > 105010000 /* > 1.5A */
+#include <uvm/uvm_extern.h>
+#else
 #include <vm/vm.h>	/* This should only be needed for older versions
 			   of NetBSD, and even then I'm not sure it
 			   was truly necessary.  bgrayson */
@@ -89,6 +97,7 @@ int DevStat_Get();
 #if _BSDI_VERSION >= 199802     /* BSD/OS 4.x */
 #include <i386/isa/icu.h>
 #endif
+
 // these two functions are declared in kvm_stat.h, unfortunately this file
 // has no c++ compatibility declerations
 __BEGIN_DECLS
@@ -119,8 +128,8 @@ static struct nlist nlst[] =
 #define DUMMY_0
 #else
 { "_cp_time" },
-#define CP_TIME_SYM_INDEX 0
 #endif
+#define CP_TIME_SYM_INDEX 0
 { "_ifnet" },
 #define IFNET_SYM_INDEX 1
 #if defined(UVM)
@@ -254,6 +263,11 @@ ValidSymbol (int index) {
 }
 
 
+int SymbolValue (int index) {
+  return (nlst[index].n_value);
+}
+
+
 void
 BSDInit() {
   kernelFileName[0] = '\0';
@@ -376,28 +390,38 @@ BSDGetCPUTimes (long* timeArray) {
   if (!timeArray) errx (-1, "BSDGetCPUTimes():  passed pointer was null!\n");
   if (CPUSTATES != 5)
     errx (-1, "Error:  xosview for *BSD expects 5 cpu states!\n");
+#if defined(__NetBSD_Version__) && __NetBSD_Version__ > 104260000 /* > 1.4Z */
+  struct schedstate_percpu ssp;
+  size_t size = sizeof(ssp.spc_cp_time);
+  if (sysctl(mib, 2, ssp.spc_cp_time, &size, NULL, 0) < 0) {
+    fprintf(stderr, "can't get schedstate_percpu: %s\n", strerror(errno));
+    memset(&ssp, 0, sizeof(ssp));
+  }
+  for (size = 0; size < CPUSTATES; size++)
+    timeArray[size] = (long) ssp.spc_cp_time[size];
+#else
 #ifdef XOSVIEW_BSDI
   if (sysctl(mib, 2, &cpu, &size, NULL, 0) < 0) {
     fprintf(stderr, "xosview: sysctl failed: %s\n", strerror(errno));
     bzero(&cpu, sizeof(cpu));
   }
   bcopy (cpu.cp_time,timeArray,sizeof (long) * CPUSTATES);
-#elif (defined(XOSVIEW_NETBSD) && (__NetBSD_Version__ >= 104260000))
-  if (sysctl(mib, 2, cp_time, &ssize, NULL, 0) < 0) {
-    fprintf(stderr, "xosview: sysctl failed: %s\n", strerror(errno));
-    bzero(cp_time, ssize);
-  }
-  bcopy (cp_time,timeArray,sizeof (u_int64_t) * CPUSTATES);
 #else
   safe_kvm_read_symbol (CP_TIME_SYM_INDEX, timeArray, sizeof (long) * CPUSTATES);
+#endif
 #endif
 }
 
 
 // ------------------------  NetMeter functions  ------------------
-void
+int
 BSDNetInit() {
   OpenKDIfNeeded();
+#ifdef XOSVIEW_NETBSD
+  return ValidSymbol(DISKLIST_SYM_INDEX);
+#else
+  return 1;
+#endif
 }
 
 void
@@ -776,7 +800,11 @@ BSDGetDiskXFerBytes (unsigned long long *bytesXferred) {
   while (kvmdiskptr != NULL) {
     safe_kvm_read ((u_long)kvmdiskptr, &kvmcurrdisk, sizeof(kvmcurrdisk));
       /*  Add up the contribution from this disk.  */
+#if defined(__NetBSD_Version__) &&  __NetBSD_Version__ > 106070000 /* > 1.6G */
+    *bytesXferred += kvmcurrdisk.dk_rbytes + kvmcurrdisk.dk_wbytes;
+#else
     *bytesXferred += kvmcurrdisk.dk_bytes;
+#endif
 #ifdef DEBUG
     printf ("Got %#x (lower 32bits)\n", (int) (*bytesXferred & 0xffffffff));
 #endif
@@ -817,7 +845,8 @@ BSDIntrInit() {
     return ValidSymbol(ISAINTR_SYM_INDEX);
 #endif /* _BSDI_VERSION */
 #else
-    return ValidSymbol(INTRCNT_SYM_INDEX) && ValidSymbol(EINTRCNT_SYM_INDEX);
+    // Make sure the intr counter array is nonzero in size.
+    return ValidSymbol(INTRCNT_SYM_INDEX) && ValidSymbol(EINTRCNT_SYM_INDEX) && ((SymbolValue(EINTRCNT_SYM_INDEX) - SymbolValue(INTRCNT_SYM_INDEX)) > 0);
 #endif
 }
 
