@@ -72,7 +72,7 @@ xosview*gfxCritColor:      red
 xosview*gfxWarnColor:      orange
 xosview*gfxSwapColor:      seagreen
 xosview*gfxIdleColor:      aquamarine
-xosview*gfxPriority:       9    ! dont change, until you know what you do
+xosview*gfxPriority:       1    ! dont change, until you know what you do
 xosview*gfxCritThreshold:  120
 xosview*gfxWarnThreshold:  60
 xosview*gfxDecay:          False
