@@ -22,7 +22,7 @@
 static const char NAME[] = "xosview@";
 #include "version.cc"
 
-int MAX_SAMPLES_PER_SECOND = 10;
+double MAX_SAMPLES_PER_SECOND = 10;
 
 CVSID("$Id$");
 CVSID_DOT_H(XOSVIEW_H_CVSID);
@@ -37,11 +37,18 @@ XOSView::XOSView( char * instName, int argc, char *argv[] ) : XWin(),
   //  XWinInit looks at the geometry resource for its geometry.  BCG
   xrm.loadAndMergeResources (argc, argv, display_); 
   XWinInit (argc, argv, NULL, &xrm);
-#if 0	//  Don't enable this yet.
-  MAX_SAMPLES_PER_SECOND = atoi(getResource("samplesPerSec"));
+#if 1	//  Don't enable this yet.
+  MAX_SAMPLES_PER_SECOND = atof(getResource("samplesPerSec"));
   if (!MAX_SAMPLES_PER_SECOND)
     MAX_SAMPLES_PER_SECOND = 10;
 #endif
+  usleeptime_ = (unsigned long) (1000000/MAX_SAMPLES_PER_SECOND);
+  if (usleeptime_ >= 1000000) {
+    /*  The syscall usleep() only takes times less than 1 sec, so
+     *  split into a sleep time and a usleep time if needed.  */
+    sleeptime_ = usleeptime_ / 1000000;
+    usleeptime_ = usleeptime_ % 1000000;
+  } else { sleeptime_ = 0; }
 #if (defined(XOSVIEW_NETBSD) || defined(XOSVIEW_FREEBSD) || defined(XOSVIEW_OPENBSD))
   BSDInit();	/*  Needs to be done before processing of -N option.  */
 #endif
@@ -252,11 +259,13 @@ void XOSView::run( void ){
 
       flush();
     }
-    unsigned long usleeptime = 1000000/MAX_SAMPLES_PER_SECOND;
 #ifdef HAVE_USLEEP
-    usleep( usleeptime );
+    /*  First, sleep for the proper integral number of seconds --
+     *  usleep only deals with times less than 1 sec.  */
+    if (sleeptime_) sleep(sleeptime_);
+    if (usleeptime_) usleep( usleeptime_);
 #else
-    usleep_via_select ( usleeptime );
+    usleep_via_select ( usleeptime_ );
 #endif
     counter = (counter + 1) % 5;    
   }

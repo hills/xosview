@@ -16,7 +16,7 @@
 
 
 /*  Take at most n samples per second (default of 10)  */
-extern int MAX_SAMPLES_PER_SECOND;
+extern double MAX_SAMPLES_PER_SECOND;
 
 class Meter;
 
@@ -51,6 +51,7 @@ protected:
   MeterNode *meters_;
   
   int legend_, xoff_, yoff_, nummeters_, usedlabels_;
+  unsigned long sleeptime_, usleeptime_;
 
   void usleep_via_select( unsigned long usec );
   void addmeter( Meter *fm );
