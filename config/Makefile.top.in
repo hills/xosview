@@ -32,7 +32,7 @@ defaultstring.cc: Xdefaults defresources.awk
 	@AWK@ -f defresources.awk Xdefaults > defaultstring.cc
 
 meterlib:
-	$(MAKE) -C @top_srcdir@/@host_os@
+	cd @top_srcdir@/@host_os@ && $(MAKE)
 
 @top_srcdir@/@host_os@/libmeter.a: meterlib
 
@@ -76,10 +76,10 @@ distrib: distclean
         gzip -9 `basename $(PWD)`.tar
 
 clean :
-	$(MAKE) -C @host_os@ clean
+	cd @host_os@ && $(MAKE) clean
 	@#  Only clean the config directory if it exists...
 	sh -c 'if [ -d config ]; then \
-	    $(MAKE) -C config clean; fi'
+	    cd config && $(MAKE) clean; fi'
 	rm -f xosview $(OBJS) $(DEPFILES) *~ defaultstring.cc
 
 distclean: clean
