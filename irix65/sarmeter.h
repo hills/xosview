@@ -47,6 +47,19 @@ public:
                 return NULL;
         }
 
+    diskinfo *getDiskInfo( void )
+        {
+            checkSadc();
+
+            if( _diNew )
+            {
+                _diNew = 0;
+                return _di;
+            }
+            else
+                return NULL;
+        }
+
 private:
     SarMeter()
             : _lastPos(0),

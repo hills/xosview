@@ -24,6 +24,20 @@ static const char * const versionString = "xosview version: " XOSVIEW_VERSION;
 
 static const char NAME[] = "xosview@";
 
+#ifdef sgi
+
+#define MIN(x,y)		\
+(				\
+    x < y ? x : y		\
+)
+
+#define MAX(x,y)		\
+(				\
+    x > y ? x : y		\
+)
+
+#else
+
 #define MIN(x,y)		\
 ({				\
     const typeof(x) _x = x;	\
@@ -43,6 +57,8 @@ static const char NAME[] = "xosview@";
 				\
     _x > _y ? _x : _y;		\
 })
+
+#endif // sgi
 
 double MAX_SAMPLES_PER_SECOND = 10;
 

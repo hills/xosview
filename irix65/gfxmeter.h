@@ -2,6 +2,7 @@
 // $Id$
 //  Initial port performed by Stefan Eilemann (eile@sgi.com)
 //
+
 #ifndef _GFXMETER_H_
 #define _GFXMETER_H_
 
