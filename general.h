@@ -17,13 +17,7 @@
       includes but before any local includes.  It should NOT be included
       by any .h files unless there is a REALLY good reason.  */
 
-
-#ifdef __GNUC__
-  /*  Grab _G_HAVE_BOOL, if possible.  */
-#include <_G_config.h>
-#endif
-
-#ifndef _G_HAVE_BOOL
+#ifndef __GNUC__
   /*  Every GNU system has _G_config.h, I believe, which tells us
       whether or not the bool define exists.  However, for simplicity,
       let's just redefine them all.  The following lines are directly
