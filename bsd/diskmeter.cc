@@ -80,7 +80,7 @@ void DiskMeter::checkevent( void ){
 
 void DiskMeter::getstats( void ){
   IntervalTimerStop();
-  u_int64_t currBytes = 0;
+  unsigned long long currBytes = 0;
 //  Reset to desired full-scale settings.
   total_ = maxBandwidth_;
 
