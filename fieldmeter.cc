@@ -75,7 +75,16 @@ void FieldMeter::setUsed (float val, float total)
   if (print_ == FLOAT)
     used_ = val;
   else if (print_ == PERCENT)
-    used_ = val / total * 100.0;
+  {
+    if (total != 0.0)
+      used_ = val / total * 100.0;
+    else
+    {
+      fprintf(stderr, "Warning:  %s meter had a zero total field!  Would have "
+	      "caused a div-by-zero exception.\n", total);
+      used_ = 0.0;
+    }
+  }
   else if (print_ == AUTOSCALE)
     used_ = val;
   else {
