@@ -245,11 +245,11 @@ void XOSView::run( void ){
 
       flush();
     }
-    unsigned long sleeptime = 1000*SAMPLE_MSECS;
+    unsigned long usleeptime = 1000000/MAX_SAMPLES_PER_SECOND;
 #ifdef HAVE_USLEEP
-    usleep( sleeptime );
+    usleep( usleeptime );
 #else
-    usleep_via_select ( sleeptime );
+    usleep_via_select ( usleeptime );
 #endif
     counter = (counter + 1) % 5;    
   }
