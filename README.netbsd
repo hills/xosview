@@ -1,4 +1,4 @@
-README file for xosview version 1.4.4, NetBSD-specific.
+README file for xosview version 1.5.0, NetBSD-specific.
 
 (Yes, this is very out of date.  We're working on it....)
 
@@ -6,6 +6,11 @@ CVS Id:  Revision: $Id$
 
   Written by Brian Grayson.  Please direct all comments, criticisms, etc.
 to me at bgrayson@ece.utexas.edu.
+
+  If you have the pkg source tree (/usr/pkgsrc, by default) on
+your machine, simply "cd /usr/pkgsrc/sysutils/xosview && make
+&& make install" should do the trick, and you can skip all of
+this mumbo jumbo.
 
 *****************************************************************************
   Note:  xosview needs to run 'setgid kmem' in order to access some of the
