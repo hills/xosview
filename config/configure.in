@@ -58,8 +58,10 @@ AC_SUBST(AUTODEPRULE)
 AC_SUBST(AUTODEPRULE_SUBDIR)
 AC_SUBST(AUTODEPEND)
 
-dnl  Check for library Xpm (main is defined in the test program.  Sneaky...)
-AC_CHECK_LIB(Xpm, main,AC_DEFINE(HAVE_XPM) XPMLIB=-lXpm)
+AC_CHECK_FUNCS(snprintf, AC_DEFINE(HAVE_SNPRITF))
+
+AC_CHECK_HEADER(X11/xpm.h,
+AC_CHECK_LIB(Xpm, XpmCreateImageFromData, AC_DEFINE(HAVE_XPM) XPMLIB=-lXpm))
 
 dnl  For FreeBSD, see if libdevstat exists.
 case $host_os in
