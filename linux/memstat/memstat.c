@@ -1,12 +1,3 @@
-/*  -*- mode: c; c-file-style: "LINUX"; -*-
- * Loadable module to replace the stock console beep routine
- *
- * Requires patches to .../linux/drivers/char/vt_kern.h and
- * .../linux/drivers/char/vt.c
- *
- * dave madden <dhm@proteon.com>
- */
-
 #undef SHOW_BUFFERS
 
 /* Kernel includes */
