@@ -16,17 +16,6 @@
 // $Id$
 //
 
-#include <stdio.h>
-#include <fcntl.h>
-#include <kvm.h>
-#include <nlist.h>
-
-#include <sys/socket.h>
-//  net/if.h is not protected from multiple inclusions, and apparently
-//  something changed recently such that it is included via
-//  sys/socket.h???  bgrayson
-//#include <net/if.h>
-
 #define KERNEL_H_CVSID	"$Id$"
 
 void
