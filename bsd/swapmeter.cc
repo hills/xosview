@@ -34,7 +34,7 @@ SwapMeter::SwapMeter( XOSView *parent )
   useSwapCtl = 0;
 #endif
   BSDSwapInit();	//  In kernel.cc
-#if !(defined(XOSVIEW_OPENBSD) && defined(HAVE_SWAPCTL))
+#if !(defined(XOSVIEW_OPENBSD) || defined(HAVE_SWAPCTL))
   if (!BSDInitSwapInfo())
 #endif
   {
@@ -85,9 +85,9 @@ void SwapMeter::getswapinfo( void ){
       BSDGetSwapCtlInfo(&total_int, &free_int);
     else
 #endif
-#if defined(XOSVIEW_OPENBSD) && defined(HAVE_SWAPCTL)
-      // For OpenBSD, _never_ use the older method if HAVE_SWAPCTL
-      // is set.
+#if defined(XOSVIEW_OPENBSD) || defined(HAVE_SWAPCTL)
+      // For OpenBSD or HAVE_SWAPCTL systems, _never_ use the older
+      // method if HAVE_SWAPCTL is set.
       ;
 #else
       BSDGetSwapInfo (&total_int, &free_int);

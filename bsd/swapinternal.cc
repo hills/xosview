@@ -1,7 +1,7 @@
-// For OpenBSD with HAVE_SWAPCTL, we don't need any of this file.
+// For OpenBSD (or NetBSD with HAVE_SWAPCTL), we don't need any of this file.
 // For others, include it to provide the old method of getting swap
 // info.
-#if !(defined(XOSVIEW_OPENBSD) && defined(HAVE_SWAPCTL))
+#if !(defined(XOSVIEW_OPENBSD) || defined(HAVE_SWAPCTL))
 
 //  Copyright (c) 1995 by Brian Grayson (bgrayson@netbsd.org)
 //
