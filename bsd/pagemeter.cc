@@ -61,6 +61,8 @@ void PageMeter::getpageinfo (void) {
   NetBSDGetPageStats(&vm);
 #ifdef XOSVIEW_FREEBSD
 #warning "FreeBSD hack"
+/*  I'm not completely sure these are the right statistics, but
+ *  they'll work for now.  */
   fields_[0] = vm.v_vnodein - prev_.v_vnodein;
   fields_[1] = vm.v_vnodeout - prev_.v_vnodeout;
 #else
