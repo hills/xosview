@@ -58,7 +58,7 @@ AC_SUBST(AUTODEPRULE)
 AC_SUBST(AUTODEPRULE_SUBDIR)
 AC_SUBST(AUTODEPEND)
 
-AC_CHECK_FUNCS(snprintf, AC_DEFINE(HAVE_SNPRITF))
+AC_CHECK_FUNCS(snprintf, AC_DEFINE(HAVE_SNPRINTF))
 
 AC_CHECK_HEADER(X11/xpm.h,
 AC_CHECK_LIB(Xpm, XpmCreateImageFromData, AC_DEFINE(HAVE_XPM) XPMLIB=-lXpm))
@@ -126,7 +126,7 @@ netbsd*)  AC_MSG_WARN([
     netbsd1.1
     netbsd1.2
     netbsd1.2.1
-    netbsd1.3 through 1.3B
+    netbsd1.3 through 1.3I
   If it works for version $host_os, please send mail to:
 	bgrayson@ece.utexas.edu.
   If this message is in error, also notify bgrayson -- we're new
