@@ -17,6 +17,7 @@ swapinternal.o \
 netmeter.o \
 loadmeter.o \
 diskmeter.o \
+pagemeter.o \
 netbsd.o
 
 #  These next two are not yet supported in the NetBSD port.
@@ -35,5 +36,6 @@ clean :
 
 libmeter.a : $(OBJS)
 	ar cvr libmeter.a $(OBJS)
+	@RANLIB@ $@
 
 @AUTODEPEND@
