@@ -82,8 +82,8 @@ bool BtryMeter::getacpiinfo( void ){
   bool found = false;
   std::string abs_battery_dir = ACPIBATTERYDIR;
   for (struct dirent *dirent; (dirent = readdir(dir)) != NULL; ) {
-    if (strcmp(dirent->d_name, ".") == 0
-    	|| strcmp(dirent->d_name, "..") == 0)
+    if (strncmp(dirent->d_name, ".", 1) == 0
+    	|| strncmp(dirent->d_name, "..", 2) == 0)
       continue;
 
     std::string abs_battery_name = abs_battery_dir + "/" + dirent->d_name;
