@@ -12,6 +12,7 @@
 #include "cpumeter.h"
 #include "memmeter.h"
 #include "swapmeter.h"
+#include "pagemeter.h"
 #include "netmeter.h"
 #include "intmeter.h"
 #include "serialmeter.h"
@@ -36,6 +37,9 @@ void MeterMaker::makeMeters(void){
     push(new MemMeter(_xos));
   if (!strcmp(_xos->getResource("swap"), "True"))
     push(new SwapMeter(_xos));
+  
+  if (!strcmp(_xos->getResource("page"), "True"))
+      push(new PageMeter(_xos, atof(_xos->getResource("pageBandWidth"))));
 
   // check for the net meter
   //  FIXME  This check should be changed to check for the "net" resource.  BCG

@@ -12,6 +12,7 @@ OBJS = \
 cpumeter.o \
 memmeter.o \
 swapmeter.o \
+pagemeter.o \
 netmeter.o \
 intmeter.o \
 serialmeter.o \

@@ -35,6 +35,11 @@ platform \fIxosview\fP is running on.
    NetBSD : used | free
    HPUX   : used | free
 
+\fBPage Swapping from/to disk\fP
+   Linux  : in | out | idle
+   NetBSD : < Not Supported >
+   HPUX   : < Not Supported >
+
 \fBNET Usage\fP
     bytes/sec
     Linux  : in | out | idle
@@ -47,7 +52,7 @@ platform \fIxosview\fP is running on.
     NetBSD : < Not Supported >
     HPUX   : < Not Supported >
 
-\fBSerail Port Status\fP
+\fBSerial Port Status\fP
     "leds" which show the serial port parameters.
     Linux  : Both the Line Status Register
              (LSR) and Modem Status Register 
@@ -107,6 +112,24 @@ xosview*load to "False".
 .RS
 This option overrides the xosview*load resource.  It is equivalent to setting
 xosview*load to "True".
+.RE
+
+-page
+.RS
+This option overrides the xosview*page resource.  It is equivalent to setting
+xosview*page to "False".
+.RE
+
++page
+.RS
+This option overrides the xosview*page resource.  It is equivalent to setting
+xosview*page to "True".
+.RE
+
+-pagespeed \fIval\fP
+.RS
+This option overrides the xosview*pageBandWidth resource.  The resource
+xosview*pageBandWidth will be set to \fIval\fP.
 .RE
 
 -network \fImaxbandwidth\fP 
@@ -408,6 +431,53 @@ instantaneous state and the other will display a decaying average of the
 state.
 .RE
 
+\fBPage Swapping Meter Resources\fP
+
+xosview*page: (True or False)
+.RS
+If True xosview will display the PageMeter.
+.RE
+
+xosview*pageBandWidth: \fImaxEvents\fP
+.RS
+This number is used to specify the expected maximum bandwidth (in events / 
+sec) for the page meter.  When the expected maximum bandwidth 
+(\fImaxEvents\fP) is exceeded then the page meter will display the relative 
+percentage of page swapping (25% in, 75% out).
+.RE
+
+xosview*pageInColor: \fIcolor\fP
+.RS
+This is the color that the page meter will use for the pages loaded into memory field.
+.RE
+
+xosview*pageOutColor: \fIcolor\fP
+.RS
+This is the color that the page meter will use for the pages swapped out 
+to disk field.
+.RE
+
+xosview*pageIdleColor: \fIcolor\fP
+.RS
+This is the color that the page meter will use to display the idle field.
+.RE
+
+xosview*pagePriority: \fIpriority\fP
+.RS
+This number (which must be an integer >= 1) sets the interval between updates
+of the page meter in tenths of second.  The number of times this meter will 
+update per second is thus :  updates per sec = 10 / \fIpriority\fP.  It can 
+of couse be greater than 10.
+.RE
+
+xosview*pageDecay: (True or False)
+.RS
+If True then the page meter will be split in two.  One half will show the
+instantaneous state and the other will display a decaying average of the
+state.
+.RE
+
+
 \fBNetwork Meter Resources\fP
 
 xosview*network: \fImaxBytes\fP
@@ -563,6 +633,11 @@ NetBSD port and most of the nice enhancements for version 1.4
 Werner Fink (werner@suse.de)
 .RS
 Originator of the loadmeter.
+.RE
+
+Massimiliano Ghilardi ( ghilardi@cibs.sns.it )
+.RS
+Linux pagemeter.
 .RE
 
 And many others who have sent in small fixes and improvements.

@@ -93,7 +93,7 @@ void MemMeter::getmemstat(MemStat *mstat){
 
   ifstream meminfo( MEMFILENAME );
   if ( !meminfo ){
-    cerr <<"Con not open file : " <<MEMFILENAME <<endl;
+    cerr <<"Can not open file : " <<MEMFILENAME <<endl;
     exit( 1 );
   }
 
@@ -108,7 +108,7 @@ void MemMeter::getmemstat(MemStat *mstat){
   if (_shAdj == 0){
     ifstream memstat(MEMSTATFNAME);
     if ( !memstat ){
-      cerr <<"Con not open file : " <<MEMSTATFNAME <<endl;
+      cerr <<"Can not open file : " <<MEMSTATFNAME <<endl;
       exit( 1 );
     }
 

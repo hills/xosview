@@ -62,6 +62,17 @@ xosview*swapFreeColor:    aquamarine
 xosview*swapPriority:     10
 xosview*swapDecay:        False
 
+! Page Meter Resources
+
+xosview*page:           True
+xosview*pageBandWidth:  120
+xosview*pageInColor:    SkyBlue
+xosview*pageOutColor:   SlateBlue1
+xosview*pageIdleColor:  aquamarine
+xosview*pagePriority:   5
+xosview*pageDecay:      False
+
+
 ! Network Meter Resources
 
 xosview*network: 2000

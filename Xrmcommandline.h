@@ -33,6 +33,11 @@ static XrmOptionDescRec options[] = {
 //  -net is an abbreviation for -network
 { "-net", "*network", XrmoptionSepArg, (caddr_t) NULL },
 
+// Page Meter
+{ "-page", "*page", XrmoptionNoArg, "False" },
+{ "+page", "*page", XrmoptionNoArg, "True" },
+{ "-pagespeed", "*pageBandWidth", XrmoptionSepArg, (caddr_t) NULL },
+
 //  Serial Meter Options
 { "+serial1", "*serial1", XrmoptionNoArg, "True" },
 { "-serial1", "*serial1", XrmoptionNoArg, "False" },
