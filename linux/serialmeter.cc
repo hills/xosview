@@ -18,6 +18,7 @@
 #include <stdlib.h>
 #include <strstream.h>
 
+// This should go away after types.h gets fixed in the kernel.
 #ifdef __alpha__
 typedef unsigned char u8;
 typedef signed short s16;
