@@ -196,9 +196,12 @@ case $host_os in
 netbsd)
   AC_CHECK_FUNCS(swapctl) 
   #  Only enable the battery meter if it appears we support it.
-  if [ -e /dev/apm ]; then
+  if test -e /dev/apm ; then
     BTRYMETER=btrymeter.o
     AC_DEFINE(HAVE_BATTERY_METER)
+    AC_MSG_WARN([/dev/apm detected -- enabling the battery meter!])
+  else
+    AC_MSG_WARN([no /dev/apm -- disabling the battery meter.])
   fi
   ;;
 esac
