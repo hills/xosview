@@ -9,6 +9,22 @@
 #include "fieldmetergraph.h"
 #include <unistd.h>
 #include <sys/sysinfo.h>
+#include <sys/elog.h>
+
+// some structs 
+typedef struct {
+    unsigned int recsize;
+    unsigned int numrec;
+}
+header;
+
+typedef struct {
+    char           pad[64];
+    char           name[12];
+    struct iotime  stat;
+    int            padding;
+} 
+diskinfo;
 
 // common function for all sar based graphs
 class SarMeter
@@ -32,7 +48,8 @@ public:
 private:
     SarMeter()
             : _lastPos(0),
-              _giNew(0)
+              _giNew(0),
+              _diNew(0)
         {
             _input = setupSadc();
         }
@@ -50,6 +67,9 @@ private:
 
     gfxinfo _gi;
     bool    _giNew;
+
+    diskinfo _di;
+    bool     _diNew;
 };
 
 #endif

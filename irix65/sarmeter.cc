@@ -59,31 +59,83 @@ void SarMeter::checkSadc( void )
         if( ptr == NULL )
             break;
 
-        if( ptr < _buf+_lastPos+24+sizeof(gfxinfo) &&
-            memcmp( ptr, "SarmagicGFX", 11 ) == 0 )
+        if( (ptr+24+sizeof(gfxinfo)) < (_buf+_lastPos) &&
+            memcmp( ptr, "Sarmagic", 8 ) == 0 )
         {
-            // already found a new record
-            if( _giNew )
-                return;
-
-            ptr += 24;
-//            fprintf( stderr, "found gfxinfo pos at 0x%x, %d bytes in _buf\n",
-//                ptr, ptr-_buf );
-            memcpy( &_gi, ptr, sizeof( gfxinfo ));
-//            fprintf( stderr, "swp %d\n", _gi.gswapbuf );
-            _giNew = 1;
-
-            // found record, move data
-            ptr += sizeof( gfxinfo );
-            size_t pos = ptr-_buf;
+            ptr += 8;
             
-//            fprintf( stderr, "memmove 0x%x, 0x%x, %d (% d - %d)\n", _buf, ptr,
-//                _lastPos - pos, _lastPos, pos );
+            if( memcmp( ptr, "GFX", 3 ) == 0 )
+            {
+                // already found a new record
+                if( _giNew )
+                    return;
 
-            memmove( _buf, ptr, _lastPos - pos );
-            _lastPos = _lastPos - pos;
+                ptr += 16;
+//              fprintf( stderr,"found gfxinfo pos at 0x%x, %d bytes in _buf\n",
+//                    ptr, ptr-_buf );
+                memcpy( &_gi, ptr, sizeof( gfxinfo ));
+//                fprintf( stderr, "swp %d\n", _gi.gswapbuf );
+                _giNew = 1;
 
-            currPos = 0;
+                // found record, move data
+                ptr += sizeof( gfxinfo );
+                size_t pos = ptr-_buf;
+                
+//                fprintf( stderr, 
+//                    "memmove gfx 0x%x, 0x%x, %d[0x%x] (%d[0x%x] - %d[0x%x])\n",
+//                    _buf, ptr, _lastPos - pos, _lastPos - pos, _lastPos,
+//                    _lastPos, pos, pos );
+
+                memmove( _buf, ptr, _lastPos - pos );
+                _lastPos = _lastPos - pos;
+                
+                currPos = 0;
+            }
+            else if( memcmp( ptr, "NEODISK", 7 ) == 0 )
+            {
+                // already found a new record
+                if( _diNew )
+                    return;
+
+                ptr += 16;
+//              fprintf(stderr,"found diskinfo pos at 0x%x, %d bytes in _buf\n",
+//                    ptr, ptr-_buf );
+                memcpy( &_di, ptr, sizeof( diskinfo ));
+#if 0
+                fprintf( stderr, "diskinfo {\n  %s\n", _di.name );
+                fprintf( stderr, "  stat {\n" );
+                fprintf( stderr, "    ios {\n" );
+                fprintf( stderr, "      %d, %d, %d, %d\n",
+                    _di.stat.ios.io_ops,
+                    _di.stat.ios.io_misc,
+                    _di.stat.ios.io_qcnt,
+                    _di.stat.ios.io_unlog );
+                fprintf( stderr, "    }\n" );
+                fprintf( stderr, "    %d %d %d %d %d\n", 
+                    _di.stat.io_bcnt,
+                    _di.stat.io_resp,
+                    _di.stat.io_act,
+                    _di.stat.io_wops,
+                    _di.stat.io_wbcnt );
+#endif
+//                _diNew = 1;
+
+                // found record, move data
+                ptr += sizeof( diskinfo );
+                size_t pos = ptr-_buf;
+                
+//                fprintf( stderr,
+//                    "memmove dsk 0x%x, 0x%x, %d[0x%x] (%d[0x%x] - %d[0x%x])\n",
+//                    _buf, ptr, _lastPos - pos, _lastPos - pos, _lastPos,
+//                    _lastPos, pos, pos );
+
+                memmove( _buf, ptr, _lastPos - pos );
+                _lastPos = _lastPos - pos;
+                
+                currPos = 0;
+            }
+            else
+                currPos = ( (char *)ptr - _buf ) + 1;
         }
         else
             currPos = ( (char *)ptr - _buf ) + 1;
