@@ -74,7 +74,7 @@ netbsd*)  AC_MSG_WARN([
     netbsd1.1
     netbsd1.2
     netbsd1.2.1
-    netbsd1.3
+    netbsd1.3 through 1.3B
   If it works for version $host_os, please send mail to:
 	bgrayson@ece.utexas.edu.
   If this message is in error, also notify bgrayson -- we're new
@@ -85,16 +85,8 @@ to autoconf!
     host_os=netbsd ;;
 
 freebsd*) AC_XOSV_FREEBSD
-	AC_MSG_WARN([
-**********************************
-The support for FreeBSD is MINIMAL -- only the working meters
-(cpu, load, memory, and page) are enabled in the code.
-I have not had the time to install FreeBSD on one of my
-machines, so I haven't ported xosview further.  Contact me if
-you would be able to do some of the porting work
-(bgrayson@ece.utexas.edu).
-**********************************
-	])
+	dnl AC_MSG_WARN([
+	dnl ])
 	host_os=freebsd ;;
 hpux*)    AC_XOSV_HPUX   
           host_os=hpux ;;
