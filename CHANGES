@@ -7,6 +7,9 @@ Changes since xosview-1.5.1, in no particular order:
 
   NetBSD now supports the interrupt meter.
 
+  Finally found the missing 'else' that was causing the net meter
+    in particular to occasionally overwrite the label.
+
 Changes since xosview-1.5.0, in no particular order:
 
   On Linux the cpu meters will now show a seperate meter per cpu if 
@@ -53,7 +56,7 @@ New meters:
   BatteryMeter for Linux
   DiskMeter for NetBSD
 
-Improved drawing.  There's still one more known drawing bug...
+Improved drawing.
 
 Improved usedLabels -- now the autoscale format can be used to
   automatically print a value in K, M, or G, as appropriate.  (Before,

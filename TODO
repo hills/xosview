@@ -27,7 +27,7 @@ Revision: $Id$
     dividing by the number of meters somewhere.  Fix this.
 
   NetBSD:  Clean up symbol defs in netbsd.cc
-  NetBSD:  Merge swapinternal.cc (or at least a lot of it) into netbsd.cc
+  NetBSD:  Merge swapinternal.cc (or at least a lot of it) into kernel.cc
   NetBSD, Linux, hp:  Instead of allowing each meter to figure out the
     per-sec rate for a measurement (page, disk, net), add a fieldmeter
     function that does the calculation, using SAMPLE_MSECS and
@@ -39,13 +39,16 @@ Revision: $Id$
   Change the CacheColor stuff from Tom Pavel's patches to be a
     new memWiredColor.
 
-  Change the names on all NetBSD* functions to just be BSD*,
+* Change the names on all NetBSD* functions to just be BSD*,
     since they are shared across multiple *BSD ports.
 
 * Merge in NetBSD interrupt support.
 
-  Add auto-detect for number of interrupts for NetBSD.
+* Add auto-detect for number of interrupts for NetBSD.
 
-  Add in support and auto-detect for new NetBSD UVM stuff.
+x Add in support and auto-detect for new NetBSD UVM stuff.
+  (added, but no auto-detect).
 
-  Merge in Tom's Xt stuff.
+  Merge in Tom's Xt stuff. -- deferred:  it appears to require
+    Xt, Xaw, and ICE, IIRC, which bloats static executables too
+    much for my taste.  bgrayson
