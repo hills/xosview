@@ -23,7 +23,7 @@ raidmeter.o \
 lmstemp.o \
 MeterMaker.o
 
-FAIL_ARCHS = arm m68k powerpc s390 sparc
+FAIL_ARCHS = arm m68k powerpc s390 sparc 3D s390x powerpc64
 
 # Test for arm specifically, because arm can show up as a number of
 # things prefixed by "arm"
