@@ -6,9 +6,13 @@
 //
 // $Id$
 //
-#include "Host.h"
 #include <stdlib.h>
 #include <string.h>
+#include "general.h"
+#include "Host.h"
+
+CVSID("$Id$");
+CVSID_DOT_H(HOST_H_CVSID);
 
 #ifdef __hpux__
 extern int h_errno;
@@ -162,7 +166,8 @@ bool Host::operator==(const Host& host) const {
 }
 
 ostream &Host::print(ostream& os) const {
-  if (!*this)
+  /*  Cast 'this' to a char*, so we don't need to create a Host::! operator.*/
+  if (!*((char*)this))
     return os <<"Invalid Host.  h_errno was = " <<_failure <<"\n";
 
   os <<"---- Host ----\n"
