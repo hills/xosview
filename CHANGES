@@ -2,6 +2,8 @@
 
 Changes since xosview-1.8.1
 
+ - Merge in the fedora-2 non-i386 patch.
+
  - Merge in the fedora-2 linux-2.6 kernel (related) patch.
 
  - Add an autogen.sh script.  This script runs autoconf to create
