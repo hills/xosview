@@ -78,6 +78,9 @@ FreeBSDGetBufspace(int* bfsp);
 int
 BSDIntrInit();
 
+int
+BSDNumInts();
+
 void
 BSDGetIntrStats (unsigned long intrCount[NUM_INTR]);
 
