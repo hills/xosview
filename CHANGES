@@ -1,0 +1,32 @@
+  /*  $Id$  */
+Changes since xosview-1.4.*, in no particular order:
+
+All meters can now be disabled individually.
+
+The overloaded 'network' resource has been deprecated, and replaced by
+  'net' to enable/disable the NetMeter, and 'netBandwidth', which sets the
+  initial maximum value for the meter.
+
+Initial support for stipple masks has been added, primarily for users
+  stuck with 1-bit monitors/display cards.  Try setting enableStipple
+  true.  Please give us feedback on this, if you use it.  It needs
+  some more work.
+
+Initial support for the -name option for specifying an X resource
+  `instance name' other than the default of `xosview'.  With the
+  following .Xdefaults file:
+    xosview*background:  blue
+    xosviewFoo*background: black
+  the command 'xosview' will have a blue background, and the command
+  'xosview -name xosviewFoo' will have a black background, but all
+  other resources will be from the default xosview resources.
+
+New meters:
+  PageMeter for Linux
+  DiskMeter for NetBSD
+
+Improved drawing.  There's still one more known drawing bug...
+
+Improved usedLabels -- now the autoscale format can be used to
+  automatically print a value in K, M, or G, as appropriate.  (Before,
+  most displays showed percent use, instead of absolute values.)
