@@ -24,7 +24,7 @@
 
 #include <sys/param.h>		/*  Needed for sysctl.h include.  */
 #include <sys/sysctl.h>		/*  Needed for kvm_cnt, kvm_uvm_exp.  */
-#if defined(XOSVIEW_FREEBSD) || defined(XOSVIEW_OPENBSD)	/*  Does
+#if defined(XOSVIEW_BSDI) || defined(XOSVIEW_FREEBSD) || defined(XOSVIEW_OPENBSD)	/*  Does
 							OpenBSD need this?  */
 # include <sys/vmmeter.h>
 #endif
