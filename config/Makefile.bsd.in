@@ -18,7 +18,7 @@ netmeter.o \
 loadmeter.o \
 diskmeter.o \
 pagemeter.o \
-netbsd.o
+kernel.o
 
 #  These next two are not yet supported in the NetBSD port.
 #intmeter.o \
