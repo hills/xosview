@@ -42,8 +42,8 @@ SwapMeter::SwapMeter( XOSView *parent )
 #else
   warnx("The kernel does not seem to have the symbols needed for the\n"
   "SwapMeter.  If your kernel is newer than 1.2F, but xosview was\n"
-  "compiled on an older system, then recompile xosview and it \n"
-  "will automatically adjust to using swapctl() when needed.\n"
+  "compiled on an older system, then recompile xosview on a 1.2G or later\n"
+  "system and it will automatically adjust to using swapctl() when needed.\n"
   "\nIf this is not the case (kernel before version 1.2G), make sure the\n"
   "running kernel is /netbsd, or use the -N flag for xosview to specify\n"
   "an alternate kernel file.\n"
