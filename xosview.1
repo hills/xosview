@@ -198,6 +198,12 @@ an abbreviation for all three of the free BSD operating systems
     OpenBSD: < Not Supported >
     HPUX   : < Not Supported >
 
+\fBRAID status\fP
+    Shows the state of disks contained in your (software)
+    RAID1/4/5 array(s) and the rebuild state of the
+    array(s). 
+    Linux  : Disk0 Disk1 Disk2 .. DiskN | Rebuild Progress
+
 .SH OPTIONS
 
 Most of these command line options are just a convenient way to set one or
@@ -717,6 +723,41 @@ This color will be used for the linux meter to show reads.
 .dg disk
 .uf disk
 
+\fBRAID Meter Resources\fP
+
+.\"  Do the RAID: True resource.
+.xt RAID
+
+xosview*RAIDdevicecount: \fIint\fP
+.RS
+Please enter your RAID device count (n) here or 0 if you don't have any
+supported RAID devices. xosview then will display n RAID state displays.
+.RE
+
+xosview*RAIDdiskOnlineColor: \fIcolor\fP
+
+xosview*RAIDdiskFailureColor: \fIcolor\fP
+.RS
+These colors will be used for indicating working/online or failed/offline
+disks. The order (from left to right) is the same as in /proc/mdstat.
+.RE
+
+xosview*RAIDresyncdoneColor: \fIcolor\fP
+
+xosview*RAIDresynctodoColor: \fIcolor\fP
+
+xosview*RAIDresynccompleteColor: \fIcolor\fP
+.RS
+If a resync/rebuild of the RAID array is in progress, the "done" and "todo"
+colors will be used. If no rebuild/resync is running, then the "complete"
+color will be shown.
+.RE
+
+.\"  RAIDpriority resource
+.pp RAID
+
+.\"  RAIDUsedFormat resource
+.uf RAID
 
 .SH BUGS
 
