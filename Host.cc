@@ -168,7 +168,7 @@ bool Host::operator==(const Host& host) const {
   return false;
 }
 
-ostream &Host::print(ostream& os) const {
+std::ostream &Host::print(std::ostream& os) const {
   /*  Cast 'this' to a char*, so we don't need to create a Host::! operator.*/
   if (!*((char*)this))
     return os <<"Invalid Host.  h_errno was = " <<_failure <<"\n";
