@@ -22,12 +22,12 @@
 #include "fieldmetergraph.h"
 #if defined(UVM)
 #include <sys/param.h>
-#if defined(XOSVIEW_NETBSD) && (__NetBSD_Version__ <= 105010000)
-// Earlier versions of NetBSD still required vm/vm.h to be included.
-#include <vm/vm.h>
-#else
+#if defined(XOSVIEW_NETBSD) && (__NetBSD_Version__ > 105010000 /* > 1.5A */)
 // No includes needed -- uvm_extern.h is now self-contained.  Noticed
 // by Bernd Ernesti.
+#else
+// Earlier versions of NetBSD still required vm/vm.h to be included.
+#include <vm/vm.h>
 #endif
 #include <uvm/uvm_extern.h>
 #else
