@@ -18,7 +18,7 @@ class ostream;
 
 class Xrm {
 public:
-  Xrm(const char *instanceName);
+  Xrm(const char *className, const char *instanceName);
   Xrm(const char *instanceName, int argc, char **argv);
   ~Xrm();
 
@@ -40,7 +40,7 @@ private:
   static Bool enumCB(XrmDatabase *, XrmBindingList bindings,
                      XrmQuarkList quarks, XrmRepresentation *type,
                      XrmValue *value, XPointer closure);
-  void initClassName(void);
+  void initClassName(const char* className);
 
   static bool _initialized;
 };

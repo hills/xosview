@@ -38,7 +38,7 @@ Xrm::Xrm(const char *instanceName, int argc, char **argv){
   //  End unsupported constructor.  !!!!!!!! BCG
 }
 
-Xrm::Xrm(const char *instanceName){
+Xrm::Xrm(const char *className, const char *instanceName){
   XrmInitialize ();
 
   //  Initialize everything to NULL.
@@ -47,8 +47,7 @@ Xrm::Xrm(const char *instanceName){
 
   // init the _instance and _class Quarks
   _instance = XrmStringToQuark(instanceName);
-  initClassName();
-
+  initClassName(className);
 }
 
 const char*
@@ -84,6 +83,21 @@ const char *Xrm::getResource(const char *rname) const{
   val.addr = NULL;
   char *type;
   XrmGetResource(_db, frn, fcn, &type, &val);
+  //  This case here is a hack, because we are currently moving from
+  //  always making the instance name be "xosview" to allowing
+  //  user-specified ones.  And unfortunately, the class name is
+  //  XOsview, and not xosview, so our old defaults (xosview.font)
+  //  will not be found when searching for XOsview.font.  bgrayson Dec. 1996
+  if (!val.addr)
+  {
+    //  Let's try with a non-uppercased class name.
+    strcpy (fcn, className());
+    char* p = fcn;
+    while (p && *p)  *p++ = tolower(*p);
+    strcat (fcn, ".");
+    strcat (fcn, rname);
+    XrmGetResource(_db, frn, fcn, &type, &val);
+  }
 
   return val.addr;
 }
@@ -191,9 +205,9 @@ Listed from weakest to strongest:
 //  =========== END X Resource lookup and merging ==========
 }
 
-void Xrm::initClassName(void){
+void Xrm::initClassName(const char* name){
   char className[256];
-  strcpy(className, instanceName());
+  strncpy(className, name, 255);  //  Avoid evil people out there...
 
   className[0] = toupper(className[0]);
   if (className[0] == 'X')
