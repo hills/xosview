@@ -47,6 +47,8 @@ PREFIX_TO_USE=@prefix@
 BINDIR=$(PREFIX_TO_USE)/bin
 MANDIR=$(PREFIX_TO_USE)/man/man1
 XAPPLOADDIR=$(PREFIX_TO_USE)/lib/X11/app-defaults
+PACKAGENAME=xosview-$(VERS)
+DISTRIBDIR=@top_srcdir@/../$(PACKAGENAME)
 
 ##  These next lines look really ugly.  The echo statements are an
 ##    attempt to make the output look a little nicer.  The "echo -n"
@@ -69,14 +71,20 @@ install-man:
 	@#@INSTALL_DATA@ xosview.1 $(MANDIR)
 
 distrib: checksource distclean
-	cd @top_srcdir@/..;tar cf `basename $(PWD)`.tar `basename $(PWD)`; \
-        gzip -9 `basename $(PWD)`.tar
+	cd @top_srcdir@/..; rm -rf $(PACKAGENAME)
+	mkdir $(DISTRIBDIR)
+	(cd @top_srcdir@; tar cf - *) | (cd $(DISTRIBDIR); tar xf -)
+	cd $(DISTRIBDIR); rm -rf `find . -name "CVS"`
+	cd @top_srcdir@/..; tar cf $(PACKAGENAME).tar $(PACKAGENAME)
+	gzip -f9 @top_srcdir@/../$(PACKAGENAME).tar
+	cd @top_srcdir@/..; uuencode $(PACKAGENAME).tar.gz \
+          $(PACKAGENAME).tar.gz > $(PACKAGENAME).tar.gz.uue
 
 #  The next one is only used by bgrayson to set up the local
 #  mirrors of the xosview distributions.
 distrib-and-copy: distrib
-	cp ../`basename $(PWD)`.tar.gz ~bgrayson/public_html/xosview
-	scp ../`basename $(PWD)`.tar.gz omni:~bgrayson/public_html/xosview
+	cp ../$(PACKAGENAME).tar.gz ~bgrayson/public_html/xosview
+	scp ../$(PACKAGENAME).tar.gz omni:~bgrayson/public_html/xosview
 
 clean :
 	cd @host_dir@ && $(MAKE) clean

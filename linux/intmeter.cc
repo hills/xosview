@@ -23,9 +23,6 @@ static const char *VERSIONFILE = "/proc/version";
 IntMeter::IntMeter( XOSView *parent, int cpu)
   : BitMeter( parent, "INTS", "", 1, 
               0, 0 ), _cpu(cpu), _old(true) {
-#ifdef __alpha__
-char tmp[32];
-#endif 
  if (getLinuxVersion() <= 2.0) {
    setNumBits(16);
    legend("INTs (0-15)");
@@ -33,9 +30,11 @@ char tmp[32];
  else {
    _old = false;
 #ifdef __alpha__
+   ostrstream os;
    setNumBits(NR_IRQS);
-   sprintf(tmp,"INTs (0-%d)",(NR_IRQS-1));
-   legend(tmp);
+   os << "INTs (0-" << (NR_IRQS-1) << ")" << ends;
+   legend(os.str());
+   delete[] os.str();
 #else    
    setNumBits(24);
    legend("INTs (0-23)");
