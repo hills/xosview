@@ -1,4 +1,4 @@
-README file for xosview version 1.4.0, NetBSD-specific.
+README file for xosview version 1.4.4, NetBSD-specific.
 
 (Yes, this is very out of date.  We're working on it....)
 
@@ -172,7 +172,7 @@ to me at bgrayson@ece.utexas.edu.
 	b)  You compiled xosview on a pre-1.2G system and are now
 	  running it on a 1.2G or later system.  In this case, you
 	  should get a helpful message, if you are running
-	  1.4.3beta or later, or no useful message if you are
-	  running 1.4.3alpha or earlier.
+	  1.4.4beta or later, or no useful message if you are
+	  running 1.4.3beta or earlier.
 	c)  Anything else is a bug, I think.
 
