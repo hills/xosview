@@ -58,7 +58,9 @@ void MeterMaker::makeMeters(void){
 
   // check for the interrupt meter
   if (_xos->isResourceTrue("interrupts")) {
-    for (int i = 0 ; i < IntMeter::countCPUs() ; i++)
+    int cpuCount = IntMeter::countCPUs();
+    cpuCount = cpuCount == 0 ? 1 : cpuCount;
+    for (int i = 0 ; i < cpuCount ; i++)
       push(new IntMeter(_xos, i));
   }
 
