@@ -9,7 +9,9 @@
     2.  Make sure CHANGES, the man page, and the list below to
     all be roughly correct.
 */
-static const char * const versionString = "xosview version 1.7.0";
+/*  *****  THIS FILE is included by xosview.cc, and is never used
+ *  on its own.  */
+static const char * const versionString = "xosview version "XOSVIEW_VERSION;
 static const char * const version_cc_cvsID = "$Id$";
 
 /*  Version 1.7.0:  has pixmap support, OpenBSD interrupt meter,
