@@ -156,7 +156,7 @@ Listed from weakest to strongest:
   if (xappdir != NULL)
   {
     char xappfile[1024];
-    sprintf (xappfile, "%s/%s", xappdir, className());
+    snprintf (xappfile, 1024, "%s/%s", xappdir, className());
     // this did not work for XAPPLRESDIR
     //if (!access (xappfile, X_OK | R_OK))  
     if (!access (xappfile, R_OK))
@@ -185,8 +185,8 @@ Listed from weakest to strongest:
   //  Now, check for a user resource file, and merge it in if there is one...
   if ( getenv( "HOME" ) != NULL ){
     char userrfilename[1024];
-    strcpy(userrfilename, getenv("HOME"));
-    strcat(userrfilename, "/.Xdefaults");
+    char *home = getenv("HOME");
+    snprintf(userrfilename, 1024, "%s/.Xdefaults", home);
     //  User file overrides system (_db).
     XrmCombineFileDatabase (userrfilename, &_db, 1);
   }
