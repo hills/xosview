@@ -6,9 +6,6 @@
 //
 // $Id$
 //
-#include "Xrm.h"
-//#include "defaultstring.h"
-#include "Xrmcommandline.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -16,6 +13,13 @@
 #include <ctype.h>
 #include <iostream.h>
 #include <unistd.h>  //  for access(), etc.  BCG
+#include "general.h"
+#include "Xrm.h"
+#include "Xrmcommandline.h"
+
+CVSID("$Id$");
+CVSID_DOT_H(XRM_H_CVSID);
+CVSID_DOT_H2(XRMCOMMANDLINE_H_CVSID);
 
 
 extern char *defaultXResourceString;

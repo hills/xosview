@@ -6,7 +6,10 @@
 //
 // $Id$
 //
+#include "general.h"
 #include "xosview.h"
+
+CVSID("$Id$");
 
 main( int argc, char *argv[] ) {
   XOSView xosview( argc, argv );

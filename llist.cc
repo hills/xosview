@@ -7,8 +7,11 @@
 // $Id$
 //
 #include <iostream.h>
+#include "general.h"
 #include "llist.h"
 
+CVSID("$Id$");
+CVSID_DOT_H(LLIST_H_CVSID);
 
 LList::LNode::LNode( void *data ){
   data_ = data;
