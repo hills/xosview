@@ -71,8 +71,11 @@ private:
 protected:
   void IntervalTimerStart() { _timer.start(); }
   void IntervalTimerStop() { _timer.stop(); }
-  LONG_LONG IntervalTimeInMicrosecs() { return _timer.report(); }
-  double IntervalTimeInSecs() { return _timer.report()/1e6; }
+  //  Before, we simply called _timer.report(), which returns usecs.
+  //  However, it suffers from wrap/overflow/sign-bit problems, so
+  //  instead we use doubles for everything.
+  double IntervalTimeInMicrosecs() { return _timer.report_usecs(); }
+  double IntervalTimeInSecs() { return _timer.report_usecs()/1e6; }
 };
 
 #endif

@@ -115,6 +115,11 @@ void FieldMeterDecay::drawfields( int manditory ){
     //  We want to round the widths, rather than truncate.
     twidth = (int) (0.5 + (width_ * (float) fields_[i]) / total_); 
     decaytwidth = (int) (0.5 + width_ * decay_[i]);
+    if (decaytwidth < 0.0) {
+      cerr << "Error:  FieldMeterDecay " << name() << ":  decaytwidth of " <<
+      decaytwidth << ", width of " << width_ << ", decay_[" << i << "]
+      of " << decay_[i] << endl;
+    }
 
     //  However, due to rounding, we may have gone one
     //  pixel too far by the time we get to the later fields...
