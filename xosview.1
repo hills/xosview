@@ -46,6 +46,18 @@ display a decaying average of the state.
 
 ..
 
+.\" The .dg macro is similar to the .dc macro, except that it is for
+.\" the scrolling graph resource paragraphs.
+.\" Usage:  .dg net
+.de dg
+xosview*\\$1Graph: (True or False)
+.RS
+If this is set to True then the \\$1 meter will be drawn as a horizontally
+scrolling bargraph showing the state value verses time.
+.RE
+
+..
+
 .\"  The .pm macro is for ``plus/minus'' -- for the
 .\"  enable/disable command-line options.
 .de pm
@@ -396,6 +408,13 @@ true.  Please give us feedback on this, if you use it.  It needs
 some more work.
 .RE
 
+xosview*graphNumCols: \fInumber\fP
+.RS
+This defines the number of sample bars drawn when a meter is in scrolling
+graph mode. This also has the side-effect of defining the width of the
+graph columns. This is only used by meters which have graph mode enabled.
+.RE
+
 
 \fBLoad Meter Resources\fP
 
@@ -434,6 +453,8 @@ You should probably leave this at the default value (False).  The load
 is already a time-averaged value!
 .RE
 
+.dg load
+
 .\"  loadUsedFormat resource
 .uf load
 
@@ -458,6 +479,7 @@ kernel patch has been applied.  See the 'README.linux' file for more details.
 .\"  Priority, decay, usedFormat resources:
 .pp cpu
 .dc cpu
+.dg cpu
 .uf cpu
 
 
@@ -497,6 +519,7 @@ kernel patch has been applied.  See the 'README.linux' file for more details.
 .\"  Priority, decay, usedFormat resources:
 .pp swap
 .dc swap
+.dg swap
 .uf swap
 
 
@@ -521,6 +544,7 @@ percentage of page swapping (25% in, 75% out).
 .\"  Priority, decay, usedFormat resources:
 .pp page
 .dc page
+.dg page
 .uf page
 
 
@@ -555,6 +579,7 @@ This is the color that the network meter will use for the "idle" field.
 .\"  Priority, decay, usedFormat resources:
 .pp net
 .dc net
+.dg net
 .uf net
 
 
