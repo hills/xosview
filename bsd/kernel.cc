@@ -4,7 +4,9 @@
 //
 //  This file was written by Brian Grayson for the NetBSD and xosview
 //    projects.
-//  dummy device ignore code by : David Cuka (dcuka@intgp1.ih.att.com)
+//  This file contains code from the NetBSD project, which is covered
+//    by the standard BSD license.
+//  Dummy device ignore code by : David Cuka (dcuka@intgp1.ih.att.com)
 //  The OpenBSD interrupt meter code was written by Oleg Safiullin
 //    (form@vs.itam.nsc.ru).
 //  This file may be distributed under terms of the GPL or of the BSD
@@ -98,6 +100,11 @@ int DevStat_Get();
 #include <i386/isa/icu.h>
 #endif
 
+// Utility/vanity define, for readability later on.
+#ifdef XOSVIEW_NETBSD && (__NetBSD_Version__ > 106010000)
+#define NETBSD_EV_IRQS
+#endif
+
 // these two functions are declared in kvm_stat.h, unfortunately this file
 // has no c++ compatibility declerations
 __BEGIN_DECLS
@@ -174,6 +181,11 @@ static struct nlist nlst[] =
 #define INTRCNT_SYM_INDEX 	7
 { "_eintrcnt" },
 #define EINTRCNT_SYM_INDEX 	8
+
+#if defined(NETBSD_EV_IRQS)
+{"_allevents" },
+#define ALLEVENTS_SYM_INDEX	9
+#endif
 
 #if defined(XOSVIEW_OPENBSD) && (defined(__pc532__) || defined(__i386__))
 
@@ -382,8 +394,6 @@ BSDGetCPUTimes (long* timeArray) {
   static int mib[] = { CTL_KERN, KERN_CPUSTATS };
 #endif
 #if defined(XOSVIEW_NETBSD) && (__NetBSD_Version__ >= 104260000)
-  u_int64_t cp_time[CPUSTATES];
-  size_t ssize = sizeof(cp_time);
   static int mib[] = { CTL_KERN, KERN_CP_TIME };
 #endif
 
@@ -814,7 +824,8 @@ BSDGetDiskXFerBytes (unsigned long long *bytesXferred) {
 }
 
 /*  ---------------------- Interrupt Meter stuff  -----------------  */
-#if (!defined(XOSVIEW_OPENBSD) || !(defined(__pc532__) && defined(__i386__))) && !defined(XOSVIEW_BSDI)
+
+#if (!defined(XOSVIEW_OPENBSD) || !(defined(__pc532__) && defined(__i386__))) && !defined(XOSVIEW_BSDI) && !defined(NETBSD_EV_IRQS)
 static unsigned long kvm_intrcnt[128];// guess at space needed
 #endif
 
@@ -845,8 +856,13 @@ BSDIntrInit() {
     return ValidSymbol(ISAINTR_SYM_INDEX);
 #endif /* _BSDI_VERSION */
 #else
+
+#if defined(NETBSD_EV_IRQS)
+    return ValidSymbol(ALLEVENTS_SYM_INDEX);
+#else
     // Make sure the intr counter array is nonzero in size.
     return ValidSymbol(INTRCNT_SYM_INDEX) && ValidSymbol(EINTRCNT_SYM_INDEX) && ((SymbolValue(EINTRCNT_SYM_INDEX) - SymbolValue(INTRCNT_SYM_INDEX)) > 0);
+#endif
 #endif
 }
 
@@ -946,12 +962,57 @@ BSDGetIntrStats (unsigned long intrCount[NUM_INTR]) {
   }
 # endif /* pc532 */
 #else /* XOSVIEW_OPENBSD && (__pc532__ || __i386__) */
+// Now let's do the modern NetBSD way...
+#if defined(NETBSD_EV_IRQS)
+    // Shamelessly lifted from vmstat.c v1.119, with additional error
+    // checking and ignoring of soft interrupts, etc.
+
+    struct evcntlist allevents;
+    struct evcnt evcnt, *evptr;
+    char evname[EVCNT_STRING_MAX];
+
+    safe_kvm_read(nlst[ALLEVENTS_SYM_INDEX].n_value, &allevents, sizeof(allevents));
+    evptr = allevents.tqh_first;
+    int i = 0;
+
+    while (evptr && i < NUM_INTR) {
+
+      safe_kvm_read((unsigned int)evptr, &evcnt, sizeof(evcnt));
+
+      evptr = evcnt.ev_list.tqe_next;
+
+      // Skip non-interrupt event counts.
+      if (evcnt.ev_type != EVCNT_TYPE_INTR)
+	continue;
+
+      safe_kvm_read((unsigned int)evcnt.ev_name, evname, evcnt.ev_namelen);
+      // If it's a soft interrupt (has a name that starts with "soft"), skip it.
+      if (!strncmp(evname, "soft", 4))
+	continue;
+
+      // If we see counts that we can hold, record them...
+      if (i < NUM_INTR) {
+	intrCount[i] = evcnt.ev_count;
+      } else {
+	// ... otherwise accumulate them all into last bucket.
+	static bool firstTime = true;
+	intrCount[NUM_INTR-1] += evcnt.ev_count;
+	if (firstTime) {
+	  warnx("!!! Saw more than %d interrupts on event chain.", NUM_INTR);
+	  warnx("!!! Lumping remainder into last bucket.");
+	  firstTime = false;
+	}
+      }
+      i++;
+    }
+#else
     int nintr = BSDNumInts();
     safe_kvm_read(nlst[INTRCNT_SYM_INDEX].n_value, kvm_intrcnt,
       sizeof(long)*nintr);
     for (int i=0;i<nintr;i++) {
       intrCount[i] = kvm_intrcnt[i];
     }
+#endif
 #endif /* XOSVIEW_OPENBSD && (pc532 || i386) */
   }
   return;
