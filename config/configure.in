@@ -2,6 +2,7 @@ dnl
 dnl $Id$
 dnl
 AC_INIT(xosview.1)
+CF_TOP_SRCDIR
 AC_CONFIG_AUX_DIR(config)
 AC_CANONICAL_HOST
 AC_PROG_CXX

@@ -6,6 +6,14 @@ dnl
 dnl $Id$
 dnl
 
+dnl Make an absolute symbol for the top of the configuration.
+dnl
+AC_DEFUN([CF_TOP_SRCDIR],
+[TOP_SRCDIR=`cd $srcdir;pwd`
+AC_SUBST(TOP_SRCDIR)
+])dnl
+
+
 AC_DEFUN(AC_SYS_LINUX_VERS,[[
 changequote(<<, >>)
 <<

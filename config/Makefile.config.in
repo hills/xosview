@@ -7,6 +7,8 @@
 # $Id$
 #
 
+TOP = @TOP_SRCDIR@
+
 #-----------------------------------------------------------------
 # C++ compiler
 #-----------------------------------------------------------------
@@ -18,28 +20,28 @@ CXX           = @CXX@
 
 # Optimized CXXFLAGS
 CXXFLAGS      += $(CFLAGS) -Wall -O4 -pipe -I@x_includes@ \
-                -I@top_srcdir@ -I./@host_os@ @DEFS@
+                -I$(TOP) -I$(TOP)/@host_os@ @DEFS@
 # DEBUG CXXFLAGS
 #CXXFLAGS      += $(CFLAGS) -Wall -ggdb -pipe -I@x_includes@ \
-#                -I@top_srcdir@ -I./@host_os@ @DEFS@
+#                -I$(TOP) -I$(TOP)/@host_os@ @DEFS@
 # PROFILE CXXFLAGS
 #CXXFLAGS      += $(CFLAGS) -Wall -ggdb -pg -pipe -I@x_includes@ \
-#                -I@top_srcdir@ -I./@host_os@ @DEFS@
+#                -I$(TOP) -I$(TOP)/@host_os@ @DEFS@
 
 #-----------------------------------------------------------------
 # Link flags and libraries
 #-----------------------------------------------------------------
 
 # NORMAL LIBS
-LFLAGS        += -L./@host_os@ -L@x_libraries@
+LFLAGS        += -L$(TOP)/@host_os@ -L@x_libraries@
 LIBS          += -lmeter -lX11 @EXTRALIBS@
 
 # DEBUG LIBS
-#LFLAGS        += -L./@host_os@ -L@x_libraries@ -static
+#LFLAGS        += -L$(TOP)/@host_os@ -L@x_libraries@ -static
 #LIBS          += -lmeter -lX11 @EXTRALIBS@
 
 # PROFILE LIBS
-#LFLAGS        += -L./@host_os@ -L@x_libraries@ -pg
+#LFLAGS        += -L$(TOP)/@host_os@ -L@x_libraries@ -pg
 #LIBS          += -lmeter -lX11 @EXTRALIBS@ -lgmon
 
 #-----------------------------------------------------------------
