@@ -1,5 +1,6 @@
 //  
 // $Id$
+//  Initial port performed by Greg Onufer (exodus@cheers.bungi.com)
 //
 #ifndef _LOADMETER_H_
 #define _LOADMETER_H_

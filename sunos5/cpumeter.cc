@@ -1,5 +1,6 @@
 //  
 // $Id$
+//  Initial port performed by Greg Onufer (exodus@cheers.bungi.com)
 //
 #include "cpumeter.h"
 #include "xosview.h"

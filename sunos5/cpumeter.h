@@ -1,5 +1,6 @@
 //  
 // $Id$
+//  Initial port performed by Greg Onufer (exodus@cheers.bungi.com)
 //
 #ifndef _CPUMETER_H_
 #define _CPUMETER_H_

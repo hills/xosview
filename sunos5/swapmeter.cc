@@ -1,5 +1,6 @@
 //  
 // $Id$
+//  Initial port performed by Greg Onufer (exodus@cheers.bungi.com)
 //
 #include "swapmeter.h"
 #include "xosview.h"
@@ -35,12 +36,6 @@ void SwapMeter::checkResources(void)
 
 void SwapMeter::checkevent(void)
 {
-	static int pass = 0;
-
-	pass = (pass + 1) % 5;
-	if (pass != 0)
-		return;
-  
 	getswapinfo();
 	drawfields();
 }

@@ -1,5 +1,6 @@
 //  
 // $Id$
+//  Initial port performed by Greg Onufer (exodus@cheers.bungi.com)
 //
 #ifndef _MeterMaker_h
 #define _MeterMaker_h

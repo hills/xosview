@@ -1,5 +1,6 @@
 //  
 // $Id$
+//  Initial port performed by Greg Onufer (exodus@cheers.bungi.com)
 //
 #ifndef _MEMMETER_H_
 #define _MEMMETER_H_

@@ -1,5 +1,6 @@
 //  
 // $Id$
+//  Initial port performed by Greg Onufer (exodus@cheers.bungi.com)
 //
 #ifndef _SWAPMETER_H_
 #define _SWAPMETER_H_
