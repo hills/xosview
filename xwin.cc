@@ -53,9 +53,9 @@ void XWin::XWinInit (int argc, char** argv, char* geometry, Xrm* xrm) {
   
   // Set up the default Events
   events_ = NULL;
-  addEvent( new Event( this, ConfigureNotify, configureEvent ) );
-  addEvent( new Event( this, ClientMessage, deleteEvent ) );
-  addEvent( new Event( this, MappingNotify, mappingNotify ) );
+  addEvent( new Event( this, ConfigureNotify, &configureEvent ) );
+  addEvent( new Event( this, ClientMessage, &deleteEvent ) );
+  addEvent( new Event( this, MappingNotify, &mappingNotify ) );
 
   //openDisplay();  //  Done explicitly in xosview.cc.
 }
