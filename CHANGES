@@ -1,5 +1,10 @@
   /*  $Id$  */
 
+Changes since xosview-1.8.1
+
+ - Add an autogen.sh script.  This script runs autoconf to create
+   the configure script.
+
 Changes since xosview-1.8.0
 
 - Update linux port to build with gcc 3.2 and 3.3 (should still work
