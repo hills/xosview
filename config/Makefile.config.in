@@ -22,7 +22,7 @@ CXX           = @CXX@
 #-----------------------------------------------------------------
 
 # Optimized CXXFLAGS
-CXXFLAGS      += $(CFLAGS) -Wall -O4 -pipe -I@x_includes@ \
+CXXFLAGS      += $(CFLAGS) @EXTRA_CXXFLAGS@ -I@x_includes@ \
                 -DXOSVIEW_VERSION=\"$(VERS)\" -I$(TOP) -I$(TOP)/@host_dir@ @DEFS@
 # DEBUG CXXFLAGS
 #CXXFLAGS      += $(CFLAGS) -Wall -ggdb -pipe -I@x_includes@ \

@@ -93,6 +93,7 @@ dnl options / configuration.
 dnl
 case $host_os in
 linux*)   AC_XOSV_LINUX  
+	  AC_GCC_EXTRA_CXXFLAGS
 	  host_dir=linux
           host_os=linux ;;
 ##  Check for known versions of NetBSD...
@@ -102,6 +103,7 @@ dnl    quote characters.
 dnl  This check is ugly.  Maybe it should be hidden away in aclocal?
 dnl    bgrayson 9/96
 netbsd1.[[012345]]*)  AC_XOSV_NETBSD
+  AC_GCC_EXTRA_CXXFLAGS
   ## Check if the network interface supports 64-bit counters.  This
   ## support was committed around 11/19/1999, for 1.4P.
   if test $host_os_full '>' netbsd1.4O ; then
@@ -177,28 +179,39 @@ to autoconf!
     host_os=netbsd ;;
 
 freebsd[[0123]]*) AC_XOSV_FREEBSD
+	AC_GCC_EXTRA_CXXFLAGS
 	dnl AC_MSG_WARN([
 	dnl ])
 	host_dir=bsd
 	host_os=freebsd ;;
 freebsd[[4]]*) AC_XOSV_FREEBSD
+	AC_GCC_EXTRA_CXXFLAGS
 	AC_DEFINE(USE_KVM_GETSWAPINFO)
 	dnl AC_MSG_WARN([
 	dnl ])
 	host_dir=bsd
 	host_os=freebsd ;;
 openbsd*) AC_XOSV_OPENBSD
+	AC_GCC_EXTRA_CXXFLAGS
 	dnl AC_MSG_WARN([
 	dnl ])
 	host_dir=bsd
 	host_os=openbsd ;;
 bsdi*) AC_XOSV_BSDI
+	AC_GCC_EXTRA_CXXFLAGS
 	host_dir=bsd
 	host_os=bsdi ;;
 hpux*)    AC_XOSV_HPUX   
+	  AC_GCC_EXTRA_CXXFLAGS
 	  host_dir=hpux
           host_os=hpux ;;
+irix*)    AC_XOSV_IRIX
+	dnl   Stefan:  Add a statement here that sets EXTRA_CXXFLAGS
+	dnl  appropriately for MipsPro compiler.
+        dnl   Stefan:  Add IRIX host_dir and host_os settings here.
+	;;
 solaris2*)
+	AC_GCC_EXTRA_CXXFLAGS
 	EXTRALIBS="-R$x_libraries -lsocket -lnsl -lkstat $XPMLIB"
 	host_dir=sunos5
 	host_os=sunos5 ;;
@@ -229,6 +242,7 @@ dnl The netbsd and linux ports modify these variables which
 dnl are exported by AC_OUTPUT.
 dnl
 AC_SUBST(BTRYMETER)
+AC_SUBST(EXTRA_CXXFLAGS)
 AC_SUBST(EXTRALIBS)
 AC_SUBST(ELF_LINK_FLAGS)
 AC_SUBST(INSTALL_ARGS)

@@ -53,6 +53,11 @@ AC_DEFINE(LONG_LONG,long)
 fi
 ])dnl
 
+dnl	For gcc-based (or primarily-gcc) OS's, set EXTRA_CXXFLAGS to -Wall -O4 -pipe.
+AC_DEFUN(AC_GCC_EXTRA_CXXFLAGS, [
+	EXTRA_CXXFLAGS="-Wall -O4 -pipe"
+])
+
 AC_DEFUN(SMP_LINUX,
 [
 AC_MSG_CHECKING(for SMP)
@@ -231,4 +236,8 @@ AC_DEFUN(AC_XOSV_HPUX, [
 dnl
 dnl No special config options for HPUX.
 dnl
+])
+
+AC_DEFUN(AC_XOSV_IRIX, [
+	dnl	Nothing special for IRIX yet.
 ])
