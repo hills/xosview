@@ -92,6 +92,9 @@ void XWin::init( int argc, char **argv ){
   setFont();
   setColors();
   getGeometry();
+#ifdef HAVE_XPM
+  doPixmap=getPixmap(&background_pixmap);
+#endif
   
   window_ = XCreateSimpleWindow(display_, DefaultRootWindow(display_), 
 				sizehints_->x, sizehints_->y,
@@ -99,9 +102,6 @@ void XWin::init( int argc, char **argv ){
 				1,
 				fgcolor_, bgcolor_);
 
-#ifdef HAVE_XPM
-  doPixmap=getPixmap(&background_pixmap);
-#endif
 
   setHints( argc, argv );
 
@@ -124,6 +124,12 @@ void XWin::init( int argc, char **argv ){
 	XSetWindowBackgroundPixmap(display_,window_,background_pixmap);
   }
 
+  // Do transparency if requested
+  if(isResourceTrue("transparent"))
+  {
+        XSetWindowBackgroundPixmap(display_,window_,ParentRelative);
+  }         
+  
   // add the events
   Event *tmp = events_;
   while ( tmp != NULL ){
@@ -241,28 +247,28 @@ int XWin::getPixmap(Pixmap *pixmap)
 	XWindowAttributes    root_att;
 	XpmAttributes        pixmap_att;
 
-	if (isResourceTrue("transparent"))
-	{
-		Atom act_type;
-		int act_format;
-		unsigned long nitems, bytes_after;
-		unsigned char *prop = NULL;
-
-		if (XGetWindowProperty(display_, window_,
-		                       XInternAtom (display_, "_XROOTPMAP_ID", True),
-		                       0, 1, False, XA_PIXMAP, &act_type, &act_format,
-		                       &nitems, &bytes_after, &prop) != Success)
-		{
-			cerr << "Unable to get root window pixmap" << endl;
-			cerr << "Defaulting to blank" << endl;
-			pixmap=NULL;
-			return 0; // OOps
-		}
-
-		pixmap = (Pixmap *) prop;
-		XFree (prop);
-		return 1;  // Good, got the pixmap of the root window
-	}
+//	if (isResourceTrue("transparent"))
+//	{
+//		Atom act_type;
+//		int act_format;
+//		unsigned long nitems, bytes_after;
+//		unsigned char *prop = NULL;
+//
+//		if (XGetWindowProperty(display_, window_,
+//		                       XInternAtom (display_, "_XROOTPMAP_ID", True),
+//		                       0, 1, False, XA_PIXMAP, &act_type, &act_format,
+//		                       &nitems, &bytes_after, &prop) != Success)
+//		{
+//			cerr << "Unable to get root window pixmap" << endl;
+//			cerr << "Defaulting to blank" << endl;
+//			pixmap=NULL;
+//			return 0; // OOps
+//		}
+//
+//		pixmap = (Pixmap *) prop;
+//		XFree (prop);
+//		return 1;  // Good, got the pixmap of the root window
+//	}
 
 	pixmap_file = (char*) getResourceOrUseDefault("pixmapName",NULL);
 
