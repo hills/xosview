@@ -21,7 +21,7 @@ public:
   SwapMeter( XOSView *parent );
   ~SwapMeter( void );
 
-  const char *name( void ) { return "SwapMeter"; }  
+  const char *name( void ) const { return "SwapMeter"; }  
   void checkevent( void );
 
   void checkResources( void );

@@ -19,7 +19,7 @@ public:
   CPUMeter( XOSView *parent );
   ~CPUMeter( void );
 
-  const char *name( void ) { return "CPUMeter"; }
+  const char *name( void ) const { return "CPUMeter"; }
   void checkevent( void );
 
   void checkResources( void );

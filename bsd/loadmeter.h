@@ -20,7 +20,7 @@ public:
   LoadMeter( XOSView *parent );
   ~LoadMeter( void );
 
-  const char *name( void ) { return "LoadMeter"; }  
+  const char *name( void ) const { return "LoadMeter"; }  
   void checkevent( void );
 
   void checkResources( void );
