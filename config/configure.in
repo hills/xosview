@@ -59,9 +59,11 @@ netbsd*)  AC_MSG_WARN([
 to autoconf!
   Thanks!
 *******************************************
-]); AC_XOSV_NETBSD ;;
+]); AC_XOSV_NETBSD 
+    host_os=netbsd ;;
 
-hpux)    AC_XOSV_HPUX   ;;
+hpux*)    AC_XOSV_HPUX   
+          host_os=hpux ;;
 *)       AC_MSG_ERROR([xosview has not been ported to $host_os :(.  Sorry.]) ;;
 esac
 
