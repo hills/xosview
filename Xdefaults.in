@@ -145,8 +145,8 @@ xosview*batteryPriority:  50
 ! Disk Meter Resources
 
 xosview*disk:		True
-xosview*diskUsedColor:	yellow
-xosview*diskIdleColor:	black
+xosview*diskUsedColor:	seagreen
+xosview*diskIdleColor:	aquamarine
 xosview*diskPriority:	10
 xosview*diskDecay:	True
 xosview*diskUsedFormat: autoscale
