@@ -183,7 +183,7 @@ void NetMeter::checkeventNew(void)
 	      }
 	}
 
-    float t = 1000000.0 / _timer.report();
+    float t = 1000000.0 / _timer.report_usecs();
 
     if (t < 0)
         t = 0.1;
@@ -273,7 +273,7 @@ void NetMeter::checkeventOld(void)
         }
     else 
         {  
-        float t = 1000000.0 / _timer.report();
+        float t = 1000000.0 / _timer.report_usecs();
 
         if (t < 0)  // can happen when system clock is reset. (ntp, timed, etc)
             t = 0.1;
