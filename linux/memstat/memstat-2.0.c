@@ -120,7 +120,7 @@ void si_memstat(memstat *val)
                 val->total++;
                 if (mem_map[i].count) {
                         val->used++;
-                        if (mem_map[i].count > 1)
+                        if (mem_map[i].count > (mem_map[i].inode ? 2 : 1))
                                 val->shared++;
                         else
                                 val->one_count++;

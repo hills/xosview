@@ -115,7 +115,8 @@ void si_memstat(memstat *val)
 		val->total++;
 		if (atomic_read(&mem_map[i].count)) {
 			val->used++;
-			if (atomic_read(&mem_map[i].count) > 1)
+                        if (atomic_read(&mem_map[i].count) 
+                          > (mem_map[i].inode ? 2 : 1))
 				val->shared++;
 			else
 				val->one_count++;
