@@ -102,11 +102,11 @@ dnl    according to GNU m4 and autoconf, [ and ] are the
 dnl    quote characters.
 dnl  This check is ugly.  Maybe it should be hidden away in aclocal?
 dnl    bgrayson 9/96
-netbsd1.[[012345]]*)  AC_XOSV_NETBSD
+netbsd1.[[012345]]*|netbsdelf1.[[5]]*)  AC_XOSV_NETBSD
   AC_GCC_EXTRA_CXXFLAGS
   ## Check if the network interface supports 64-bit counters.  This
   ## support was committed around 11/19/1999, for 1.4P.
-  if test $host_os_full '>' netbsd1.4O ; then
+  if test $host_os_full '>' netbsd1.4O  -o $host_os_full '>' netbsdelf1.4O ; then
     AC_DEFINE(NETBSD_64BIT_IFACE_CTRS)
   fi
 
@@ -130,7 +130,7 @@ EOF
 
   *Enabling* UVM -- 'UVM=' found in /etc/mk.conf.
   If this is in error, remove the define of UVM=1 from CXXFLAGS
-  in Makefile.config, and mail bgrayson@ece.utexas.edu that
+  in Makefile.config, and mail bgrayson@netbsd.org that
   the autoconf script didn't work properly.
     ])
   else
@@ -141,7 +141,7 @@ EOF
       AC_DEFINE(UVM)
       AC_MSG_WARN([*Enabling* UVM -- 'uvm_sysctl' symbol found in /netbsd.
   If this is in error, remove the define of UVM=1 from CXXFLAGS
-  in Makefile.config, and mail bgrayson@ece.utexas.edu that
+  in Makefile.config, and mail bgrayson@netbsd.org that
   the autoconf script didn't work properly.
   ])
     else
@@ -149,7 +149,7 @@ EOF
 
     *Disabling* UVM -- 'UVM=' not found in /etc/mk.conf.
     If this is in error, add -DUVM=1 to CXXFLAGS in
-    Makefile.config, and please mail bgrayson@ece.utexas.edu that
+    Makefile.config, and please mail bgrayson@netbsd.org that
     the autoconf script did not work properly.
     ])
     fi
@@ -167,8 +167,9 @@ netbsd*)  AC_MSG_WARN([
     netbsd1.2
     netbsd1.3
     netbsd1.4
+    netbsd1.5 / netbsdelf1.5
   If it works for version $host_os, please send mail to:
-	bgrayson@ece.utexas.edu.
+	bgrayson@netbsd.org
   If this message is in error, also notify bgrayson -- we're new
 to autoconf!
   Thanks!
