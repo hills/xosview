@@ -71,14 +71,20 @@ AC_CHECK_HEADER(linux/modversions.h, [USE_MOD_VERSIONS=-DMODVERSIONS])
 INSTALL_ARGS='-s -m 4755'
 fi
 ,
-MEMSTAT=MemStat
 AC_SYS_LINUX_VERS
-echo "enabled  the Linux $LVERSION memstat module by default"
+if test "$LVERSION" = "2.0"
+then
+        MEMSTAT=MemStat
+        echo "enabled  the Linux $LVERSION memstat module by default"
 dnl
 dnl If this module is to be built then check to see if we can
 dnl use MODVERSIONS.
 dnl
-AC_CHECK_HEADER(linux/modversions.h, [USE_MOD_VERSIONS=-DMODVERSIONS])
+        AC_CHECK_HEADER(linux/modversions.h, [USE_MOD_VERSIONS=-DMODVERSIONS])
+else
+        MEMSTAT=
+        echo "disabled the Linux $LVERSION memstat module by default"
+fi
 )
 INSTALL_ARGS='-s -m 4755'
 ])
