@@ -161,10 +161,13 @@ esac
 dnl
 dnl  Now check all the NetBSD ones for the new swapctl() function.
 dnl  I don't know what the status of this is for OpenBSD folks.  Anyone?
+dnl  Also look for battery-meter support.
 dnl
 case $host_os in
 netbsd)
   AC_CHECK_FUNCS(swapctl) 
+  BTRYMETER=btrymeter.o
+  AC_DEFINE(HAVE_BATTERY_METER)
   ;;
 esac
 
@@ -172,6 +175,7 @@ dnl
 dnl The netbsd and linux ports modify these variables which
 dnl are exported by AC_OUTPUT.
 dnl
+AC_SUBST(BTRYMETER)
 AC_SUBST(EXTRALIBS)
 AC_SUBST(INSTALL_ARGS)
 AC_SUBST(MEMSTAT)

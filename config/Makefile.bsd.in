@@ -11,6 +11,7 @@ CXXFLAGS += -I@top_srcdir@
 
 OBJS = \
 MeterMaker.o \
+@BTRYMETER@ \
 cpumeter.o \
 memmeter.o \
 swapmeter.o \
