@@ -25,7 +25,6 @@
 #include <sys/sysctl.h>
 #include <vm/vm_param.h>
 #ifdef XOSVIEW_FREEBSD
-#warning "Quick hack for FreeBSD -- fix later."
 #include <sys/vmmeter.h>
 #endif
 #include <stdlib.h>		//  For atoi().  BCG
@@ -61,7 +60,7 @@ void MemMeter::checkevent( void ){
 }
 
 void MemMeter::getmeminfo (void) {
-//  Begin NetBSD-specific code...
+//  Begin *BSD-specific code...
   struct vmtotal meminfo;
   int params[] = {CTL_VM, VM_METER};
   unsigned meminfosize = sizeof (struct vmtotal);
@@ -73,7 +72,7 @@ void MemMeter::getmeminfo (void) {
   fields_[2] = 4096*meminfo.t_rmshr;
   fields_[1] = 4096*(meminfo.t_rm - meminfo.t_arm - meminfo.t_rmshr);
   fields_[0] = 4096*meminfo.t_arm;
-//  End NetBSD-specific code...
+//  End *BSD-specific code...
 
   setUsed (total_ - fields_[FREE_INDEX], total_);
 }
