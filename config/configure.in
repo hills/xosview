@@ -56,6 +56,9 @@ AC_SUBST(AUTODEPRULE)
 AC_SUBST(AUTODEPRULE_SUBDIR)
 AC_SUBST(AUTODEPEND)
 
+dnl  Check for library Xpm (main is defined in the test program.  Sneaky...)
+AC_CHECK_LIB(Xpm, main,AC_DEFINE(HAVE_XPM) XPMLIB=-lXpm)
+
 dnl
 dnl Call each ports macro so that it can set up its own 
 dnl options / configuration.
@@ -139,7 +142,7 @@ hpux*)    AC_XOSV_HPUX
 	  host_dir=hpux
           host_os=hpux ;;
 solaris2*)
-	EXTRALIBS='-lsocket -lnsl -lkstat'
+	EXTRALIBS='-lsocket -lnsl -lkstat XPMLIB'
 	host_dir=sunos5
 	host_os=sunos5 ;;
 *)       AC_MSG_ERROR([xosview has not been ported to $host_os :(.  Sorry.]) ;;
