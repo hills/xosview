@@ -1,4 +1,8 @@
   /*  $Id$  */
+Changes since xosview-1.7.0
+  Optimised scrolling graph to use XCopyArea.
+  Fixes to linux diskmeter.
+  
 Changes since xosview-1.6.2
   Added a linux diskmeter which *should* be similar to the BSD version
     but which also differentiates between reading and writing. Linux 
