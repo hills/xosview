@@ -20,7 +20,7 @@
 #endif
 
 static const char NAME[] = "xosview@";
-static const char versionString[] = "xosview 1.4.0";
+#include "version.cc"
 
 CVSID("$Id$");
 CVSID_DOT_H(XOSVIEW_H_CVSID);
