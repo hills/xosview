@@ -55,9 +55,9 @@ void BitMeter::drawBits( int manditory ){
 
   for ( int i = 0 ; i < numbits_ ; i++ ){
     if ( i != (numbits_ - 1) )
-      x2 = x_ + ((i + 1) * width_) / numbits_ - 1;
+      x2 = x_ + ((i + 1) * (width_+1)) / numbits_ - 1;
     else
-      x2 = x_ + width_ - 1;
+      x2 = x_ + (width_+1) - 1;
     
     if ( (bits_[i] != lastbits_[i]) || manditory ){
       if ( bits_[i] && pass )
@@ -75,14 +75,10 @@ void BitMeter::drawBits( int manditory ){
 }
 
 void BitMeter::draw( void ){
-  parent_->lineWidth( 2 );
+  parent_->lineWidth( 1 );
   parent_->setForeground( parent_->foreground() );
-  parent_->drawRectangle( x_ - 1, y_ - 1, width_ + 1, height_ + 1 );
+  parent_->drawFilledRectangle( x_ -1, y_ - 1, width_ + 2, height_ + 1 );
 
-  for ( int i = 1 ; i < numbits_ ; i++ ){
-    int x = x_ + (i * width_) / numbits_;
-    parent_->drawLine( x, y_, x, y_ + height_ );
-  }
   parent_->lineWidth( 0 );
 
   if ( dolegends_ ){
