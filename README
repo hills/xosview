@@ -15,7 +15,7 @@
     than 2.7.0 may fail to build xosview.  Please see the README file for
     your the platform you are building on for further details.
 
-    edit Makefile.config for your setup, if you wish to change
+    Edit Makefile.config for your setup, if you wish to change
     anything from the default settings, such as the optimization
     flags.  This of course, should be done before one runs make.
 

@@ -89,12 +89,12 @@ to me at bgrayson@ece.utexas.edu.
     aficionados.  
     
   Stipple support:
-    Also, NetBSD-mac68k people that have monochrome systems may want to try
-      out the new stipple code -- set the enableStipple resource to true,
-      and choose black and white for the various fields.  The fields are
-      automatically stippled 100%, 75%, 50%, and 25% in a fixed fashion
-      (future versions may allow the user to specify the stipple
-      percentage).
+    Also, NetBSD-mac68k people (and others) that have monochrome systems
+      may want to try out the new stipple code -- set the enableStipple
+      resource to true, and choose black and white for the various
+      fields.  The fields are automatically stippled 100%, 75%, 50%, and
+      25% in a fixed fashion (future versions may allow the user to
+      specify the stipple percentage).
 
     Some resources were included with the xosview source code to allow
       an easy example.  Type 'xrdb -merge Xdefaults.stipple', followed
