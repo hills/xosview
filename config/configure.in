@@ -20,7 +20,9 @@ dnl  This is _very_ ugly.  First, we set it to /usr/X11, and then
 dnl if /usr/X11R6 exists, we change ac_default_prefix BEHIND
 dnl autoconf's BACK!
 AC_PREFIX_DEFAULT(/usr/X11)
-if test -e /usr/X11R6 ; then
+dnl  For Solaris, simply test for it being readable, and not
+dnl  merely existence.
+if test -r /usr/X11R6 ; then
   dnl echo "Using /usr/X11R6 as default base for install."
   ac_default_prefix=/usr/X11R6
 fi
@@ -179,7 +181,7 @@ hpux*)    AC_XOSV_HPUX
 	  host_dir=hpux
           host_os=hpux ;;
 solaris2*)
-	EXTRALIBS='-lsocket -lnsl -lkstat XPMLIB'
+	EXTRALIBS="-lsocket -lnsl -lkstat $XPMLIB"
 	host_dir=sunos5
 	host_os=sunos5 ;;
 *)       AC_MSG_ERROR([xosview has not been ported to $host_os :(.  Sorry.]) ;;
