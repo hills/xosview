@@ -13,3 +13,6 @@ NetBSDInitSwapInfo();
 
 void
 NetBSDGetSwapInfo(int* total, int* free);
+
+void
+NetBSDGetSwapCtlInfo(int* total, int* free);

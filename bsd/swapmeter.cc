@@ -20,6 +20,7 @@
 
 #include "swapinternal.h"
 #include "netbsd.h"
+#include <err.h>			//  For warnx.  BCG
 #include <stdlib.h>		//  For atoi().  BCG
 
 CVSID("$Id$");
@@ -27,8 +28,26 @@ CVSID_DOT_H(SWAPMETER_H_CVSID);
 
 SwapMeter::SwapMeter( XOSView *parent )
 : FieldMeterDecay( parent, 2, "SWAP", "USED/FREE" ){
+#ifdef HAVE_SWAPCTL
+  useSwapCtl = 0;
+#endif
   NetBSDSwapInit();	//  In netbsd.cc
-  NetBSDInitSwapInfo();	//  In swapinternal.cc
+  if (!NetBSDInitSwapInfo())
+  {
+#ifdef HAVE_SWAPCTL
+    //  Set up to use new swap code instead.
+    useSwapCtl = 1;
+#else
+  warnx("The kernel does not seem to have the symbols needed for the\n"
+  "SwapMeter.  If your kernel is newer than 1.2F, but xosview was\n"
+  "compiled on an older system, then recompile xosview and it \n"
+  "will automatically adjust to using swapctl() when needed.\n"
+  "\nIf this is not the case (kernel before version 1.2G), make sure the\n"
+  "running kernel is /netbsd, or use the -N flag for xosview to specify\n"
+  "an alternate kernel file.\n"
+  "\nThe SwapMeter has been disabled.\n");
+#endif
+  }
 }
 
 SwapMeter::~SwapMeter( void ){
@@ -52,7 +71,13 @@ void SwapMeter::checkevent( void ){
 void SwapMeter::getswapinfo( void ){
   int total_int, free_int;
 
-  NetBSDGetSwapInfo (&total_int, &free_int);
+#ifdef HAVE_SWAPCTL
+  if (useSwapCtl)
+    NetBSDGetSwapCtlInfo(&total_int, &free_int);
+  else
+#endif
+    NetBSDGetSwapInfo (&total_int, &free_int);
+
   total_ = total_int;
   if ( total_ == 0 )
     total_ = 1;	/*  We don't want any division by zero, now, do we?  :)  */

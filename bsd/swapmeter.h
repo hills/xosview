@@ -32,6 +32,9 @@ protected:
 
   void getswapinfo( void );
 private:
+#ifdef HAVE_SWAPCTL
+  int useSwapCtl;
+#endif
 };
 
 

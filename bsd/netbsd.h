@@ -49,6 +49,11 @@ NetBSDGetNetInOut (long long * inbytes, long long * outbytes);
 int
 NetBSDSwapInit();
 
+#ifdef HAVE_SWAPCTL
+void
+NetBSDGetSwapCtlInfo(int* total, int* free);
+#endif
+
 int
 NetBSDDiskInit();
 
