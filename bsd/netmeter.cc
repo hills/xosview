@@ -69,12 +69,21 @@ void NetMeter::checkevent( void ){
 
 //  The BSDGetNetInOut() function is in kernel.cc    BCG
   BSDGetNetInOut (&nowBytesIn, &nowBytesOut);
+  long long correction = 0x10000000;
+  correction *= 0x10;
+  /*  Deal with 32-bit wrap by making last value 2^32 less.  Yes,
+   *  this is a better idea than adding to nowBytesIn -- the
+   *  latter would only work for the first wrap (1+2^32 vs. 1)
+   *  but not for the second (1+2*2^32 vs. 1) -- 1+2^32 -
+   *  (1+2^32) is still too big.  */
+  if (nowBytesIn < _lastBytesIn) _lastBytesIn -= correction;
+  if (nowBytesOut < _lastBytesOut) _lastBytesOut -= correction;
   float t = (1e6) / IntervalTimeInMicrosecs();
   fields_[0] = (float)(nowBytesIn - _lastBytesIn) * t;
   _lastBytesIn = nowBytesIn;
   fields_[1] = (float)(nowBytesOut - _lastBytesOut) * t;
   _lastBytesOut = nowBytesOut;
-//  End NetBSD-specific code.  BCG
+//  End BSD-specific code.  BCG
 
   adjust();
   fields_[2] = total_ - fields_[0] - fields_[1];
