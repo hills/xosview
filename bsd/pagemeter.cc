@@ -44,7 +44,7 @@ void PageMeter::checkResources( void ){
   setfieldcolor( 1, parent_->getResource("pageOutColor") );
   setfieldcolor( 2, parent_->getResource("pageIdleColor") );
   priority_ = atoi (parent_->getResource("pagePriority"));
-  dodecay_ = !strcmp (parent_->getResource("pageDecay"),"True");
+  dodecay_ = !strncasecmp (parent_->getResource("pageDecay"),"True", 5);
   SetUsedFormat (parent_->getResource("pageUsedFormat"));
 }
 

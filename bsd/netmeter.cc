@@ -43,7 +43,7 @@ void NetMeter::checkResources( void ){
   setfieldcolor( 1, parent_->getResource("netOutColor") );
   setfieldcolor( 2, parent_->getResource("netBackground") );
   priority_ = atoi (parent_->getResource("netPriority") );
-  dodecay_ = !strcmp (parent_->getResource("netDecay"),"True");
+  dodecay_ = !strncasecmp (parent_->getResource("netDecay"),"True", 5);
   SetUsedFormat (parent_->getResource("netUsedFormat"));
 }
 

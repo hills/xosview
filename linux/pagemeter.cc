@@ -36,7 +36,7 @@ void PageMeter::checkResources( void ){
   setfieldcolor( 2, parent_->getResource( "pageIdleColor" ) );
   priority_ = atoi (parent_->getResource( "pagePriority" ) );
   maxspeed_ *= priority_ / 10.0;
-  dodecay_ = !strcmp (parent_->getResource( "pageDecay" ), "True" );
+  dodecay_ = !strncasecmp (parent_->getResource( "pageDecay" ), "True", 5 );
   SetUsedFormat (parent_->getResource("pageUsedFormat"));
 }
 
@@ -57,7 +57,7 @@ void PageMeter::getpageinfo( void ){
 
   do {
     stats >>buf;
-  } while (strcmp(buf, "swap"));
+  } while (strncasecmp(buf, "swap", 5));
 	  
   stats >>pageinfo_[pageindex_][0] >>pageinfo_[pageindex_][1];
 
