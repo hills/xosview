@@ -10,7 +10,7 @@ AC_DEFUN(AC_SYS_LINUX_VERS,[[
 changequote(<<, >>)
 <<
 LVERSION=`uname -r`
-LVERSION=`/bin/expr $LVERSION : '\([0-9]*\.[0-9]*\)'`
+LVERSION=`expr $LVERSION : '\([0-9]*\.[0-9]*\)'`
 >>
 changequote([, ])
 ]])
