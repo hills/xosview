@@ -72,7 +72,7 @@ int RAIDMeter::find1(char *key, char *findwhat, int num1){
   char buf[80];
   int rc;
   ostrstream os(buf, 80);
-  os << findwhat << "." << numl << ends;
+  os << findwhat << "." << num1 << ends;
   rc=!strncmp(buf,key, 80);
   return rc;
 }
@@ -81,7 +81,7 @@ int RAIDMeter::find2(char *key, char *findwhat, int num1, int num2){
   char buf[80];
   int rc;
   ostrstream os(buf, 80);
-  os << findwhat << "." << numl << "." << num2 << ends;
+  os << findwhat << "." << num1 << "." << num2 << ends;
   rc=!strncmp(buf,key, 80);
   return rc;
 }
