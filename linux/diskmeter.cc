@@ -73,6 +73,7 @@ void DiskMeter::getdiskinfo( void )
     // assume each "unit" is 1k. 
     // This is true for ext2, but seems to be 512 bytes 
     // for vfat and 2k for cdroms
+    // work in 512-byte blocks
     
     // tw: strange, on my system, a ext2fs (read and write)
     // unit seems to be 2048. kernel 2.2.12 and the file system
@@ -81,17 +82,25 @@ void DiskMeter::getdiskinfo( void )
     // So this is a FIXME - but how ???
     
     float itim = IntervalTimeInMicrosecs();
-    unsigned long read_curr = one * 1024;  // FIXME!
-    unsigned long write_curr = two * 1024; // FIXME!
+    unsigned long read_curr = one * 2;  // FIXME!
+    unsigned long write_curr = two * 2; // FIXME!
 
     // avoid strange values at first call
     if(read_prev_ == 0) read_prev_ = read_curr;
     if(write_prev_ == 0) write_prev_ = write_curr;
     
     // calculate rate in bytes per second
-    fields_[0] = ((read_curr - read_prev_) * 1e6) / itim;
-    fields_[1] = ((write_curr - write_prev_) * 1e6) / itim;
+    fields_[0] = ((read_curr - read_prev_) * 1e6 * 512) / 
+      IntervalTimeInMicrosecs();
+    fields_[1] = ((write_curr - write_prev_) * 1e6 * 512) / 
+      IntervalTimeInMicrosecs();
 
+    // fix overflow (conversion bug?)
+    if (fields_[0] < 0.0)
+        fields_[0] = 0.0;
+    if (fields_[1] < 0.0)
+        fields_[1] = 0.0;
+    
     if (fields_[0] + fields_[1] > total_)
        	total_ = fields_[0] + fields_[1];
 

@@ -52,6 +52,29 @@ To install xosview:
         If you are running one of these kernels, xosview will use this 
         information and you will not need to read further in this section.
 
+	NOTE (2.1+ series kernels): /proc/net/dev has the downside of
+	logging ANY packet passing on your interface, regardless of its
+	destination/source. This causes the network meter to report
+	non-zero traffic even if there are no in/outbound packets from the
+	machine. Ipchains provides a way to solve this, but it requires
+	xosview to access /proc/net/ip_fwchains, which requires root
+	privileges (i.e. it's bad).  If xosview is installed setuid root
+	it can access the ip_fwchains file: it'll then scan it for two
+	chains named "iacct" and "oacct" to determine traffic.
+	The chains are created with the following commands (you must
+	be root to execute this), where YOUR-IP is either your ip or
+	your hostname:
+
+ipchains -N iacct
+ipchains -N oacct
+ipchains -A iacct -s \! YOUR-IP -d YOUR-IP
+ipchains -A oacct -s YOUR-IP -d \! YOUR-IP
+ipchains -A input -j iacct
+ipchains -A output -j oacct
+
+	(these rules will also eliminate any traffic from your machine
+	to your machine).
+
         If you are running an older 2.1 or 2.0 kernel then you must setup
         ipaccounting to get the information for xosview.  In order for this 
         new network meter to function you must do the following for older

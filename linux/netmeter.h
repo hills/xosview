@@ -31,6 +31,7 @@ private:
   Timer _timer;
   unsigned long _lastBytesIn, _lastBytesOut;
   char *_netfilename;
+  bool _usechains;
   int _bytesInDev;
 
   void adjust(void);

@@ -47,6 +47,7 @@ NetMeter::NetMeter( XOSView *parent, float max )
   _timer.start();
   maxpackets_ = max;
   _lastBytesIn = _lastBytesOut = 0;
+  _usechains = false;
 
   checkOSVersion();
 }
@@ -63,18 +64,41 @@ void NetMeter::checkOSVersion(void)
         cerr <<"Can not open file : " << "/proc/sys/kernel/osrelease" <<endl;
         exit(1);
         }
-
+    
     int major, minor;
     _bytesInDev = 0;
     ifs >> major;
     ifs.ignore(1);
     ifs >> minor;
     ifs.ignore(1);
-
+    
     if (major > 2 || (major == 2 && minor >= 1))
         {
-        _netfilename = "/proc/net/dev";
-        _bytesInDev = 1;
+	// check presence of iacct and oacct chains
+        ifstream chains("/proc/net/ip_fwchains");
+	int n = 0;
+	char buf[1024];
+        
+        while (chains && !chains.eof())
+            {
+            chains >> buf;
+            chains.ignore(1024, '\n');
+            
+            if (!strcmp(buf, "iacct"))
+                n |= 1;
+            if (!strcmp(buf, "oacct"))
+                n |= 2;
+            }
+
+	if (n == 3)
+            {
+            _netfilename = "/proc/net/ip_fwchains";
+            _usechains = true;
+            }
+	else
+            _netfilename = "/proc/net/dev";
+
+	_bytesInDev = 1;
         }
     else
         _netfilename = "/proc/net/ip_acct";
@@ -120,28 +144,44 @@ void NetMeter::checkeventNew(void)
 
     unsigned long in, out, ig;
     unsigned long totin = 0, totout = 0;
+    char buf[1024];
     
     fields_[2] = maxpackets_;     // assume no
     fields_[0] = fields_[1] = 0;  // network activity
 
     _timer.stop();
 
-    ifs.ignore(1024, '\n');
-    ifs.ignore(1024, '\n');
-
-    while (!ifs.eof())
+    if (_usechains)
+      while (!ifs.eof())
         {
-        ifs.ignore(1024, ':');
-        ifs >> in >> ig >> ig >> ig >> ig >> ig >> ig >> ig >> out;
+	ifs >> buf;
 
-        if (!ifs.eof())
-            {
-            totin += in;
-            totout += out;
-            }
+	if (!strcmp(buf, "iacct")) 
+	  ifs >> buf >> buf >> ig >> ig >> ig >> ig >> ig >> ig >> totin;
+	else if (!strcmp(buf, "oacct")) 
+	  ifs >> buf >> buf >> ig >> ig >> ig >> ig >> ig >> ig >> totout;
 
-        ifs.ignore(1024, '\n');
+	ifs.ignore(1024, '\n');
         }
+    else
+        {
+	  ifs.ignore(1024, '\n');
+	  ifs.ignore(1024, '\n');
+
+	  while (!ifs.eof())
+	      {
+	      ifs.ignore(1024, ':');
+	      ifs >> in >> ig >> ig >> ig >> ig >> ig >> ig >> ig >> out;
+
+	      if (!ifs.eof())
+		  {
+		  totin += in;
+		  totout += out;
+		  }
+
+	      ifs.ignore(1024, '\n');
+	      }
+	}
 
     float t = 1000000.0 / _timer.report();
 
