@@ -142,30 +142,6 @@ display a meter that will shows network usage, with a maximum bandwidth of
 not be displayed.
 .RE
 
-+serial1
-.RE
-+serial2
-.RE
-+serial3
-.RE
-+serial4
-.RS
-These options override the the appropriate xosview*serial{\fBi\fP} resource.  
-They are equivalent to setting xosview*serial{\fBi\fP} to "True".
-.RE
-
--serial1
-.RE
--serial2
-.RE
--serial3
-.RE
--serial4
-.RS
-These options override the the appropriate xosview*serial{\fBi\fP} resource.  
-They are equivalent to setting xosview*serial{\fBi\fP} to "False".
-.RE
-
 -xrm \fIresource_string\fP
 .RS
 This switch allows any of xosview's resources to be set on the command line.
@@ -521,24 +497,13 @@ state.
 
 \fBSerial Meter Resources\fP
 
-xosview*serial1: (True or False)
+xosview*serial(0-9): (True, False, or portBase)
 .RS
-If True then xosview will display a serial meter for cua0.
-.RE
-
-xosview*serial2: (True or False)
-.RS
-If True then xosview will display a serial meter for cua1.
-.RE
-
-xosview*serial3: (True or False)
-.RS
-If True then xosview will display a serial meter for cua2.
-.RE
-
-xosview*serial4: (True or False)
-.RS
-If True then xosview will display a serial meter for cua3.
+If True then xosview will display a serial meter for ttySx.  The
+portbase will be autodetected.  Because autodetection can fail, (if
+the port is locked by ppp/slip for example) you can specify the
+portbase instead of "True".  If a portBase is used then xosview will use
+it instead of trying to autodetect.
 .RE
 
 xosview*serialOnColor: \fIcolor\fP
@@ -638,6 +603,11 @@ Originator of the loadmeter.
 Massimiliano Ghilardi ( ghilardi@cibs.sns.it )
 .RS
 Linux pagemeter.
+.RE
+
+Carsten Schabacker (cschaba@spock.central.de)
+.RS
+Made extensions to the serial-meter.
 .RE
 
 And many others who have sent in small fixes and improvements.

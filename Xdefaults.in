@@ -98,7 +98,14 @@ xosview*netUsedFormat:	  autoscale
 !!!  Linux-only meters
 !!!
 ! Serial Meter Resources
+! set 'True' for autodetection or give the baseaddress
+!   (autodetection may fail sometimes, if
+!    the port is locked by ppp/slip for example)
 
+!xosview*serial0: 0x3f8
+!xosview*serial1: 0x2f8
+!xosview*serial2: 0x3e8
+!xosview*serial3: 0x2e8
 xosview*serial0: False
 xosview*serial1: False
 xosview*serial2: False
