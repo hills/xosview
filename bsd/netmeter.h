@@ -29,7 +29,7 @@ public:
 
   void checkResources( void );
 protected:
-  float maxpackets_;
+  float netBandwidth_;
 
 private:
   Host *_thisHost;

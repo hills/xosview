@@ -25,7 +25,8 @@ CVSID_DOT_H3(TIMEVAL_H_CVSID);
 NetMeter::NetMeter( XOSView *parent, float max )
   : FieldMeterDecay( parent, 3, "NET", "IN/OUT/IDLE" ){
   _timer.start();
-  maxpackets_ = max;
+  netBandwidth_ = max;
+  total_ = netBandwidth_;
   _lastBytesIn = _lastBytesOut = 0;
   NetBSDGetNetInOut (&_lastBytesIn, &_lastBytesOut);
 
@@ -51,7 +52,11 @@ void NetMeter::checkResources( void ){
 
 void NetMeter::checkevent( void ){
   _timer.stop();
-  total_ = maxpackets_;
+
+//  Reset total_ to expected maximum.  If it is too low, it
+//  will be adjusted in adjust().  bgrayson
+  total_ = netBandwidth_;
+
   fields_[0] = fields_[1] = 0;
 
 //  Begin NetBSD-specific code.  BCG
