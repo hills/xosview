@@ -9,6 +9,8 @@
 #ifndef _TIMER_H_
 #define _TIMER_H_
 
+#define TIMER_H_CVSID "$Id$"
+
 //
 //                 General purpose interval timer class
 //

@@ -9,6 +9,8 @@
 #ifndef __LLIST_H__
 #define __LLIST_H__
 
+#define LLIST_H_CVSID "$Id$"
+
 #include <stdio.h>
 
 #define MAXCURR 4    //  number of 'current' pointers

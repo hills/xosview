@@ -9,6 +9,8 @@
 #ifndef _pllist_h
 #define _pllist_h
 
+#define PLLIST_H_CVSID "$Id$"
+
 #include "llist.h"
 
 //-------------------------------------------------------------------------
