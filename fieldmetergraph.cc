@@ -24,7 +24,11 @@
 //   5.  Make the checkResources () function in the meter set the 
 //	 useGraph_ variable according to the, e.g., xosview*cpuGraph resource.
 
+#ifdef HAVE_FSTREAM
+#include <fstream>
+#else
 #include <fstream.h>
+#endif
 #include <math.h>		//  For fabs()
 #include "general.h"
 #include "fieldmeter.h"

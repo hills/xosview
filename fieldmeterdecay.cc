@@ -26,7 +26,16 @@
 //   4.  Make the checkResources () function in the meter set the 
 //	 dodecay_ variable according to the, e.g., xosview*cpuDecay resource.
 
+#ifdef HAVE_IOSTREAM
+#include <iostream>
+#else
+#include <iostream.h>
+#endif
+#ifdef HAVE_FSTREAM
+#include <fstream>
+#else
 #include <fstream.h>
+#endif
 #include <math.h>		//  For fabs()
 #include "general.h"
 #include "fieldmeter.h"
@@ -116,9 +125,9 @@ void FieldMeterDecay::drawfields( int manditory ){
     twidth = (int) (0.5 + (width_ * (float) fields_[i]) / total_); 
     decaytwidth = (int) (0.5 + width_ * decay_[i]);
     if (decaytwidth < 0.0) {
-        cerr << "Error:  FieldMeterDecay " << name() << ":  decaytwidth of ";
-        cerr << decaytwidth << ", width of " << width_ << ", decay_[" << i;
-        cerr << "] of " << decay_[i] << endl;
+        std::cerr << "Error:  FieldMeterDecay " << name() << ":  decaytwidth of ";
+        std::cerr << decaytwidth << ", width of " << width_ << ", decay_[" << i;
+        std::cerr << "] of " << decay_[i] << std::endl;
     }
 
     //  However, due to rounding, we may have gone one
@@ -142,13 +151,13 @@ void FieldMeterDecay::drawfields( int manditory ){
       //    Let's correct for that here.
     if ( manditory || (twidth != lastvals_[i]) || (x != lastx_[i]) ){
       if (!checkX(x, twidth))
-        cerr <<__FILE__ << ":" << __LINE__ <<endl;
+        std::cerr <<__FILE__ << ":" << __LINE__ <<std::endl;
       parent_->drawFilledRectangle( x, y_, twidth, halfheight );
     }
 
     if ( manditory || (decay_[i] != lastDecayval_[i]) ){
       if (!checkX(decayx, decaytwidth))
-        cerr <<__FILE__ << ":" << __LINE__ <<endl;
+        std::cerr <<__FILE__ << ":" << __LINE__ <<std::endl;
       parent_->drawFilledRectangle( decayx, y_+halfheight+1,
             decaytwidth, height_ - halfheight-1);
     }

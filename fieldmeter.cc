@@ -6,7 +6,16 @@
 //
 // $Id$
 //
+#ifdef HAVE_IOSTREAM
+#include <iostream>
+#else
+#include <iostream.h>
+#endif
+#ifdef HAVE_FSTREAM
+#include <fstream>
+#else
 #include <fstream.h>
+#endif
 #include <stdlib.h>
 #include "snprintf.h"
 #include "general.h"
@@ -40,6 +49,9 @@ FieldMeter::disableMeter ( )
   setNumFields(1);
   setfieldcolor (0, "gray");
   Meter::legend ("Disabled");
+  // And specify the total of 1.0, so the meter is grayed out.
+  total_ = 1.0;
+  fields_[0] = 1.0;
 }
 
 
@@ -302,14 +314,14 @@ void FieldMeter::setNumFields(int n){
 bool FieldMeter::checkX(int x, int width) const {
   if ((x < x_) || (x + width < x_)
       || (x > x_ + width_) || (x + width > x_ + width_)){
-    cerr << "FieldMeter::checkX() : bad horiz values for meter : "
-         << name() << endl;
+    std::cerr << "FieldMeter::checkX() : bad horiz values for meter : "
+         << name() << std::endl;
 
-    cerr <<"value "<<x<<", width "<<width<<", total_ = "<<total_<<endl;
+    std::cerr <<"value "<<x<<", width "<<width<<", total_ = "<<total_<<std::endl;
 
     for (int i = 0 ; i < numfields_ ; i++)
-      cerr <<"fields_[" <<i <<"] = " <<fields_[i] <<",";
-    cerr <<endl;
+      std::cerr <<"fields_[" <<i <<"] = " <<fields_[i] <<",";
+    std::cerr <<std::endl;
 
     return false;
   }
