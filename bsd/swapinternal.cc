@@ -8,6 +8,8 @@
 //
 // $Id$
 //
+//  NOTE THAT THIS FILE IS UNDER THE BSD COPYRIGHT, AND NOT GPL!
+//
 
 /*      $NetBSD: swap.c,v 1.4 1995/08/31 22:20:19 jtc Exp $     */
 
