@@ -10,13 +10,15 @@
 #include "xosview.h"
 #include <fstream.h>
 #include <stdlib.h>
-
+#include <string.h>
+#include <strstream.h>
+#include <ctype.h>
 
 static const char STATFILENAME[] = "/proc/stat";
 
-
-CPUMeter::CPUMeter( XOSView *parent )
-: FieldMeterDecay( parent, 4, "CPU", "USR/NICE/SYS/FREE" ){
+CPUMeter::CPUMeter(XOSView *parent, const char *cpuID)
+: FieldMeterDecay( parent, 4, toUpper(cpuID), "USR/NICE/SYS/FREE" ) {
+  _lineNum = findLine(cpuID);
   for ( int i = 0 ; i < 2 ; i++ )
     for ( int j = 0 ; j < 4 ; j++ )
       cputime_[i][j] = 0;
@@ -45,13 +47,17 @@ void CPUMeter::checkevent( void ){
 
 void CPUMeter::getcputime( void ){
   total_ = 0;
-  char tmp[10];
+  char tmp[256];
   ifstream stats( STATFILENAME );
 
   if ( !stats ){
-    cerr <<"Con not open file : " <<STATFILENAME <<endl;
+    cerr <<"Can not open file : " <<STATFILENAME <<endl;
     exit( 1 );
   }
+
+  // read until we are at the right line.
+  for (int i = 0 ; i < _lineNum ; i++)
+    stats.getline(tmp, 256);
 
   stats >>tmp >>cputime_[cpuindex_][0]  
 	      >>cputime_[cpuindex_][1]  
@@ -68,4 +74,71 @@ void CPUMeter::getcputime( void ){
     used( (int)((100 * (total_ - fields_[3])) / total_) );
     cpuindex_ = (cpuindex_ + 1) % 2;
   }
+}
+
+int CPUMeter::findLine(const char *cpuID){
+  ifstream stats( STATFILENAME );
+
+  if ( !stats ){
+    cerr <<"Can not open file : " <<STATFILENAME <<endl;
+    exit( 1 );
+  }
+
+  int line = -1;
+  char buf[256];
+  while (!stats.eof()){
+    stats.getline(buf, 256);
+    if (!stats.eof()){
+      line++;
+      if (!strncmp(cpuID, buf, strlen(cpuID)) && buf[strlen(cpuID)] == ' ')
+        return line;
+    }
+  }
+  return -1;
+}
+
+// Checks for the SMP kernel patch by forissier@isia.cma.fr.  
+// http://www-isia.cma.fr/~forissie/smp_kernel_patch/
+// If it finds that this patch has been applied to the current kernel 
+// then returns the number of cpus that are on this machine.
+int CPUMeter::countCPUs(void){
+  ifstream stats( STATFILENAME );
+
+  if ( !stats ){
+    cerr <<"Can not open file : " <<STATFILENAME <<endl;
+    exit( 1 );
+  }
+
+  int cpuCount = 0;
+  char buf[256];
+  while (!stats.eof()){
+    stats.getline(buf, 256);
+    if (!stats.eof()){
+      if (!strncmp(buf, "cpu", 3) && buf[3] != ' ')
+          cpuCount++;
+    }
+  }
+
+  return cpuCount;
+}
+
+const char *CPUMeter::cpuStr(int num){
+  static char buffer[32];
+  ostrstream str(buffer, 32);
+  
+  str << "cpu";
+  if (num != 0)
+    str << (num - 1);
+  str << ends;
+
+  return buffer;
+}
+
+const char *CPUMeter::toUpper(const char *str){
+  static char buffer[256];
+  strcpy(buffer, str);
+  for (char *tmp = buffer ; *tmp != '\0' ; tmp++)
+    *tmp = toupper(*tmp);
+
+  return buffer;
 }

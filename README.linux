@@ -81,6 +81,14 @@ To install xosview:
         called /proc/memstat.  Xosview will display a shared memory field if
         it finds this file (ie the memstat module is loaded).
 
+      - If you have an SMP machine xosview will now show a seperate cpumeter
+        for each processor provided your kernel has support for this.  To
+        get this to work you will need Jerome Forissier's kernel patch which
+        modifies the proc filesystem to provide stats on a per processor basis.
+        You can find this patch at the following URL:
+
+        http://www-isia.cma.fr/~forissie/smp_kernel_patch/
+
 Other notes:
        
         Xosview should work for 2.0 and 2.1 kernels.  The memory meters have

@@ -13,18 +13,24 @@
 
 class CPUMeter : public FieldMeterDecay {
 public:
-  CPUMeter( XOSView *parent );
-  ~CPUMeter( void );
+  CPUMeter(XOSView *parent, const char *cpuID = "cpu");
+  ~CPUMeter(void);
 
-  const char *name( void ) const { return "CPUMeter"; }
-  void checkevent( void );
+  const char *name(void) const { return "CPUMeter"; }
+  void checkevent(void);
 
-  void checkResources( void );
+  void checkResources(void);
+
+  static int countCPUs(void);
+  static const char *cpuStr(int num);
 protected:
+  int _lineNum;
   float cputime_[2][4];
   int cpuindex_;
 
-  void getcputime( void );
+  void getcputime(void);
+  int findLine(const char *cpuID);
+  const char *toUpper(const char *str);
 private:
 };
 
