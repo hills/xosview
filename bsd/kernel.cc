@@ -21,6 +21,7 @@
 #include <limits.h>		/*  For _POSIX2_LINE_MAX  */
 
 #include <err.h>                /*  For err(), warn(), etc.  BCG  */
+#include <errno.h>
 #include <sys/dkstat.h>         /*  For CPUSTATES, which tells us how
                                       many cpu states there are.  */
 #ifndef XOSVIEW_FREEBSD
@@ -34,13 +35,24 @@
 #if defined(XOSVIEW_FREEBSD) && (__FreeBSD_version >= 300000)
 #include <net/if_var.h>
 #endif
+
+#include <sys/param.h>	/*  Needed by both UVM and swapctl stuff.  */
+#if defined(UVM)
+#include <string.h>
+#include <sys/malloc.h>
+#include <sys/sysctl.h>
+#include <sys/device.h>
+#include <vm/vm.h>	/* XXX  Is this needed?  */
+#else
 #include <sys/vmmeter.h>	/*  For struct vmmeter.  */
+#endif
+
 #ifdef HAVE_SWAPCTL
-#include <sys/param.h>
 #include <unistd.h>
 #include <vm/vm_swap.h>
 #include <stdlib.h>
 #endif
+
 #include "kernel.h"		/*  To grab CVSID stuff.  */
 
 CVSID("$Id$");
@@ -58,7 +70,11 @@ static struct nlist nlst[] =
 #define CP_TIME_SYM_INDEX 0
 { "_ifnet" },
 #define IFNET_SYM_INDEX 1
+#if defined(UVM)
+{ "_disklist" },	/*  Keep UVM happy...  */
+#else
 { "_cnt" },
+#endif
 #define VMMETER_SYM_INDEX	2
 
 #ifndef XOSVIEW_FREEBSD	/*  FreeBSD doesn't have a diskmeter yet.  */
@@ -183,14 +199,34 @@ OpenKDIfNeeded()
 
 // ------------------------  PageMeter functions  -----------------
 void
-BSDPageInit() { OpenKDIfNeeded(); }
+BSDPageInit() {
+  OpenKDIfNeeded();
+  /*  XXX  Ought to add a check/warning for UVM/non-UVM kernel here, to
+   *  avoid surprises.  */
+}
 
+
+#if defined(UVM)
+void
+BSDGetUVMPageStats(struct uvmexp* uvm) {
+  size_t size;
+  int mib[2];
+  if (!uvm) errx(-1, "NetBSDGetPageStats():  passed pointer was null!\n");
+  size = sizeof(uvmexp);
+  mib[0] = CTL_VM;
+  mib[1] = VM_UVMEXP;
+  if (sysctl(mib, 2, uvm, &size, NULL, 0) < 0) {
+    printf("can't get uvmexp: %s\n", strerror(errno));
+    memset(&uvm, 0, sizeof(uvmexp));
+  }
+}
+#else
 void
 BSDGetPageStats(struct vmmeter* vmp) {
   if (!vmp) errx(-1, "BSDGetPageStats():  passed pointer was null!\n");
   safe_kvm_read_symbol(VMMETER_SYM_INDEX, vmp, sizeof(struct vmmeter));
 }
-
+#endif
 #ifdef XOSVIEW_FREEBSD
 // This function returns the num bytes devoted to buffer cache
 void

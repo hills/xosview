@@ -38,8 +38,13 @@ SetKernelName(const char* const kernelName);
 void
 BSDPageInit();
 
+#if defined(UVM)
+void
+BSDGetUVMPageStats(struct uvmexp* uvmp);
+#else
 void
 BSDGetPageStats(struct vmmeter* vmp);
+#endif
 
 void
 BSDCPUInit();
