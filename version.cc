@@ -11,9 +11,11 @@
 */
 /*  *****  THIS FILE is included by xosview.cc, and is never used
  *  on its own.  */
-static const char * const versionString = "xosview version 1.7.2";
+static const char * const versionString = "xosview version 1.7.3";
 static const char * const version_cc_cvsID = "$Id$";
 
+/*  Version 1.7.3:  Added initial irqrate meter.  Also has some
+ *  FreeBSD fixes for FreeBSD 4.* from David O'Brien.  */
 /*  Version 1.7.2:  BSDI support from Tomer Klainer.  */
 
 /*  Version 1.7.0:  has pixmap support, OpenBSD interrupt meter,

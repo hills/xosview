@@ -1,4 +1,10 @@
   /*  $Id$  */
+Changes since xosview-1.7.2
+
+- IRQ rate meter for BSDs added.
+
+- FreeBSD 4.* fixes by David O'Brien
+
 Changes since xosview-1.7.1
 
 - Linux now has a RAID meter.  See README.linux for how to set it up.
