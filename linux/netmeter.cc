@@ -34,8 +34,13 @@
 #include <stdlib.h>
 #include <sys/socket.h>
 #include <sys/ioctl.h>
+#ifdef GNULIBC
+#include <net/if.h>
+#else
 #include <linux/if.h>
+#endif
 #include <netinet/in.h>
+#include <errno.h>
 
 static const char NETFILENAME[] = "/proc/net/ip_acct";
 

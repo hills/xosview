@@ -14,8 +14,12 @@
 #include <stdlib.h>
 
 #ifdef USESYSCALLS
+#ifdef GNULIBC
+#include <sys/sysinfo.h>
+#else
 #include <syscall.h>
 #include <linux/kernel.h>
+#endif
 #endif
 
 
@@ -49,7 +53,11 @@ void SwapMeter::checkevent( void ){
 void SwapMeter::getswapinfo( void ){
   struct sysinfo sinfo;
 
+#ifdef GNULIBC
+  sysinfo(&sinfo);
+#else
   syscall( SYS_sysinfo, &sinfo );
+#endif
 
   total_ = sinfo.totalswap;
   fields_[0] = total_ - sinfo.freeswap;

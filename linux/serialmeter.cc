@@ -19,7 +19,12 @@
 #include <strstream.h>
 
 #include <unistd.h>
+#ifdef GNULIBC
+#include <sys/io.h>
+#include <sys/perm.h>
+#else
 #include <asm/io.h>
+#endif
 #include <linux/serial.h>
 #include <linux/serial_reg.h>
 

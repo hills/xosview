@@ -12,6 +12,14 @@ EXTRA_OUT_FILES="$EXTRA_OUT_FILES \
   linux/memstat/Makefile:config/Makefile.linux.memstat.in"
 
 dnl
+dnl Define GNULIBC for the new GNU libc for linux
+dnl
+if test "$host_os" == "linux-gnulibc2"; then
+AC_DEFINE(GNULIBC)
+echo "GNULIBC"
+fi
+
+dnl
 dnl Add a switch to add -DUSESYSCALLS for linux.
 dnl
 AC_ARG_ENABLE([linux-syscalls],
