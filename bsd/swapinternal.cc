@@ -78,6 +78,13 @@
 #include <stdlib.h>		/*  For malloc().  */
 #include <string.h>		/*  For bzero().  */
 
+#ifdef XOSVIEW_BSDI      /* some more include files */
+#include <err.h>
+#include <vm/swap_pager.h>
+#include <nlist.h>
+#include <stdio.h>
+#include <unistd.h>
+#endif
 
 
 extern char *getbsize __P((int *headerlenp, long *printoutblocksizep));
@@ -94,10 +101,17 @@ extern kvm_t*	swap_kd;
 struct nlist syms[] = {
         { "_swdevt" },  /* list of swap devices and sizes */
 #define VM_SWDEVT       0
+#ifdef XOSVIEW_BSDI
+        { "_niswap" },
+#define VM_NSWAP       1
+        { "_niswdev" },
+#define VM_NSWDEV      2
+#else
         { "_nswap" },   /* size of largest swap device */
 #define VM_NSWAP        1
         { "_nswdev" },  /* number of swap devices */
 #define VM_NSWDEV       2
+#endif
         { "_dmmax" },   /* maximum size of a swap block */
 #define VM_DMMAX        3
 #ifdef XOSVIEW_FREEBSD
@@ -106,19 +120,31 @@ struct nlist syms[] = {
 #else /* XOSVIEW_FREEBSD */
         { "_swapmap" }, /* list of free swap areas */
 #define VM_SWAPMAP      4
+#ifdef XOSVIEW_BSDI
+        { "_swseq" },
+#define VM_SWSEQ        5
+        { "_swapstats" }, /* do we need to work on dead kernels? */
+#define VM_SWAPSTATS    6
+#else
         { "_nswapmap" },/* size of the swap map */
 #define VM_NSWAPMAP     5
+#endif /* BSDI */
 #endif /* XOSVIEW_FREEBSD */
         {0}		/* End-of-list (need {} to avoid gcc warning) */
 };
 
+#ifdef XOSVIEW_BSDI
+static struct swapstats swapstats;
+#endif
 static int nswap, nswdev, dmmax;
 static struct swdevt *sw;
 static long *perdev;
 #ifdef XOSVIEW_FREEBSD
 static struct rlisthdr swaplist;
 #else
+#ifndef XOSVIEW_BSDI
 static int nswapmap;
+#endif
 static struct map *swapmap, *kswapmap;
 static struct mapent *mp;
 #endif
@@ -138,6 +164,10 @@ static int nfree;
 int
 BSDInitSwapInfo()
 {
+#ifdef XOSVIEW_BSDI
+        struct swdevt *swseq;
+        int i;
+#endif
         static int once = 0;
         u_long ptr;
 
@@ -161,6 +191,9 @@ BSDInitSwapInfo()
 #endif
                 return (0);
         }
+#ifdef XOSVIEW_BSDI
+        KGET(VM_SWAPSTATS, swapstats);
+#endif
         KGET(VM_NSWAP, nswap);
         KGET(VM_NSWDEV, nswdev);
         KGET(VM_DMMAX, dmmax);
@@ -174,16 +207,37 @@ BSDInitSwapInfo()
 	KGET1(VM_SWDEVT, &ptr, sizeof ptr, "swdevt");
 	KGET2(ptr, sw, (signed) (nswdev * sizeof(*sw)), "*swdevt");
 #else /* XOSVIEW_FREEBSD */
+#ifndef XOSVIEW_BSDI
         KGET(VM_NSWAPMAP, nswapmap);
+#endif
         KGET(VM_SWAPMAP, kswapmap);     /* kernel `swapmap' is a pointer */
+#ifdef XOSVIEW_BSDI
+        if ((sw = (struct swdevt*) malloc(swapstats.swap_nswdev * sizeof(*sw)))
+	    == NULL ||
+            (perdev = (long*) malloc(swapstats.swap_nswdev * sizeof(*perdev)))
+	    == NULL ||
+            (mp =(struct mapent*) malloc(swapstats.swap_mapsize * sizeof(*mp)))
+	    == NULL) {
+#else
         if ((sw = (struct swdevt*) malloc(nswdev * sizeof(*sw))) == NULL ||
             (perdev = (long*) malloc(nswdev * sizeof(*perdev))) == NULL ||
             (mp = (struct mapent*) malloc(nswapmap * sizeof(*mp))) == NULL) {
+#endif
                 printf("xosview: swap: malloc returned NULL.\n"  
 		  "Number of Swap devices (nswdef) looked like %d\n", nswdev);
                 return (0);
         }
         KGET1(VM_SWDEVT, sw, (signed) (nswdev * sizeof(*sw)), "swdevt");
+#ifdef XOSVIEW_BSDI
+        if (swapstats.swap_nswdev > nswdev) {
+                /* The rest were allocated individually. */
+                KGET(VM_SWSEQ, swseq);
+                for (i = nswdev; i < swapstats.swap_nswdev; i++) {
+                        KGET2((u_long)swseq, &sw[i], sizeof(sw[i]), "swseq");
+                        swseq = sw[i].sw_next;
+                }
+        }
+#endif
 #endif /* XOSVIEW_FREEBSD */
         once = 1;
         return (1);
@@ -243,12 +297,20 @@ fetchswap()
 void
 fetchswap()
 {
-        int s, e, i;
+        int s, e, i=0;
         int elast;
 	struct mapent* localmp;
+#ifdef XOSVIEW_BSDI
+	long  siz;
+        struct swdevt *sp;
+#endif
 
 	localmp = mp;
+#ifdef XOSVIEW_BSDI
+        s= swapstats.swap_mapsize * sizeof(*mp);
+#else
         s = nswapmap * sizeof(*localmp);
+#endif
         if (kvm_read(swap_kd, (long)kswapmap, localmp, s) != s)
                 printf("cannot read swapmap: %s", kvm_geterr(swap_kd));
 
@@ -257,25 +319,69 @@ fetchswap()
 	if (!swapmap)
 	{
 	  fprintf(stderr, "Error:  swapmap appears to be %p.  Did you\n"
+#ifdef XOSVIEW_BSDI
+                  "specify the correct kernel via -N, if not running /bsd?\n",
+#else
 	    "specify the correct kernel via -N, if not running /netbsd?\n",
+#endif
 	    swapmap);
 	  exit(1);
 	}
+#ifdef XOSVIEW_BSDI
+        if (swapstats.swap_mapsize !=
+            (unsigned)(swapmap->m_limit + 1 - (struct mapent *)kswapmap))
+                err(-1,"panic: swap: swapstats.swap_mapsize goof");
+#else
         if (nswapmap != swapmap->m_limit - (struct mapent *)kswapmap)
                 printf("panic: swap: nswapmap goof");
+#endif
 
         /*
          * Count up swap space.
          */
         nfree = 0;
         elast = 0;
+#ifdef XOSVIEW_BSDI
+        bzero(perdev, swapstats.swap_nswdev * sizeof(*perdev));
+#else
         bzero(perdev, nswdev * sizeof(*perdev));
+#endif
+#ifdef XOSVIEW_BSDI
+        for (localmp++; (unsigned)(siz = localmp->m_size) != 0xffffffff; localmp++) {
+#else
         for (localmp++; localmp->m_addr != 0; localmp++) {
+#endif
                 s = localmp->m_addr;                 /* start of swap region */
                 e = localmp->m_addr + localmp->m_size;    /* end of region */
                 elast = e;
                 nfree += localmp->m_size;
 
+#ifdef XOSVIEW_BSDI
+/* This code mimics swstrategy(). */
+                if (swapstats.swap_nswdev > 1) {
+                        if (s < nswap) {
+                                if (nswdev > 1)
+                                        i = (s / dmmax / 2) % nswdev;
+                                else
+                                        i = 0;
+                                if (sw[i].sw_flags & SW_SEQUENTIAL)
+                                        err(-1,"panic: swap: interlv/seq 1");
+                        } else {
+                                s -= nswap;
+                                for (sp = &sw[i = nswdev];
+                                     i < swapstats.swap_nswdev; sp++, i++) {
+                                        if (s <= sp->sw_nblks)
+                                                break;
+                                        s -= sp->sw_nblks;
+                                }
+                                if ((sw[i].sw_flags & SW_SEQUENTIAL) == 0)
+                                        err(-1,"panic: swap: interlv/seq 2");
+                        }
+                } else
+                        i = 0;
+
+                perdev[i] += siz;
+#else
                 /*
                  * Swap space is split up among the configured disks.
                  * The first dmmax blocks of swap space some from the
@@ -298,6 +404,7 @@ fetchswap()
                                 i = 0;
                         s = bound;
                 }
+#endif
         }
 }
 #endif /* XOSVIEW_FREEBSD */
@@ -309,7 +416,11 @@ BSDGetSwapInfo(int* total, int* free)
 
 	fetchswap();
         avail = npfree = 0;
+#ifdef XOSVIEW_BSDI
+        for (i = 0; i < swapstats.swap_nswdev; i++) {
+#else
         for (i = 0; i < nswdev; i++) {
+#endif
                 /*
                  * Don't report statistics for partitions which have not
                  * yet been activated via swapon(8).

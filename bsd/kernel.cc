@@ -71,6 +71,21 @@ int DevStat_Get();
 #include <stdlib.h>		/*  For malloc(), free().  */
 #endif
 
+#ifdef XOSVIEW_BSDI
+#include <stdlib.h>
+#if _BSDI_VERSION >= 199802     /* BSD/OS 4.x */
+#include <i386/isa/icu.h>
+#endif
+// these two functions are declared in kvm_stat.h, unfortunately this file
+// has no c++ compatibility declerations
+__BEGIN_DECLS
+char  **kvm_dknames __P((kvm_t *, int *));
+int     kvm_disks __P((kvm_t *, struct diskstats *dkp, int));
+__END_DECLS
+#include <sys/sysctl.h>
+#include <sys/cpustats.h>
+#endif /* BSD/OS */
+
 #include "general.h"
 #include "kernel.h"		/*  To grab CVSID stuff.  */
 
@@ -85,8 +100,14 @@ kvm_t* kd = NULL;	//  This single kvm_t is shared by all
 //  This struct has the list of all the symbols we want from the kernel.
 static struct nlist nlst[] =
 {
+#ifdef XOSVIEW_BSDI
+// BSDI reads cp_time through sysctl
+{ "_ifnet" },
+#define DUMMY_0
+#else
 { "_cp_time" },
 #define CP_TIME_SYM_INDEX 0
+#endif
 { "_ifnet" },
 #define IFNET_SYM_INDEX 1
 #if defined(UVM)
@@ -96,6 +117,28 @@ static struct nlist nlst[] =
 #endif
 #define VMMETER_SYM_INDEX	2
 
+#ifdef XOSVIEW_BSDI /* bsdi get disk statistics through sysctl */
+{ "_cnt" },
+#define DUMMY_3                 3
+{ "_cnt" },
+#define DUMMY_4                 4
+{ "_cnt" },
+#define DUMMY_5                 5
+{ "_cnt" },
+#define DUMMY_6                 6
+#if _BSDI_VERSION >= 199802  /* BSD/OS 4.x */
+{ "inin" },
+#define ININ_SYM_INDEX          7
+{ "inin" },
+#define DUMMY_8                 8
+#else /* BSD/OS 3.x */
+{ "_isa_intr" },
+#define ISAINTR_SYM_INDEX       7
+{ "_isa_intr" },
+#define DUMMY_8                 8
+#endif /* _BSDI_VERSION */
+
+#else
 #ifndef XOSVIEW_FREEBSD	/*  NetBSD has a disklist, which FreeBSD doesn't...  */
 { "_disklist" },
 #define DISKLIST_SYM_INDEX	3
@@ -145,11 +188,19 @@ static struct nlist nlst[] =
 #endif /*HAVE_DEVSTAT */
 
 #endif /* XOSVIEW_FREEBSD */
+#endif /* BSDI */
 
   {NULL}
 };
 
 static char kernelFileName[_POSIX2_LINE_MAX];
+
+#ifdef XOSVIEW_BSDI
+// local variables for BSDI sysctl
+static  char **bsdi_dk_names;
+static  struct diskstats *bsdi_dkp;
+static  int bsdi_dk_count=0;
+#endif
 
 // ------------------------  utility functions  -------------------
 //  The following is an error-checking form of kvm_read.  In addition
@@ -272,6 +323,7 @@ void
 BSDGetPageStats(struct vmmeter* vmp) {
   if (!vmp) errx(-1, "BSDGetPageStats():  passed pointer was null!\n");
   safe_kvm_read_symbol(VMMETER_SYM_INDEX, vmp, sizeof(struct vmmeter));
+// for BSDI - perhaps use kvm_vmmeter ?
 }
 #endif
 #ifdef XOSVIEW_FREEBSD
@@ -282,6 +334,7 @@ FreeBSDGetBufspace(int* bfsp) {
     safe_kvm_read_symbol (BUFSPACE_SYM_INDEX, bfsp, sizeof(int));
 }
 #endif
+// something for BSDI perhaps?
 
 // ------------------------  CPUMeter functions  ------------------
 
@@ -292,10 +345,24 @@ BSDCPUInit() {
 
 void
 BSDGetCPUTimes (long* timeArray) {
+#ifdef XOSVIEW_BSDI
+  struct cpustats cpu;
+  size_t size = sizeof(cpu);
+  static int mib[] = { CTL_KERN, KERN_CPUSTATS };
+#endif
+
   if (!timeArray) errx (-1, "BSDGetCPUTimes():  passed pointer was null!\n");
   if (CPUSTATES != 5)
     errx (-1, "Error:  xosview for *BSD expects 5 cpu states!\n");
+#ifdef XOSVIEW_BSDI
+  if (sysctl(mib, 2, &cpu, &size, NULL, 0) < 0) {
+    fprintf(stderr, "xosview: sysctl failed: %s\n", strerror(errno));
+    bzero(&cpu, sizeof(cpu));
+  }
+  bcopy (cpu.cp_time,timeArray,sizeof (long) * CPUSTATES);
+#else
   safe_kvm_read_symbol (CP_TIME_SYM_INDEX, timeArray, sizeof (long) * CPUSTATES);
+#endif
 }
 
 
@@ -349,6 +416,8 @@ BSDGetNetInOut (long long * inbytes, long long * outbytes) {
 #else 
     ifnetp = (struct ifnet*) ifnet.if_next;
 #endif
+#elif defined(XOSVIEW_BSDI)
+    ifnetp = (struct ifnet*) ifnet.if_next;
 #else /* XOSVIEW_NETBSD or XOSVIEW_OPENBSD */
     ifnetp = (struct ifnet*) ifnet.if_list.tqe_next;
 #endif
@@ -610,6 +679,12 @@ DevStat_Get(void) {
 int
 BSDDiskInit() {
   OpenKDIfNeeded(); 
+#ifdef XOSVIEW_BSDI
+  bsdi_dk_names = kvm_dknames(kd,&bsdi_dk_count);
+  if (!(bsdi_dkp = (struct diskstats *)(calloc((bsdi_dk_count + 1) , sizeof (*bsdi_dkp)))))
+    errx(-1,"calloc ");
+  return (1);
+#else
 #ifdef XOSVIEW_FREEBSD
 #ifdef HAVE_DEVSTAT
   return 1;
@@ -619,6 +694,7 @@ BSDDiskInit() {
 #else
   return ValidSymbol(DISKLIST_SYM_INDEX);
 #endif
+#endif /* BSDI */
 }
 
 void
@@ -640,6 +716,13 @@ BSDGetDiskXFerBytes (unsigned long long *bytesXferred) {
   for (int i=0; i < kvm_dk_ndrive; i++)
       *bytesXferred += kvm_dk_wds[i] * 64;
 #endif
+#elif defined (XOSVIEW_BSDI)
+  int n,i;
+  if ((n= kvm_disks(kd,bsdi_dkp,bsdi_dk_count+1)) != bsdi_dk_count)
+    warnx ("kvm_disks returned unexpected number of disks");
+  *bytesXferred= 0;
+  for (i=0;i<n;i++)
+    *bytesXferred += bsdi_dkp[i].dk_sectors * bsdi_dkp[i].dk_secsize;
 #else
   /*  This function is a little tricky -- we have to iterate over a
    *  list in kernel land.  To make things simpler, data structures
@@ -667,7 +750,7 @@ BSDGetDiskXFerBytes (unsigned long long *bytesXferred) {
 }
 
 /*  ---------------------- Interrupt Meter stuff  -----------------  */
-#if !defined(XOSVIEW_OPENBSD) || !(defined(pc532) && defined(i386))
+#if (!defined(XOSVIEW_OPENBSD) || !(defined(pc532) && defined(i386))) && !defined(XOSVIEW_BSDI)
 static unsigned long kvm_intrcnt[128];// guess at space needed
 #endif
 
@@ -675,19 +758,34 @@ static unsigned long kvm_intrcnt[128];// guess at space needed
 static unsigned long kvm_intrptrs[NUM_INTR];
 #endif
 
+#ifdef XOSVIEW_BSDI
+#if _BSDI_VERSION >= 199802 /* BSD/OS 4.x */
+static intr_info_t intrs[NISRC];
+#else /* BSD/OS 3.x or FreeBSD*/
+static unsigned long kvm_intrptrs[NUM_INTR];
+#endif /* BSD/OS 4.x && BSDI */
+#endif /* BSDI */
+
 int
 BSDIntrInit() {
     OpenKDIfNeeded();
+
 #if defined(XOSVIEW_OPENBSD) && defined(i386)
     return ValidSymbol(INTRHAND_SYM_INDEX) && ValidSymbol(INTRSTRAY_SYM_INDEX);
 #elif defined (XOSVIEW_OPENBSD) && defined(pc532)
     return ValidSymbol(IVP_SYM_INDEX);
+#elif defined (XOSVIEW_BSDI)
+#if _BSDI_VERSION >= 199802 /* BSD/OS 4.x */
+    return ValidSymbol(ININ_SYM_INDEX);
+#else /* BSD/OS 3.x */
+    return ValidSymbol(ISAINTR_SYM_INDEX);
+#endif /* _BSDI_VERSION */
 #else
     return ValidSymbol(INTRCNT_SYM_INDEX) && ValidSymbol(EINTRCNT_SYM_INDEX);
 #endif
 }
 
-#if !defined(XOSVIEW_OPENBSD) || !(defined(pc532) || defined(i386))
+#if (!defined(XOSVIEW_OPENBSD) || !(defined(pc532) || defined(i386))) && !defined (XOSVIEW_BSDI)
 int
 BSDNumInts() {
   int nintr;
@@ -726,6 +824,21 @@ BSDGetIntrStats (unsigned long intrCount[NUM_INTR]) {
 	    sizeof(unsigned long);
 	intrCount[i] = kvm_intrcnt[idx];
     }
+#elif defined (XOSVIEW_BSDI)
+    int nintr = 16;
+#if _BSDI_VERSION >= 199802 /* BSD/OS 4.x */
+    safe_kvm_read(nlst[ININ_SYM_INDEX].n_value,intrs,
+                  NISRC*sizeof(intr_info_t));
+    for (int i=0;i<NISRC;i++)
+            if ((intrs[i].ii_irq >= 0) && (intrs[i].ii_irq < nintr))
+                    intrCount[intrs[i].ii_irq] = intrs[i].ii_cnt;
+#else /* BSD/OS 3.x */
+    safe_kvm_read(nlst[ISAINTR_SYM_INDEX].n_value,kvm_intrptrs ,
+                  sizeof(long)*nintr);
+    for (int i=0;i<nintr;i++)
+      intrCount[i] = kvm_intrptrs[i];
+#endif /* _BSDI_VERSION */
+
 #else /* XOSVIEW_FREEBSD */
   //  NetBSD/OpenBSD version, based on vmstat.c.  Note that the pc532
   //  platform does support intrcnt and eintrcnt, but vmstat uses
