@@ -1,4 +1,9 @@
   /*  $Id$  */
+Changes since xosview-1.6.2
+  Better *BSD support:  OpenBSD intmeter, FreeBSD diskmeter,
+    NetBSD battery meter.
+  Some Solaris support.
+
 Changes since xosview-1.6.1
   Check for and set -D__SMP__ if the linux memstat module is built on a
     SMP system.
