@@ -10,7 +10,7 @@ ICE_CXX_BOOL
 ICE_CXX_LONG_LONG
 AC_PATH_X
 CXXFLAGS="$CXXFLAGS -I$x_includes"
-LIBS="$LIBS -L$x_libraries"
+LIBS="-L$x_libraries -R$x_libraries $LIBS"
 dnl AC_PREFIX_DEFAULT(/usr/X11)	dnl No longer needed with our
 dnl 				x_includes magic in Makefile.top.in.
 dnl  Check for /usr/X11R6.  If it exists, make that the default prefix.
@@ -100,7 +100,7 @@ dnl    according to GNU m4 and autoconf, [ and ] are the
 dnl    quote characters.
 dnl  This check is ugly.  Maybe it should be hidden away in aclocal?
 dnl    bgrayson 9/96
-netbsd1.*)  AC_XOSV_NETBSD
+netbsd1.[012345]*)  AC_XOSV_NETBSD
   ## Also check for the existence of UVM.  This is a nasty,
   ## complicated check.  This could be avoided by having the *BSD
   ## platform-specific Makefiles include <bsd.own.mk> on their own.
