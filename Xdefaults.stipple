@@ -1,0 +1,66 @@
+#$Id$
+#  See the README.netbsd file on how to use the stipple options and
+#  these example resources.
+
+xosvstipple*enableStipple:	True
+xosvstipple*loadWarnColor:	red
+xosvstipple*loadProcColor:	red
+xosvstipple*loadIdleColor:	red
+xosvstipple*cpuUserColor:       red
+xosvstipple*cpuNiceColor:       red
+xosvstipple*cpuSystemColor:     red
+xosvstipple*cpuInterruptColor:  red
+xosvstipple*cpuFreeColor:       red
+xosvstipple*memUsedColor:	orange
+xosvstipple*memSharedColor:	orange
+xosvstipple*memBufferColor:	orange
+xosvstipple*memFreeColor:	orange
+xosvstipple*memTextColor:	orange
+xosvstipple*memOtherColor:	orange
+xosvstipple*memActiveColor:	orange
+xosvstipple*memInactiveColor:	orange
+xosvstipple*swapUsedColor:	yellow
+xosvstipple*swapFreeColor:	yellow
+xosvstipple*netInColor:		green
+xosvstipple*netOutColor:	green
+xosvstipple*netBackground:	green
+xosvstipple*serialOnColor:	red
+xosvstipple*serialOffColor:	aquamarine
+xosvstipple*intOnColor:		red
+xosvstipple*intOffColor:	aquamarine
+xosvstipple*diskUsedColor:	blue
+xosvstipple*diskIdleColor:	blue
+
+xosvstipplebw*meterLabelColor:  black
+xosvstipplebw*usedLabelColor:   black
+xosvstipplebw*background:       white
+xosvstipplebw*foreground:       black
+xosvstipplebw*enableStipple:	True
+xosvstipplebw*loadWarnColor:    black
+xosvstipplebw*loadProcColor:    black
+xosvstipplebw*loadIdleColor:    black
+xosvstipplebw*cpuUserColor:	black
+xosvstipplebw*cpuNiceColor:	black
+xosvstipplebw*cpuSystemColor:	black
+xosvstipplebw*cpuInterruptColor:black
+xosvstipplebw*cpuFreeColor:	black
+xosvstipplebw*memUsedColor:	black
+xosvstipplebw*memSharedColor:	black
+xosvstipplebw*memBufferColor:	black
+xosvstipplebw*memFreeColor:	black
+xosvstipplebw*memTextColor:	black
+xosvstipplebw*memOtherColor:	black
+xosvstipplebw*memActiveColor:	black
+xosvstipplebw*memInactiveColor: black
+xosvstipplebw*swapUsedColor:    black
+xosvstipplebw*swapFreeColor:    black
+xosvstipplebw*netInColor:       black
+xosvstipplebw*netOutColor:      black
+xosvstipplebw*netBackground:    black
+xosvstipplebw*serialOnColor:    black
+xosvstipplebw*serialOffColor:   white
+xosvstipplebw*intOnColor:       black
+xosvstipplebw*intOffColor:      white
+xosvstipplebw*diskUsedColor:	black
+xosvstipplebw*diskIdleColor:	black
+
