@@ -48,6 +48,16 @@ public:
     { XSetForeground( display_, gc_, pixelvalue ); }
   void setBackground( unsigned long pixelvalue )
     { XSetBackground( display_, gc_, pixelvalue ); }
+  void setStipple( Pixmap stipple) 
+    { if (!doStippling_) return;
+      XSetStipple(display_, gc_, stipple);
+      XGCValues xgcv;
+      xgcv.fill_style = FillOpaqueStippled;
+      XChangeGC (display_, gc_, GCFillStyle, &xgcv); }
+  void setStippleN (int n) {setStipple(stipples_[n]); }
+  Pixmap createPixmap(char* data, unsigned int w, unsigned int h) {
+      return XCreatePixmapFromBitmapData(display_, window_, data, w, h,
+      0, 1, 1); }
   unsigned long foreground( void ) { return fgcolor_; }
   unsigned long background( void ) { return bgcolor_; }
   void resize( int width, int height ) 
@@ -82,6 +92,8 @@ public:
 
   const char *getResource( const char *name );
   const char *getResourceOrUseDefault( const char *name, const char* defaultVal );
+  const int isResourceTrue( const char* name ) {
+    return (!strcasecmp(getResource(name),"True")); }
   void dumpResources( ostream &os );
   
 protected:
@@ -126,6 +138,8 @@ protected:
   char		display_name_[256];  //  Display name string.
   char*		geometry_;	//  geometry string.
   Xrm*		xrmptr_;	//  Pointer to the XOSView xrm.  FIXME???
+  int		doStippling_;	//  Either 0 or 1.
+  Pixmap	stipples_[4];	//  Array of Stipple masks.
 
   void init( int argc, char *argv[] );
   void getGeometry( void );
