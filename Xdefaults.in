@@ -23,7 +23,6 @@ xosview*enableStipple:	  False !  Change to true to try beta stipple support.
 xosview*load: True
 !  We don't need to enable the Decay option for the load -- the load
 !    is already a time-averaged value!
-xosview*loadDecay: False
 xosview*loadWarnColor:    orange
 xosview*loadProcColor:    seagreen
 xosview*loadIdleColor:    aquamarine
@@ -137,7 +136,8 @@ xosview*diskIdleColor:	black
 xosview*diskPriority:	10
 xosview*diskDecay:	True
 xosview*diskUsedFormat: autoscale
-xosview*diskBandwidth:  5000000	!  Default to 5MB/s bandwidth -- I
-				! think that's IDE's theoretical
-				! peak?, and SCSI-II's peak (no fast, no
-				! wide) bgrayson
+!  Default to 5MB/s bandwidth -- I
+! think that's IDE's theoretical
+! peak?, and SCSI-II's peak (no fast, no
+! wide) bgrayson
+xosview*diskBandwidth:  5000000
