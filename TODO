@@ -1,5 +1,8 @@
 Revision: $Id$
 
+  NetBSD:  Add interrupt-rate meter, add tape-drive meter (or
+    arbitrary device throughput meter?)
+
 * Do if(dolegends_) fix for loadmeter.cc for all ports.
 
 * Make xosview re-check resources when the resources are changed, 
