@@ -1,4 +1,10 @@
   /*  $Id$  */
+
+Changes since xosview-1.7.3
+
+- Updated NetBSD support, based on patches from Bernd Ernesti, to
+  use new CPU meter sysctl interface.
+
 Changes since xosview-1.7.2
 
 - IRQ rate meter for BSDs added.
