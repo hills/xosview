@@ -1,4 +1,12 @@
   /*  $Id$  */
+Changes since xosview-1.5.1, in no particular order:
+
+  Much better support for FreeBSD, thanks to Tom Pavel!
+
+  Check for invalid meter priority of 0 added.
+
+  NetBSD now supports the interrupt meter.
+
 Changes since xosview-1.5.0, in no particular order:
 
   On Linux the cpu meters will now show a seperate meter per cpu if 
