@@ -1,0 +1,21 @@
+
+  The IRIX port has support for load, cpu and mem meter. You're welcome
+to send me patches.
+
+  The cpu meter has a new X resource cpuFormat, with the possible values
+of single, all, auto or both. It determines how cpu meters are handled
+for multiprocessors: single displays only meters for each cpu, all
+displays only a cumulative meter for all cpus, both displays both and
+auto behaves like both on mp machines and single on up machines.
+
+  I experienced some errors with the cpu meter on O2.
+
+
+  It is tested on: 
+
+  IP20, IP22, IP27, IP30, IP32 and IP35. 
+
+
+  Stefan Eilemann, Feb 02	eile@sgi.com
+
+  $Id$
