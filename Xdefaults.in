@@ -29,6 +29,7 @@ xosview*loadIdleColor:    aquamarine
 xosview*loadPriority:     50
 xosview*loadAlarmThreshold: 2
 xosview*loadDecay: False
+xosview*loadUsedFormat:	  float
 
 ! CPU Meter Resources
 
@@ -40,6 +41,7 @@ xosview*cpuInterruptColor : red
 xosview*cpuFreeColor:       aquamarine
 xosview*cpuPriority:        1
 xosview*cpuDecay:           True
+xosview*cpuUsedFormat:	    percent
 
 ! Memory Meter Resources
 !  Not all of these are used by a specific platform.
@@ -56,7 +58,7 @@ xosview*memActiveColor:	  blue
 xosview*memInactiveColor: lightblue
 xosview*memPriority:      10
 xosview*memDecay:         False
-xosview*memUsedFormat:	  bytes
+xosview*memUsedFormat:	  autoscale
 
 ! Swap Meter Resources
 
@@ -65,28 +67,31 @@ xosview*swapUsedColor:    seagreen
 xosview*swapFreeColor:    aquamarine
 xosview*swapPriority:     10
 xosview*swapDecay:        False
-xosview*swapUsedFormat:	  bytes
+xosview*swapUsedFormat:	  autoscale
 
 
 ! Page Meter Resources
 
 xosview*page:           True
-xosview*pageBandWidth:  120
+xosview*pageBandwidth:  120
 xosview*pageInColor:    SkyBlue
 xosview*pageOutColor:   SlateBlue1
 xosview*pageIdleColor:  aquamarine
 xosview*pagePriority:   5
 xosview*pageDecay:      False
+xosview*pageUsedFormat: autoscale
 
 
 ! Network Meter Resources
 
-xosview*network: 2000
+xosview*net:		True
+xosview*netBandwidth: 2000
 xosview*netInColor:       SkyBlue
 xosview*netOutColor:      SlateBlue1
 xosview*netBackground:    aquamarine
 xosview*netPriority:      2
 xosview*netDecay:         True
+xosview*netUsedFormat:	  autoscale
 
 !!!
 !!!  Linux-only meters
@@ -112,8 +117,9 @@ xosview*intOffColor:      aquamarine
 !!!
 ! Disk Meter Resources
 
+xosview*disk:		True
 xosview*diskUsedColor:	yellow
 xosview*diskIdleColor:	black
 xosview*diskPriority:	10
 xosview*diskDecay:	True
-xosview*diskUsedFormat: bytes
+xosview*diskUsedFormat: autoscale
