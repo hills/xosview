@@ -138,6 +138,7 @@ xosview*battery:          False
 xosview*batteryLeftColor: orange
 xosview*batteryUsedColor: aquamarine
 xosview*batteryPriority:  50
+xosview*batteryUsedFormat: percent
 
 !!!
 !!!  NetBSD-only meters
