@@ -22,7 +22,8 @@ diskmeter.o \
 raidmeter.o \
 MeterMaker.o
 
-ifeq (@host_cpu@, m68k)
+FAIL_ARCHS =3D m68k sparc
+ifneq (,$(findstring @host_cpu@, $(FAIL_ARCHS)))
 # nothing else for m68k
 else
 OBJS += serialmeter.o
