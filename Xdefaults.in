@@ -133,6 +133,7 @@ xosview*serialPriority:   1
 xosview*interrupts:       True
 xosview*intOnColor:       red
 xosview*intOffColor:      aquamarine
+xosview*intPriority:	  1
 
 ! Battery meter
 xosview*battery:          False
