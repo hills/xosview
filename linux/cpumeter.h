@@ -1,5 +1,5 @@
-//  
-//  Copyright (c) 1994, 1995 by Mike Romberg ( romberg@fsl.noaa.gov )
+//
+//  Copyright (c) 1994, 1995, 2004 by Mike Romberg ( romberg@fsl.noaa.gov )
 //
 //  This file may be distributed under terms of the GPL
 //
@@ -25,7 +25,7 @@ public:
   static const char *cpuStr(int num);
 protected:
   int _lineNum;
-  float cputime_[2][4];
+  long cputime_[2][4];
   int cpuindex_;
 
   void getcputime(void);
