@@ -49,7 +49,7 @@ void DiskMeter::getdiskinfo( void )
     {
     IntervalTimerStop();
     total_ = maxspeed_;
-    char buf[256];
+    char buf[1024];
     ifstream stats( STATFILENAME );
 
     if ( !stats )
@@ -71,21 +71,23 @@ void DiskMeter::getdiskinfo( void )
     stats >> one >> two;
 
     // assume each "unit" is 1k. 
-    // This is true for ext2, but seems to be 512 bytes for vfat and 2k for cdroms
+    // This is true for ext2, but seems to be 512 bytes 
+    // for vfat and 2k for cdroms
     unsigned long int read_curr = one * 1024;
     unsigned long int write_curr = two * 1024;
 
-	fields_[0] = ((read_curr - read_prev_) * 1e6) / IntervalTimeInMicrosecs();
-  	fields_[1] = ((write_curr - write_prev_) * 1e6) / IntervalTimeInMicrosecs();
+    fields_[0] = ((read_curr - read_prev_) * 1e6) / IntervalTimeInMicrosecs();
+    fields_[1] = ((write_curr - write_prev_) * 1e6) / 
+      IntervalTimeInMicrosecs();
 
-  	if (fields_[0] + fields_[1] > total_)
+    if (fields_[0] + fields_[1] > total_)
        	total_ = fields_[0] + fields_[1];
 
-	fields_[2] = total_ - (fields_[0] + fields_[1]);
+    fields_[2] = total_ - (fields_[0] + fields_[1]);
     
     read_prev_ = read_curr;
     write_prev_ = write_curr;
-
+    
     //setUsed((fields_[0]+fields_[1]) * IntervalTimeInMicrosecs()/1e6, total_);
     // give rate in units per second, not units per interval
     setUsed((fields_[0]+fields_[1]), total_);
