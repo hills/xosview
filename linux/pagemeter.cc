@@ -54,12 +54,11 @@ void PageMeter::getpageinfo( void ){
     exit( 1 );
   }
 
-  stats.getline( buf, 256 );
-  stats.getline( buf, 256 );
-  stats.getline( buf, 256 );
-
-  stats >>buf >>pageinfo_[pageindex_][0]
-	      >>pageinfo_[pageindex_][1];
+  do {
+    stats >>buf;
+  } while (strcmp(buf, "swap"));
+	  
+  stats >>pageinfo_[pageindex_][0] >>pageinfo_[pageindex_][1];
 
   int oldindex = (pageindex_+1)%2;
   
@@ -81,3 +80,42 @@ void PageMeter::getpageinfo( void ){
   used( (int)((100 * (total_ - fields_[2])) / maxspeed_) );
   pageindex_ = (pageindex_ + 1) % 2;
 }
+
+
+// void PageMeter::getpageinfo( void ){
+//   total_ = 0;
+//   char buf[256];
+//   ifstream stats( STATFILENAME );
+
+//   if ( !stats ){
+//     cerr <<"Cannot open file : " <<STATFILENAME <<endl;
+//     exit( 1 );
+//   }
+
+//   stats.getline( buf, 256 );
+//   stats.getline( buf, 256 );
+//   stats.getline( buf, 256 );
+
+//   stats >>buf >>pageinfo_[pageindex_][0]
+// 	      >>pageinfo_[pageindex_][1];
+
+//   int oldindex = (pageindex_+1)%2;
+  
+//   for ( int i = 0; i < 2; i++ ) {
+//     if ( pageinfo_[oldindex][i] == 0 )
+//       pageinfo_[oldindex][i] = pageinfo_[pageindex_][i];
+
+//     fields_[i] = pageinfo_[pageindex_][i] - pageinfo_[oldindex][i];
+//     total_ += fields_[i];
+//   }
+
+//   if ( total_ > maxspeed_ )
+//     fields_[2] = 0.0;
+//   else {
+//     fields_[2] = maxspeed_ - total_;
+//     total_ = maxspeed_;
+//   }
+
+//   used( (int)((100 * (total_ - fields_[2])) / maxspeed_) );
+//   pageindex_ = (pageindex_ + 1) % 2;
+// }
