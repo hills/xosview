@@ -10,17 +10,29 @@
 #include "xosview.h"
 #include <fstream>
 #include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
-static const char STATFILENAME[] = "/proc/stat";
 #define MAX_PROCSTAT_LENGTH 2048
 
 DiskMeter::DiskMeter( XOSView *parent, float max ) : FieldMeterGraph(
-  parent, 3, "DISK", "READ/WRITE/IDLE")
+  parent, 3, "DISK", "READ/WRITE/IDLE"), _vmstat(false),
+  _statFileName("/proc/stat")
     {
     read_prev_ = 0;
     write_prev_ = 0;
     maxspeed_ = max;
-    getdiskinfo();
+
+    struct stat buf;
+    if (stat("/proc/vmstat", &buf) == 0
+      && buf.st_mode & S_IFREG)
+        {
+        _vmstat = true;
+        _statFileName = "/proc/vmstat";
+        }
+    else
+        getdiskinfo();
     }
 
 DiskMeter::~DiskMeter( void )
@@ -42,37 +54,16 @@ void DiskMeter::checkResources( void )
 
 void DiskMeter::checkevent( void )
     {
-    getdiskinfo();
+    if (_vmstat)
+        getvmdiskinfo();
+    else
+        getdiskinfo();
     drawfields();
     }
 
-void DiskMeter::getdiskinfo( void )
+void DiskMeter::updateinfo(unsigned long one, unsigned long two,
+  int fudgeFactor)
     {
-    IntervalTimerStop();
-    total_ = maxspeed_;
-    char buf[MAX_PROCSTAT_LENGTH];
-    std::ifstream stats( STATFILENAME );
-
-    if ( !stats )
-        {
-        std::cerr <<"Can not open file : " <<STATFILENAME << std::endl;
-        exit( 1 );
-        }
-
-    // Find the line with 'page'
-    stats >> buf;
-    while (strncmp(buf, "page", 9))
-        {
-        stats.ignore(MAX_PROCSTAT_LENGTH, '\n');
-        stats >> buf;
-        if (stats.eof())
-            break;
-        }
-
-	// read values
-    unsigned long one, two;
-    stats >> one >> two;
-
     // assume each "unit" is 1k.
     // This is true for ext2, but seems to be 512 bytes
     // for vfat and 2k for cdroms
@@ -85,8 +76,8 @@ void DiskMeter::getdiskinfo( void )
     // So this is a FIXME - but how ???
 
     float itim = IntervalTimeInMicrosecs();
-    unsigned long read_curr = one * 2;  // FIXME!
-    unsigned long write_curr = two * 2; // FIXME!
+    unsigned long read_curr = one * fudgeFactor;  // FIXME!
+    unsigned long write_curr = two * fudgeFactor; // FIXME!
 
     // avoid strange values at first call
     if(read_prev_ == 0) read_prev_ = read_curr;
@@ -112,4 +103,73 @@ void DiskMeter::getdiskinfo( void )
 
     setUsed((fields_[0]+fields_[1]), total_);
     IntervalTimerStart();
+    }
+
+
+void DiskMeter::getvmdiskinfo(void)
+    {
+    IntervalTimerStop();
+    total_ = maxspeed_;
+    char buf[MAX_PROCSTAT_LENGTH];
+    std::ifstream stats(_statFileName);
+    unsigned long one, two;
+
+    if ( !stats )
+        {
+        std::cerr <<"Can not open file : " << _statFileName << std::endl;
+        exit( 1 );
+        }
+
+
+    stats >> buf;
+    // kernel >= 2.5
+    while (!stats.eof() && strncmp(buf, "pgpgin", 7))
+        {
+        stats.ignore(1024, '\n');
+        stats >> buf;
+        }
+
+    // read first value
+    stats >> one;
+
+    while (!stats.eof() && strncmp(buf, "pgpgout", 7))
+        {
+        stats.ignore(1024, '\n');
+        stats >> buf;
+        }
+
+    // read second value
+    stats >> two;
+
+    updateinfo(one, two, 4);
+    }
+
+void DiskMeter::getdiskinfo( void )
+    {
+    IntervalTimerStop();
+    total_ = maxspeed_;
+    char buf[MAX_PROCSTAT_LENGTH];
+    std::ifstream stats(_statFileName);
+
+    if ( !stats )
+        {
+        std::cerr <<"Can not open file : " << _statFileName << std::endl;
+        exit( 1 );
+        }
+
+    // Find the line with 'page'
+    stats >> buf;
+    while (strncmp(buf, "page", 9))
+        {
+        stats.ignore(MAX_PROCSTAT_LENGTH, '\n');
+        stats >> buf;
+        if (stats.eof())
+            break;
+        }
+
+	// read values
+    unsigned long one, two;
+    stats >> one >> two;
+
+    updateinfo(one, two, 2);
     }

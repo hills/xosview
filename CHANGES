@@ -1,6 +1,9 @@
   /*  $Id$  */
 
 Changes since xosview-1.8.1
+ - Linux diskmeter now uses vmstat and thus works with 2.6.
+   But the units problem (block size) probably still remains.
+
  - Linux pagemeter should now work with 2.6 kernels
 
  - Merge in the fedora-2 nfs patch.
