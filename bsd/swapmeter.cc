@@ -14,6 +14,7 @@
 #include "xosview.h"
 
 #include "swapinternal.h"
+#include "netbsd.h"
 #include <stdlib.h>		//  For atoi().  BCG
 
 CVSID("$Id: ");
@@ -21,7 +22,8 @@ CVSID_DOT_H(SWAPMETER_H_CVSID);
 
 SwapMeter::SwapMeter( XOSView *parent )
 : FieldMeterDecay( parent, 2, "SWAP", "USED/FREE" ){
-  NetBSDInitSwapInfo();
+  NetBSDSwapInit();	//  In netbsd.cc
+  NetBSDInitSwapInfo();	//  In swapinternal.cc
 }
 
 SwapMeter::~SwapMeter( void ){

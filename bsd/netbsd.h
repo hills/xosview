@@ -36,6 +36,9 @@ void
 NetBSDGetNetInOut (long long * inbytes, long long * outbytes);
 
 int
+NetBSDSwapInit();
+
+int
 NetBSDDiskInit();
 
 void
