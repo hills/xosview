@@ -19,6 +19,7 @@ intmeter.o \
 serialmeter.o \
 loadmeter.o \
 btrymeter.o \
+diskmeter.o \
 MeterMaker.o
 
 CFILES := $(OBJS:.o=.cc)
