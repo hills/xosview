@@ -40,6 +40,7 @@ MemMeter::MemMeter( XOSView *parent )
 : FieldMeterDecay( parent, 4, "MEM", "ACT/INACT/WIRE/FREE" ){
 #define FREE_INDEX 3
 #endif
+  BSDPageInit();
 }
 
 MemMeter::~MemMeter( void ){ }
