@@ -20,6 +20,7 @@ loadmeter.o \
 btrymeter.o \
 diskmeter.o \
 raidmeter.o \
+lmstemp.o \
 MeterMaker.o
 
 FAIL_ARCHS =3D m68k sparc

@@ -2,6 +2,8 @@
 
 Changes since xosview-1.7.3
 
+- Add Leopold Toetsch's linux lmstemp meter.
+
 - Linux port (and maybe others) now works with gcc-3.0.4
 
 - added IRIX 6.5 support

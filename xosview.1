@@ -324,6 +324,10 @@ Equivalent to -int and +int.
 Equivalent to -irqrate and +irqrate.
 .RE
 
+.\"  Handle -/+lmstemp
+.pm lmstemp
+.RE
+
 -xrm \fIresource_string\fP
 .RS
 This switch allows any of xosview's resources to be set on the command line.
@@ -733,8 +737,53 @@ This is the color that will be used to show "inactive" interrupts.
 .pp int
 
 
-\fBBattery Meter Resources\fP
+\fBLm Sensors Temperature Resources\fP
 
+.xt lmstemp
+
+xosview*lmstempHighest:	100
+.RS
+Highest temp value displayed, default 100.
+.RE
+
+xosview*lmstempActColor:  \fIcolor\fP
+.RS
+Color of actual temperature.
+.RE
+
+xosview*lmstempHighColor:  \fIcolor\fP
+.RS
+Color above alarm temperature, also used to indicate alarm.
+.RE
+
+xosview*lmstempIdleColor:   \fIcolor\fP
+.RS
+Color between actual and alarm temperatures.
+.RE
+
+xosview*lmstemp\fIN\fP:	\fIfilename\fP
+.RS
+Name of temperature file from /proc/sys/dev/sensors/*/*, N=1..
+.br
+Note if more files with same name exists, only the first is found. There is
+currently no possiblity to configure equal named files on different busses
+(which would be rarely necessary, I hope).
+.br
+eg.
+.br
+xosview*lmstemp1:	temp
+xosview*lmstemp2:	remote_temp
+.RE
+
+xosview*lmstempLabel\fIN\fP:	\fILabelstring\fP
+.RS
+N-th label for above temperatures, default is TMP.
+.RE
+
+.pp lmstemp
+.uf lmstemp
+
+\fBBattery Meter Resources\fP
 
 xosview*battery: (True or False)
 .RS
@@ -964,6 +1013,11 @@ Thomas Waldmann (ThomasWaldmann@gmx.de)
 .RS
 Linux raid meter, bitfieldmeter.
 Many cosmetic fixes.
+.RE
+
+Leopold Toetsch <lt@toetsch.at>
+.RS
+Linux lms temp meter.
 .RE
 
 David O'Brien (obrien@nuxi.com)

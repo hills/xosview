@@ -1,5 +1,5 @@
-//  
-//  Copyright (c) 1994, 1995 by Mike Romberg ( romberg@fsl.noaa.gov )
+//
+//  Copyright (c) 1994, 1995, 2002 by Mike Romberg ( romberg@fsl.noaa.gov )
 //
 //  This file may be distributed under terms of the GPL
 //
@@ -20,6 +20,7 @@
 #include "btrymeter.h"
 #include "diskmeter.h"
 #include "raidmeter.h"
+#include "lmstemp.h"
 
 #include <stdlib.h>
 
@@ -44,7 +45,7 @@ void MeterMaker::makeMeters(void){
     push(new MemMeter(_xos));
   if (_xos->isResourceTrue("swap"))
     push(new SwapMeter(_xos));
-  
+
   if (_xos->isResourceTrue("page"))
     push(new PageMeter(_xos, atof(_xos->getResource("pageBandwidth"))));
 
@@ -80,5 +81,22 @@ void MeterMaker::makeMeters(void){
     int RAIDCount = atoi(_xos->getResource("RAIDdevicecount"));
     for (int i = 0 ; i < RAIDCount ; i++)
       push(new RAIDMeter(_xos, i));
+  }
+
+  // check for the LmsTemp meter
+  if (_xos->isResourceTrue("lmstemp")){
+    char caption[80];
+    snprintf(caption, 80, "ACT/HIGH/%s",
+      _xos->getResourceOrUseDefault("lmstempHighest", "100"));
+    for (int i = 1 ; ; i++) {
+      char s[20];
+      snprintf(s, 20, "lmstemp%d", i);
+      const char *res = _xos->getResourceOrUseDefault(s, NULL);
+      if(!res || !*res)
+	break;
+      snprintf(s, 20, "lmstempLabel%d", i);
+      const char *lab = _xos->getResourceOrUseDefault(s, "TMP");
+      push(new LmsTemp(_xos, res, lab, caption));
+    }
   }
 }
