@@ -2,13 +2,16 @@
 // $Id$
 //
 
-#include "xwin.h"
-#include "Xrm.h"
 #include <X11/Xatom.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include "general.h"
+#include "xwin.h"
+#include "Xrm.h"
 
+CVSID("$Id$");
+CVSID_DOT_H(XWIN_H_CVSID);
 
 //-----------------------------------------------------------------------------
 
@@ -334,6 +337,8 @@ const char *XWin::getResource( const char *name ){
   {
     cerr << "Error:  Couldn't find '" << name << "' resource in the resource database!\n";
     exit (-1);
+      /*  Some compilers aren't smart enough to know that exit() exits.  */
+    return '\0';
   }
 }
 
