@@ -26,14 +26,16 @@ static XrmOptionDescRec options[] = {
 { "+labels", "*labels", XrmoptionNoArg, "True" },
 { "-load", "*load", XrmoptionNoArg, "False" },
 { "+load", "*load", XrmoptionNoArg, "True" },
-//  FIXME BCG  The network option needs to be changed -- it is overloaded
-//  more than it should be.  It is both whether or not a netmeter should be
-//  shown, and the maximum bandwidth of the network.  A 'xosview.net'
-//  resource exists for the sole purpose of turning on or off the
-//  netmeter already.
-{ "-network", "*network", XrmoptionSepArg, (caddr_t) NULL },
+//  Previously, network was overloaded to be the bandwidth and the
+//  on/off flag.  Now, we have -net for on/off, and networkBandwidth
+//  for bandwidth, with the alias networkBW, and network for backwards
+//  compatibility.
+{ "-network", "*networkBandwidth", XrmoptionSepArg, (caddr_t) NULL },
+{ "-networkBW", "*networkBandwidth", XrmoptionSepArg, (caddr_t) NULL },
+{ "-networkBandwidth", "*networkBandwidth", XrmoptionSepArg, (caddr_t) NULL },
 //  -net is an abbreviation for -network
-{ "-net", "*network", XrmoptionSepArg, (caddr_t) NULL },
+{ "-net", "*net", XrmoptionNoArg, "False" },
+{ "+net", "*net", XrmoptionNoArg, "True" },
 
 // Page Meter
 { "-page", "*page", XrmoptionNoArg, "False" },
@@ -50,8 +52,13 @@ static XrmOptionDescRec options[] = {
 { "+serial4", "*serial4", XrmoptionNoArg, "True" },
 { "-serial4", "*serial4", XrmoptionNoArg, "False" },
 
+#ifdef XOSVIEW_NETBSD
+//  Disk Meter Options
+{ "-disk", "*disk", XrmoptionNoArg, "False" },
+{ "+disk", "*disk", XrmoptionNoArg, "True" },
+#endif
 //  Special, catch-all option here --
-//    xosview -xrm "*memFreeColor: purple" should work.
+//    xosview -xrm "*memFreeColor: purple" should work, for example.
 { "-xrm", "*xrm", XrmoptionResArg, (caddr_t) NULL },
 };
 //  This auto-detects changes in the number of options.
