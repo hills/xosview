@@ -12,7 +12,7 @@
 #ifndef _NETMETER_H_
 #define _NETMETER_H_
 
-#define NETMETER_H_CVSID "$Id: "
+#define NETMETER_H_CVSID "$Id$"
 
 #include "fieldmeterdecay.h"
 #include "timer.h"

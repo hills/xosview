@@ -11,7 +11,7 @@
 #ifndef _DISKMETER_H_
 #define _DISKMETER_H_
 
-#define DISKMETER_H_CVSID "$Id: "
+#define DISKMETER_H_CVSID "$Id$"
 
 #include "fieldmeterdecay.h"
 #include <sys/types.h>		//  For u_int64_t

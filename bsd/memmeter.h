@@ -12,7 +12,7 @@
 #ifndef _MEMMETER_H_
 #define _MEMMETER_H_
 
-#define MEMMETER_H_CVSID "$Id: "
+#define MEMMETER_H_CVSID "$Id$"
 
 #include "fieldmeterdecay.h"
 

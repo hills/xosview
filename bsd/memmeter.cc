@@ -20,7 +20,7 @@
 #include <vm/vm_param.h>
 #include <stdlib.h>		//  For atoi().  BCG
 
-CVSID("$Id: ");
+CVSID("$Id$");
 CVSID_DOT_H(MEMMETER_H_CVSID);
 //  Once we figure out how to get the buffers field, change the next line.
 #define FREE_INDEX 3

@@ -23,6 +23,10 @@
 
 #include <sys/socket.h>         /*  These two are needed for the  */
 #include <net/if.h>             /*    NetMeter helper functions.  */
+#include "netbsd.h"		/*  To grab CVSID stuff.  */
+
+CVSID("$Id$");
+CVSID_DOT_H(NETBSD_H_CVSID);
 
 
 // ------------------------  local variables  ---------------------

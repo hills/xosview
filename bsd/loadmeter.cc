@@ -15,7 +15,7 @@
 #include <stdlib.h>  //  for getloadavg()
 #include <stdio.h>
 
-CVSID("$Id: ");
+CVSID("$Id$");
 CVSID_DOT_H(LOADMETER_H_CVSID);
 
 LoadMeter::LoadMeter( XOSView *parent )

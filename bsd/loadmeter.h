@@ -11,7 +11,7 @@
 #ifndef _LOADMETER_H_
 #define _LOADMETER_H_
 
-#define LOADMETER_H_CVSID "$Id: "
+#define LOADMETER_H_CVSID "$Id$"
 
 #include "fieldmeterdecay.h"
 

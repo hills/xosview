@@ -17,7 +17,7 @@
 #include "netbsd.h"
 #include <stdlib.h>		//  For atoi().  BCG
 
-CVSID("$Id: ");
+CVSID("$Id$");
 CVSID_DOT_H(SWAPMETER_H_CVSID);
 
 SwapMeter::SwapMeter( XOSView *parent )

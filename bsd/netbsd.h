@@ -15,8 +15,12 @@
 #include <nlist.h>
 
 #include <sys/socket.h>
-#include <net/if.h>
+//  net/if.h is not protected from multiple inclusions, and apparently
+//  something changed recently such that it is included via
+//  sys/socket.h???  bgrayson
+//#include <net/if.h>
 
+#define NETBSD_H_CVSID	"$Id$"
 void
 NetBSDInit();
 

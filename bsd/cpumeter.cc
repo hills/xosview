@@ -17,7 +17,7 @@
 #include "netbsd.h"             //  For NetBSD-specific icky kvm_ code.  BCG
 #include <stdlib.h>		//  For use of atoi  BCG
 
-CVSID("$Id: ");
+CVSID("$Id$");
 CVSID_DOT_H(CPUMETER_H_CVSID);
 
 CPUMeter::CPUMeter( XOSView *parent )
