@@ -14,8 +14,9 @@
 #include "xwin.h"
 #include "Xrm.h"  //  For Xrm resource manager class.
 
-#define MAX_SAMPLES_PER_SECOND	10  /*  Take at most n samples per
-					second (default of 10)  */
+
+/*  Take at most n samples per second (default of 10)  */
+extern int MAX_SAMPLES_PER_SECOND;
 
 class Meter;
 
