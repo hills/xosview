@@ -38,6 +38,9 @@ static XrmOptionDescRec options[] = {
 // Swapmeter resources
 { "-swap", "*swap", XrmoptionNoArg, "False" },
 { "+swap", "*swap", XrmoptionNoArg, "True" },
+// Batterymeter resources
+{ "-battery", "*battery", XrmoptionNoArg, "False" },
+{ "+battery", "*battery", XrmoptionNoArg, "True" },
 
 //  Previously, network was overloaded to be the bandwidth and the
 //  on/off flag.  Now, we have -net for on/off, and networkBandwidth

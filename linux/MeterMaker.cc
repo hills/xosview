@@ -56,5 +56,6 @@ void MeterMaker::makeMeters(void){
   if (_xos->isResourceTrue("interrupts"))
     push(new IntMeter(_xos));
 
-  //push(new BtryMeter(_xos));
+  if (_xos->isResourceTrue("battery"))
+    push(new BtryMeter(_xos));
 }

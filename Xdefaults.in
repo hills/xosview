@@ -125,6 +125,12 @@ xosview*interrupts:       True
 xosview*intOnColor:       red
 xosview*intOffColor:      aquamarine
 
+! Battery meter
+xosview*battery:          False
+xosview*batteryLeftColor: orange
+xosview*batteryUsedColor: aquamarine
+xosview*batteryPriority:  50
+
 !!!
 !!!  NetBSD-only meters
 !!!
