@@ -51,8 +51,8 @@ AC_CHECK_HEADER(linux/modversions.h, [USE_MOD_VERSIONS=-DMODVERSIONS])
 
 fi
 ,
-MEMSTAT=MemStat
-echo "enabled  Linux memstat module by default"
+MEMSTAT=
+echo "disabled Linux memstat module by default"
 dnl
 dnl If this module is to be built then check to see if we can
 dnl use MODVERSIONS.
