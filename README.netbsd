@@ -1,9 +1,13 @@
-	README file for xosview version 1.4.0, NetBSD-specific.
-	CVS Id:  Revision: $Id$
+README file for xosview version 1.4.0, NetBSD-specific.
+
+(Yes, this is very out of date.  We're working on it....)
+
+CVS Id:  Revision: $Id$
 
   Written by Brian Grayson.  Please direct all comments, criticisms, etc.
 to me at bgrayson@ece.utexas.edu.
 
+*****************************************************************************
   Note:  xosview needs to run 'setgid kmem' in order to access some of the
     kernel information (at least until some more statistics are added to
     the /kern or /proc file systems).  If you do not have root or kmem
@@ -12,49 +16,50 @@ to me at bgrayson@ece.utexas.edu.
   Note:  The default Makefiles used by the xosview distribution require
     GNU make, rather than BSD make.  I've tried to make a parallel set of
     Makefiles for BSD make, but it's not easy trying to keep them
-    completely the same.  If you don't already have GNU make, try "make -f
-    Makefile.bsd".  If that doesn't work, I guess you'll have to bite the
-    bullet and install GNU make (available from your favorite GNU site)!
+    completely the same.  If you don't already have GNU make, contact
+    me and I will make custom BSD-make Makefiles for you.  If only
+    BSD-make and GNU-make agreed on 'include' versus '.include' etc.....  :(
+*****************************************************************************
 
   To make xosview:
 
-    Edit the Makefile.config to use METERDIR = netbsd (this variable
-      controls which operating-system subdirectory is used for
-      platform-dependent code).  Since xosview started out as a Linux
-      application, the default configuration is usually for Linux.
+    Unpack the tar file.  It should create its own directory, named
+      xosview-1.x.x, and place all of its files there.
 
+    Now, cd to xosview-1.x.x, and run ./configure.  This should set up
+      acceptable Makefiles for you.
+
+    Edit Makefile.config if desired (to enable debugging, or disable
+      optimization, for example).
 
     Make sure CXX and CXXFLAGS are set up properly for your version of gcc
       (gcc 2.6.3 or higher is required.  The code development was done using
       gcc 2.7.2).  Only profiling (-p, -pg, -a) and debugging (-g, -ggdb)
       options should usually be modified in the CXXFLAGS definitions.
 
-    The Makefile.config should have a section (using an 'ifeq') that adds
-      -lkvm to the LIBS variable.  If not, or if you are trying to hand-link,
-      make sure -lkvm is passed to the linker.
+    The Makefile.config should include -lkvm in the LIBS definition.
+      If not, configuration must have not worked properly.  Mail me if
+      this happens....
 
-     Run "make" with no options.  (Since most people shouldn't need to mess
-       with the source code, we haven't enabled automatic dependence
-       checking.  If you plan on modifying bits and pieces and recompiling,
-       just modify the "include dependfile" lines appopriately, or mail
-       one of us (Mike or I) for the appropriate lines to uncomment.)
+    Run GNU "make" with no options.  (Since most people shouldn't need to mess
+      with the source code, we haven't enabled automatic dependence
+      checking.  If you plan on modifying bits and pieces and recompiling,
+      mail one of us (Mike or I) for the appropriate lines to uncomment.)
   
-     It should start compiling the netbsd directory files, create a library
-       (libmeter.a) out of all the .o files, and then compile the
-       main directory.   Finally, it should link. 
+    It should start compiling the netbsd directory files, create a library
+      (libmeter.a) out of all the .o files, and then compile the
+      main directory.   Finally, it should link. 
 
     Test the executable to make sure it works.  You need to be root, or a
       member of group 'kmem', to test it at this stage.  xosview will come up
       with the default compile-time resources.  If there are no problems,
-      then you can use 'gmake install' (run while 'root') to install a
-      stripped, setgid copy of xosview into /usr/bin/X11 (aka
-      /usr/local/X11R6/bin), and install the Xdefaults into the
-      /usr/lib/X11/app-defaults/XOsview file.  An Imakefile is going to be
-      constructed for the next release, to avoid having specific paths
-      written into the Makefile.  (Any volunteers?  Mike and I are newbies
-      when it comes to xmkmf and company...)
+      then you can use 'make install' (run while 'root') to install a
+      stripped, setgid copy of xosview and the Xdefaults into appropriate
+      places.  The configure script uses a little Imakefile magic to
+      guess the proper locations (usually /usr/bin/X11 and
+      /usr/lib/X11/app-defaults/XOsview, respectively).
 
-    The man page can be installed by "gmake install-man".
+    The man page can be installed by "make install-man".
 
     If you have /usr/local NFS-mounted from another computer, you may need
       to make sure that the mount has maproot=0 and is suid (or something
@@ -76,6 +81,15 @@ to me at bgrayson@ece.utexas.edu.
     This setup is the one that is viewable on my xosview web page
     (http://lore.ece.utexas.edu/~bgrayson/xosview.html).
 
+  xosview is able to accept the -name option, for you XResource
+    aficionados.  
+    
+  Also, NetBSD-mac68k people that have monochrome systems may want to try
+    out the new stipple code -- set the enableStipple resource to true,
+    and choose black and white for the various fields.  The fields are
+    automatically stippled 100%, 75%, 50%, and 25% in a fixed fashion
+    (future versions may allow the user to specify the foreground color
+    (white or black) and the stipple percentage).
 
   If this README was incomplete, or you feel an additional comment or two
     would be helpful to other users, please Email me -- I want this to be as
