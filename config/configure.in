@@ -37,7 +37,8 @@ dnl Call each ports macro so that it can set up its own
 dnl options / configuration.
 dnl
 case $host_os in
-linux)   AC_XOSV_LINUX  ;;
+linux*)   AC_XOSV_LINUX  
+          host_os=linux ;;
 ##  Check for known versions of NetBSD...
 dnl  Notice that we need to use [] to 'quote' the brackets --
 dnl    according to GNU m4 and autoconf, [ and ] are the
