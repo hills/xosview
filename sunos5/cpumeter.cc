@@ -81,7 +81,7 @@ void CPUMeter::getcputime(void)
 const char *CPUMeter::toUpper(const char *str)
 {
 	static char buffer[256];
-	strcpy(buffer, str);
+	strncpy(buffer, str, 256);
 	for (char *tmp = buffer ; *tmp != '\0' ; tmp++)
 		*tmp = toupper(*tmp);
 

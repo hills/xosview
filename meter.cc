@@ -38,14 +38,16 @@ void Meter::checkResources( void ){
 
 void Meter::title( const char *title ){
   delete[] title_;
-  title_ = new char[strlen( title ) + 1];
-  strcpy( title_, title );
+  int len = strlen(title);
+  title_ = new char[len + 1];
+  strncpy( title_, title, len );
 }
 
 void Meter::legend( const char *legend ){
   delete[] legend_;
-  legend_ = new char[strlen( legend ) + 1];
-  strcpy( legend_, legend );
+  int len = strlen(legend);
+  legend_ = new char[len + 1];
+  strncpy( legend_, legend, len );
 }
 
 void Meter::resize( int x, int y, int width, int height ){

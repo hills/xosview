@@ -68,14 +68,16 @@ void Host::copy(const struct hostent *hent){
     }
 
     // copy the official name.
-    _hent.h_name = new char[strlen(hent->h_name) + 1];
-    strcpy((char *)_hent.h_name, hent->h_name);
+    int hnamelen = strlen(hent->h_name) + 1;
+    _hent.h_name = new char[hnamelen];
+    strncpy((char *)_hent.h_name, hent->h_name, hnamelen);
 
     // copy the aliases.
     _hent.h_aliases = new char *[_numAliases + 1];
     for (int i = 0 ; i < _numAliases ; i++){
-      _hent.h_aliases[i] = new char[strlen(hent->h_aliases[i]) + 1];
-      strcpy(_hent.h_aliases[i], hent->h_aliases[i]);
+      int len = strlen(hent->h_aliases[i]) + 1;
+      _hent.h_aliases[i] = new char[len + 1];
+      strncpy(_hent.h_aliases[i], hent->h_aliases[i], len);
     }
     _hent.h_aliases[_numAliases] = NULL;
 

@@ -195,9 +195,8 @@ void XOSView::checkOverallResources() {
 const char *XOSView::winname( void ){
   static char name[100];
   char host[100];
-  strcpy( name, NAME );
   gethostname( host, 99 );
-  strcat( name, host );
+  snprintf( name, 100, "%s%s", NAME, host);
   //  Allow overriding of this name through the -title option.
   return getResourceOrUseDefault ("title", name);
 }

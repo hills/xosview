@@ -149,15 +149,15 @@ BSDInitSwapInfo()
 		int i;
 		char msgbuf[BUFSIZ];
 
-                strcpy(msgbuf, "xosview: swap: cannot find");
+                strncpy(msgbuf, "xosview: swap: cannot find", BUFSIZ);
                 for (i = 0; syms[i].n_name != NULL; i++) {
                         if (syms[i].n_value == 0) {
-                                strcat(msgbuf, " ");
-                                strcat(msgbuf, syms[i].n_name);
+			  	strncat(msgbuf, " ", BUFSIZ-strlen(msgbuf));
+			  	strncat(msgbuf, syms[i].n_name,
+				    BUFSIZ-strlen(msgbuf));
                         }
                 }
-		strcat(msgbuf,"\n");
-                printf(msgbuf);
+                printf("%s\n", msgbuf);
 #endif
                 return (0);
         }

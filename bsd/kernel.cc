@@ -22,6 +22,7 @@
 #include <fcntl.h>
 #include <kvm.h>
 #include <limits.h>		/*  For _POSIX2_LINE_MAX  */
+#include <string.h>		/*  For strncpy().  */
 
 #include <err.h>                /*  For err(), warn(), etc.  BCG  */
 #include <errno.h>
@@ -165,7 +166,7 @@ SetKernelName(const char* const kernelName)
       kernelName);
     exit(1);
   }
-  strcpy(kernelFileName, kernelName);
+  strncpy(kernelFileName, kernelName, _POSIX2_LINE_MAX);
 }
 
 void
