@@ -136,13 +136,13 @@ void FieldMeterDecay::drawfields( int manditory ){
       //    Let's correct for that here.
     if ( manditory || (twidth != lastvals_[i]) || (x != lastx_[i]) ){
       if (!checkX(x, twidth))
-        cerr <<"ONE" <<endl;
+        cerr <<__FILE__ << ":" << __LINE__ <<endl;
       parent_->drawFilledRectangle( x, y_, twidth, halfheight );
     }
 
     if ( manditory || (decay_[i] != lastDecayval_[i]) ){
       if (!checkX(decayx, decaytwidth))
-        cerr <<"ONE" <<endl;
+        cerr <<__FILE__ << ":" << __LINE__ <<endl;
       parent_->drawFilledRectangle( decayx, y_+halfheight+1,
             decaytwidth, height_ - halfheight-1);
     }

@@ -271,7 +271,7 @@ bool FieldMeter::checkX(int x, int width) const {
     cerr << "FieldMeter::checkX() : bad horiz values for meter : "
          << name() << endl;
 
-    cerr <<"total_ = " <<total_ <<endl;
+    cerr <<"value "<<x<<", width "<<width<<", total_ = "<<total_<<endl;
 
     for (int i = 0 ; i < numfields_ ; i++)
       cerr <<"fields_[" <<i <<"] = " <<fields_[i] <<",";
