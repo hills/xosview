@@ -19,7 +19,9 @@ public:
 private:
   XOSView *_xos;
 
-    int setupSadc();
+#ifdef USE_SAR
+    int setupSar();
+#endif
 };
 
 #endif

@@ -79,16 +79,16 @@ void MeterMaker::makeMeters(void)
 #endif
 }
 
-#if 0 
-// starts /usr/lib/sa/sadc, from where certain meters read data
-int MeterMaker::setupSadc()
+#ifdef USE_SAR
+// starts /usr/bin/sar, from where certain meters read data
+int MeterMaker::setupSar()
 {
-    char    sadcPath[] = "/usr/lib/sa/sadc";
+    char    sarPath[] = "/usr/bin/sar";
     int fd[2];
     int input = 0;
 
     if (pipe(fd) == -1)
-        perror("setupSadc: pipe");
+        perror("setupSar: pipe");
 
     if ( fork()==0 )    // child
     {
@@ -97,8 +97,8 @@ int MeterMaker::setupSadc()
         close(fd[0]);   // close other end of the pipe
 
         // sadc wants number of loops: 31536000 is one year
-        if (execlp (sadc_path, sadc_path, "1", "31536000", 0) == -1)
-            perror("setupSadc: exec sadc");
+        if (execlp (sar_path, sar_path, "-g", "1", "31536000", 0) == -1)
+            perror("setupSar: exec sar");
     }
 
     input = fd[0];
