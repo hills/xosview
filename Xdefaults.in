@@ -63,7 +63,21 @@ xosview*loadCritThreshold:  5
 xosview*loadWarnThreshold:  2
 xosview*loadDecay:          False
 xosview*loadGraph:          False
-xosview*loadUsedFormat:	    float
+xosview*loadUsedFormat:     float
+
+! Gfx Meter Resources ( Irix )
+
+xosview*gfx:               True
+xosview*gfxCritColor:      red
+xosview*gfxWarnColor:      orange
+xosview*gfxSwapColor:      seagreen
+xosview*gfxIdleColor:      aquamarine
+xosview*gfxPriority:       9    ! dont change, until you know what you do
+xosview*gfxCritThreshold:  120
+xosview*gfxWarnThreshold:  60
+xosview*gfxDecay:          False
+xosview*gfxGraph:          False
+xosview*gfxUsedFormat:	   autoscale
 
 ! CPU Meter Resources
 

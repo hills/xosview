@@ -9,6 +9,7 @@
 
 #include "cpumeter.h"
 #include "memmeter.h"
+#include "gfxmeter.h"
 #if 0
 #include "swapmeter.h"
 #include "pagemeter.h"
@@ -66,6 +67,9 @@ void MeterMaker::makeMeters(void)
 
     }
 
+    if (_xos->isResourceTrue("gfx"))
+        push(new GfxMeter( _xos, atoi( _xos->getResource( "gfxWarnThreshold" ))));
+
     if (_xos->isResourceTrue("mem"))
         push(new MemMeter(_xos));
 
@@ -79,33 +83,3 @@ void MeterMaker::makeMeters(void)
 #endif
 }
 
-#ifdef USE_SAR
-// starts /usr/bin/sar, from where certain meters read data
-int MeterMaker::setupSar()
-{
-    char    sarPath[] = "/usr/bin/sar";
-    int fd[2];
-    int input = 0;
-
-    if (pipe(fd) == -1)
-        perror("setupSar: pipe");
-
-    if ( fork()==0 )    // child
-    {
-        close(1);       // move fd[write] to stdout
-        dup(fd[1]);
-        close(fd[0]);   // close other end of the pipe
-
-        // sadc wants number of loops: 31536000 is one year
-        if (execlp (sar_path, sar_path, "-g", "1", "31536000", 0) == -1)
-            perror("setupSar: exec sar");
-    }
-
-    input = fd[0];
-    close(fd[1]);   // Close other end of the pipe
-
-    return input;
-}
-
-
-#endif

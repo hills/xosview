@@ -12,6 +12,8 @@ OBJS = \
 MeterMaker.o \
 loadmeter.o \
 cpumeter.o \
+gfxmeter.o \
+sarmeter.o \
 memmeter.o 
 #pagemeter.o \
 #swapmeter.o

@@ -18,10 +18,6 @@ public:
 
 private:
   XOSView *_xos;
-
-#ifdef USE_SAR
-    int setupSar();
-#endif
 };
 
 #endif
