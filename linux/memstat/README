@@ -4,8 +4,3 @@ proc filesystem.  The code for the memstat module is very similar to the
 code which produces the /proc/meminfo output.  There is one difference.
 /proc/memstat has output which allows xosview to display the percentage
 of memory which is shared.  See README.linux for further details.
-
-**NOTE** This code will only work for linux2.0.  In the near future, I
-hope to have it working with linux2.1.  Anyone out there who is familiar
-with the module related changes in linux2.1 is encouraged :) to send
-in patches.
