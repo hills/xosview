@@ -126,6 +126,7 @@ void FieldMeterDecay::drawfields( int manditory ){
       decaytwidth = width_ + x_ - decayx;
 
     parent_->setForeground( colors_[i] );
+    parent_->setStippleN(i%4);
 
       //  drawFilledRectangle() adds one to its width and height.
       //    Let's correct for that here.
@@ -146,6 +147,7 @@ void FieldMeterDecay::drawfields( int manditory ){
     lastx_[i] = x;
     lastDecayval_[i] = decay_[i];
 
+    parent_->setStippleN(0);	/*  Restore all-bits stipple.  */
     if ( dousedlegends_ )
       drawused( manditory );
     x += twidth;
