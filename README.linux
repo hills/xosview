@@ -9,7 +9,13 @@
         compatable with your C library.  This information can be gathered
         by reading the release notes for the libraries.  If you do not
         use compatable libraries xosview will probably crash due to a 
-        segmentation violation.
+        segmentation violation.  In particular, recent redhat distributions 
+        seem to have a libg++ which has bad strstream code in it.  Xosview
+        is know to work with the following libc/libg++ combinations.  If you
+        are having trouble with xosview dumping core in strstream code try
+        one of these library combinations:
+
+            libc.so.5.4.38, libstdc++.so.27.2.8
 
       - The memory meter can now display shared memory correctly.
         Unfortunatly, it needs more information than a "stock" linux
@@ -18,13 +24,10 @@
         this release.  If this module is not loaded, then xosview will
         not provide a "shared" memory field in the memory meter.
 
-        This kernel module will not be built by default because it only
-        works for linux2.0 at the moment.  If you are running linux2.0
-        and want to have xosview display shared memory usage then you
-        can enable this module with the '--enable-linux-memstat' switch
-        to configure.  Please see the file linux/memstat/README for more
-        details.
-        
+        The memstat module is now built by default thanks to Paal Beyer 
+        <pbeyer@online.no> who provided code to make it work under linux
+        2.1.  If you do not want to build the memstat modue you can run
+        configure with a '--disable-linux-memstat' switch.
 
 To install xosview:
         
