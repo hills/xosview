@@ -2,6 +2,8 @@
 
 Changes since xosview-1.7.3
 
+- added IRIX 6.5 support
+
 - Updated NetBSD support, based on patches from Bernd Ernesti, to
   use new CPU meter sysctl interface.
 
