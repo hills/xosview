@@ -9,6 +9,10 @@ Changes since xosview-1.5.1, in no particular order:
 
   Finally found the missing 'else' that was causing the net meter
     in particular to occasionally overwrite the label.
+  
+  Found 32-bit-wrap case that was also causing the netmeter grief.
+
+  Bitmeter class drawing routine tweaked.
 
 Changes since xosview-1.5.0, in no particular order:
 
