@@ -26,7 +26,13 @@ CVSID("$Id$");
 CVSID_DOT_H(CPUMETER_H_CVSID);
 
 CPUMeter::CPUMeter( XOSView *parent )
+#ifdef XOSVIEW_FREEBSD
+: FieldMeterDecay( parent, 5, "CPU", "USR/NICE/SYS/INT/FREE" ){
+#define FREE_INDEX 4
+#else
 : FieldMeterDecay( parent, 4, "CPU", "USR/NICE/SYS/FREE" ){
+#define FREE_INDEX 3
+#endif
   for ( int i = 0 ; i < 2 ; i++ )
     for ( int j = 0 ; j < 4 ; j++ )
       cputime_[i][j] = 0;
@@ -46,7 +52,12 @@ void CPUMeter::checkResources( void ){
   setfieldcolor( 0, parent_->getResource("cpuUserColor") );
   setfieldcolor( 1, parent_->getResource("cpuNiceColor") );
   setfieldcolor( 2, parent_->getResource("cpuSystemColor") );
+#ifdef XOSVIEW_FREEBSD
+  setfieldcolor( 3, parent_->getResource("cpuInterruptColor") );
+  setfieldcolor( 4, parent_->getResource("cpuFreeColor") );
+#else
   setfieldcolor( 3, parent_->getResource("cpuFreeColor") );
+#endif
   priority_ = atoi (parent_->getResource("cpuPriority"));
   dodecay_ = !strcmp (parent_->getResource("cpuDecay"),"True");
   SetUsedFormat (parent_->getResource("cpuUsedFormat"));
@@ -68,19 +79,28 @@ void CPUMeter::getcputime( void ){
 
   cputime_[cpuindex_][0] = tempCPU[0];
   cputime_[cpuindex_][1] = tempCPU[1];
+#ifdef XOSVIEW_FREEBSD
+  // FreeBSD seems at least to be filling cp_time[CP_INTR].  So, we add that
+  // as another field. (pavel 25-Jan-1998)
+  cputime_[cpuindex_][2] = tempCPU[2];
+  cputime_[cpuindex_][3] = tempCPU[3];
+  cputime_[cpuindex_][4] = tempCPU[4];
+#else /* XOSVIEW_FREEBSD */
 //  Merge System and Interrupt here...  NetBSD does not yet (Nov 95) support
 //  the interrupt ticks, even though most code has been written to allow
 //  it -- interrupt ticks are credited to system by the kernel.  BCG
   cputime_[cpuindex_][2] = tempCPU[2] + tempCPU[3];
   cputime_[cpuindex_][3] = tempCPU[4];
+#endif /* XOSVIEW_FREEBSD */
   //  End NetBSD-specific code...  BCG
+
   
   int oldindex = (cpuindex_+1)%2;
-  for ( int i = 0 ; i < 4 ; i++ ){
+  for ( int i = 0 ; i <= FREE_INDEX ; i++ ){
     fields_[i] = cputime_[cpuindex_][i] - cputime_[oldindex][i];
     total_ += fields_[i];
   }
-  setUsed (total_ - fields_[3], total_);
+  setUsed (total_ - fields_[FREE_INDEX], total_);
 
   cpuindex_ = (cpuindex_ + 1) % 2;
 }
