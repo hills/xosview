@@ -50,8 +50,11 @@ INSTALL_ARGS='-s -m 4755'
 
 
 AC_DEFUN(AC_XOSV_NETBSD, [
+dnl  We need to strip the version numbers off the $host_os string (netbsd1.1)
+dnl  Let's just be lazy -- set host_os to be netbsd.  
+	host_os=netbsd
 dnl
-dnl Nethsd needs to link with libknm
+dnl Netbsd needs to link with libkvm
 dnl
         EXTRALIBS=-lkvm
         INSTALL_ARGS='-s -g kmem -m 02555'
