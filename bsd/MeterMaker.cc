@@ -23,9 +23,7 @@
 #include "loadmeter.h"
 #include "diskmeter.h"
 #include "pagemeter.h"
-#ifdef XOSVIEW_FREEBSD
-#include "intmeter.h"  
-#endif
+#include "intmeter.h"
 //  This one is not yet supported under *BSD.
 //#include "serialmeter.h"
 
@@ -62,6 +60,7 @@ void MeterMaker::makeMeters(void){
   if (_xos->isResourceTrue("disk"))
     push(new DiskMeter (_xos, atof(_xos->getResource("diskBandwidth"))));
 
+  push(new IntMeter (_xos));
   //  The serial meters and the interrupt meter are not yet
   //  available for NetBSD.  BCG
 #ifdef XOSVIEW_FREEBSD
