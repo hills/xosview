@@ -42,9 +42,8 @@ void MeterMaker::makeMeters(void){
       push(new PageMeter(_xos, atof(_xos->getResource("pageBandwidth"))));
 
   // check for the net meter
-  //  FIXME  This check should be changed to check for the "net" resource.  BCG
-  if (strcmp(_xos->getResource("network"), "0"))
-    push(new NetMeter(_xos, atof(_xos->getResource("network"))));
+  if (strcmp(_xos->getResource("net"), "True"))
+    push(new NetMeter(_xos, atof(_xos->getResource("netBandwidth"))));
 
   // check for the serial meters.
   if (!strcmp(_xos->getResource("serial1"), "True"))
