@@ -29,7 +29,7 @@ public:
   void start( void ) { gettimeofday( &starttime_, NULL ); }
   void stop( void )  { gettimeofday( &stoptime_, NULL );  }
   //  reports time intervall between calls to start and stop in usec
-  long report( void ) const { 
+  long long report( void ) const { 
     return (stoptime_.tv_sec - starttime_.tv_sec) * 1000000
            + stoptime_.tv_usec - starttime_.tv_usec; 
   }
