@@ -65,7 +65,7 @@ private:
 protected:
   void IntervalTimerStart() { _timer.start(); }
   void IntervalTimerStop() { _timer.stop(); }
-  long long IntervalTimeInMicrosecs() { return _timer.report(); }
+  LONG_LONG IntervalTimeInMicrosecs() { return _timer.report(); }
 };
 
 #endif

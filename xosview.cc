@@ -269,8 +269,8 @@ void XOSView::run( void ){
 #ifdef HAVE_USLEEP
     /*  First, sleep for the proper integral number of seconds --
      *  usleep only deals with times less than 1 sec.  */
-    if (sleeptime_) sleep(sleeptime_);
-    if (usleeptime_) usleep( usleeptime_);
+    if (sleeptime_) sleep((unsigned int)sleeptime_);
+    if (usleeptime_) usleep( (unsigned int)usleeptime_);
 #else
     usleep_via_select ( usleeptime_ );
 #endif
@@ -281,7 +281,7 @@ void XOSView::run( void ){
 void XOSView::usleep_via_select( unsigned long usec ){
   struct timeval time;
 
-  time.tv_sec = usec / 1000000;
+  time.tv_sec = (int)(usec / 1000000);
   time.tv_usec = usec - time.tv_sec * 1000000;
 
   select( 0, 0, 0, 0, &time );

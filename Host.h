@@ -18,6 +18,7 @@
 #include <netdb.h>
 #include <arpa/inet.h>
 #include <iostream.h>
+#include "bool.h"
 
 class Host {
 public:

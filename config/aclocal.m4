@@ -13,6 +13,46 @@ AC_DEFUN([CF_TOP_SRCDIR],
 AC_SUBST(TOP_SRCDIR)
 ])dnl
 
+AC_DEFUN(ICE_CXX_BOOL,
+[
+AC_REQUIRE([AC_PROG_CXX])
+AC_MSG_CHECKING(whether ${CXX} supports bool types)
+AC_CACHE_VAL(ice_cv_have_bool,
+[
+AC_LANG_SAVE
+AC_LANG_CPLUSPLUS
+AC_TRY_COMPILE(,[bool b = true;],
+ice_cv_have_bool=yes,
+ice_cv_have_bool=no)
+AC_LANG_RESTORE
+])
+AC_MSG_RESULT($ice_cv_have_bool)
+if test "$ice_cv_have_bool" = yes; then
+AC_DEFINE(HAVE_BOOL)
+fi
+])dnl
+
+AC_DEFUN(ICE_CXX_LONG_LONG,
+[
+AC_REQUIRE([AC_PROG_CXX])
+AC_MSG_CHECKING(whether ${CXX} supports long long types)
+AC_CACHE_VAL(ice_cv_have_long_long,
+[
+AC_LANG_SAVE
+AC_LANG_CPLUSPLUS
+AC_TRY_COMPILE(,[long long x; x = (long long)0;],
+ice_cv_have_long_long=yes,
+ice_cv_have_long_long=no)
+AC_LANG_RESTORE
+])
+AC_MSG_RESULT($ice_cv_have_long_long)
+if test "$ice_cv_have_long_long" = yes; then
+AC_DEFINE(LONG_LONG,long long)
+else
+AC_DEFINE(LONG_LONG,long)
+fi
+])dnl
+
 
 AC_DEFUN(AC_SYS_LINUX_VERS,[[
 changequote(<<, >>)

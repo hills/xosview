@@ -28,13 +28,13 @@ BEGIN {
   #    general.h file.  Let's let this .cc file do that, since it doesn't
   #    have an associated header file.
   print "CVSID_DOT_H(GENERAL_H_CVSID);\n";
-  print "char *defaultXResourceString = \"";
+  printf "char *defaultXResourceString = \"";
 }
 
 #
 # Echo each line of input (that is not a comment or empty) to stdout.
 #
-(! /^!/) && (NF != 0)
+(! /^!/) && (NF != 0) { printf "%s\\n", $0 }
 
 #
 # Insert the "tail" for defresources.cc

@@ -53,9 +53,9 @@ void XWin::XWinInit (int argc, char** argv, char* geometry, Xrm* xrm) {
   
   // Set up the default Events
   events_ = NULL;
-  addEvent( new Event( this, ConfigureNotify, &configureEvent ) );
-  addEvent( new Event( this, ClientMessage, &deleteEvent ) );
-  addEvent( new Event( this, MappingNotify, &mappingNotify ) );
+  addEvent( new Event( this, ConfigureNotify, &XWin::configureEvent ) );
+  addEvent( new Event( this, ClientMessage, &XWin::deleteEvent ) );
+  addEvent( new Event( this, MappingNotify, &XWin::mappingNotify ) );
 
   //openDisplay();  //  Done explicitly in xosview.cc.
 }
@@ -307,7 +307,6 @@ void XWin::checkevent( void ){
 #if 0
 void XWin::usage( void ){
   //  FIXME  We need to update this.  BCG
-#warning The usage() function needs to be updated.
   cerr <<name_ <<" [-display name] [-geometry geom]" <<endl;
 //    exit (1);
 }

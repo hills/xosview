@@ -14,7 +14,7 @@
 CVSID("$Id$");
 CVSID_DOT_H(HOST_H_CVSID);
 
-#ifdef __hpux__
+#if defined(__hpux__) || defined(__hpux)
 extern int h_errno;
 #endif
 
@@ -32,7 +32,8 @@ Host::Host(const struct in_addr *address){
 }
 
 Host::Host(unsigned int addr){
-  struct in_addr ia = {htonl(addr)};
+  struct in_addr ia;
+  ia.s_addr = htonl(addr);
   constuct(&ia);
 }
 

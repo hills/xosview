@@ -17,7 +17,7 @@ public:
   MemMeter( XOSView *parent );
   ~MemMeter( void );
 
-  const char *name( void ) { return "MemMeter"; }  
+  const char *name( void ) const { return "MemMeter"; }  
   void checkevent( void );
 
   void checkResources(void);
