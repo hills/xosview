@@ -14,17 +14,25 @@
 //
 // $Id$
 //
-#include <sys/dkstat.h>         //  For CPUSTATES #define.  BCG
+#include <sys/param.h>		// Needed for __NetBSD_Version__
 #include <stdlib.h>		//  For use of atoi  BCG
 #include "general.h"
 #include "cpumeter.h"
 #include "kernel.h"             //  For NetBSD-specific icky kvm_ code.  BCG
 
+//  For CPUSTATES #define.  BCG
+#if defined(XOSVIEW_NETBSD) && (__NetBSD_Version__ >= 104260000)
+#include <sys/sched.h>
+#else
+#include <sys/dkstat.h>
+#endif
+
 CVSID("$Id$");
 CVSID_DOT_H(CPUMETER_H_CVSID);
 
 CPUMeter::CPUMeter( XOSView *parent )
-#if defined(XOSVIEW_FREEBSD) || defined(XOSVIEW_BSDI)
+#if defined(XOSVIEW_FREEBSD) || defined(XOSVIEW_BSDI) || \
+  (defined(XOSVIEW_NETBSD) && (__NetBSD_Version__ >= 104260000))
 : FieldMeterGraph( parent, 5, "CPU", "USR/NICE/SYS/INT/FREE" ){
 #define FREE_INDEX 4
 #else
@@ -50,7 +58,8 @@ void CPUMeter::checkResources( void ){
   setfieldcolor( 0, parent_->getResource("cpuUserColor") );
   setfieldcolor( 1, parent_->getResource("cpuNiceColor") );
   setfieldcolor( 2, parent_->getResource("cpuSystemColor") );
-#if defined(XOSVIEW_FREEBSD) || defined(XOSVIEW_BSDI)
+#if defined(XOSVIEW_FREEBSD) || defined(XOSVIEW_BSDI) || \
+  (defined(XOSVIEW_NETBSD) && (__NetBSD_Version__ >= 104260000))
   setfieldcolor( 3, parent_->getResource("cpuInterruptColor") );
   setfieldcolor( 4, parent_->getResource("cpuFreeColor") );
 #else
@@ -72,13 +81,18 @@ void CPUMeter::getcputime( void ){
   static double lastTotal = 0, lastLastTotal = -1;
 
   //  Begin NetBSD-specific code...  BCG
+#if  defined(XOSVIEW_NETBSD) && (__NetBSD_Version__ >= 104260000)
+  u_int64_t tempCPU[CPUSTATES];
+#else
   long tempCPU[CPUSTATES];
+#endif
 
   BSDGetCPUTimes (tempCPU);
 
   cputime_[cpuindex_][0] = tempCPU[0];
   cputime_[cpuindex_][1] = tempCPU[1];
-#if defined(XOSVIEW_FREEBSD) || defined(XOSVIEW_BSDI)
+#if defined(XOSVIEW_FREEBSD) || defined(XOSVIEW_BSDI) || \
+  (defined(XOSVIEW_NETBSD) && (__NetBSD_Version__ >= 104260000))
   // FreeBSD seems at least to be filling cp_time[CP_INTR].  So, we add that
   // as another field. (pavel 25-Jan-1998)
   cputime_[cpuindex_][2] = tempCPU[2];
