@@ -53,7 +53,9 @@ distrib: distclean
 
 clean :
 	$(MAKE) -C @host_os@ clean
-	$(MAKE) -C config clean
+	@#  Only clean the config directory if it exists...
+	sh -c 'if [ -d config ]; then \
+	    $(MAKE) -C config clean; fi'
 	rm -f xosview $(OBJS) $(DEPFILES) *~ defaultstring.cc
 
 distclean: clean
