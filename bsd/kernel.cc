@@ -26,7 +26,9 @@
                                       many cpu states there are.  */
 #ifndef XOSVIEW_FREEBSD
 #include <sys/device.h>
+#ifndef XOSVIEW_OPENBSD		/*  OpenBSD doesn't like this include.  */
 #include <sys/disklabel.h>
+#endif
 #include <sys/disk.h>		/*  For disk statistics.  */
 #endif
 
@@ -215,7 +217,7 @@ void
 BSDGetUVMPageStats(struct uvmexp* uvm) {
   size_t size;
   int mib[2];
-  if (!uvm) errx(-1, "NetBSDGetPageStats():  passed pointer was null!\n");
+  if (!uvm) errx(-1, "BSDGetUVMPageStats():  passed pointer was null!\n");
   size = sizeof(uvmexp);
   mib[0] = CTL_VM;
   mib[1] = VM_UVMEXP;
@@ -254,7 +256,7 @@ BSDGetCPUTimes (long* timeArray)
 {
   if (!timeArray) errx (-1, "BSDGetCPUTimes():  passed pointer was null!\n");
   if (CPUSTATES != 5)
-    errx (-1, "Error:  xosview for NetBSD expects 5 cpu states!\n");
+    errx (-1, "Error:  xosview for *BSD expects 5 cpu states!\n");
   safe_kvm_read_symbol (CP_TIME_SYM_INDEX, timeArray, sizeof (long) * CPUSTATES);
 }
 
@@ -299,7 +301,7 @@ BSDGetNetInOut (long long * inbytes, long long * outbytes)
 #else 
     ifnetp = (struct ifnet*) ifnet.if_next;
 #endif
-#else /* XOSVIEW_NETBSD */
+#else /* XOSVIEW_NETBSD or XOSVIEW_OPENBSD */
     ifnetp = (struct ifnet*) ifnet.if_list.tqe_next;
 #endif
   }
@@ -482,7 +484,7 @@ BSDGetIntrStats (unsigned long intrCount[NUM_INTR])
 	intrCount[i] = kvm_intrcnt[idx];
     }
 #else /* XOSVIEW_FREEBSD */
-  //  NetBSD version, based on vmstat.c.  Note that the pc532
+  //  NetBSD/OpenBSD version, based on vmstat.c.  Note that the pc532
   //  platform does support intrcnt and eintrcnt, but vmstat uses
   //  the more advanced event counters to provide software
   //  counts.  We'll just use the intrcnt array here.  If anyone

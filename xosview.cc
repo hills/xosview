@@ -15,7 +15,7 @@
 #include "xosview.h"
 #include "meter.h"
 #include "MeterMaker.h"
-#ifdef XOSVIEW_NETBSD
+#if (defined(XOSVIEW_NETBSD) || defined(XOSVIEW_FREEBSD) || defined(XOSVIEW_OPENBSD))
 #include "kernel.h"
 #endif
 
@@ -42,7 +42,7 @@ XOSView::XOSView( char * instName, int argc, char *argv[] ) : XWin(),
   if (!MAX_SAMPLES_PER_SECOND)
     MAX_SAMPLES_PER_SECOND = 10;
 #endif
-#ifdef XOSVIEW_NETBSD
+#if (defined(XOSVIEW_NETBSD) || defined(XOSVIEW_FREEBSD) || defined(XOSVIEW_OPENBSD))
   BSDInit();	/*  Needs to be done before processing of -N option.  */
 #endif
 
@@ -308,7 +308,7 @@ void XOSView::checkArgs (int argc, char** argv) const
 		  argc--;
 		}
 		break;
-#ifdef XOSVIEW_NETBSD
+#if (defined(XOSVIEW_NETBSD) || defined(XOSVIEW_FREEBSD) || defined(XOSVIEW_OPENBSD))
       case 'N': if (strlen(argv[0]) > 2)
       		  SetKernelName(argv[0]+2);
 		else
