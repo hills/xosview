@@ -62,7 +62,7 @@ void MemMeter::getmeminfo (void) {
 //  Begin *BSD-specific code...
   struct vmtotal meminfo;
   int params[] = {CTL_VM, VM_METER};
-  unsigned meminfosize = sizeof (struct vmtotal);
+  size_t meminfosize = sizeof (struct vmtotal);
   sysctl (params, 2, &meminfo, &meminfosize, NULL, NULL);
   /*  Note that the numbers are in terms of 4K pages.  */
 
