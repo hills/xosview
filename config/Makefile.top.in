@@ -87,8 +87,8 @@ clean :
 	rm -f xosview $(OBJS) $(DEPFILES) *~ defaultstring.cc
 
 distclean: clean
-	rm -f Makefile Makefile.config @host_os@/Makefile \
-           config.cache config.log config.status
+	rm -f Makefile Makefile.config Makefile.GNU.autodep \
+           @host_os@/Makefile config.cache config.log config.status
 
 maintainer-clean: distclean
 	rm -f configure
