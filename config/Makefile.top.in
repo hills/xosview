@@ -32,6 +32,9 @@ defaultstring.cc: Xdefaults defresources.awk
 	@AWK@ -f defresources.awk Xdefaults > defaultstring.cc
 
 meterlib:
+	if [ @host_os@ = freebsd ]; then \
+	  cd @top_srcdir@/@host_os@ && $(MAKE) makelinks; \
+	fi
 	cd @top_srcdir@/@host_os@ && $(MAKE)
 
 @top_srcdir@/@host_os@/libmeter.a: meterlib
