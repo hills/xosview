@@ -86,10 +86,15 @@ XWin::~XWin( void ){
 void XWin::init( int argc, char **argv ){
   XGCValues            gcv;
   XSetWindowAttributes xswa;
+  Pixmap	       background_pixmap;
+  int		       doPixmap = 0;
 
   setFont();
   setColors();
   getGeometry();
+#ifdef HAVE_XPM
+  doPixmap=getPixmap(&background_pixmap);
+#endif
   
   window_ = XCreateSimpleWindow(display_, DefaultRootWindow(display_), 
 				sizehints_->x, sizehints_->y,
@@ -111,6 +116,12 @@ void XWin::init( int argc, char **argv ){
   xswa.bit_gravity = NorthWestGravity;
   XChangeWindowAttributes(display_, window_,
 			  (CWColormap | CWBitGravity), &xswa);
+
+  // If there is a pixmap file, set it as the background
+  if(doPixmap)
+  {
+	XSetWindowBackgroundPixmap(display_,window_,background_pixmap);
+  }
 
   // add the events
   Event *tmp = events_;
@@ -221,6 +232,39 @@ void XWin::setColors( void ){
     fgcolor_ = color.pixel;
 }
 //-----------------------------------------------------------------------------
+
+int XWin::getPixmap(Pixmap *pixmap)
+{
+#ifdef HAVE_XPM
+	char	*pixmap_file;
+	XWindowAttributes    root_att;
+	XpmAttributes        pixmap_att;
+
+
+	pixmap_file = (char*) getResourceOrUseDefault("pixmapName",NULL);
+
+	if(pixmap_file)
+	{
+		XGetWindowAttributes(display_, DefaultRootWindow(display_),&root_att);
+		pixmap_att.closeness=30000;
+		pixmap_att.colormap=root_att.colormap;
+		pixmap_att.valuemask=XpmSize|XpmReturnPixels|XpmColormap|XpmCloseness;
+		if(XpmReadFileToPixmap(display_,DefaultRootWindow(display_),pixmap_file, pixmap, NULL, &pixmap_att))
+        	{
+                	cerr << "Pixmap " << pixmap_file  << " not found" << endl;
+                	cerr << "Defaulting to blank" << endl;
+                	pixmap=NULL;
+			return 0; // OOps
+        	}
+		return 1;  // Good, found the pixmap
+  	}
+	return 0; // No file specified, none used
+#else
+	(void) pixmap;
+	cerr << "Error:  getPixmap called, when Xpm is not enabled!\n" ;
+	return 0;
+#endif
+}
 
 void XWin::getGeometry( void ){
   char                 default_geometry[80];

@@ -6,6 +6,9 @@
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
+#ifdef HAVE_XPM
+#include <X11/xpm.h>
+#endif
 #include <iostream.h>
 #include <string.h>
 
@@ -143,6 +146,7 @@ protected:
 
   void init( int argc, char *argv[] );
   void getGeometry( void );
+  int getPixmap(Pixmap *);
   void setDisplayName (const char* new_display_name) { strncpy
     (display_name_, new_display_name, 256); }
   const char* displayName () { return display_name_; }
