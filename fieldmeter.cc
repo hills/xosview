@@ -179,9 +179,10 @@ void FieldMeter::drawused( int manditory ){
        *  legends.  */
     if (scaled_used == 0.0)
       sprintf (buf, "0");
-    else if (scaled_used < 9.995)
+    else if (scaled_used < 9.95)  //  9.95 or above would get
+				  //  rounded to 10.0, which is too wide.
       sprintf (buf, "%.1f%c", scaled_used, scale);
-    else if (scaled_used < 99.95)
+    else if (scaled_used < 99.5)
       sprintf (buf, "%.0f%c", scaled_used, scale);
     else 
       sprintf (buf, "%.0f%c", scaled_used, scale);
