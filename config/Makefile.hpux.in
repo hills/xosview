@@ -31,5 +31,6 @@ clean :
 
 libmeter.a : $(OBJS)
 	ar cvr libmeter.a $(OBJS)
+	@RANLIB@ $@
 
 @AUTODEPEND@
