@@ -26,9 +26,8 @@
                                       many cpu states there are.  */
 #ifndef XOSVIEW_FREEBSD
 #include <sys/device.h>
-#ifndef XOSVIEW_OPENBSD		/*  OpenBSD doesn't like this include.  */
-#include <sys/disklabel.h>
-#endif
+/*  ----------  XXX  Still need to see if any of these includes
+ *  can be removed.  bgrayson  */
 #include <sys/disk.h>		/*  For disk statistics.  */
 #endif
 
