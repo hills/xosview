@@ -14,8 +14,6 @@
 
 GfxMeter::GfxMeter(XOSView *parent, int max)
         : FieldMeterGraph(parent, 2, "GFX","SWAPBUF/S", 1, 1, 0 ),
-          SarMeter(),
-          lastPos(0),
           lastSwapBuf(0)
 {
     inventory_t *inv;
@@ -34,9 +32,7 @@ GfxMeter::GfxMeter(XOSView *parent, int max)
     }
     total_ = nPipes * max;
 
-    input = setupSar( "-g" );
-
-    if ( total_==0 || input==0 ) {
+    if ( total_==0 ) {
         parent_->done(1);
         return;
     }
@@ -86,61 +82,17 @@ void GfxMeter::checkevent(void)
 
 void GfxMeter::getgfxinfo(void)
 {
-    if( lastPos >= 50000 )
-        lastPos = 0;
+    gfxinfo *gi = SarMeter::Instance()->getGfxInfo();
 
-    size_t remaining = 50000 - lastPos;
-    size_t currPos = 0;
-    int    found = 0;
-
-    lastPos += readLine( input, &buf[lastPos], remaining );
-
-    while( currPos < lastPos )
-    {
-        remaining = lastPos-currPos;
-
-//        fprintf( stderr, "currPos %d, lastPos %d, remaining %d\n", currPos,
-//            lastPos, remaining );
-
-        char *ptr = (char *)memchr( &buf[currPos], 'S', remaining );
-        
-        if( ptr == NULL )
-            break;
-
-        if( ptr < buf+lastPos+24+sizeof(gfxinfo) &&
-            memcmp( ptr, "SarmagicGFX", 11 ) == 0 )
-        {
-            ptr += 24;
-//            fprintf( stderr, "found gfxinfo pos at 0x%x, %d bytes in buf\n",
-//                ptr, ptr-buf );
-            memcpy( &gi, ptr, sizeof( gfxinfo ));
-//            fprintf( stderr, "swp %d\n", gi.gswapbuf );
-            found = 1;
-
-            // found record, move data
-            ptr += sizeof( gfxinfo );
-            size_t pos = ptr-buf;
-            
-//            fprintf( stderr, "memmove 0x%x, 0x%x, %d (% d - %d)\n",  buf, ptr,
-//                lastPos - pos, lastPos, pos );
-
-            memmove( buf, ptr, lastPos - pos );
-            lastPos = lastPos - pos;
-            break;
-        }
-                
-        currPos = ( (char *)ptr - buf ) + 1;
-    }
-    
-    if( !found )
+    if( gi == NULL )
         return;
 
     // got data
-    unsigned int swapBuf = gi.gswapbuf - lastSwapBuf;
+    unsigned int swapBuf = gi->gswapbuf - lastSwapBuf;
     if( swapBuf > 1000 )
         swapBuf = 0;
 
-    lastSwapBuf = gi.gswapbuf;
+    lastSwapBuf = gi->gswapbuf;
 
 
     fields_[0] = (float) swapBuf;

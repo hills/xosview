@@ -8,9 +8,8 @@
 #include "sarmeter.h"
 
 #include <rpcsvc/rstat.h>
-#include <sys/sysinfo.h>
 
-class GfxMeter : public FieldMeterGraph, public SarMeter {
+class GfxMeter : public FieldMeterGraph {
  public:
 	GfxMeter(XOSView *parent, int max);
 	~GfxMeter(void);
@@ -27,13 +26,8 @@ protected:
 private:
     int warnThreshold, critThreshold, alarmstate, lastalarmstate;
     int nPipes;
-    int input;
-    struct statstime res;
 
-    gfxinfo gi;
     unsigned int lastSwapBuf;
-    off_t lastPos;
-    char buf[50000];
 };
 
 #endif
