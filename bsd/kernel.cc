@@ -4,7 +4,9 @@
 //
 //  This file was written by Brian Grayson for the NetBSD and xosview
 //    projects.
-// dummy device ignore code by : David Cuka (dcuka@intgp1.ih.att.com)
+//  dummy device ignore code by : David Cuka (dcuka@intgp1.ih.att.com)
+//  The OpenBSD interrupt meter code was written by Oleg Safiullin
+//    (form@vs.itam.nsc.ru).
 //  This file may be distributed under terms of the GPL or of the BSD
 //    license, whichever you choose.  The full license notices are
 //    contained in the files COPYING.GPL and COPYING.BSD, which you
@@ -30,6 +32,10 @@
                                       many cpu states there are.  */
 #ifndef XOSVIEW_FREEBSD
 #include <sys/disk.h>		/*  For disk statistics.  */
+#endif
+
+#ifdef XOSVIEW_OPENBSD
+#include "obsdintr.h"		/* XXX: got from 2.4 */
 #endif
 
 #include <sys/socket.h>         /*  These two are needed for the  */
@@ -103,6 +109,20 @@ static struct nlist nlst[] =
 #define INTRCNT_SYM_INDEX 	7
 { "_eintrcnt" },
 #define EINTRCNT_SYM_INDEX 	8
+
+#if defined(XOSVIEW_OPENBSD) && (defined(pc532) || defined(i386))
+
+# ifdef i386
+{ "_intrhand" },
+#define INTRHAND_SYM_INDEX    9
+{ "_intrstray" },
+#define INTRSTRAY_SYM_INDEX   10
+# else
+{ "_ivt" },
+#define IVT_SYM_INDEX         9
+# endif
+# endif /* XOSVIEW_OPENBSD ... */
+
 
 #else                   // but FreeBSD has unified buffer cache...
 
@@ -657,7 +677,10 @@ BSDGetDiskXFerBytes (unsigned long long *bytesXferred)
 }
 
 /*  ---------------------- Interrupt Meter stuff  -----------------  */
+#if !defined(XOSVIEW_OPENBSD) || !(defined(pc532) && defined(i386))
 static unsigned long kvm_intrcnt[128];// guess at space needed
+#endif
+
 #ifdef XOSVIEW_FREEBSD
 static unsigned long kvm_intrptrs[NUM_INTR];
 #endif
@@ -665,9 +688,16 @@ static unsigned long kvm_intrptrs[NUM_INTR];
 int
 BSDIntrInit() {
     OpenKDIfNeeded();
+#if defined(XOSVIEW_OPENBSD) && defined(i386)
+    return ValidSymbol(INTRHAND_SYM_INDEX) && ValidSymbol(INTRSTRAY_SYM_INDEX);
+#elif defined (XOSVIEW_OPENBSD) && defined(pc532)
+    return ValidSymbol(IVP_SYM_INDEX);
+#else
     return ValidSymbol(INTRCNT_SYM_INDEX) && ValidSymbol(EINTRCNT_SYM_INDEX);
+#endif
 }
 
+#if !defined(XOSVIEW_OPENBSD) || !(defined(pc532) || defined(i386))
 int BSDNumInts() {
   int nintr;
   OpenKDIfNeeded(); 
@@ -687,6 +717,7 @@ int BSDNumInts() {
 # endif
 #endif
 }
+#endif /* XOSVIEW_OPENBSD */
 
 void
 BSDGetIntrStats (unsigned long intrCount[NUM_INTR])
@@ -712,12 +743,48 @@ BSDGetIntrStats (unsigned long intrCount[NUM_INTR])
   //  counts.  We'll just use the intrcnt array here.  If anyone
   //  has problems, please mail me.  bgrayson
   {
+#if defined(XOSVIEW_OPENBSD) && (defined(pc532) || defined(i386))
+# ifdef i386
+  struct intrhand *intrhand[16], *ihp, ih;
+  int intrstray[16];
+
+  safe_kvm_read(nlst[INTRHAND_SYM_INDEX].n_value, intrhand,
+    sizeof(intrhand));
+  safe_kvm_read(nlst[INTRSTRAY_SYM_INDEX].n_value, intrstray,
+    sizeof(intrstray));
+
+  for (int i=0;i<16;i++) {
+    ihp = intrhand[i];
+    intrCount[i] = 0;
+    while (ihp) {
+      if (kvm_read(kd, (u_long)ihp, &ih, sizeof(ih)) != sizeof(ih)) {
+        fprintf(stderr, "Error: kvm_read(): %s\n", kvm_geterr(kd));
+        exit(1);
+      }
+      intrCount[i] = ih.ih_count;
+      ihp = ih.ih_next;
+    }
+  }
+# endif /* i386 */
+# ifdef pc532
+  struct iv ivt[32], *ivp = ivt;
+
+  safe_kvm_read(nlst[IVP_SYM_INDEX].n_value, ivp, sizeof(ivt));
+  for (int i=0;i<16;i++,ivp++) {
+    if (ivp->iv_vec && ivp->iv_use)
+      intrCount[i] = ivp->iv_cnt;
+    else
+      intrCount[i] = 0;
+  }
+# endif /* pc532 */
+#else /* XOSVIEW_OPENBSD && (pc532 || i386) */
     int nintr = BSDNumInts();
     safe_kvm_read(nlst[INTRCNT_SYM_INDEX].n_value, kvm_intrcnt,
       sizeof(long)*nintr);
     for (int i=0;i<nintr;i++) {
       intrCount[i] = kvm_intrcnt[i];
     }
+#endif /* XOSVIEW_OPENBSD && (pc532 || i386) */
   }
   return;
 #endif
