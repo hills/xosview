@@ -30,7 +30,7 @@ void MemMeter::checkResources( void ){
   setfieldcolor( 3, parent_->getResource( "memFreeColor" ) );
   priority_ = atoi (parent_->getResource( "memPriority" ) );
   dodecay_ = !strcmp (parent_->getResource( "memDecay" ), "True" );
-  SetUsedFormat( parent_->getResource( "memUsedFormat" );
+  SetUsedFormat( parent_->getResource( "memUsedFormat" ) );
 }
 
 MemMeter::~MemMeter( void ){

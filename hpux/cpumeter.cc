@@ -32,7 +32,7 @@ void CPUMeter::checkResources( void ){
   setfieldcolor( 4, parent_->getResource( "cpuFreeColor" ) );
   priority_ = atoi (parent_->getResource( "cpuPriority" ) );
   dodecay_ = !strcmp (parent_->getResource( "cpuDecay" ), "True" );
-  SetUsedFormat( parent_->getResource( "cpuUsedFormat" );
+  SetUsedFormat( parent_->getResource( "cpuUsedFormat" ) );
 }
 
 void CPUMeter::checkevent( void ){
