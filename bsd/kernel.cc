@@ -6,7 +6,7 @@
 //    projects.
 // dummy device ignore code by : David Cuka (dcuka@intgp1.ih.att.com)
 //  This file may be distributed under terms of the GPL or of the BSD
-//    copyright, whichever you choose.  The full copyright notices are
+//    license, whichever you choose.  The full license notices are
 //    contained in the files COPYING.GPL and COPYING.BSD, which you
 //    should have received.  If not, contact one of the xosview
 //    authors for a copy.
