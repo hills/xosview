@@ -110,6 +110,24 @@ checksource:
 		`echo *.cc *.h */*.cc */*.h | sed -e 's/snprintf.cc//'`; \
 		if [ $$? != 0 ]; then exit 0; else \
 		echo "***  Bad functions found -- error!"; exit 1; fi'
+	@#  Also check that the version in the man page is the
+	@#  same as the one in the Makefile, VERS.
+	@echo "***  Checking for consistent version in config/Makefile.top.in and man page..."
+	@#  This is a tricky little thing, since both 'make' and
+	@#  'sh' try to deal with the embedded $3 for awk.
+	@sh -c 'manver=`sed -ne 2p xosview.1 | awk \{print\ \\$$3\}`; \
+	  manver2=`sed -ne 3p xosview.1 | awk \{print\ \\$$3\}`; \
+	  if [ x"$$manver" != x"$$manver2" ]; then \
+	    echo "!!!  Version mismatch in the man page file xosview.1:"; \
+	    echo "     $$manver in SCCS header (line 2),"; \
+	    echo "     $$manver2 in title (line 3)."; \
+	    exit 1; \
+	  fi; \
+	  if [ x"$$manver" != x"$(VERS)" ]; then \
+	    echo "!!!  Apparent version mismatch:  "; \
+	    echo "      $(VERS) in config/Makefile.top.in,"; \
+	    echo "      $$manver in man page file xosview.1"; exit 1; \
+	  fi'
 
 distclean: clean
 	@#  Also check _all_ subdirs, not just the configured one, for
