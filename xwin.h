@@ -79,6 +79,8 @@ public:
     { XFillRectangle( display_, window_, gc_, x, y, width + 1, height + 1 ); }
   void drawString( int x, int y, const char *str )
     { XDrawString( display_, window_, gc_, x, y, str, strlen( str ) ); }
+  void copyArea( int src_x, int src_y, int width, int height, int dest_x, int dest_y )
+    { XCopyArea( display_, window_, window_, gc_, src_x, src_y, width, height, dest_x, dest_y ); }
   int textWidth( const char *str, int n )
     { return XTextWidth( font_, str, n ); }
   int textWidth( const char *str )

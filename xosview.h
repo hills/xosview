@@ -36,6 +36,9 @@ public:
   int xoff(void) const { return xoff_; }
   int newypos( void );
 
+  int isExposed() const { return expose_flag_; }
+  int isFullyVisible() const { return _isvisible && !_ispartiallyvisible; }
+
 protected:
 
   Xrm xrm;
@@ -53,6 +56,8 @@ protected:
   int caption_, legend_, xoff_, yoff_, nummeters_, usedlabels_;
   unsigned long sleeptime_, usleeptime_;
 
+  int expose_flag_;
+
   void usleep_via_select( unsigned long usec );
   void addmeter( Meter *fm );
   void checkMeterResources( void );
@@ -62,7 +67,7 @@ protected:
   void dolegends( void );
 
   void checkOverallResources();
-  void resizeEvent( XEvent &) { resize(); draw(); }
+  void resizeEvent( XEvent & );
   void exposeEvent( XExposeEvent &event );
   void keyPressEvent( XKeyEvent &event );
   void visibilityEvent( XVisibilityEvent &event );
@@ -70,6 +75,7 @@ protected:
 private:
 
   bool _isvisible;
+  bool _ispartiallyvisible;
 };
 
 #endif

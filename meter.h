@@ -44,6 +44,11 @@ public:
     return !rval;
   }
 
+  int getX() const { return x_; }
+  int getY() const { return y_; }
+  int getWidth() const { return width_; }
+  int getHeight() const { return height_; }
+
   virtual void checkResources( void );
 
 protected:

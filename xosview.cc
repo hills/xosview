@@ -61,6 +61,9 @@ XOSView::XOSView( char * instName, int argc, char *argv[] ) : XWin(),
   meters_ = NULL;
   name_ = "xosview";
   _isvisible = false;
+  _ispartiallyvisible = false;
+
+  expose_flag_ = 1;
 
   //  set up the X events
   addEvent( new Event( this, ConfigureNotify, 
@@ -237,11 +240,14 @@ XOSView::~XOSView( void ){
 void XOSView::draw( void ){
   clear();
   MeterNode *tmp = meters_;
+
   while ( tmp != NULL ){
     tmp->meter_->draw();
     tmp = tmp->next_;
   }
   flush();
+
+  expose_flag_ = 0;
 }
 
 void XOSView::keyrelease( char *ch ){
@@ -351,23 +357,34 @@ void XOSView::checkArgs (int argc, char** argv) const
 void XOSView::exposeEvent( XExposeEvent &event ) { 
   _isvisible = true;
   if ( event.count == 0 ) 
+  {
+    expose_flag_++;
     draw();
+  }
 }
 
+void XOSView::resizeEvent( XEvent & ) {
+  resize(); 
+  expose_flag_++;
+  draw();
+}
+
+
 void XOSView::visibilityEvent( XVisibilityEvent &event ){
-  //cerr <<"XOSView::visibilityEvent() : ";
+
+  _ispartiallyvisible = false;
+  if (event.state == VisibilityPartiallyObscured){
+    _ispartiallyvisible = true;
+  }
+
   if (event.state == VisibilityFullyObscured){
-    //cerr <<"hidden";
     _isvisible = false;
   }
   else {
-    //cerr <<"not hidden";
     _isvisible = true;
   }
-  //cerr <<endl;
 }
 
 void XOSView::unmapEvent( XUnmapEvent & ){
-  //cerr <<"XOSView::unmapEvent()" <<endl;
   _isvisible = false;
 }

@@ -36,6 +36,7 @@ protected:
   int graphpos_;
   float *heightfield_;
 private:
+  void drawBar( int i );
 };
 
 #endif
