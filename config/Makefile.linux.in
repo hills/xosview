@@ -23,9 +23,28 @@ raidmeter.o \
 lmstemp.o \
 MeterMaker.o
 
-FAIL_ARCHS =3D m68k sparc
-ifneq (,$(findstring @host_cpu@, $(FAIL_ARCHS)))
-# nothing else for m68k
+FAIL_ARCHS = arm m68k powerpc s390 sparc
+
+# Test for arm specifically, because arm can show up as a number of
+# things prefixed by "arm"
+# This means that no return value for host_cpu that contains a
+# substring of "arm" will ever have a serialmeter.  Oh well.
+#
+# With the ioperm checks in serialmeter.cc, this should no longer be
+# necessary.  In fact, it may no longer be necessary to perform this
+# check at all, but it is left here just in case until this can be
+# tested.
+#
+# ifneq (,$(findstring arm, @host_cpu@))
+# ARCH = arm
+# else
+# ARCH = @host_cpu@
+# endif
+
+ARCH = @host_cpu@
+
+ifneq (,$(findstring $(ARCH), $(FAIL_ARCHS)))
+# Don't include serialmeter for above architectures
 else
 OBJS += serialmeter.o
 endif

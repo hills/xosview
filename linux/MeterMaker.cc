@@ -57,7 +57,9 @@ void MeterMaker::makeMeters(void){
       push(new DiskMeter(_xos, atof(_xos->getResource("diskBandwidth"))));
 
   // check for the serial meters.
-#ifndef __mc68000__
+#if defined (__arm__) || defined(__mc68000__) || defined(__powerpc__) || defined(__sparc__) || defined(__s390__)
+  /* these architectures have no ioperm() */
+#else
   for (int i = 0 ; i < SerialMeter::numDevices() ; i++)
     if (_xos->isResourceTrue(SerialMeter::getResourceName(
       (SerialMeter::Device)i)))
