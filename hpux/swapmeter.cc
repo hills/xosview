@@ -52,8 +52,8 @@ void SwapMeter::getswapinfo( void ){
       pstat_getswap(&swapinfo, sizeof(swapinfo), 1, i);
       if (swapinfo.pss_idx == (unsigned)i)
           {
-          total_ += swapinfo.pss_nblks;
-          fields_[1] += swapinfo.pss_nfpgs * 4;
+          total_ += (swapinfo.pss_nblksenabled * 1024);
+          fields_[1] += (swapinfo.pss_nfpgs * 4 * 1024);
           }
       }
 

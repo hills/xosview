@@ -24,6 +24,7 @@ public:
 
 protected:
   struct pst_status *stats_;
+  int _pageSize;
 
   void getmeminfo( void );
 private:

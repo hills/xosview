@@ -17,6 +17,7 @@ MemMeter::MemMeter( XOSView *parent )
 
   pstat_getstatic( &pststatic, sizeof( struct pst_static ), 1, 0 );
   total_ = pststatic.physical_memory;
+  _pageSize = pststatic.page_size;
 
   stats_ = new struct pst_status[pststatic.max_proc];
 }
@@ -61,7 +62,8 @@ void MemMeter::getmeminfo( void ){
   fields_[2] = total_ - fields_[0] - fields_[1] - stats.psd_free;
   fields_[3] = stats.psd_free;
 
-  FieldMeterDecay::setUsed( total_ - fields_[3], total_ );
+  FieldMeterDecay::setUsed( (total_ - fields_[3]) * _pageSize , 
+    total_ * _pageSize);
 }
 
 
