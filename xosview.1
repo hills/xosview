@@ -119,7 +119,17 @@ Displays the version number.
 
 -name \fIname\fP
 .RS
-Sets the Resource name xosview will use.
+Sets the Resource name xosview will use (same as the -name option
+for typical X applications like xterm).  When performing resource
+lookups, xosview will look under \fIname\fP, and then under
+``xosview''.  For an example, perform the following (as
+documented in README.netbsd):
+.RS
+  xrdb -merge Xdefaults.stipple
+  xosview -name xosvstipple &
+  xosview -name xosvstipplebw &
+.RE
+
 .RE
 
 -display \fIdisplay\fP
