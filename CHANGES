@@ -23,6 +23,7 @@ Initial support for the -name option for specifying an X resource
 
 New meters:
   PageMeter for Linux
+  BatteryMeter for Linux
   DiskMeter for NetBSD
 
 Improved drawing.  There's still one more known drawing bug...
