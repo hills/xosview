@@ -13,13 +13,16 @@
 
     - mem meter
 
-    - gfx meter: Displays swapbuffers/second. It is forking
-                 /usr/lib/sa/sadc to read system accounting data.
-
+    - gfx meter: Displays swapbuffers/second.
 
   Of course, you're welcome to send me patches.
 
-  I experienced some errors with the cpu meter on O2.
+  For the gfx meter, sadc is forked to read the activity. The sadc
+  process is handled from the singleton SarMeter, which reads the binary
+  data from sadc and converts it into structures. Currently, it parses
+  gfxinfo and diskinfo data. The diskinfo can be used to create a disk
+  meter, but I do not have the time currently. As said above, send me
+  patches ;).
 
 
   It is tested on: 
@@ -27,6 +30,6 @@
   IP20, IP22, IP27, IP30, IP32 and IP35. 
 
 
-  Stefan Eilemann, Feb 02	eile@sgi.com
+  Stefan Eilemann, Apr 03 	eile@sgi.com
 
   $Id$
