@@ -62,13 +62,6 @@ BINDIR=$(PREFIX_TO_USE)/bin
 MANDIR=$(PREFIX_TO_USE)/man/man1
 XAPPLOADDIR=$(PREFIX_TO_USE)/lib/X11/app-defaults
 
-X11BASEDIR=`echo @x_includes@ | sed -e 's:/[^/]*$$::'`
-##  If the variable PREFIX is _not_ set, use the X11 dir found above.
-PREFIX=$(X11BASEDIR)
-BINDIR=$(PREFIX)/bin
-MANDIR=$(PREFIX)/man/man1
-XAPPLOADDIR=$(PREFIX)/lib/X11/app-defaults
-
 ##  These next lines look really ugly.  The echo statements are an
 ##    attempt to make the output look a little nicer.  The "echo -n"
 ##    statements create a two-space indent at the beginning of the line.
