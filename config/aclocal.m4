@@ -55,7 +55,7 @@ fi
 
 dnl	For gcc-based (or primarily-gcc) OS's, set EXTRA_CXXFLAGS to -Wall -O4 -pipe.
 AC_DEFUN(AC_GCC_EXTRA_CXXFLAGS, [
-	EXTRA_CXXFLAGS="-Wall -O4 -pipe"
+	EXTRA_CXXFLAGS="-Wall -O4 -pipe -Wno-deprecated"
 ])
 
 AC_DEFUN(SMP_LINUX,
@@ -189,7 +189,7 @@ AC_DEFUN(AC_XOSV_NETBSD, [
 dnl  Remember the full version in host_os_full
 	host_os_full=$host_os
 dnl  We need to strip the version numbers off the $host_os string (netbsd1.1)
-dnl  Let's just be lazy -- set host_os to be netbsd.  
+dnl  Let's just be lazy -- set host_os to be netbsd.
 	host_os=netbsd
 dnl
 dnl Netbsd needs to link with libkvm
@@ -239,7 +239,7 @@ dnl
 ])
 
 AC_DEFUN(AC_XOSV_IRIX65, [
-	dnl	
+	dnl
 	EXTRALIBS="-lrpcsvc"
     AC_DEFINE(_G_HAVE_BOOL)
     AC_DEFINE(HAVE_SNPRINTF)
