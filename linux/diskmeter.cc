@@ -90,10 +90,8 @@ void DiskMeter::getdiskinfo( void )
     if(write_prev_ == 0) write_prev_ = write_curr;
     
     // calculate rate in bytes per second
-    fields_[0] = ((read_curr - read_prev_) * 1e6 * 512) / 
-      IntervalTimeInMicrosecs();
-    fields_[1] = ((write_curr - write_prev_) * 1e6 * 512) / 
-      IntervalTimeInMicrosecs();
+    fields_[0] = ((read_curr - read_prev_) * 1e6 * 512) / itim;
+    fields_[1] = ((write_curr - write_prev_) * 1e6 * 512) / itim;
 
     // fix overflow (conversion bug?)
     if (fields_[0] < 0.0)
