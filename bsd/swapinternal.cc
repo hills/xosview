@@ -147,6 +147,7 @@ NetBSDInitSwapInfo()
                                 strcat(msgbuf, syms[i].n_name);
                         }
                 }
+		strcat(msgbuf,"\n");
                 printf(msgbuf);
 #endif
                 return (0);
