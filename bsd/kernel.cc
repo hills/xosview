@@ -341,6 +341,7 @@ BSDGetSwapCtlInfo(int *totalp, int *freep)
 {
   int	totalinuse, totalsize;
   int rnswap, nswap = swapctl(SWAP_NSWAP, 0, 0);
+  struct swapent *swapiter;
 
   if (nswap < 1) {
     *totalp = *freep = 0;
@@ -358,14 +359,17 @@ BSDGetSwapCtlInfo(int *totalp, int *freep)
   rnswap = swapctl(SWAP_STATS, (void *)sep, nswap);
   if (nswap < 0)
     errx(1, "SWAP_STATS");
-  if (nswap != rnswap)
+  if (rnswap < 0)
+    warnx("SWAP_STATS error");
+  else if (nswap != rnswap)
     warnx("SWAP_STATS gave different value than SWAP_NSWAP "
     "(nswap=%d versus rnswap=%d)", nswap, rnswap);
 
+  swapiter = sep;
   totalsize = totalinuse = 0;
-  for (; rnswap-- > 0; sep++) {
-    totalsize += sep->se_nblks;
-    totalinuse += sep->se_inuse;
+  for (; rnswap-- > 0; swapiter++) {
+    totalsize += swapiter->se_nblks;
+    totalinuse += swapiter->se_inuse;
   }
 #define BYTES_PER_SWAPBLOCK	512
   *totalp = totalsize * BYTES_PER_SWAPBLOCK;
