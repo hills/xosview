@@ -25,6 +25,7 @@ xosview*loadProcColor:    seagreen
 xosview*loadIdleColor:    aquamarine
 xosview*loadPriority:     50
 xosview*loadAlarmThreshold: 2
+xosview*loadDecay: False
 
 ! CPU Meter Resources
 
