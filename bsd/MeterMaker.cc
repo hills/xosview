@@ -55,16 +55,12 @@ void MeterMaker::makeMeters(void){
   if (_xos->isResourceTrue("page"))
     push(new PageMeter (_xos, atof(_xos->getResource("pageBandwidth"))));
 
-#ifndef XOSVIEW_FREEBSD		/*  FreeBSD net meter isn't done yet.  */
   // check for the net meter
   if (_xos->isResourceTrue("net"))
     push(new NetMeter(_xos, atof(_xos->getResource("netBandwidth"))));
-#endif
 
-#ifndef XOSVIEW_FREEBSD		/*  FreeBSD diskmeter also isn't done.  */
   if (_xos->isResourceTrue("disk"))
     push(new DiskMeter (_xos, atof(_xos->getResource("diskBandwidth"))));
-#endif
 
   //  The serial meters and the interrupt meter are not yet
   //  available for NetBSD.  BCG
