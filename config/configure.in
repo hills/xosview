@@ -10,8 +10,15 @@ ICE_CXX_BOOL
 ICE_CXX_LONG_LONG
 AC_PATH_X
 CXXFLAGS="$CXXFLAGS -I$x_includes"
-LIBS="-L$x_libraries -R$x_libraries $LIBS"
-ELF_LINK_FLAGS="-Wl,-R$x_libraries"
+case $host_os in
+linux*) 
+  LIBS="-L$x_libraries $LIBS"
+  ELF_LINK_FLAGS="" ;;
+*)
+  LIBS="-L$x_libraries -R$x_libraries $LIBS"
+  ELF_LINK_FLAGS="-Wl,-R$x_libraries" ;;
+esac
+
 dnl AC_PREFIX_DEFAULT(/usr/X11)	dnl No longer needed with our
 dnl 				x_includes magic in Makefile.top.in.
 dnl  Check for /usr/X11R6.  If it exists, make that the default prefix.
