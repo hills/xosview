@@ -56,11 +56,11 @@ void FieldMeter::checkResources( void ){
 
 void FieldMeter::SetUsedFormat ( const char * const fmt ) {
     /*  Do case-insensitive compares.  */
-  if (!strcasecmp (fmt, "percent"))
+  if (!strncasecmp (fmt, "percent", 8))
     print_ = PERCENT;
-  else if (!strcasecmp (fmt, "autoscale"))
+  else if (!strncasecmp (fmt, "autoscale", 10))
     print_ = AUTOSCALE;
-  else if (!strcasecmp (fmt, "float"))
+  else if (!strncasecmp (fmt, "float", 6))
     print_ = FLOAT;
   else
   {
