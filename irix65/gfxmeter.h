@@ -24,11 +24,10 @@ protected:
     void getgfxinfo(void);
     
     unsigned long swapgfxcol_, warngfxcol_, critgfxcol_;
+
 private:
     int warnThreshold, critThreshold, alarmstate, lastalarmstate;
     int nPipes;
-
-    unsigned int lastSwapBuf;
 };
 
 #endif

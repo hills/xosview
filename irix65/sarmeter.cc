@@ -17,141 +17,185 @@ SarMeter *SarMeter::Instance()
     return _instance;
 }
 
-size_t SarMeter::readLine( int input, char *buf, size_t max )
+SarMeter::SarMeter( void )
+    : _bufSize(0)
 {
-    int readBytes, ret;
-
-    // use fgets ??
-
-    for( readBytes = 0 ; readBytes < max-100; )
+    _input = setupSadc();
+    
+    _gi.last.gswapbuf = 0;
+    _gi.info.swapBuf = 0;
+    
+    for( int i=0; i<MAX_DISKS; i++ )
     {
-        ret = read( input, &buf[readBytes], 100);
-        if( ret < 0 )
-            return readBytes;
-
-        readBytes += ret;
-
-        if( ret < 100 )
-            return readBytes;
+        _di.last[i].stat.io_bcnt  = 0;
+        _di.last[i].stat.io_wbcnt = 0;
+        
+        _di.info.nDevices = 0;
+        _di.info.read[i] = 0;
+        _di.info.write[i] = 0;
     }
-    return readBytes;
+}
+
+bool SarMeter::readLine( void )
+{
+    while( _bufSize < BUFSIZE-100 )
+    {
+        int ret = read( _input, &_buf[_bufSize], 100);
+
+        if( ret < 0 )
+            return false; // error equals eof in our case
+
+        _bufSize += ret;
+
+        if( ret < 100 ) // eof reached
+            return false;
+    }
+
+    // buffer full
+    return true;
 }
 
 void SarMeter::checkSadc( void )
 {
-    if( _lastPos >= 50000 )
-        _lastPos = 0;
+    bool dataInPipe = true;
 
-    size_t remaining = 50000 - _lastPos;
-    size_t currPos = 0;
-
-    _lastPos += readLine( _input, &_buf[_lastPos], remaining );
-
-    while( currPos < _lastPos )
+    while( dataInPipe )
     {
-        remaining = _lastPos-currPos;
-
-//        fprintf( stderr, "currPos %d, _lastPos %d, remaining %d\n", currPos,
-//            _lastPos, remaining );
-
-        char *ptr = (char *)memchr( &_buf[currPos], 'S', remaining );
-        
-        if( ptr == NULL )
-            break;
-
-        if( (ptr+24+3*sizeof(diskinfo)) < (_buf+_lastPos) &&
-            memcmp( ptr, "Sarmagic", 8 ) == 0 )
-        {
-            ptr += 8;
-            
-            if( memcmp( ptr, "GFX", 3 ) == 0 )
-            {
-                // already found a new record
-                if( _giNew )
-                    return;
-
-                ptr += 16;
-//              fprintf( stderr,"found gfxinfo pos at 0x%x, %d bytes in _buf\n",
-//                    ptr, ptr-_buf );
-                memcpy( &_gi, ptr, sizeof( gfxinfo ));
-//                fprintf( stderr, "swp %d\n", _gi.gswapbuf );
-                _giNew = 1;
-
-                // found record, move data
-                ptr += sizeof( gfxinfo );
-                size_t pos = ptr-_buf;
-                
-//                fprintf( stderr, 
-//                    "memmove gfx 0x%x, 0x%x, %d[0x%x] (%d[0x%x] - %d[0x%x])\n",
-//                    _buf, ptr, _lastPos - pos, _lastPos - pos, _lastPos,
-//                    _lastPos, pos, pos );
-
-                memmove( _buf, ptr, _lastPos - pos );
-                _lastPos = _lastPos - pos;
-                
-                currPos = 0;
-            }
-            else if( memcmp( ptr, "NEODISK", 7 ) == 0 )
-            {
-                // already found a new record
-                if( _diNew )
-                    return;
-
-                ptr += 12;
-
-                // number of records [devices]
-                int num;
-                memcpy( &num, ptr, 4 );
-                ptr += 4;
-
-//              fprintf(stderr,
-//                 "found %d diskinfo records, pos at 0x%x, %d bytes in _buf\n",
-//                    num, ptr, ptr-_buf );
-                for( int i=0; i < num && i < MAX_DISKS; i++ )
-                {
-                    memcpy( &_di[i], ptr, sizeof( diskinfo ));
-#if 0
-                    fprintf( stderr, "diskinfo {\n  %s\n", _di[i].name );
-                    fprintf( stderr, "  stat {\n" );
-                    fprintf( stderr, "    ios {\n" );
-                    fprintf( stderr, "      %d, %d, %d, %d\n",
-                        _di[i].stat.ios.io_ops,
-                        _di[i].stat.ios.io_misc,
-                        _di[i].stat.ios.io_qcnt,
-                        _di[i].stat.ios.io_unlog );
-                    fprintf( stderr, "    }\n" );
-                    fprintf( stderr, "    %d %d %d %d %d\n", 
-                        _di[i].stat.io_bcnt,
-                        _di[i].stat.io_resp,
-                        _di[i].stat.io_act,
-                        _di[i].stat.io_wops,
-                        _di[i].stat.io_wbcnt );
-#endif
-                    // found record, move data
-                    ptr += sizeof( diskinfo );
-                }
-
-                _diNew = 1;
-                size_t pos = ptr-_buf;
-                
-//                fprintf( stderr,
-//                    "memmove dsk 0x%x, 0x%x, %d[0x%x] (%d[0x%x] - %d[0x%x])\n",
-//                    _buf, ptr, _lastPos - pos, _lastPos - pos, _lastPos,
-//                    _lastPos, pos, pos );
-
-                memmove( _buf, ptr, _lastPos - pos );
-                _lastPos = _lastPos - pos;
-                
-                currPos = 0;
-            }
-            else
-                currPos = ( (char *)ptr - _buf ) + 1;
-        }
-        else
-            currPos = ( (char *)ptr - _buf ) + 1;
+        dataInPipe = readLine();
+        parseBuffer();
     }
 }
-// starts /usr/bin/sar, from where data is read from
+
+void SarMeter::parseBuffer( void )
+{
+    while( _bufSize > 100 )
+    {
+        // look for 'S' (starting of Sarmagic)
+        char *ptr = (char *)memchr( _buf, 'S', _bufSize );
+        
+        // not found -- discard this buffer
+        if( ptr == NULL )
+        {
+            _bufSize = 0;
+            return;
+        }
+
+        // not enough data read
+        if( (ptr+100) > (_buf+_bufSize) )
+            return;
+
+
+        // check for SarmagicGFX
+        if( memcmp( ptr, "SarmagicGFX", 11 ) == 0 )
+        {
+            forwardBufferTo( ptr );
+
+            // data is not complete in buffer
+            if( _bufSize < 24 + sizeof( gfxinfo ))
+                return;
+
+            // retrieve gfxinfo structure
+            ptr = _buf + 24;
+            memcpy( &_gi.current, ptr, sizeof( gfxinfo ));
+            ptr += sizeof( gfxinfo );
+
+            forwardBufferTo( ptr );
+            newGfxInfo();
+        }
+        // check for SarmagicNEODISK
+        else if( memcmp( ptr, "SarmagicNEODISK", 15 ) == 0 )
+        {
+            forwardBufferTo( ptr );
+
+            ptr = _buf + 20;
+
+            // number of records [devices]
+            int num;
+            memcpy( &num, ptr, 4 );
+            ptr += 4;
+
+            if( num > MAX_DISKS ) num = MAX_DISKS;
+
+            // data is not complete in buffer
+            if( _bufSize < 24 + num*sizeof( diskinfo ))
+                return;
+
+            _di.info.nDevices = num;
+
+            // read disk info
+            for( int i=0; i<num; i++ )
+            {
+                memcpy( &_di.current[i], ptr, sizeof( diskinfo ));
+                ptr += sizeof( diskinfo );
+
+#if 0
+                fprintf( stderr, "diskinfo {\n  %s\n", _di.current[i].name );
+                fprintf( stderr, "  stat {\n" );
+                fprintf( stderr, "    ios {\n" );
+                fprintf( stderr, "      %d, %d, %d, %d\n",
+                    _di.current[i].stat.ios.io_ops,
+                    _di.current[i].stat.ios.io_misc,
+                    _di.current[i].stat.ios.io_qcnt,
+                    _di.current[i].stat.ios.io_unlog );
+                fprintf( stderr, "    }\n" );
+                fprintf( stderr, "    %d %d %d %d %d\n", 
+                    _di.current[i].stat.io_bcnt,
+                    _di.current[i].stat.io_resp,
+                    _di.current[i].stat.io_act,
+                    _di.current[i].stat.io_wops,
+                    _di.current[i].stat.io_wbcnt );
+#endif
+            }
+            
+            forwardBufferTo( ptr );
+            newDiskInfo();
+        }
+        else // no known Sarmagic record
+            forwardBufferTo( ptr+1 );
+    }
+}
+
+void SarMeter::newGfxInfo( void )
+{
+    if( _gi.last.gswapbuf == 0 )
+    {
+        _gi.last.gswapbuf = _gi.current.gswapbuf;
+        return;
+    }
+
+    _gi.info.swapBuf = _gi.current.gswapbuf - _gi.last.gswapbuf;
+    _gi.last.gswapbuf = _gi.current.gswapbuf;
+}
+
+void SarMeter::newDiskInfo( void )
+{
+    for( int i=0; i<_di.info.nDevices; i++ )
+    {
+        _di.info.read[i]  = 
+            (_di.current[i].stat.io_bcnt - _di.current[i].stat.io_wbcnt) - 
+            (_di.last[i].stat.io_bcnt    - _di.last[i].stat.io_wbcnt) ;
+
+        _di.info.write[i] = 
+            _di.current[i].stat.io_wbcnt - _di.last[i].stat.io_wbcnt;
+
+        _di.info.read[i] *= 512;
+        _di.info.write[i] *= 512;
+
+        _di.last[i].stat.io_bcnt  = _di.current[i].stat.io_bcnt;
+        _di.last[i].stat.io_wbcnt = _di.current[i].stat.io_wbcnt;        
+    }
+}
+
+void SarMeter::forwardBufferTo( char *ptr )
+{
+    size_t moveBytes = ptr-_buf;
+    size_t bytesLeft = _bufSize - moveBytes;
+    memmove( _buf, ptr, bytesLeft );
+    _bufSize = bytesLeft;
+};
+
+
+// starts /usr/bin/sar, from where data is read
 int SarMeter::setupSadc( void )
 {
     char    sarPath[] = "/usr/lib/sa/sadc";

@@ -13,8 +13,7 @@
 // GfxMeter display swapbuffers per second. max is base rate for one gfx pipe.
 
 GfxMeter::GfxMeter(XOSView *parent, int max)
-        : FieldMeterGraph(parent, 2, "GFX","SWAPBUF/S", 1, 1, 0 ),
-          lastSwapBuf(0)
+        : FieldMeterGraph(parent, 2, "GFX","SWAPBUF/S", 1, 1, 0 )
 {
     inventory_t *inv;
 
@@ -82,20 +81,9 @@ void GfxMeter::checkevent(void)
 
 void GfxMeter::getgfxinfo(void)
 {
-    gfxinfo *gi = SarMeter::Instance()->getGfxInfo();
+    SarMeter::GfxInfo *gi = SarMeter::Instance()->getGfxInfo();
 
-    if( gi == NULL )
-        return;
-
-    // got data
-    unsigned int swapBuf = gi->gswapbuf - lastSwapBuf;
-    if( swapBuf > 1000 )
-        swapBuf = 0;
-
-    lastSwapBuf = gi->gswapbuf;
-
-
-    fields_[0] = (float) swapBuf;
+    fields_[0] = (float)gi->swapBuf;
     
     if ( fields_[0] < warnThreshold ) 
         alarmstate = 0;

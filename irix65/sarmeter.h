@@ -27,6 +27,7 @@ typedef struct {
 diskinfo;
 
 #define MAX_DISKS 16
+#define BUFSIZE   0x2000
 
 // common function for all sar based graphs
 class SarMeter
@@ -34,57 +35,61 @@ class SarMeter
 public:
     static SarMeter *Instance();
 
-    gfxinfo *getGfxInfo( void )
+    struct GfxInfo {
+        unsigned int swapBuf;
+    };
+
+    struct DiskInfo {
+        unsigned int nDevices;
+
+        unsigned int read[MAX_DISKS];
+        unsigned int write[MAX_DISKS];
+    };
+
+    GfxInfo *getGfxInfo( void )
         {
             checkSadc();
-
-            if( _giNew )
-            {
-                _giNew = 0;
-                return &_gi;
-            }
-            else
-                return NULL;
+            return &_gi.info;
         }
 
-    diskinfo *getDiskInfo( void )
+    DiskInfo *getDiskInfo( void )
         {
             checkSadc();
-
-            if( _diNew )
-            {
-                _diNew = 0;
-                return _di;
-            }
-            else
-                return NULL;
+            return &_di.info;
         }
 
 private:
-    SarMeter()
-            : _lastPos(0),
-              _giNew(0),
-              _diNew(0)
-        {
-            _input = setupSadc();
-        }
-
+    SarMeter();
     ~SarMeter(void) {}
 
-    size_t readLine( int input, char *buf, size_t max );
-    int    setupSadc( void );
-    void   checkSadc( void );
+    int  setupSadc( void );
+
+    void checkSadc( void );
+
+    bool readLine( void );
+    void parseBuffer( void );
+    void forwardBufferTo( char *ptr );
+
+    void newGfxInfo( void );
+    void newDiskInfo( void );
+
 
     static SarMeter *_instance;
     int    _input;
-    off_t  _lastPos;
-    char   _buf[50000];
+    off_t  _bufSize;
+    char   _buf[BUFSIZE];
 
-    gfxinfo _gi;
-    bool    _giNew;
+    struct {
+        gfxinfo current;
+        gfxinfo last;
+        GfxInfo info;
+    } _gi;
 
-    diskinfo _di[MAX_DISKS];
-    bool     _diNew;
+    struct {
+        diskinfo current[MAX_DISKS];
+        diskinfo last[MAX_DISKS];
+        DiskInfo info;
+    } _di;
 };
 
 #endif
