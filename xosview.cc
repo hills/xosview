@@ -6,17 +6,24 @@
 //
 // $Id$
 //
-#include "xosview.h"
-#include "meter.h"
-#include "MeterMaker.h"
 #include <iostream.h>
 #include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
 #include <sys/time.h>
+#include "general.h"
+#include "xosview.h"
+#include "meter.h"
+#include "MeterMaker.h"
+#ifdef XOSVIEW_NETBSD
+#include "netbsd.h"
+#endif
 
 static const char NAME[] = "xosview@";
 static const char versionString[] = "xosview 1.4.0";
+
+CVSID("$Id$");
+CVSID_DOT_H(XOSVIEW_H_CVSID);
 
 
 XOSView::XOSView( int argc, char *argv[] ) : XWin(), xrm(Xrm("xosview")){
@@ -28,6 +35,9 @@ XOSView::XOSView( int argc, char *argv[] ) : XWin(), xrm(Xrm("xosview")){
   //  XWinInit looks at the geometry resource for its geometry.  BCG
   xrm.loadAndMergeResources (argc, argv, display_); 
   XWinInit (argc, argv, NULL, &xrm);
+#ifdef XOSVIEW_NETBSD
+  NetBSDInit();	/*  Needs to be done before processing of -N option.  */
+#endif
 
   checkArgs (argc, argv);  //  Check for any other unhandled args.
   xoff_ = 5;
@@ -54,14 +64,6 @@ XOSView::XOSView( int argc, char *argv[] ) : XWin(), xrm(Xrm("xosview")){
 
   // see if legends are to be used
   checkOverallResources ();
-  if ( legend_ ){
-    if ( !usedlabels_ )
-      xoff_ = textWidth( "XXXXX" );
-    else
-      xoff_ = textWidth( "XXXXXXXXX" );
-
-    yoff_ = textHeight() + textHeight() / 4;
-  }
   
   // add in the meters
   mm.makeMeters();
@@ -72,13 +74,32 @@ XOSView::XOSView( int argc, char *argv[] ) : XWin(), xrm(Xrm("xosview")){
   checkMeterResources();
 
   // determine the width and height of the window then create it
-  width_ = findx();
-  height_ = findy();
+  figureSize();
   init( argc, argv );
   title( winname() );
   iconname( winname() );
   dolegends();
   resize();
+}
+
+void XOSView::figureSize ( void ) {
+  if ( legend_ ){
+    if ( !usedlabels_ )
+      xoff_ = textWidth( "XXXXX" );
+    else
+      xoff_ = textWidth( "XXXXXXXXX" );
+
+    yoff_ = textHeight() + textHeight() / 4;
+  }
+  static int firsttime = 1;
+  if (firsttime) {
+    firsttime = 0;
+    width_ = findx();
+    height_ = findy();
+  }
+  else
+  {
+  }
 }
 
 void XOSView::checkMeterResources( void ){
@@ -162,7 +183,8 @@ const char *XOSView::winname( void ){
 }
 
 void  XOSView::resize( void ){
-  int newwidth = width_ - xoff_ - 5;
+  int rightmargin = 5;
+  int newwidth = width_ - xoff_ - rightmargin;
   int newheight = (height_ - (10 + 5 * (nummeters_ - 1) + 
 			      nummeters_ * yoff_)) / nummeters_;
 
@@ -196,8 +218,8 @@ void XOSView::draw( void ){
 }
 
 void XOSView::keyrelease( char *ch ){
-  if ( (*ch == 'q') || (*ch == 'Q') )
-    done_ = 1;
+/*  WARNING:  This code is not called by anything.  */
+(void) ch;  /*  To avoid gcc warnings.  */
 }
 
 void XOSView::run( void ){
@@ -216,12 +238,17 @@ void XOSView::run( void ){
 
       flush();
     }
-    usleep( 100000 );
+    unsigned long sleeptime = 1000*SAMPLE_MSECS;
+#ifdef HAVE_USLEEP
+    usleep( sleeptime );
+#else
+    usleep_via_select ( sleeptime );
+#endif
     counter = (counter + 1) % 5;    
   }
 }
 
-void XOSView::usleep( unsigned long usec ){
+void XOSView::usleep_via_select( unsigned long usec ){
   struct timeval time;
 
   time.tv_sec = usec / 1000000;
@@ -259,6 +286,17 @@ void XOSView::checkArgs (int argc, char** argv) const
       case 'v':
       		cerr << versionString << endl;
 		exit(0);
+#ifdef XOSVIEW_NETBSD
+      case 'N': if (strlen(argv[0]) > 2)
+      		  SetKernelName(argv[0]+2);
+		else
+		{
+		  SetKernelName(argv[1]);
+		  argc--;
+		  argv++;
+		}
+		break;
+#endif
       default:
       		cerr << "Ignoring unknown option '" << argv[0] << "'.\n";
 	  	break;
