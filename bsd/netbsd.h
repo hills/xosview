@@ -18,6 +18,12 @@
 #include <net/if.h>
 
 void
+NetBSDInit();
+
+void
+SetKernelName(const char* const kernelName);
+
+void
 NetBSDCPUInit();
 
 void
@@ -29,4 +35,9 @@ NetBSDNetInit();
 void
 NetBSDGetNetInOut (long long * inbytes, long long * outbytes);
 
+int
+NetBSDDiskInit();
+
+void
+NetBSDGetDiskXFerBytes (unsigned long long * bytes);
 #endif
