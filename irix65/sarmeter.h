@@ -19,12 +19,14 @@ typedef struct {
 header;
 
 typedef struct {
-    char           pad[64];
     char           name[12];
+    char           pad1[68];
     struct iotime  stat;
-    int            padding;
+    char           pad2[4];
 } 
 diskinfo;
+
+#define MAX_DISKS 16
 
 // common function for all sar based graphs
 class SarMeter
@@ -68,7 +70,7 @@ private:
     gfxinfo _gi;
     bool    _giNew;
 
-    diskinfo _di;
+    diskinfo _di[MAX_DISKS];
     bool     _diNew;
 };
 

@@ -59,7 +59,7 @@ void SarMeter::checkSadc( void )
         if( ptr == NULL )
             break;
 
-        if( (ptr+24+sizeof(gfxinfo)) < (_buf+_lastPos) &&
+        if( (ptr+24+3*sizeof(diskinfo)) < (_buf+_lastPos) &&
             memcmp( ptr, "Sarmagic", 8 ) == 0 )
         {
             ptr += 8;
@@ -97,31 +97,41 @@ void SarMeter::checkSadc( void )
                 if( _diNew )
                     return;
 
-                ptr += 16;
-//              fprintf(stderr,"found diskinfo pos at 0x%x, %d bytes in _buf\n",
-//                    ptr, ptr-_buf );
-                memcpy( &_di, ptr, sizeof( diskinfo ));
-#if 0
-                fprintf( stderr, "diskinfo {\n  %s\n", _di.name );
-                fprintf( stderr, "  stat {\n" );
-                fprintf( stderr, "    ios {\n" );
-                fprintf( stderr, "      %d, %d, %d, %d\n",
-                    _di.stat.ios.io_ops,
-                    _di.stat.ios.io_misc,
-                    _di.stat.ios.io_qcnt,
-                    _di.stat.ios.io_unlog );
-                fprintf( stderr, "    }\n" );
-                fprintf( stderr, "    %d %d %d %d %d\n", 
-                    _di.stat.io_bcnt,
-                    _di.stat.io_resp,
-                    _di.stat.io_act,
-                    _di.stat.io_wops,
-                    _di.stat.io_wbcnt );
-#endif
-//                _diNew = 1;
+                ptr += 12;
 
-                // found record, move data
-                ptr += sizeof( diskinfo );
+                // number of records [devices]
+                int num;
+                memcpy( &num, ptr, 4 );
+                ptr += 4;
+
+//              fprintf(stderr,
+//                 "found %d diskinfo records, pos at 0x%x, %d bytes in _buf\n",
+//                    num, ptr, ptr-_buf );
+                for( int i=0; i < num && i < MAX_DISKS; i++ )
+                {
+                    memcpy( &_di[i], ptr, sizeof( diskinfo ));
+#if 0
+                    fprintf( stderr, "diskinfo {\n  %s\n", _di[i].name );
+                    fprintf( stderr, "  stat {\n" );
+                    fprintf( stderr, "    ios {\n" );
+                    fprintf( stderr, "      %d, %d, %d, %d\n",
+                        _di[i].stat.ios.io_ops,
+                        _di[i].stat.ios.io_misc,
+                        _di[i].stat.ios.io_qcnt,
+                        _di[i].stat.ios.io_unlog );
+                    fprintf( stderr, "    }\n" );
+                    fprintf( stderr, "    %d %d %d %d %d\n", 
+                        _di[i].stat.io_bcnt,
+                        _di[i].stat.io_resp,
+                        _di[i].stat.io_act,
+                        _di[i].stat.io_wops,
+                        _di[i].stat.io_wbcnt );
+#endif
+                    // found record, move data
+                    ptr += sizeof( diskinfo );
+                }
+
+                _diNew = 1;
                 size_t pos = ptr-_buf;
                 
 //                fprintf( stderr,
