@@ -152,14 +152,13 @@ xosview*batteryUsedColor: aquamarine
 xosview*batteryPriority:  50
 xosview*batteryUsedFormat: percent
 
-!!!
-!!!  NetBSD-only meters
-!!!
 ! Disk Meter Resources
 
 xosview*disk:		True
 xosview*diskUsedColor:	seagreen
 xosview*diskIdleColor:	aquamarine
+xosview*diskWriteColor: SlateBlue1
+xosview*diskReadColor:  SkyBlue
 !  Default to 5MB/s bandwidth -- I
 ! think that's IDE's theoretical
 ! peak?, and SCSI-II's peak (no fast, no
