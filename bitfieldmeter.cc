@@ -5,7 +5,11 @@
 //  This file may be distributed under terms of the GPL
 //
 //
+#ifdef HAVE_FSTREAM
+#include <fstream>
+#else
 #include <fstream.h>
+#endif
 #include <stdlib.h>
 #include "snprintf.h"
 #include "general.h"
