@@ -49,7 +49,7 @@ public:
       + stoptime_.tv_usec - starttime_.tv_usec;
   }
   
-  ostream &printOn(ostream &os) const {
+  std::ostream &printOn(std::ostream &os) const {
     return os <<"Timer : ["
       <<"starttime_ = " <<TimeVal(starttime_)
       <<", stoptime_ = " <<TimeVal(stoptime_)
@@ -62,7 +62,7 @@ protected:
 private:
 };
 
-inline ostream &operator<<(ostream &os, const Timer &t){
+inline std::ostream &operator<<(std::ostream &os, const Timer &t){
   return t.printOn(os);
 }
 

@@ -17,7 +17,11 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <arpa/inet.h>
+#ifdef HAVE_IOSTREAM
+#include <iostream>
+#else
 #include <iostream.h>
+#endif
 #include "bool.h"
 
 class Host {
@@ -66,7 +70,7 @@ public:
 
   // Should not use this under linux for the same reashon as the above
   // function.
-  ostream &print(ostream &os) const;
+  std::ostream &print(std::ostream &os) const;
 
 protected:
 private:
@@ -84,7 +88,7 @@ private:
 };
 
 // Do not use this under linux until inet_ntoa() is fixed.
-inline ostream &operator<<(ostream &os, const Host& host) {
+inline std::ostream &operator<<(std::ostream &os, const Host& host) {
   return host.print(os);
 }
 

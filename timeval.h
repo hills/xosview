@@ -12,7 +12,11 @@
 #define TIMEVAL_H_CVSID "$Id$"
 
 #include <sys/time.h>
+#ifdef HAVE_IOSTREAM
+#include <iostream>
+#else
 #include <iostream.h>
+#endif
 
 class TimeVal {
 public:
@@ -29,7 +33,7 @@ public:
 
   operator struct timeval(void) const { return _val; }
 
-  ostream &printOn(ostream &os) const {
+  std::ostream &printOn(std::ostream &os) const {
     return os <<"(" <<sec() <<" sec, " <<usec() <<" usec)";
   }
 
@@ -37,7 +41,7 @@ private:
   struct timeval _val;
 };
 
-inline ostream &operator<<(ostream &os, const TimeVal &tv){
+inline std::ostream &operator<<(std::ostream &os, const TimeVal &tv){
   return tv.printOn(os);
 }
 
