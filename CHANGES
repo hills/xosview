@@ -1,5 +1,10 @@
   /*  $Id$  */
 
+Changes since xosview-1.8.0
+
+- Change MAX_PROC_LENGTH in linux/cpumeter to 4096 to avoid
+  an infinite loop with redhat 7.3
+
 Changes since xosview-1.7.3
 
 - Add Mike Butler's patch which fixes an infinite loop in

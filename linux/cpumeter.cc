@@ -1,5 +1,5 @@
-//  
-//  Copyright (c) 1994, 1995 by Mike Romberg ( romberg@fsl.noaa.gov )
+//
+//  Copyright (c) 1994, 1995, 2002 by Mike Romberg ( romberg@fsl.noaa.gov )
 //
 //  This file may be distributed under terms of the GPL
 //
@@ -15,7 +15,7 @@
 #include <ctype.h>
 
 static const char STATFILENAME[] = "/proc/stat";
-#define MAX_PROCSTAT_LENGTH 2048
+#define MAX_PROCSTAT_LENGTH 4096
 
 CPUMeter::CPUMeter(XOSView *parent, const char *cpuID)
 : FieldMeterGraph( parent, 4, toUpper(cpuID), "USR/NICE/SYS/FREE" ) {
@@ -62,9 +62,9 @@ void CPUMeter::getcputime( void ){
   for (int i = 0 ; i < _lineNum ; i++)
     stats.getline(tmp, MAX_PROCSTAT_LENGTH);
 
-  stats >>tmp >>cputime_[cpuindex_][0]  
-	      >>cputime_[cpuindex_][1]  
-	      >>cputime_[cpuindex_][2]  
+  stats >>tmp >>cputime_[cpuindex_][0]
+	      >>cputime_[cpuindex_][1]
+	      >>cputime_[cpuindex_][2]
 	      >>cputime_[cpuindex_][3];
 
   int oldindex = (cpuindex_+1)%2;
@@ -100,9 +100,9 @@ int CPUMeter::findLine(const char *cpuID){
   return -1;
 }
 
-// Checks for the SMP kernel patch by forissier@isia.cma.fr.  
+// Checks for the SMP kernel patch by forissier@isia.cma.fr.
 // http://www-isia.cma.fr/~forissie/smp_kernel_patch/
-// If it finds that this patch has been applied to the current kernel 
+// If it finds that this patch has been applied to the current kernel
 // then returns the number of cpus that are on this machine.
 int CPUMeter::countCPUs(void){
   ifstream stats( STATFILENAME );
@@ -128,7 +128,7 @@ int CPUMeter::countCPUs(void){
 const char *CPUMeter::cpuStr(int num){
   static char buffer[32];
   ostrstream str(buffer, 32);
-  
+
   str << "cpu";
   if (num != 0)
     str << (num - 1);
