@@ -9,7 +9,7 @@
 /*#include <sys/loadavg.h>*/
 
 LoadMeter::LoadMeter(XOSView *parent, kstat_ctl_t *_kc)
-	: FieldMeterDecay(parent, 2, "LOAD", "PROCS/MIN", 1, 1, 0)
+	: FieldMeterGraph(parent, 2, "LOAD", "PROCS/MIN", 1, 1, 0)
 {
 	kc = _kc;
 	ksp = kstat_lookup(kc, "unix", 0, "system_misc");
@@ -25,7 +25,7 @@ LoadMeter::~LoadMeter(void)
 
 void LoadMeter::checkResources(void)
 {
-	FieldMeterDecay::checkResources();
+	FieldMeterGraph::checkResources();
 
 	warnloadcol_ = parent_->allocColor(
 	    parent_->getResource("loadWarnColor" ));
@@ -35,7 +35,8 @@ void LoadMeter::checkResources(void)
 	setfieldcolor(0, procloadcol_);
 	setfieldcolor(1, parent_->getResource("loadIdleColor"));
 	priority_ = atoi (parent_->getResource("loadPriority"));
-	dodecay_ = !strncasecmp (parent_->getResource("loadDecay"), "True", 5);
+	dodecay_ = parent_->isResourceTrue("loadDecay");
+	useGraph_ = parent_->isResourceTrue("loadGraph");
 	SetUsedFormat(parent_->getResource("loadUsedFormat"));
 
 	alarmThreshold = atoi (parent_->getResource("loadAlarmThreshold"));

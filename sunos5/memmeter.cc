@@ -8,7 +8,7 @@
 #include <stdlib.h>
 
 MemMeter::MemMeter(XOSView *parent, kstat_ctl_t *_kc)
-	: FieldMeterDecay(parent, 2, "MEM", "USED/FREE")
+	: FieldMeterGraph(parent, 2, "MEM", "USED/FREE")
 {
 	kc = _kc;
 
@@ -24,12 +24,13 @@ MemMeter::MemMeter(XOSView *parent, kstat_ctl_t *_kc)
 
 void MemMeter::checkResources(void)
 {
-	FieldMeterDecay::checkResources();
+	FieldMeterGraph::checkResources();
 
 	setfieldcolor(0, parent_->getResource("memUsedColor"));
 	setfieldcolor(1, parent_->getResource("memFreeColor"));
 	priority_ = atoi (parent_->getResource("memPriority"));
-	dodecay_ = !strncasecmp (parent_->getResource("memDecay"), "True", 5);
+	dodecay_ = parent_->isResourceTrue("memDecay");
+	useGraph_ = parent_->isResourceTrue("memGraph");
 	SetUsedFormat(parent_->getResource("memUsedFormat"));
 }
 

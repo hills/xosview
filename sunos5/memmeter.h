@@ -5,10 +5,10 @@
 #ifndef _MEMMETER_H_
 #define _MEMMETER_H_
 
-#include "fieldmeterdecay.h"
+#include "fieldmetergraph.h"
 #include <kstat.h>
 
-class MemMeter : public FieldMeterDecay {
+class MemMeter : public FieldMeterGraph {
  public:
 	MemMeter(XOSView *parent, kstat_ctl_t *kcp);
 	~MemMeter(void);

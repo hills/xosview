@@ -5,10 +5,10 @@
 #ifndef _PAGEMETER_H_
 #define _PAGEMETER_H_
 
-#include "fieldmeterdecay.h"
+#include "fieldmetergraph.h"
 #include <kstat.h>
 
-class PageMeter : public FieldMeterDecay {
+class PageMeter : public FieldMeterGraph {
  public:
 	PageMeter(XOSView *parent, kstat_ctl_t *kcp, float max);
 	~PageMeter(void);

@@ -11,7 +11,7 @@
 #include <strstream.h>
 
 CPUMeter::CPUMeter(XOSView *parent, kstat_ctl_t *_kc, int cpuid)
-	: FieldMeterDecay(parent, CPU_STATES, toUpper(cpuStr(cpuid)),
+	: FieldMeterGraph(parent, CPU_STATES, toUpper(cpuStr(cpuid)),
 	    "USER/SYS/WAIT/IDLE")
 {
 	kc = _kc;
@@ -36,14 +36,15 @@ CPUMeter::~CPUMeter(void)
 
 void CPUMeter::checkResources(void)
 {
-	FieldMeterDecay::checkResources();
+	FieldMeterGraph::checkResources();
 
 	setfieldcolor(0, parent_->getResource("cpuUserColor"));
 	setfieldcolor(1, parent_->getResource("cpuSystemColor"));
 	setfieldcolor(2, parent_->getResource("cpuInterruptColor"));
 	setfieldcolor(3, parent_->getResource("cpuFreeColor"));
 	priority_ = atoi(parent_->getResource("cpuPriority"));
-	dodecay_ = !strncasecmp(parent_->getResource("cpuDecay"), "True", 5);
+	dodecay_ = parent_->isResourceTrue("cpuDecay");
+	useGraph_ = parent_->isResourceTrue("cpuGraph");
 	SetUsedFormat(parent_->getResource("cpuUsedFormat"));
 }
 

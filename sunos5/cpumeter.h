@@ -5,12 +5,12 @@
 #ifndef _CPUMETER_H_
 #define _CPUMETER_H_
 
-#include "fieldmeterdecay.h"
+#include "fieldmetergraph.h"
 
 #include <kstat.h>
 #include <sys/sysinfo.h>
 
-class CPUMeter : public FieldMeterDecay {
+class CPUMeter : public FieldMeterGraph {
  public:
 	CPUMeter(XOSView *parent, kstat_ctl_t *kcp, const int cpuid = 0);
 	~CPUMeter(void);

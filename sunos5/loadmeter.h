@@ -5,10 +5,10 @@
 #ifndef _LOADMETER_H_
 #define _LOADMETER_H_
 
-#include "fieldmeterdecay.h"
+#include "fieldmetergraph.h"
 #include <kstat.h>
 
-class LoadMeter : public FieldMeterDecay {
+class LoadMeter : public FieldMeterGraph {
  public:
 	LoadMeter(XOSView *parent, kstat_ctl_t *kcp);
 	~LoadMeter(void);

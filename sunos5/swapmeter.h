@@ -5,10 +5,10 @@
 #ifndef _SWAPMETER_H_
 #define _SWAPMETER_H_
 
-#include "fieldmeterdecay.h"
+#include "fieldmetergraph.h"
 #include <kstat.h>
 
-class SwapMeter : public FieldMeterDecay {
+class SwapMeter : public FieldMeterGraph {
  public:
 	SwapMeter(XOSView *parent, kstat_ctl_t *kcp);
 	~SwapMeter(void);
