@@ -185,17 +185,17 @@ void XOSView::checkOverallResources() {
 
   setFont();
   
-  // use captions
-  if ( !strcmp( getResource("captions"), "True" ) )
+   // use captions
+  if ( isResourceTrue("captions") )
       caption_ = 1;
-
+  
   // use labels
-  if ( !strncasecmp( getResource("labels"), "True", 5 ) )
+  if ( isResourceTrue("labels") )
       legend_ = 1;
-
+  
   // use "free" labels
-  if ( !strncasecmp( getResource("usedlabels"), "True", 5 ) )
-    usedlabels_ = 1;
+  if ( isResourceTrue("usedlabels") )
+      usedlabels_ = 1;
 }
 
 const char *XOSView::winname( void ){
