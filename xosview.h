@@ -28,6 +28,7 @@ public:
   void figureSize ( void );
   void resize( void );
   void draw( void );
+  void safedraw ( void );
   void run( void );
   void keyrelease( char *ch );
   const char *winname( void );
@@ -36,8 +37,10 @@ public:
   int xoff(void) const { return xoff_; }
   int newypos( void );
 
+  int hasBeenExposedAtLeastOnce() const {return exposed_once_flag_; }
   int isExposed() const { return expose_flag_; }
   int isFullyVisible() const { return _isvisible && !_ispartiallyvisible; }
+  int isAtLeastPartiallyVisible() const { return _isvisible; }
 
 protected:
 
@@ -56,7 +59,7 @@ protected:
   int caption_, legend_, xoff_, yoff_, nummeters_, usedlabels_;
   unsigned long sleeptime_, usleeptime_;
 
-  int expose_flag_;
+  int expose_flag_, exposed_once_flag_;
 
   void usleep_via_select( unsigned long usec );
   void addmeter( Meter *fm );
@@ -78,4 +81,8 @@ private:
   bool _ispartiallyvisible;
 };
 
+/*  Make XOSDEBUG("This is a format string.  %d %d\n", a, b); look
+ *  like if (0) printf("This ..."...);.  Change the 0 to a 1, to
+ *  enable these debugging outputs.  */
+#define XOSDEBUG	if (0) printf
 #endif
