@@ -21,6 +21,7 @@
 #include "diskmeter.h"
 #include "raidmeter.h"
 #include "lmstemp.h"
+#include "nfsmeter.h"
 
 #include <stdlib.h>
 
@@ -100,5 +101,12 @@ void MeterMaker::makeMeters(void){
       const char *lab = _xos->getResourceOrUseDefault(s, "TMP");
       push(new LmsTemp(_xos, res, lab, caption));
     }
+  }
+  // check for the NFS mesters
+  if (_xos->isResourceTrue("NFSDStats")){
+      push(new NFSDStats(_xos));
+  }
+  if (_xos->isResourceTrue("NFSStats")){
+      push(new NFSStats(_xos));
   }
 }

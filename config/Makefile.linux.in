@@ -15,6 +15,7 @@ memmeter.o \
 swapmeter.o \
 pagemeter.o \
 netmeter.o \
+nfsmeter.o \
 intmeter.o \
 loadmeter.o \
 btrymeter.o \

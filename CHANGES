@@ -1,6 +1,7 @@
   /*  $Id$  */
 
 Changes since xosview-1.8.1
+ - Merge in the fedora-2 nfs patch.
 
  - Merge in the fedora-2 strip patch.
 

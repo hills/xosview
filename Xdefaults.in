@@ -234,3 +234,16 @@ xosview*lmstemp2:	remote_temp
 xosview*lmstempLabel2:	RTMP
 xosview*lmstempPriority: 20
 xosview*lmstempUsedFormat: autoscale
+
+xosview*NFSDStats:       False
+xosview*NFSDStatCallsColor:     green
+xosview*NFSDStatBadCallsColor: red
+xosview*NFSDStatUDPColor:       yellow
+xosview*NFSDStatTCPColor:       orange
+xosview*NFSDStatIdleColor:      aquamarine
+
+xosview*NFSStats:	False
+xosview*NFSStatReTransColor:	aquamarine
+xosview*NFSStatAuthRefrshColor:	seagreen
+xosview*NFSStatCallsColor:	green
+xosview*NFSStatIdleColor:	aquamarine
