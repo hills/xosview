@@ -19,10 +19,10 @@ netmeter.o \
 loadmeter.o \
 diskmeter.o \
 pagemeter.o \
+intmeter.o \
 kernel.o
 
-#  These next two are not yet supported in the NetBSD port.
-#intmeter.o \
+#  This next one is not yet supported in the NetBSD port.
 #serialmeter.o \
 
 CFILES := $(OBJS:.o=.cc)
