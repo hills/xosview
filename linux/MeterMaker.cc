@@ -56,9 +56,9 @@ void MeterMaker::makeMeters(void){
 
   // check for the serial meters.
   for (int i = 0 ; i < SerialMeter::numDevices() ; i++)
-    if (strncasecmp(_xos->getResource(
-      SerialMeter::getResourceName((SerialMeter::Device)i)), "False", 6))
-      push(new SerialMeter(_xos, (SerialMeter::Device)i));
+    if (_xos->isResourceTrue(SerialMeter::getResourceName(
+      (SerialMeter::Device)i)))
+        push(new SerialMeter(_xos, (SerialMeter::Device)i));
 
   // check for the interrupt meter
   if (_xos->isResourceTrue("interrupts")) {
