@@ -99,10 +99,16 @@ xosview*netUsedFormat:	  autoscale
 !!!
 ! Serial Meter Resources
 
+xosview*serial0: False
 xosview*serial1: False
 xosview*serial2: False
 xosview*serial3: False
 xosview*serial4: False
+xosview*serial5: False
+xosview*serial6: False
+xosview*serial7: False
+xosview*serial8: False
+xosview*serial9: False
 xosview*serialOnColor:    red
 xosview*serialOffColor:   aquamarine
 xosview*serialPriority:   1

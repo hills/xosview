@@ -46,14 +46,35 @@ void MeterMaker::makeMeters(void){
     push(new NetMeter(_xos, atof(_xos->getResource("netBandwidth"))));
 
   // check for the serial meters.
+//   if (!strcmp(_xos->getResource("serial1"), "True"))
+//     push(new SerialMeter(_xos, SerialMeter::S0, "cua0"));
+//   if (!strcmp(_xos->getResource("serial2"), "True"))
+//     push(new SerialMeter(_xos, SerialMeter::S1, "cua1"));
+//   if (!strcmp(_xos->getResource("serial3"), "True"))
+//     push(new SerialMeter(_xos, SerialMeter::S2, "cua2"));
+//   if (!strcmp(_xos->getResource("serial4"), "True"))
+//     push(new SerialMeter(_xos, SerialMeter::S3, "cua3"));
+
+  if (!strcmp(_xos->getResource("serial0"), "True"))
+      push(new SerialMeter(_xos, SerialMeter::S0, "ttyS0"));
   if (!strcmp(_xos->getResource("serial1"), "True"))
-    push(new SerialMeter(_xos, SerialMeter::S0, "cua0"));
+      push(new SerialMeter(_xos, SerialMeter::S1, "ttyS1"));
   if (!strcmp(_xos->getResource("serial2"), "True"))
-    push(new SerialMeter(_xos, SerialMeter::S1, "cua1"));
+      push(new SerialMeter(_xos, SerialMeter::S2, "ttyS2"));
   if (!strcmp(_xos->getResource("serial3"), "True"))
-    push(new SerialMeter(_xos, SerialMeter::S2, "cua2"));
+      push(new SerialMeter(_xos, SerialMeter::S3, "ttyS3"));
   if (!strcmp(_xos->getResource("serial4"), "True"))
-    push(new SerialMeter(_xos, SerialMeter::S3, "cua3"));
+      push(new SerialMeter(_xos, SerialMeter::S4, "ttyS4"));
+  if (!strcmp(_xos->getResource("serial5"), "True"))
+      push(new SerialMeter(_xos, SerialMeter::S5, "ttyS5"));
+  if (!strcmp(_xos->getResource("serial6"), "True"))
+      push(new SerialMeter(_xos, SerialMeter::S6, "ttyS6"));
+  if (!strcmp(_xos->getResource("serial7"), "True"))
+      push(new SerialMeter(_xos, SerialMeter::S7, "ttyS7"));
+  if (!strcmp(_xos->getResource("serial8"), "True"))
+      push(new SerialMeter(_xos, SerialMeter::S8, "ttyS8"));
+  if (!strcmp(_xos->getResource("serial9"), "True"))
+      push(new SerialMeter(_xos, SerialMeter::S0, "ttyS9"));
 
   // check for the interrupt meter
   if (!strcmp(_xos->getResource("interrupts"), "True"))

@@ -11,7 +11,6 @@
 
 #include "bitmeter.h"
 
-
 class IntMeter : public BitMeter {
 public:
   IntMeter( XOSView *parent,

@@ -20,29 +20,61 @@
 
 #include <unistd.h>
 #include <asm/io.h>
+#include <linux/serial.h>
 #include <linux/serial_reg.h>
 
 
-const unsigned short int SerialMeter::Ports[4] = {
-  0x03f8, 0x02f8, 0x03e8, 0x02e8
-};
+// const unsigned short int SerialMeter::Ports[4] = {
+//   0x03f8, 0x02f8, 0x03e8, 0x02e8
+// };
+const int SerialMeter::NUMBER_OF_PORTS = 10;
+unsigned short int SerialMeter::Ports[SerialMeter::NUMBER_OF_PORTS];
+
+/* a bad hack! */
+static char *deviceFile[] = { "/dev/ttyS0",
+                              "/dev/ttyS1",
+                              "/dev/ttyS2",
+                              "/dev/ttyS3",
+                              "/dev/ttyS4",
+                              "/dev/ttyS5",
+                              "/dev/ttyS6",
+                              "/dev/ttyS7",
+                              "/dev/ttyS8",
+                              "/dev/ttyS9"};
 
 
 SerialMeter::SerialMeter( XOSView *parent,
 			  Device device,
 			  const char *title, const char *, int dolegends,
 			  int dousedlegends )
-: BitMeter( parent, title, 
-	    "LSR bits(0-7), MSR bits(0-7)", 16, 
-	    dolegends, dousedlegends ) {
+  : BitMeter( parent, title, 
+              "LSR bits(0-7), MSR bits(0-7)", 16, 
+              dolegends, dousedlegends ) {
+    
+  int fd;
+  struct serial_struct serinfo;
 
+  /* get the real serial port (code stolen from setserial 2.11) */
+  if ((fd = open(deviceFile[device], O_RDONLY|O_NONBLOCK)) < 0) {
+    cerr << "SerialMeter::SerialMeter() : "
+         << deviceFile[device] 
+         << " xosview has no permissions to read the port." <<endl;
+    exit(1);
+  }  
+  if (ioctl(fd, TIOCGSERIAL, &serinfo) < 0) {
+    cerr << "Cannot get serial info" <<endl;
+    close(fd);
+    exit(1);
+  }
+  Ports[device]=serinfo.port;
+  close(fd);
+  
   _port = Ports[device];
-  if (!getport(_port + UART_LSR) || !getport(_port + UART_MSR))
-    {
-      cerr << "SerialMeter::SerialMeter() : "
-        << "xosview must be suid root to use the serial meter." <<endl;
-      exit(1);
-    }
+  if (!getport(_port + UART_LSR) || !getport(_port + UART_MSR)){
+    cerr << "SerialMeter::SerialMeter() : "
+         << "xosview must be suid root to use the serial meter." <<endl;
+    exit(1);
+  }
 }
 
 SerialMeter::~SerialMeter( void ){

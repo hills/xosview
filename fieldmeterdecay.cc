@@ -62,18 +62,19 @@ void FieldMeterDecay::drawfields( int manditory ){
     FieldMeter::drawfields (manditory);
     return;
   }
+
+  if ( total_ == 0.0 )
+    return;
+
   int halfheight = height_ / 2;
   int decaytwidth, decayx = x_;
-
-  if ( total_ == 0 )
-    return;
   
   //  This code is supposed to make the average display look just like
   //  the ordinary display for the first drawfields, but it doesn't seem
   //  to work too well.  But it's better than setting all decay_ fields
   //  to 0.0 initially!
 
-  if ((total_ != 0.0) && firsttime_) {
+  if (firsttime_) {
     firsttime_ = 0;
     for (int i = 0; i < numfields_; i++) 
          {
@@ -100,12 +101,9 @@ void FieldMeterDecay::drawfields( int manditory ){
      *  then turn to ints.  I think this will solve a whole bunch of
      *  our problems with rounding that before we tackled at a whole
      *  lot of places.  BCG */
-  if (total_ != 0.0)
-    for ( int i = 0 ; i < numfields_ ; i++ ){
-      decay_[i] = ALPHA*decay_[i] + (1-ALPHA)*(fields_[i]*1.0/total_);
-    }
-    
   for ( int i = 0 ; i < numfields_ ; i++ ){
+
+    decay_[i] = ALPHA*decay_[i] + (1-ALPHA)*(fields_[i]*1.0/total_);
 
     //  We want to round the widths, rather than truncate.
     twidth = (int) (0.5 + (width_ * (float) fields_[i]) / total_); 
@@ -156,5 +154,5 @@ void FieldMeterDecay::drawfields( int manditory ){
 
   }
 
-  parent_->flush();
+  //parent_->flush();
 }

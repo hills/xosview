@@ -226,7 +226,7 @@ void FieldMeter::drawfields( int manditory ){
     x += twidth;
   }
 
-  parent_->flush();
+  //parent_->flush();
 }
 
 void FieldMeter::checkevent( void ){

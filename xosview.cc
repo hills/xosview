@@ -221,6 +221,7 @@ void XOSView::draw( void ){
     tmp->meter_->draw();
     tmp = tmp->next_;
   }
+  flush();
 }
 
 void XOSView::keyrelease( char *ch ){
