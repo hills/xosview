@@ -195,8 +195,11 @@ dnl
 case $host_os in
 netbsd)
   AC_CHECK_FUNCS(swapctl) 
-  BTRYMETER=btrymeter.o
-  AC_DEFINE(HAVE_BATTERY_METER)
+  #  Only enable the battery meter if it appears we support it.
+  if [ -e /dev/apm ]; then
+    BTRYMETER=btrymeter.o
+    AC_DEFINE(HAVE_BATTERY_METER)
+  fi
   ;;
 esac
 
