@@ -6,8 +6,12 @@
 //
 // $Id$
 //
+#include "general.h"
 #include "bitmeter.h"
 #include "xosview.h"
+
+CVSID("$Id$");
+CVSID_DOT_H(BITMETER_H_CVSID);
 
 
 BitMeter::BitMeter( XOSView *parent,
