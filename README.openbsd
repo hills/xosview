@@ -1,0 +1,14 @@
+  The OpenBSD version has been verified to work on version 2.3.
+If you find that it works on other versions (earlier or later),
+please inform me (bgrayson@ece.utexas.edu).  I do not currently
+run OpenBSD, and am thus unable to test xosview out.
+
+  There are no OpenBSD-specific instructions.  Some meters may
+not work, depending on how divergent the NetBSD and OpenBSD
+trees have become.  If you find any things that don't work,
+please let me know.  If you know a fix, it would be greatly
+appreciated!
+
+  See README.netbsd for generic *BSD info.
+
+  Brian Grayson (bgrayson@ece.utexas.edu)      May 1998
