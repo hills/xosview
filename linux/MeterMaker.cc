@@ -17,6 +17,7 @@
 #include "intmeter.h"
 #include "serialmeter.h"
 #include "loadmeter.h"
+#include "btrymeter.h"
 
 #include <stdlib.h>
 
@@ -54,4 +55,6 @@ void MeterMaker::makeMeters(void){
   // check for the interrupt meter
   if (_xos->isResourceTrue("interrupts"))
     push(new IntMeter(_xos));
+
+  //push(new BtryMeter(_xos));
 }
