@@ -601,6 +601,64 @@ percentage of page swapping (25% in, 75% out).
 .uf page
 
 
+\fBGfx Meter Resources\fP
+
+
+xosview*gfx:	(True or False)
+.RS
+If True xosview will display the GfxMeter. The value is sampled once per
+second, due to the usage of sadc to sample data.
+.RE
+
+xosview*gfxWarnColor: \fIcolor\fP
+.RS
+This is the color that the gfx meter will use once the warn state is
+reached.
+.RE
+
+xosview*gfxAlarmColor: \fIcolor\fP
+.RS
+This is the color that the gfx meter will use once the alarm state is
+reached.
+.RE
+
+xosview*gfxSwapColor: \fIcolor\fP
+.RS
+This is the color that the gfx meter will use in normal state
+.RE
+
+.\"  gfxIdleColor
+.cc gfx Idle idle
+
+.\"  Do the priority resource
+.pp gfx
+
+xosview*gfxWarnThreshold: \fIint\fP
+.RS
+This number (which must be an integer >= 1) of swapbuffers per second
+and pipe at which the gfxmeter changes its status and color from
+"normal" to "warn". The default value is 60.
+.RE
+
+xosview*gfxAlarmThreshold: \fIint\fP
+.RS
+This number (which must be an integer >= gfxWarnThreshold) of
+swapbuffers per second and pipe at which the gfxmeter changes its status
+and color from "warn" to "alarm". The default value is 120.
+.RE
+
+xosview*gfxDecay: (True or False)
+.RS
+You should probably leave this at the default value (False).  The gfx
+does not work in decay mode.
+.RE
+
+.dg gfx
+
+.\"  gfxUsedFormat resource
+.uf gfx
+
+
 \fBNetwork Meter Resources\fP
 
 
