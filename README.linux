@@ -5,11 +5,20 @@
 
       - xosview uses the C++ iostream library.  On linux this is usually
         distributed as part of libg++.  If you have an ELF system please
-        check and make sure that you have a recent copy of libg++ from
-        tsx-11.mit.edu:/pub/linux/packages/GCC as early ELF versions of
-        libg++ were not compatable with code in the C library.  If you
-        use one of these early ELF versions of libg++ xosview will probably
-        crash due to a segmentation violation.
+        check and make sure that you have a copy of libg++ which is 
+        compatable with your C library.  This information can be gathered
+        by reading the release notes for the libraries.  If you do not
+        use compatable libraries xosview will probably crash due to a 
+        segmentation violation.
+
+To install xosview:
+        
+        If one installs xosview via the 'make install' target it will place
+     things in the following locations.  The binary (xosview) will be copied
+     to /usr/bin/X11/xosview and will be suid root.  If you do not want to
+     run xosview suid root (this will just disable the serial meters) you
+     can change the permissions to whatever you like.  The X defaults for
+     xosview (Xdefaults) are copied to /usr/lib/X11/app-defaults/XOsview.
 
   To run xosview :
 
@@ -24,18 +33,8 @@
 
                   2 Enable IP accounting for all IP packets into and out
                     of your machine.  This is done by using a program called
-                    'ipfw'.  If you do not have this program on your system
-                    it can be found as part of the net-tools package available
-                    at your favorite Linux ftp site.  The example below is 
-                    how I run ipfw to do this at boot time in my rc.local:
-
-/sbin/ipfw add accounting all iface 192.168.0.3 from 192.168.0.3 to 0/0
-/sbin/ipfw add accounting all iface 192.168.0.3 from 0/0 to 192.168.0.3
-
-                    Just to make things interesting, it seems that kernels 
-                    newer than 1.3.66 have made ipfw obsolete.  It has been
-                    been replaced with ipfwadm.  Here is how to setup the
-                    accounting using ipfwadm:
+                    'ipfwadm'.  The example below is how I run ipfwadm to do 
+                    this at boot time in my rc.local:
 
 /sbin/ipfwadm -A -a -P all -S 192.168.0.3 -D 0/0
 /sbin/ipfwadm -A -a -P all -S 0/0 -D 192.168.0.3
@@ -43,7 +42,7 @@
         If you do not do these steps, you will still be able to use xosview.
         You just will not be able to use the network meter.
 
-      - The serial meter code in xosview-1.4 has been updated so that it
+      - The serial meter code in has been updated so that it
         displays more useful information.  To do this xosview now looks
         directly at a couple of the serial registers.  As a result of
         this, xosview now need to be suid root in order to use the serial
@@ -55,13 +54,24 @@
         /proc filesystem will provide some more useful serial stats and
         xosview will not have to be suid to get serial information.
 
-To install xosview:
-        
-        If one installs xosview via the 'make install' target it will place
-     things in the following locations.  The binary (xosview) will be copied
-     to /usr/bin/X11/xosview and will be suid root.  If you do not want to
-     run xosview suid root (this will just disable the serial meters) you
-     can change the permissions to whatever you like.  The X defaults for
-     xosview (Xdefaults) are copied to /usr/lib/X11/app-defaults/XOsview.
+      - The memory meter no longer displays shared memory by default.  The
+        information found in /proc/meminfo is not sufficient to figure out
+        what percentage of real memory is being used for 'shared'.  There
+        is a kernel module which comes with xosview that provides this 
+        information.  It is found in the linux/memstat directory.  If this
+        module is loaded into the kernel, a new entry will show up in /proc
+        called /proc/memstat.  Xosview will display a shared memory field if
+        it finds this file (ie the memstat module is loaded).
+
+Other notes:
+       
+        I have only run xosview on linux kernels in the 2.0 series.  It
+        may work with newer kernels but this is untested.
+
+        And finally, to all the folks who sent in linux related patches,
+        I would like to give a big thanks.  Many of your patches made it
+        into this release.  Many did not :(.  The good news is that I still
+        have them, and if yours does not show up here, it should probably
+        make it in shortly.
 
 Revision: $Id$
