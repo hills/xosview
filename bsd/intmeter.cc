@@ -6,10 +6,8 @@
 //
 // $Id$
 //
+#include <stdlib.h>		/*  For atoi().  */
 #include "intmeter.h"
-#include "xosview.h"
-#include <fstream.h>
-#include <stdlib.h>
 #include "kernel.h"
 
 
@@ -46,6 +44,7 @@ void IntMeter::checkResources( void ){
   BitMeter::checkResources();
   onColor_  = parent_->allocColor( parent_->getResource( "intOnColor" ) );
   offColor_ = parent_->allocColor( parent_->getResource( "intOffColor" ) );
+  priority_ = atoi( parent_->getResource( "intPriority" ) );
 }
 
 void 
