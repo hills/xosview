@@ -49,7 +49,4 @@ LIBS          += -lmeter -lX11 @EXTRALIBS@
 .cc.o:
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-.%.o.d : %.cc
-	@echo building dependencies for $<
-	@$(SHELL) -ec '$(CXX) -MM $(CXXFLAGS) $< \
-	   | sed '\''s/$*.o/$*.o $@/'\'' > $@'
+@AUTODEPRULE@

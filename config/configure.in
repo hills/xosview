@@ -24,15 +24,23 @@ AC_ARG_ENABLE([auto-depend],
 if test "$enableval" = "no"
 then
         AUTODEPEND=
+	AUTODEPRULE='\
+##  Autodepend rule defaults to disabled.\
+#-include Makefile.GNU.autodep'
         echo "disabled automatic dependencies"
 else
         AUTODEPEND='-include $(DEPFILES)'
+	AUTODEPRULE='-include Makefile.GNU.autodep'
         echo "enabled  automatic dependencies"
 fi
 ,
 AUTODEPEND=
+AUTODEPRULE='\
+##  Autodepend rule defaults to disabled.\
+#-include Makefile.GNU.autodep'
 echo "disabled automatic dependencies by default"
 )
+AC_SUBST(AUTODEPRULE)
 AC_SUBST(AUTODEPEND)
 
 dnl
@@ -111,5 +119,6 @@ AC_OUTPUT(\
   Makefile:config/Makefile.top.in \
   $host_os/Makefile:config/Makefile.$host_os.in \
   Makefile.config:config/Makefile.config.in \
+  Makefile.GNU.autodep:config/Makefile.GNU.autodep.in \
   $EXTRA_OUT_FILES)
 

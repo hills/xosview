@@ -1,0 +1,6 @@
+##  This rule doesn't work for BSD-style make, but it's fine for
+##  GNU make.
+.%.o.d : %.cc
+	@echo building dependencies for $<
+	@$(SHELL) -ec '$(CXX) -MM $(CXXFLAGS) $< \
+	   | sed '\''s/$*.o/$*.o $@/'\'' > $@'
