@@ -12,7 +12,7 @@
 
 CPUMeter::CPUMeter(XOSView *parent, int cpuid)
 	: FieldMeterGraph(parent, USED_CPU_STATES, toUpper(cpuStr(cpuid)),
-	    "USER/SYS/INTR/IDLE")
+	    "USER/SYS/INTR/WAIT/IDLE")
 {
 	for (int i = 0 ; i < 2 ; i++)
 		for (int j = 0 ; j < USED_CPU_STATES ; j++)
@@ -38,7 +38,8 @@ void CPUMeter::checkResources(void)
 	setfieldcolor(0, parent_->getResource("cpuUserColor"));
 	setfieldcolor(1, parent_->getResource("cpuSystemColor"));
 	setfieldcolor(2, parent_->getResource("cpuInterruptColor"));
-	setfieldcolor(3, parent_->getResource("cpuFreeColor"));
+	setfieldcolor(3, parent_->getResource("cpuWaitColor"));
+	setfieldcolor(4, parent_->getResource("cpuFreeColor"));
 	priority_ = atoi(parent_->getResource("cpuPriority"));
 	dodecay_ = parent_->isResourceTrue("cpuDecay");
 	useGraph_ = parent_->isResourceTrue("cpuGraph");
@@ -65,9 +66,8 @@ void CPUMeter::getcputime(void)
 	cputime_[cpuindex_][0] = tsp.cpu[CPU_USER];  
 	cputime_[cpuindex_][1] = tsp.cpu[CPU_KERNEL];
 	cputime_[cpuindex_][2] = tsp.cpu[CPU_INTR];  
-	cputime_[cpuindex_][3] = tsp.cpu[CPU_IDLE]
-        + tsp.cpu[CPU_WAIT]
-        + tsp.cpu[CPU_SXBRK];  
+	cputime_[cpuindex_][3] = tsp.cpu[CPU_WAIT];  
+	cputime_[cpuindex_][4] = tsp.cpu[CPU_IDLE] + tsp.cpu[CPU_SXBRK];
 
 	int oldindex = (cpuindex_ + 1) % 2;
 	for (int i = 0 ; i < USED_CPU_STATES ; i++) {

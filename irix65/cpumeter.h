@@ -11,7 +11,7 @@
 #include <sys/sysmp.h>
 #include <sys/sysinfo.h>
     
-#define USED_CPU_STATES (CPU_STATES-2) // no SXBRK + WAIT
+#define USED_CPU_STATES (CPU_STATES-1) // SXBRK + IDLE merged
 
 class CPUMeter : public FieldMeterGraph {
  public:

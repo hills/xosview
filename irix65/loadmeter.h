@@ -18,13 +18,12 @@ class LoadMeter : public FieldMeterGraph {
 
 	void checkResources(void);
 
- protected:
-	void getloadinfo(void);
-	unsigned long procloadcol_;
-	unsigned long warnloadcol_;
-
- private:
-	int alarmThreshold;
+protected:
+    void getloadinfo(void);
+    
+    unsigned long procloadcol_, warnloadcol_, critloadcol_;
+private:
+    int warnThreshold, critThreshold, alarmstate, lastalarmstate;
     char hostname[256];
     struct statstime res;
 };
