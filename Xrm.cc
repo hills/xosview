@@ -147,6 +147,15 @@ Listed from weakest to strongest:
       XrmQuarkToString(_class));
   if (rfilename != NULL)
     XrmCombineFileDatabase (rfilename, &_db, 1);
+  //  Try a few more, for SunOS/Solaris folks.
+  snprintf(rfilename, 2048, "/usr/openwin/lib/X11/app-defaults/%s",
+      XrmQuarkToString(_class));
+  if (rfilename != NULL)
+    XrmCombineFileDatabase (rfilename, &_db, 1);
+  snprintf(rfilename, 2048, "/usr/local/X11R6/lib/X11/app-defaults/%s",
+      XrmQuarkToString(_class));
+  if (rfilename != NULL)
+    XrmCombineFileDatabase (rfilename, &_db, 1);
 
   //  Now, check for an XOSView file in the XAPPLRESDIR directory...
   char* xappdir = getenv ("XAPPLRESDIR");
