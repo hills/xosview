@@ -100,11 +100,6 @@ int DevStat_Get();
 #include <i386/isa/icu.h>
 #endif
 
-// Utility/vanity define, for readability later on.
-#ifdef XOSVIEW_NETBSD && (__NetBSD_Version__ > 106010000)
-#define NETBSD_EV_IRQS
-#endif
-
 // these two functions are declared in kvm_stat.h, unfortunately this file
 // has no c++ compatibility declerations
 __BEGIN_DECLS
@@ -114,6 +109,13 @@ __END_DECLS
 #include <sys/sysctl.h>
 #include <sys/cpustats.h>
 #endif /* BSD/OS */
+
+// Utility/vanity define, for readability later on.
+// Note that this has to be after the above includes, which will pull
+// in __NetBSD_Version__ for us if needed.
+#if defined(XOSVIEW_NETBSD) && defined(__NetBSD_Version__) && (__NetBSD_Version__ >= 106010000)
+#define NETBSD_1_6A_EV_IRQS
+#endif
 
 #include "general.h"
 #include "kernel.h"		/*  To grab CVSID stuff.  */
@@ -182,7 +184,7 @@ static struct nlist nlst[] =
 { "_eintrcnt" },
 #define EINTRCNT_SYM_INDEX 	8
 
-#if defined(NETBSD_EV_IRQS)
+#if defined(NETBSD_1_6A_EV_IRQS)
 {"_allevents" },
 #define ALLEVENTS_SYM_INDEX	9
 #endif
@@ -825,7 +827,7 @@ BSDGetDiskXFerBytes (unsigned long long *bytesXferred) {
 
 /*  ---------------------- Interrupt Meter stuff  -----------------  */
 
-#if (!defined(XOSVIEW_OPENBSD) || !(defined(__pc532__) && defined(__i386__))) && !defined(XOSVIEW_BSDI) && !defined(NETBSD_EV_IRQS)
+#if (!defined(XOSVIEW_OPENBSD) || !(defined(__pc532__) && defined(__i386__))) && !defined(XOSVIEW_BSDI) && !defined(NETBSD_1_6A_EV_IRQS)
 static unsigned long kvm_intrcnt[128];// guess at space needed
 #endif
 
@@ -857,7 +859,7 @@ BSDIntrInit() {
 #endif /* _BSDI_VERSION */
 #else
 
-#if defined(NETBSD_EV_IRQS)
+#if defined(NETBSD_1_6A_EV_IRQS)
     return ValidSymbol(ALLEVENTS_SYM_INDEX);
 #else
     // Make sure the intr counter array is nonzero in size.
@@ -963,7 +965,7 @@ BSDGetIntrStats (unsigned long intrCount[NUM_INTR]) {
 # endif /* pc532 */
 #else /* XOSVIEW_OPENBSD && (__pc532__ || __i386__) */
 // Now let's do the modern NetBSD way...
-#if defined(NETBSD_EV_IRQS)
+#if defined(NETBSD_1_6A_EV_IRQS)
     // Shamelessly lifted from vmstat.c v1.119, with additional error
     // checking and ignoring of soft interrupts, etc.
 
