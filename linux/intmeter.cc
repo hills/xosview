@@ -12,6 +12,9 @@
 #include <fstream.h>
 #include <strstream.h>
 #include <stdlib.h>
+#ifdef __alpha__
+#include <asm/irq.h>
+#endif 
 
 
 static const char *INTFILE     = "/proc/interrupts";
@@ -20,14 +23,23 @@ static const char *VERSIONFILE = "/proc/version";
 IntMeter::IntMeter( XOSView *parent, int cpu)
   : BitMeter( parent, "INTS", "", 1, 
               0, 0 ), _cpu(cpu), _old(true) {
+#ifdef __alpha__
+char tmp[32];
+#endif 
  if (getLinuxVersion() <= 2.0) {
    setNumBits(16);
    legend("INTs (0-15)");
  }
  else {
    _old = false;
+#ifdef __alpha__
+   setNumBits(NR_IRQS);
+   sprintf(tmp,"INTs (0-%d)",(NR_IRQS-1));
+   legend(tmp);
+#else    
    setNumBits(24);
    legend("INTs (0-23)");
+#endif
  }
 
   for ( int i = 0 ; i < numBits() ; i++ )

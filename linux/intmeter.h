@@ -24,7 +24,13 @@ public:
   static int countCPUs(void);
 
 protected:
+#ifdef __alpha__
+  // Alphas can have up to 64 IRQs!
+  unsigned long irqs_[65], lastirqs_[65];
+#else
   unsigned long irqs_[24], lastirqs_[24];
+#endif
+
   int _cpu;
   bool _old;
 

@@ -204,7 +204,7 @@ void NetMeter::checkeventOld(void)
         if (!ifs.eof())
             {
             struct ifreq *ifr = ifc.ifc_req;
-            for (register i = ifc.ifc_len / sizeof(struct ifreq); 
+            for (int i = ifc.ifc_len / sizeof(struct ifreq);
                  --i >= 0; ifr++) 
                 {
                 unsigned long adr = ntohl(
