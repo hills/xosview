@@ -1,9 +1,8 @@
 Revision: $Id$
 
 * Do if(dolegends_) fix for loadmeter.cc for all ports.
-* Add a version string, so that xosview -v prints out the version.
 
-  Make xosview re-check resources when the resources are changed, 
+* Make xosview re-check resources when the resources are changed, 
     or when a signal is sent to it, or a key is pressed in it?
 
 * Add command-line on/off switches for most, if not all, meters.
@@ -53,8 +52,6 @@ x Add in support and auto-detect for new NetBSD UVM stuff.
     Xt, Xaw, and ICE, IIRC, which bloats static executables too
     much for my taste.  bgrayson
   
-  Add in the pixmap support.
-
 * The Netmeter under *BSD has wrap problems:  the internal
     counter in the kernel is 32 bits, so once we receive 4G of
     traffic, we wrap, and it looks like we received a lot of
