@@ -27,7 +27,7 @@ CVSID_DOT_H3(TIMEVAL_H_CVSID);
 
 NetMeter::NetMeter( XOSView *parent, float max )
   : FieldMeterGraph( parent, 3, "NET", "IN/OUT/IDLE" ){
-  bool kernelHasStats_ = BSDNetInit();
+  kernelHasStats_ = BSDNetInit();
   if (!kernelHasStats_) {
     warnx(
   "!!! The kernel does not seem to have the symbols needed for the NetMeter.");
