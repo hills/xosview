@@ -126,6 +126,13 @@ void XWin::init( int argc, char **argv ){
     cerr <<"Error getting attributes of Main." <<endl;
     exit(2);
   }
+
+  //  Create stipple pixmaps.
+  stipples_[0] = createPixmap("\000\000", 2, 2);
+  stipples_[1] = createPixmap("\002\000\001\000", 2, 4);
+  stipples_[2] = createPixmap("\002\001", 2, 2);
+  stipples_[3] = createPixmap("\002\003\001\003", 2, 4);
+  doStippling_ = isResourceTrue("enableStipple");
 }
 //-----------------------------------------------------------------------------
 
