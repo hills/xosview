@@ -39,13 +39,37 @@ meterlib:
 xosview: $(OBJS) @top_srcdir@/@host_os@/libmeter.a
 	$(CXX) $(LFLAGS) -o xosview $(OBJS) $(LIBS)
 
+##  If for some reason (such as permissions) you wish to change where
+##    xosview is installed, modify X11BASEDIR here to point to your
+##    desired tree (i.e., "X11BASEDIR=/usr/local").
+##  The sed command strips off the last portion of the path.  Without
+##    the double-quotes around the colons, the $: gets mis-parsed.
+##  I think we can use the dirname program for this, but I don't know
+##    how standard it is.  bgrayson
+X11BASEDIR=`echo @x_includes@ | sed -e 's:/[^/]*$$::'`
+BINDIR=$(X11BASEDIR)/bin
+MANDIR=$(X11BASEDIR)/man/man1
+XAPPLOADDIR=$(X11BASEDIR)/lib/X11/app-defaults
+
+##  These next lines look really ugly.  The echo statements are an
+##    attempt to make the output look a little nicer.  The "echo -n"
+##    statements create a two-space indent at the beginning of the line.
 install: xosview
-	@INSTALL_PROGRAM@ @INSTALL_ARGS@ xosview @prefix@/bin
-	@INSTALL_DATA@ Xdefaults /usr/lib/X11/app-defaults/XOsview
-	@INSTALL_DATA@ xosview.1 @prefix@/man/man1
+	@echo "Installing executable..."; echo -n "  "
+	@INSTALL_PROGRAM@ @INSTALL_ARGS@ xosview $(BINDIR)
+	@echo "Installing application defaults..."; echo -n "  "
+	@INSTALL_DATA@ Xdefaults $(XAPPLOADDIR)/XOsview
+	@echo "Making sure $(MANDIR) exists..."
+	@if [ ! -d $(MANDIR) ]; then \
+	  echo "Making $(MANDIR)..."; \
+	  mkdir $(MANDIR); \
+	fi
+	@echo "Installing man page..."; echo -n "  "
+	@INSTALL_DATA@ xosview.1 $(MANDIR)
 
 install-man:
-	install -c xosview.1 /usr/X11/man/man1
+	@echo "Use the 'install' target -- it installs the man page, too."
+	@#@INSTALL_DATA@ xosview.1 $(MANDIR)
 
 distrib: distclean
 	cd @top_srcdir@/..;tar cf `basename $(PWD)`.tar `basename $(PWD)`; \
