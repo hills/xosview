@@ -262,6 +262,8 @@ BSDGetUVMPageStats(struct uvmexp* uvm) {
   mib[1] = VM_UVMEXP;
   if (sysctl(mib, 2, uvm, &size, NULL, 0) < 0) {
     printf("can't get uvmexp: %s\n", strerror(errno));
+    printf("(This is most likely due to a /usr/include/uvm/uvm_extern.h\n"
+	  "file older than /sys/uvm/uvm_extern.h.)\n");
     memset(&uvm, 0, sizeof(uvmexp));
   }
 }
