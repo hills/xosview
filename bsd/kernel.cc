@@ -36,8 +36,10 @@
 #endif
 #include <sys/vmmeter.h>	/*  For struct vmmeter.  */
 #ifdef HAVE_SWAPCTL
+#include <sys/param.h>
 #include <unistd.h>
 #include <vm/vm_swap.h>
+#include <stdlib.h>
 #endif
 #include "kernel.h"		/*  To grab CVSID stuff.  */
 
@@ -282,19 +284,16 @@ BSDSwapInit() {
 //  This code is based on a patch sent in by Scott Stevens
 //  (s.k.stevens@ic.ac.uk, at the time).
 //
-#include <sys/param.h>
-#include <vm/vm_swap.h>
-#include <stdlib.h>
 
 void
-BSDGetSwapCtlInfo(int *total, int *free)
+BSDGetSwapCtlInfo(int *totalp, int *freep)
 {
   struct swapent *sep;
   int	totalinuse, totalsize;
   int rnswap, nswap = swapctl(SWAP_NSWAP, 0, 0);
 
   if (nswap < 1) {
-    *total = *free = 0;
+    *totalp = *freep = 0;
     return;
   }
 
@@ -313,8 +312,9 @@ BSDGetSwapCtlInfo(int *total, int *free)
     totalinuse += sep->se_inuse;
   }
 #define BYTES_PER_SWAPBLOCK	512
-  *total = totalsize * BYTES_PER_SWAPBLOCK;
-  *free = (totalsize - totalinuse) * BYTES_PER_SWAPBLOCK;
+  *totalp = totalsize * BYTES_PER_SWAPBLOCK;
+  *freep = (totalsize - totalinuse) * BYTES_PER_SWAPBLOCK;
+  free(sep);
 }
 #endif	/*  Swapctl info retrieval  */
 
@@ -385,6 +385,26 @@ BSDIntrInit() {
     return ValidSymbol(INTRCNT_SYM_INDEX) && ValidSymbol(EINTRCNT_SYM_INDEX);
 }
 
+int BSDNumInts() {
+  int nintr;
+  OpenKDIfNeeded(); 
+  nintr = (nlst[EINTRCNT_SYM_INDEX].n_value -
+	   nlst[INTRCNT_SYM_INDEX].n_value)   / sizeof(int);
+#ifdef XOSVIEW_FREEBSD
+  /*  I'm not sure exactly how FreeBSD does things, but just do
+   *  16 for now.  bgrayson  */
+  return 16;
+#else
+# if defined(i386)
+  /*  On the 386 platform, we count stray interrupts between
+   *  intrct and eintrcnt, also, but we don't want to show these.  */
+  return nintr/2;
+# else
+  return nintr;
+# endif
+#endif
+}
+
 void
 BSDGetIntrStats (unsigned long intrCount[NUM_INTR])
 {
@@ -403,35 +423,19 @@ BSDGetIntrStats (unsigned long intrCount[NUM_INTR])
 	intrCount[i] = kvm_intrcnt[idx];
     }
 #else /* XOSVIEW_FREEBSD */
-  //  NetBSD version, mostly from vmstat.c:
-# if defined(pc532)
-#  warning "The interrupt meter for pc532 is not yet supported --
-	    it'll be added in a few weeks, hopefully."
-# else /* pc532 */
+  //  NetBSD version, based on vmstat.c.  Note that the pc532
+  //  platform does support intrcnt and eintrcnt, but vmstat uses
+  //  the more advanced event counters to provide software
+  //  counts.  We'll just use the intrcnt array here.  If anyone
+  //  has problems, please mail me.  bgrayson
   {
-    int nintr;
-    nintr = (nlst[EINTRCNT_SYM_INDEX].n_value -
-	     nlst[INTRCNT_SYM_INDEX].n_value)   / sizeof(int);
-#  if 0
-    if (nintr/sizeof(int) != NUM_INTR*2) {
-      static int firsttime=1;
-      if (firsttime)
-	fprintf(stderr, "Confusion with interrupts: I expected there"
-	" to be %d interrupt counters, and I found %d.\n", NUM_INTR, nintr);
-      firsttime=0;
-      /*exit(-1);*/
-    }
-#  endif
-    safe_kvm_read(nlst[INTRCNT_SYM_INDEX].n_value, kvm_intrcnt, sizeof(long)*nintr);
-    /*  On the i386, for example, there are two arrays back to back
-     *  --- the actual interrupt count, followed by the
-     *  stray-interrupt count.  So, only look at the first nintr or
-     *  NUM_INTR, whichever is less.  */
-    for (int i=0;i<nintr && i<NUM_INTR;i++) {
+    int nintr = BSDNumInts();
+    safe_kvm_read(nlst[INTRCNT_SYM_INDEX].n_value, kvm_intrcnt,
+      sizeof(long)*nintr);
+    for (int i=0;i<nintr;i++) {
       intrCount[i] = kvm_intrcnt[i];
     }
   }
-# endif /* pc532 */
-    return;
+  return;
 #endif
 }
