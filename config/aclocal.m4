@@ -77,6 +77,11 @@ dnl
         INSTALL_ARGS='-s -g kmem -m 02555'
 	AC_DEFINE(XOSVIEW_NETBSD)
 ])
+dnl  For now, make FreeBSD be a superset of NetBSD.
+AC_DEFUN(AC_XOSV_FREEBSD, [
+AC_XOSV_NETBSD
+AC_DEFINE(XOSVIEW_FREEBSD)
+])
 
 
 AC_DEFUN(AC_XOSV_HPUX, [

@@ -66,6 +66,8 @@ to autoconf!
 ]); AC_XOSV_NETBSD 
     host_os=netbsd ;;
 
+freebsd*) AC_XOSV_FREEBSD
+	host_os=freebsd ;;
 hpux*)    AC_XOSV_HPUX   
           host_os=hpux ;;
 *)       AC_MSG_ERROR([xosview has not been ported to $host_os :(.  Sorry.]) ;;
