@@ -37,7 +37,7 @@ private:
     const char *id(void) { return _id; }
     int idlen(void) { return _idlen; }
 
-    void setVal(unsigned long val) { *_val = val; }
+    void setVal(double val) { *_val = val; }
 
   private:
     int _line;
