@@ -42,6 +42,9 @@ static XrmOptionDescRec options[] = {
 { "-battery", "*battery", XrmoptionNoArg, "False" },
 { "+battery", "*battery", XrmoptionNoArg, "True" },
 
+// Networkmeter resources
+{ "-net", "*net", XrmoptionNoArg, "False" },
+{ "+net", "*net", XrmoptionNoArg, "True" },
 //  Previously, network was overloaded to be the bandwidth and the
 //  on/off flag.  Now, we have -net for on/off, and networkBandwidth
 //  for bandwidth, with the alias networkBW, and network for backwards
@@ -49,9 +52,6 @@ static XrmOptionDescRec options[] = {
 { "-network", "*networkBandwidth", XrmoptionSepArg, (caddr_t) NULL },
 { "-networkBW", "*networkBandwidth", XrmoptionSepArg, (caddr_t) NULL },
 { "-networkBandwidth", "*networkBandwidth", XrmoptionSepArg, (caddr_t) NULL },
-//  -net is an abbreviation for -network
-{ "-net", "*net", XrmoptionNoArg, "False" },
-{ "+net", "*net", XrmoptionNoArg, "True" },
 
 // Page Meter
 { "-page", "*page", XrmoptionNoArg, "False" },
@@ -69,8 +69,5 @@ static XrmOptionDescRec options[] = {
 };
 //  This auto-detects changes in the number of options.
 static const int NUM_OPTIONS = sizeof(options) / sizeof(options[0]);
-
-
-
 
 #endif
