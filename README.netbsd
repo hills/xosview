@@ -1,7 +1,5 @@
 README file for xosview version 1.5.1, NetBSD-specific.
 
-(Yes, this is very out of date.  We're working on it....)
-
 CVS Id:  Revision: $Id$
 
   Written by Brian Grayson.  Please direct all comments, criticisms, etc.
@@ -17,13 +15,6 @@ this mumbo jumbo.
     kernel information (at least until some more statistics are added to
     the /kern or /proc file systems).  If you do not have root or kmem
     permission on the machine, xosview will not run.
-
-  Note:  The default Makefiles used by the xosview distribution require
-    GNU make, rather than BSD make.  I've tried to make a parallel set of
-    Makefiles for BSD make, but it's not easy trying to keep them
-    completely the same.  If you don't already have GNU make, contact
-    me and I will make custom BSD-make Makefiles for you.  If only
-    BSD-make and GNU-make agreed on 'include' versus '.include' etc.....  :(
 *****************************************************************************
 
   To make xosview:
@@ -46,10 +37,11 @@ this mumbo jumbo.
       If not, configuration must have not worked properly.  Mail me if
       this happens....
 
-    Run GNU "make" with no options.  (Since most people shouldn't need to mess
+    Run "make" with no options.  (Since most people shouldn't need to mess
       with the source code, we haven't enabled automatic dependence
       checking.  If you plan on modifying bits and pieces and recompiling,
-      mail one of us (Mike or I) for the appropriate lines to uncomment.)
+      simply run configure with --enable-auto-depend.
+      Unfortunately, the autodepend code requires the use of GNU make.)
   
     It should start compiling the netbsd directory files, create a library
       (libmeter.a) out of all the .o files, and then compile the
