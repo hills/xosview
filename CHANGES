@@ -1,5 +1,8 @@
   /*  $Id$  */
 Changes since xosview-1.6.2
+  Added a linux diskmeter which *should* be similar to the BSD version.
+    Linux looks like it actually has more stats (input, output, per disk).
+    So, this could be expanded upon.
   Better *BSD support:  OpenBSD intmeter, FreeBSD diskmeter,
     NetBSD battery meter.
   Some Solaris support.

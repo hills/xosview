@@ -18,6 +18,7 @@
 #include "serialmeter.h"
 #include "loadmeter.h"
 #include "btrymeter.h"
+#include "diskmeter.h"
 
 #include <stdlib.h>
 
@@ -49,6 +50,9 @@ void MeterMaker::makeMeters(void){
   // check for the net meter
   if (_xos->isResourceTrue("net"))
     push(new NetMeter(_xos, atof(_xos->getResource("netBandwidth"))));
+
+  if (_xos->isResourceTrue("disk"))
+      push(new DiskMeter(_xos, atof(_xos->getResource("diskBandwidth"))));
 
   // check for the serial meters.
   for (int i = 0 ; i < SerialMeter::numDevices() ; i++)
