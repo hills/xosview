@@ -1,0 +1,39 @@
+  $Id$
+
+  The majority of the xosview source code is covered by the GNU
+General Public License (GPL), which is presented in the file
+COPYING.GPL.
+
+  In addition, a portion of the NetBSD port's code is covered under
+the traditional BSD copyright, which is presented in COPYING.BSD.  If you
+plan on modifying or distributing any portion of this code, make sure
+that you agree to the terms in the BSD copyright (which in general is
+less restrictive than the GPL, from what I've seen, but I'm not a
+lawyer-type).  These files are:
+  netbsd/swapinternal.cc
+
+  Lastly, various portions of the xosview source code were developed
+by various authors who have intentionally chosen to allow the user
+to choose between the BSD copyright or the GPL copyright.  These files
+are:
+  fieldmeterdecay.h
+  fieldmeterdecay.cc
+  general.h
+  netbsd/MeterMaker.h
+  netbsd/MeterMaker.cc
+  netbsd/cpumeter.h
+  netbsd/cpumeter.cc
+  netbsd/diskmeter.h
+  netbsd/diskmeter.cc
+  netbsd/loadmeter.h
+  netbsd/loadmeter.cc
+  netbsd/memmeter.h
+  netbsd/memmeter.cc
+  netbsd/netbsd.h
+  netbsd/netbsd.cc
+  netbsd/netmeter.h
+  netbsd/netmeter.cc
+  netbsd/swapmeter.h
+  netbsd/swapmeter.cc
+    
+  Brian Grayson, Feb. 1997
