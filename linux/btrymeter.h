@@ -26,6 +26,12 @@ protected:
 
   void getpwrinfo( void );
 private:
+  bool getapminfo( void );
+  bool getacpiinfo( void );
+  bool getacpiinfofield(const std::string& filename,
+			const std::string& fieldname,
+			float& value);
+
   int alarmThreshold;
 };
 
