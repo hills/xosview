@@ -167,3 +167,4 @@ xosview*diskBandwidth:  5000000
 xosview*diskPriority:	10
 xosview*diskDecay:	True
 xosview*diskUsedFormat: autoscale
+xosview*diskGraph:	False
