@@ -24,6 +24,7 @@ public:
 
   void checkevent( void );
   void draw( void );
+  void disableMeter ( void );
 
   int numBits(void) const { return numbits_; }
   void setNumBits(int n);
@@ -33,6 +34,7 @@ protected:
   unsigned long onColor_, offColor_;
   char *bits_, *lastbits_;
   int numbits_;
+  bool disabled_;
 
   void setBits(int startbit, unsigned char values);
 

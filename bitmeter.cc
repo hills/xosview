@@ -17,7 +17,7 @@ BitMeter::BitMeter( XOSView *parent,
 		    const char *title, const char *legend, int numBits,
 		    int docaptions, int, int dousedlegends)
   : Meter( parent, title, legend, docaptions, dousedlegends, dousedlegends ),
-  bits_(NULL), lastbits_(NULL)  {
+  bits_(NULL), lastbits_(NULL), disabled_(false)  {
   setNumBits(numBits); 
 }
 
@@ -36,6 +36,14 @@ void BitMeter::setNumBits(int n){
   
   for ( int i = 0 ; i < numbits_ ; i++ )
       bits_[i] = lastbits_[i] = 0;
+}
+
+void BitMeter::disableMeter ( void ) {
+  disabled_ = true;
+  onColor_ = parent_->allocColor ("gray");
+  offColor_ = onColor_;
+  Meter::legend ("Disabled");
+
 }
 
 void BitMeter::checkResources( void ){
@@ -93,7 +101,9 @@ void BitMeter::draw( void ){
     parent_->drawString( x_ - offset + 1, y_ + height_, title_ );
     parent_->setForeground( onColor_ );
     if(docaptions_)
+    {
       parent_->drawString( x_, y_ - 5, legend_ );
+      }
   }
 
   drawBits( 1 );
