@@ -29,6 +29,9 @@ clean :
 tags TAGS :
 	etags $(CFILES) *.h
 
+%.o : %-@LVERSION@.$(FEXT)
+	$(CC) $(CFLAGS) -c $< -o $@
+
 %.o : %.$(FEXT)
 	$(CC) $(CFLAGS) -c $< -o $@
 

@@ -6,6 +6,15 @@ dnl
 dnl $Id$
 dnl
 
+AC_DEFUN(AC_SYS_LINUX_VERS,[[
+changequote(<<, >>)
+<<
+LVERSION=`uname -r`
+LVERSION=`/bin/expr $LVERSION : '\([0-9]*\.[0-9]*\)'`
+>>
+changequote([, ])
+]])
+
 AC_DEFUN(AC_XOSV_LINUX, [
 
 EXTRA_OUT_FILES="$EXTRA_OUT_FILES \
@@ -50,28 +59,27 @@ then
         MEMSTAT=
         echo "disabled the Linux memstat module"
 else
+        AC_SYS_LINUX_VERS
         MEMSTAT=MemStat
-        echo "enabled  the Linux memstat module"
+        echo "enabled  the Linux $LVERSION memstat module"
 
 dnl
 dnl If this module is to be built then check to see if we can
 dnl use MODVERSIONS.
 dnl
 AC_CHECK_HEADER(linux/modversions.h, [USE_MOD_VERSIONS=-DMODVERSIONS])
-
+INSTALL_ARGS='-s -m 4755'
 fi
 ,
-MEMSTAT=
-echo "disabled Linux memstat module by default"
+MEMSTAT=MemStat
+AC_SYS_LINUX_VERS
+echo "enabled  the Linux $LVERSION memstat module by default"
 dnl
 dnl If this module is to be built then check to see if we can
 dnl use MODVERSIONS.
 dnl
 AC_CHECK_HEADER(linux/modversions.h, [USE_MOD_VERSIONS=-DMODVERSIONS])
-
 )
-AC_SUBST(MEMSTAT)
-
 INSTALL_ARGS='-s -m 4755'
 ])
 

@@ -108,6 +108,8 @@ dnl are exported by AC_OUTPUT.
 dnl
 AC_SUBST(EXTRALIBS)
 AC_SUBST(INSTALL_ARGS)
+AC_SUBST(MEMSTAT)
+AC_SUBST(LVERSION)
 AC_SUBST(USE_MOD_VERSIONS)
 dnl  Check for usleep().  Currently, only HP-UX doesn't have it.
 AC_CHECK_FUNCS(usleep)
