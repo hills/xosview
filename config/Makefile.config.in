@@ -36,7 +36,7 @@ CXXFLAGS      += $(CFLAGS) -Wall -O4 -pipe -I@x_includes@ \
 #-----------------------------------------------------------------
 
 # NORMAL LIBS
-LFLAGS        += -L$(TOP)/@host_dir@ -L@x_libraries@
+LFLAGS        += -L$(TOP)/@host_dir@ -L@x_libraries@ -R@x_libraries@
 LIBS          += -lmeter @EXTRALIBS@ -lX11
 
 # DEBUG LIBS
