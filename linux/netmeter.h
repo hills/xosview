@@ -30,8 +30,14 @@ private:
   int _ipsock;
   Timer _timer;
   unsigned long _lastBytesIn, _lastBytesOut;
+  char *_netfilename;
+  int _bytesInDev;
 
   void adjust(void);
+  void checkOSVersion(void);
+
+  void checkeventOld(void);
+  void checkeventNew(void);
 };
 
 #endif
