@@ -3,7 +3,6 @@
 
 /*  WHEN CHANGING the version number:
     1.  Make sure you catch all of these files:
-      version.cc
       xosview.1
       config/Makefile.config.in
     2.  Make sure CHANGES, the man page, and the list below to
@@ -11,7 +10,8 @@
 */
 /*  *****  THIS FILE is included by xosview.cc, and is never used
  *  on its own.  */
-static const char * const versionString = "xosview version 1.7.3";
+
+static const char * const versionString = "xosview version: " XOSVIEW_VERSION;
 static const char * const version_cc_cvsID = "$Id$";
 
 /*  Version 1.7.3:  Added initial irqrate meter.  Also has some

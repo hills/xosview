@@ -1,12 +1,11 @@
 '\" t
-.\" @(#)xosview.1	1.7.3 1/99 "
-.TH XOSVIEW 1.7.3 "$Date$"
+.\" @(#)xosview.1	1.8.0 1/99 "
+.TH XOSVIEW 1.8.0 "$Date$"
 .UC
 .SH NAME
 xosview \- X based system monitor
 .SH SYNOPSIS
 xosview [options]
-
 .\"  ================  Macros  =============================
 .\"  First, let's define some handy roff macros.
 .\"  A macro begins with .de <xx> where one will invoke this macro with .xx
@@ -30,9 +29,7 @@ a second that the \\$1 meter waits between updates.  A value of 1 has xosview
 update the meter 10 times per second (the fastest).  A value of 600 would
 cause xosview to update the meter once a minute.
 .RE
-
 ..
-
 .\"  The .dc macro is similar to the .pp macro, except that it is for
 .\" the decay resource paragraphs.
 .\"  Usage:  .dc net
@@ -43,9 +40,7 @@ If True then the \\$1 meter will be split vertically in two.  The top
 half will show the instantaneous state, while the bottom half will
 display a decaying average of the state.
 .RE
-
 ..
-
 .\" The .dg macro is similar to the .dc macro, except that it is for
 .\" the scrolling graph resource paragraphs.
 .\" Usage:  .dg net
@@ -55,9 +50,7 @@ xosview*\\$1Graph: (True or False)
 If this is set to True then the \\$1 meter will be drawn as a horizontally
 scrolling bargraph showing the state value verses time.
 .RE
-
 ..
-
 .\"  The .pm macro is for ``plus/minus'' -- for the
 .\"  enable/disable command-line options.
 .de pm
@@ -66,15 +59,12 @@ scrolling bargraph showing the state value verses time.
 This option overrides the xosview*\\$1 resource.  It is
 equivalent to setting xosview*\\$1 to "False".
 .RE
-
 +\\$1
 .RS
 This option overrides the xosview*\\$1 resource.  It is
 equivalent to setting xosview*\\$1 to "True".
 .RE
-
 ..
-
 .\"  The .xt macro is for ``Xresource true'' -- for enabling a
 .\"  meter, like the .pm macro/-+foo.
 .de xt
@@ -82,9 +72,7 @@ xosview*\\$1: (True or False)
 .RS
 If True then xosview will display a \\$1 meter.
 .RE
-
 ..
-
 .\"  The .uf macro is for the ``used format'' stuff.
 .de uf
 xosview*\\$1UsedFormat:	  (float, percent or autoscale)
@@ -106,9 +94,7 @@ Display the absolute value and automatically print the units (K, M, or G) as
 appropriate.
 .RE
 .RE
-
 ..
-
 .\"  Define a color macro for the various xosview*fooXXXColor: resources.
 .\"  Usage:  .cc swap Used used "swap space"  <--  keep 'swap
 \"                                                       space' as one arg.
@@ -117,22 +103,20 @@ xosview*\\$1\\$2Color: \fIcolor\fP
 .RS
 The \\$1 meter will use this color to display the \\$3 field.
 .RE
-
 ..
 .\"  ================  End of Macros  =============================
-
 .SH DESCRIPTION
 \fIxosview\fP is a monitor which displays the status of several system based
-parameters.  These include CPU usage, load average, memory usage, swap 
-space usage, network usage, interrupts, and serial port status.  Each of 
-these is displayed as a horizontal bar which is separated into color coded 
-regions.  Each region represents a percentage of the resource which is being 
+parameters.  These include CPU usage, load average, memory usage, swap
+space usage, network usage, interrupts, and serial port status.  Each of
+these is displayed as a horizontal bar which is separated into color coded
+regions.  Each region represents a percentage of the resource which is being
 put to a particular use.  Typing a 'q' in the window will terminate xosview.
 
 At the moment \fIxosview\fP runs on seven platforms (Linux,
 NetBSD, FreeBSD, OpenBSD, some Solaris systems, IRIX 6.5 and HPUX).
-Not all of the meters described below are supported on all 
-platforms.  Some of the meters may appear different depending upon the 
+Not all of the meters described below are supported on all
+platforms.  Some of the meters may appear different depending upon the
 platform \fIxosview\fP is running on.  Note that *BSD is used as
 an abbreviation for all three of the free BSD operating systems
 (NetBSD, FreeBSD, OpenBSD).
@@ -190,13 +174,13 @@ an abbreviation for all three of the free BSD operating systems
 \fBSerial Port Status\fP
     "leds" which show the serial port parameters.
     Linux  : Both the Line Status Register
-             (LSR) and Modem Status Register 
+             (LSR) and Modem Status Register
              (MSR) are displayed.
     *BSD   : < Not Supported >
     HPUX   : < Not Supported >
 
 \fBBattery Level\fP
-    Shows the current condition of the 
+    Shows the current condition of the
     battery (for laptops).
     Linux  : %left | %used
     NetBSD : %left | %used
@@ -207,7 +191,7 @@ an abbreviation for all three of the free BSD operating systems
 \fBRAID status\fP
     Shows the state of disks contained in your (software)
     RAID1/4/5 array(s) and the rebuild state of the
-    array(s). 
+    array(s).
     Linux  : Disk0 Disk1 Disk2 .. DiskN | Rebuild Progress
 
 .SH OPTIONS
@@ -238,7 +222,7 @@ documented in README.netbsd):
 
 -display \fIdisplay\fP
 .RS
-Sets the X display to \fIdisplay\fP.  This option overrides the 
+Sets the X display to \fIdisplay\fP.  This option overrides the
 xosview*display resource.
 .RE
 
@@ -299,11 +283,11 @@ setting xosview*usedlabels to "True".
 .\"  Handle -/+net
 .pm net
 
--network \fImaxbandwidth\fP 
+-network \fImaxbandwidth\fP
 .RE
--networkBW \fImaxbandwidth\fP 
+-networkBW \fImaxbandwidth\fP
 .RE
--networkBandWidth \fImaxbandwidth\fP 
+-networkBandWidth \fImaxbandwidth\fP
 .RS
 These options override the xosview*networkBandwidth resource.  They cause
 xosview to display a meter that will shows network usage, with a maximum
@@ -355,12 +339,12 @@ and \'purple\'):
 .SH X RESOURCES
 
 The following is a list of X resources supported by \fIxosview\fP.  Each has
-a default value assigned to it.  These values can be found in the file 
+a default value assigned to it.  These values can be found in the file
 Xdefaults which can be obtained in the source distribution of xosview.
 They can be overridden in the usual places (/usr/lib/X11/app-defaults/XOsview,
 $HOME/.Xdefaults, etc.).
 
-It should be noted that it is OK to have a resource defined for a port of 
+It should be noted that it is OK to have a resource defined for a port of
 xosview that does not support the feature the resource configures.  Xosview
 will simply ignore the resources that are set for it but not supported on
 a given platform.
@@ -586,9 +570,9 @@ and like both on multiprocessor systems.
 
 xosview*pageBandWidth: \fImaxEvents\fP
 .RS
-This number is used to specify the expected maximum bandwidth (in events / 
-sec) for the page meter.  When the expected maximum bandwidth 
-(\fImaxEvents\fP) is exceeded then the page meter will display the relative 
+This number is used to specify the expected maximum bandwidth (in events /
+sec) for the page meter.  When the expected maximum bandwidth
+(\fImaxEvents\fP) is exceeded then the page meter will display the relative
 percentage of page swapping (25% in, 75% out).
 .RE
 
@@ -674,9 +658,9 @@ file README.linux which comes with the xosview distribution for details.
 
 xosview*netBandwidth: \fImaxBytes\fP
 .RS
-This number is used to specify the expected maximum bandwidth 
-(in bytes / sec) for the meter.  When the expected maximum bandwidth 
-(\fImaxBytes\fP) is exceeded then the network meter will display the 
+This number is used to specify the expected maximum bandwidth
+(in bytes / sec) for the meter.  When the expected maximum bandwidth
+(\fImaxBytes\fP) is exceeded then the network meter will display the
 relative percentage of network usage (25% incomming, 75% outgoing).
 .RE
 
@@ -862,7 +846,7 @@ reports for the other *BSDs and SunOS.
 .RE
 
 Occasionally (and unrepeatably?), the NetBSD xosview will clobber the NET text
-in the netmeter with horizontal black bars and the used-label numbers. 
+in the netmeter with horizontal black bars and the used-label numbers.
 I'm guessing this has something to do with the net numbers reaching some
 unusual number (like 0 or maximum), but have not been able to pinpoint it
 further.  BCG
