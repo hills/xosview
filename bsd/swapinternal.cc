@@ -49,7 +49,8 @@
 
 //---------------------  The remainder of this file is based/borrowed
 //                       from /usr/src/bin/systat/swap.c in the NetBSD
-//                       distribution.  BCG
+//                       distribution.  Modifications will be
+//                       bracketed by comment markers like these.  BCG
 
 /*
  * swapinfo - based on a program of the same name by Kevin Lahey
@@ -84,7 +85,14 @@ static long netbsdSwapBlockSize;
 
 extern char *getbsize __P((int *headerlenp, long *printoutblocksizep));
 
-static kvm_t   *swap_kd;
+//-----------------------  We use a single kd for kvm access,
+//			   initialized in netbsd.cc, so the local one
+//			   (swap_kd) has been commented out, and a
+//			   #define has been added to make future
+//			   references to swap_kd look like kd.  BCG
+/*static kvm_t   *swap_kd;*/
+#define swap_kd kd
+extern kvm_t*	swap_kd;
 
 struct nlist syms[] = {
         { "_swapmap" }, /* list of free swap areas */
@@ -129,9 +137,6 @@ NetBSDInitSwapInfo()
 	int stringlen;
 
 	getbsize (&stringlen, &netbsdSwapBlockSize);
-        swap_kd = kvm_open (NULL, NULL, NULL, O_RDONLY, NULL);
-	if (!swap_kd)
-	  err (-1, "NetBSDInitSwapInfo(): kvm_open()");
         if (once)
                 return (1);
         if (kvm_nlist(swap_kd, syms)) {
@@ -175,6 +180,13 @@ fetchswap()
 
         /* first entry in map is `struct map'; rest are mapent's */
         swapmap = (struct map *)localmp;
+	if (!swapmap)
+	{
+	  fprintf(stderr, "Error:  swapmap appears to be %p.  Did you\n"
+	    "specify the correct kernel via -N, if not running /netbsd?\n",
+	    swapmap);
+	  exit(1);
+	}
         if (nswapmap != swapmap->m_limit - (struct mapent *)kswapmap)
                 printf("panic: swap: nswapmap goof");
 
@@ -218,10 +230,9 @@ fetchswap()
 void
 NetBSDGetSwapInfo(int* total, int* free)
 {
-        int div, i, avail, npfree, used=0, xsize, xfree;
+        int i, avail, npfree, used=0, xsize, xfree;
 
 	fetchswap();
-        div = netbsdSwapBlockSize / 512;
         avail = npfree = 0;
         for (i = 0; i < nswdev; i++) {
                 /*
@@ -246,6 +257,7 @@ NetBSDGetSwapInfo(int* total, int* free)
         if (npfree > 1) {
                 used = avail - nfree;
         }
-        *total = avail;
-        *free = avail-used;
+	  /*  Convert from 512-byte blocks to bytes.  */
+        *total = 512*avail;
+        *free = 512*(avail-used);
 }
