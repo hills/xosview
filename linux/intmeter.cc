@@ -52,6 +52,7 @@ void IntMeter::checkResources( void ){
   BitMeter::checkResources();
   onColor_  = parent_->allocColor( parent_->getResource( "intOnColor" ) );
   offColor_ = parent_->allocColor( parent_->getResource( "intOffColor" ) );
+  priority_ = atoi(parent_->getResource("intPriority"));
 }
 
 float IntMeter::getLinuxVersion(void) {

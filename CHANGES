@@ -1,10 +1,14 @@
   /*  $Id$  */
 Changes since xosview-1.6.0:
-  Interrupt meter now supports priority settings under *BSD.
+  Linux netmeter for kernels 1.1 and above no longer hangs after
+    the packet count gets too high.
+  Interrupt meter now supports priority settings under *BSD and Linux.
   Better UVM detection for *BSD.
   Code cleanup/removal of unneeded #include's for *BSD.
 
 Changes since xosview-1.5.1, in no particular order:
+
+  Linux netmeter does not need IPACCOUNTING for 1.1 kernels.
 
   Much better support for FreeBSD, thanks to Tom Pavel!
 
