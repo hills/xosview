@@ -30,6 +30,7 @@ DiskMeter::DiskMeter( XOSView *parent, float max ) : FieldMeterGraph(
         {
         _vmstat = true;
         _statFileName = "/proc/vmstat";
+        getvmdiskinfo();
         }
     else
         getdiskinfo();
