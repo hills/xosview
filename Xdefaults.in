@@ -84,8 +84,8 @@ xosview*pageUsedFormat: autoscale
 
 ! Network Meter Resources
 
-xosview*net:		True
-xosview*netBandwidth: 2000
+xosview*net:		  False
+xosview*netBandwidth:     2000
 xosview*netInColor:       SkyBlue
 xosview*netOutColor:      SlateBlue1
 xosview*netBackground:    aquamarine
