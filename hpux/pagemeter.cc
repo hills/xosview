@@ -33,6 +33,7 @@ void PageMeter::checkResources( void ){
   priority_ = atoi (parent_->getResource( "pagePriority" ) );
   maxspeed_ *= priority_ / 10.0;
   dodecay_ = !strcmp (parent_->getResource( "pageDecay" ), "True" );
+  SetUsedFormat( parent_->getResource( "pageUsedFormat" );
 }
 
 void PageMeter::checkevent( void ){
@@ -67,6 +68,6 @@ void PageMeter::getpageinfo( void ){
     total_ = maxspeed_;
   }
 
-  used( (int)((100 * (total_ - fields_[2])) / maxspeed_) );
+  setUsed (total_ - fields_[2], maxspeed_ );
   pageindex_ = (pageindex_ + 1) % 2;
 }
