@@ -1,6 +1,8 @@
   /*  $Id$  */
 
 Changes since xosview-1.8.1
+ - Linux pagemeter should now work with 2.6 kernels
+
  - Merge in the fedora-2 nfs patch.
 
  - Merge in the fedora-2 strip patch.
