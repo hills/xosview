@@ -52,3 +52,5 @@ x Add in support and auto-detect for new NetBSD UVM stuff.
   Merge in Tom's Xt stuff. -- deferred:  it appears to require
     Xt, Xaw, and ICE, IIRC, which bloats static executables too
     much for my taste.  bgrayson
+  
+  Add in the pixmap support.
