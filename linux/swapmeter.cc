@@ -54,6 +54,7 @@ void SwapMeter::checkevent( void ){
 #ifdef USESYSCALLS
 void SwapMeter::getswapinfo( void ){
   struct sysinfo sinfo;
+  int unit;
 
 #if defined(GNULIBC) || defined(__GLIBC__)
   sysinfo(&sinfo);
@@ -61,9 +62,11 @@ void SwapMeter::getswapinfo( void ){
   syscall( SYS_sysinfo, &sinfo );
 #endif
 
-  total_ = sinfo.totalswap;
-  fields_[0] = total_ - sinfo.freeswap;
-  fields_[1] = sinfo.freeswap;
+  unit = (sinfo.mem_unit ? sinfo.mem_unit : 1); 
+
+  total_ = sinfo.totalswap * unit;
+  fields_[0] = (sinfo.totalswap - sinfo.freeswap) * unit;
+  fields_[1] = sinfo.freeswap * unit;
 
   if ( total_ == 0 ){
     total_ = 1;

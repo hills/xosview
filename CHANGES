@@ -1,6 +1,9 @@
   /*  $Id$  */
 
 Changes since xosview-1.8.1
+ - Applied sourceforge patch 927112 from Russell Reed which fixes
+   the swapmeter when USESYSCALLS is defined.
+
  - Applied sourceforge patch 959433 which adds acpi support to
    the linux battery meter.
 
