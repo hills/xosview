@@ -54,19 +54,18 @@ PACKAGENAME=xosview-$(VERS)
 DISTRIBDIR=@top_srcdir@/../$(PACKAGENAME)
 
 ##  These next lines look really ugly.  The echo statements are an
-##    attempt to make the output look a little nicer.  The "echo -n"
-##    statements create a two-space indent at the beginning of the line.
+##    attempt to make the output look a little nicer.
 install: xosview
-	@echo "Installing executable..."; echo -n "  "
+	@echo "***  Installing executable..."
 	@INSTALL_PROGRAM@ @INSTALL_ARGS@ xosview $(BINDIR)
-	@echo "Installing application defaults..."; echo -n "  "
+	@echo "***  Installing application defaults..."
 	@INSTALL_DATA@ Xdefaults $(XAPPLOADDIR)/XOsview
-	@echo "Making sure $(MANDIR) exists..."
+	@echo "***  Making sure $(MANDIR) exists..."
 	@if [ ! -d $(MANDIR) ]; then \
-	  echo "Making $(MANDIR)..."; \
+	  echo "***  Making $(MANDIR)..."; \
 	  mkdir $(MANDIR); \
 	fi
-	@echo "Installing man page..."; echo -n "  "
+	@echo "***  Installing man page..."
 	@INSTALL_DATA@ xosview.1 $(MANDIR)
 
 install-man:
