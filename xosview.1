@@ -7,6 +7,7 @@ xosview \- X based system monitor
 .SH SYNOPSIS
 xosview [options]
 
+.\"  ================  Macros  =============================
 .\"  First, let's define some handy roff macros.
 .\"  A macro begins with .de <xx> where one will invoke this macro with .xx
 .\"  The macro definition ends with the .. line.
@@ -29,6 +30,7 @@ a second that the \\$1 meter waits between updates.  A value of 1 has xosview
 update the meter 10 times per second (the fastest).  A value of 600 would
 cause xosview to update the meter once a minute.
 .RE
+
 ..
 
 .\"  The .dc macro is similar to the .pp macro, except that it is for
@@ -41,6 +43,7 @@ If True then the \\$1 meter will be split vertically in two.  The top
 half will show the instantaneous state, while the bottom half will
 display a decaying average of the state.
 .RE
+
 ..
 
 .\"  The .pm macro is for ``plus/minus'' -- for the
@@ -57,6 +60,7 @@ equivalent to setting xosview*\\$1 to "False".
 This option overrides the xosview*\\$1 resource.  It is
 equivalent to setting xosview*\\$1 to "True".
 .RE
+
 ..
 
 .\"  The .xt macro is for ``Xresource true'' -- for enabling a
@@ -66,6 +70,7 @@ xosview*\\$1: (True or False)
 .RS
 If True then xosview will display a \\$1 meter.
 .RE
+
 ..
 
 .\"  The .uf macro is for the ``used format'' stuff.
@@ -89,7 +94,20 @@ Display the absolute value and automatically print the units (K, M, or G) as
 appropriate.
 .RE
 .RE
+
 ..
+
+.\"  Define a color macro for the various xosview*fooXXXColor: resources.
+.\"  Usage:  .cc swap Used used "swap space"  <--  keep 'swap
+\"                                                       space' as one arg.
+.de cc
+xosview*\\$1\\$2Color: \fIcolor\fP
+.RS
+The \\$1 meter will use this color to display the \\$3 field.
+.RE
+
+..
+.\"  ================  End of Macros  =============================
 
 .SH DESCRIPTION
 \fIxosview\fP is a monitor which displays the status of several system based
@@ -393,10 +411,8 @@ This is the color that the load meter will use to display the load average
 when it is less than or equal to 1.
 .RE
 
-xosview*loadIdleColor: \fIcolor\fP
-.RS
-This is the color that the load meter will use to display its "idle" field.
-.RE
+.\"  loadIdleColor
+.cc load Idle idle
 
 .\"  Do the priority resource
 .pp load
@@ -428,38 +444,16 @@ will cause a seperate meter to be displayed for each cpu if Jerome Forissier's
 kernel patch has been applied.  See the 'README.linux' file for more details.
 .RE
 
-xosview*cpuUserColor: \fIcolor\fP
-.RS
-The color to use for user time in the cpu meter.
-.RE
+.\"  cpuUserColor, cpuNiceColor, cpuSystemColor, cpuInterruptColor, cpuFreeColor
+.cc cpu User "cpu user time"
+.cc cpu Nice "cpu nice time"
+.cc cpu System "cpu system time"
+.cc cpu Interrupt "cpu interrupt time"
+.cc cpu Free "cpu idle time"
 
-xosview*cpuNiceColor: \fIcolor\fP
-.RS
-The color to use for nice time in the cpu meter.
-.RE
-
-xosview*cpuSystemColor: \fIcolor\fP
-.RS
-The color to use for system time in the cpu meter.
-.RE
-
-xosview*cpuInterruptColor \fIcolor\fP
-.RS
-The color used to display interrupt time in the cpu meter.
-.RE
-
-xosview*cpuFreeColor: \fIcolor\fP
-.RS
-The color to use for free time in the cpu meter.
-.RE
-
-.\"  Do the priority resource
+.\"  Priority, decay, usedFormat resources:
 .pp cpu
-
-.\"  Do decay resource
 .dc cpu
-
-.\"  cpuUsedFormat resource
 .uf cpu
 
 
@@ -469,61 +463,21 @@ The color to use for free time in the cpu meter.
 .\"  Do the mem: True resource.
 .xt mem
 
-xosview*memUsedColor: \fIcolor\fP
-.RS
-This is the color that the memory meter will use to display the used memory
-field.
-.RE
+.\"  mem{Used,Share,Buffer,...}Color resources
+.cc mem Used "used memory"
+.cc mem Shared "shared memory"
+.cc mem Buffer "buffer memory"
+.cc mem Cache "cache memory"
+.cc mem Free "free memory"
+.cc mem Shared "shared memory"
+.cc mem Text "HP text memory"
+.cc mem Other "HP ``other'' memory"
+.cc mem Active "NetBSD active memory"
+.cc mem Inactive "NetBSD inactive memory"
 
-xosview*memSharedColor: \fIcolor\fP
-.RS
-This is the color that the memory meter will use to display the shared memory
-field.
-.RE
-
-xosview*memBufferColor: \fIcolor\fP
-.RS
-This is the color that the memory meter will use to display the buffer field.
-.RE
-
-xosview*memCacheColor: \fIcolor\fP
-.RS
-This is the color that the memory meter will use to display the cache field.
-.RE
-
-xosview*memFreeColor: \fIcolor\fP
-.RS
-This is the color that the memory meter will use to display the free memory
-field.
-.RE
-
-xosview*memTextColor: \fIcolor\fP
-.RS
-The color used by the HP memory meter for text segments.
-.RE
-
-xosview*memOtherColor: \fIcolor\fP
-.RS
-The color used by the HP memory meter for the "other" category of memory usage.
-.RE
-
-xosview*memActiveColor: \fIcolor\fP
-.RS
-The color used by the NetBSD memory meter for active pages.
-.RE
-
-xosview*memInactiveColor: \fIcolor\fP
-.RS
-The color used by the NetBSD memory meter for inactive pages.
-.RE
-
-.\"  Do the priority resource
+.\"  Priority, decay, usedFormat resources:
 .pp mem
-
-.\"  Do decay resource
 .dc mem
-
-.\"  memUsedFormat resource
 .uf mem
 
 
@@ -532,23 +486,13 @@ The color used by the NetBSD memory meter for inactive pages.
 .\"  Do the swap: True resource.
 .xt swap
 
-xosview*swapUsedColor: \fIcolor\fP
-.RS
-This is the color that the swap meter will use for "used" swap space.
-.RE
+.\"  swap{Used,Free}Color resources.
+.cc swap Used "used swap"
+.cc swap Free "free swap"
 
-xosview*swapFreeColor: \fIcolor\fP
-.RS
-This is the color that the swap meter will use for free swap space.
-.RE
-
-.\"  Do the priority resource
+.\"  Priority, decay, usedFormat resources:
 .pp swap
-
-.\"  Do decay resource
 .dc swap
-
-.\"  swapUsedFormat resource
 .uf swap
 
 
@@ -565,30 +509,14 @@ sec) for the page meter.  When the expected maximum bandwidth
 percentage of page swapping (25% in, 75% out).
 .RE
 
-xosview*pageInColor: \fIcolor\fP
-.RS
-This is the color that the page meter will use for the pages loaded into
-memory field.
-.RE
+.\"  page{In,Out,Idle}Color:
+.cc page In page-in
+.cc page Out page-out
+.cc page Idle idle
 
-xosview*pageOutColor: \fIcolor\fP
-.RS
-This is the color that the page meter will use for the pages swapped out 
-to disk field.
-.RE
-
-xosview*pageIdleColor: \fIcolor\fP
-.RS
-This is the color that the page meter will use to display the idle field.
-.RE
-
-.\"  Do the priority resource
+.\"  Priority, decay, usedFormat resources:
 .pp page
-
-.\"  Do decay resource
 .dc page
-
-.\"  pageUsedFormat resource
 .uf page
 
 
@@ -610,28 +538,19 @@ This number is used to specify the expected maximum bandwidth
 relative percentage of network usage (25% incomming, 75% outgoing).
 .RE
 
-xosview*netInColor: \fIcolor\fP
-.RS
-This is the color that the network meter will use for the incoming field.
-.RE
-
-xosview*netOutColor: \fIcolor\fP
-.RS
-This is the color that the network meter will use for the outgoing field.
-.RE
+.\"  net{In,Out}Color:
+.cc net In incoming
+.cc net Out outgoing
+.\"  FIXME XXX  Change the netBackground resource to be netIdleColor.
 
 xosview*netBackground: \fIcolor\fP
 .RS
 This is the color that the network meter will use for the "idle" field.
 .RE
 
-.\"  Do the priority resource
+.\"  Priority, decay, usedFormat resources:
 .pp net
-
-.\"  Do decay resource
 .dc net
-
-.\"  netUsedFormat resource
 .uf net
 
 
@@ -713,17 +632,9 @@ This is the color that will be used to show the amount of battery power used.
 .\"  Do the disk: True resource.
 .xt disk
 
-xosview*diskUsedColor: \fIcolor\fP
-.RS
-This is the color that the disk meter will use for bytes transferred
-(in or out).
-.RE
-
-xosview*diskIdleColor: \fIcolor\fP
-.RS
-This is the color that the disk meter will use to display the idle
-field.
-.RE
+.\"  disk colors
+.cc disk Used "bytes transferred (in or out)"
+.cc disk Idle idle
 
 xosview*diskBandwidth: \fIbandwidth\fP
 .RS
@@ -731,13 +642,9 @@ This number is used to specify the expected maximum bandwidth in bytes
 per second for the disk meter.
 .RE
 
-.\"  Do the priority resource
+.\"  Priority, decay, usedFormat resources:
 .pp disk
-
-.\"  Do decay resource
 .dc disk
-
-.\"  diskUsedFormat resource
 .uf disk
 
 
