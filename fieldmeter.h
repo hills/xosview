@@ -28,8 +28,8 @@ public:
   void dousedlegends( int val ) { dousedlegends_ = val; }
   void reset( void );
     /*  These next two are deprecated -- use setUsed instead.  bgrayson  */
-  void used( int val ) { print_ = PERCENT; used_ = val; }
-  void absolute( float val ) { print_ = FLOAT; used_ = val; }
+  void used_obsolete( int val ) { print_ = PERCENT; used_ = val; }
+  void absolute_obsolete( float val ) { print_ = FLOAT; used_ = val; }
 
   void setUsed (float val, float total);
   void draw( void );
