@@ -14,7 +14,7 @@
 #include <stdlib.h>
 
 #ifdef USESYSCALLS
-#ifdef GNULIBC
+#if defined(GNULIBC) || defined(__GLIBC__)
 #include <sys/sysinfo.h>
 #else
 #include <syscall.h>
@@ -53,7 +53,7 @@ void SwapMeter::checkevent( void ){
 void SwapMeter::getswapinfo( void ){
   struct sysinfo sinfo;
 
-#ifdef GNULIBC
+#if defined(GNULIBC) || defined(__GLIBC__)
   sysinfo(&sinfo);
 #else
   syscall( SYS_sysinfo, &sinfo );

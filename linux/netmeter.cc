@@ -34,7 +34,7 @@
 #include <stdlib.h>
 #include <sys/socket.h>
 #include <sys/ioctl.h>
-#ifdef GNULIBC
+#if defined(GNULIBC) || defined(__GLIBC__)
 #include <net/if.h>
 #else
 #include <linux/if.h>

@@ -14,7 +14,9 @@ EXTRA_OUT_FILES="$EXTRA_OUT_FILES \
 dnl
 dnl Define GNULIBC for the new GNU libc for linux
 dnl
-if test "$host_os" == "linux-gnulibc2"; then
+dnl Assume "linux-gnu" is GNU libc and linux-gnulibc1 is the old libc
+dnl
+if test "$host_os" == "linux-gnu"; then
 AC_DEFINE(GNULIBC)
 echo "GNULIBC"
 fi

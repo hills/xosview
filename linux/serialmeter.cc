@@ -19,7 +19,7 @@
 #include <strstream.h>
 
 #include <unistd.h>
-#ifdef GNULIBC
+#if defined(GNULIBC) || defined(__GLIBC__)
 #include <sys/io.h>
 #include <sys/perm.h>
 #else
