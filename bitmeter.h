@@ -9,6 +9,8 @@
 #ifndef _BITMETER_H_
 #define _BITMETER_H_
 
+#define BITMETER_H_CVSID "$Id$"
+
 #include "meter.h"
 
 class XOSView;

@@ -10,6 +10,8 @@
 #ifndef _Host_h
 #define _Host_h
 
+#define HOST_H_CVSID "$Id$"
+
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>

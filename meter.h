@@ -9,6 +9,8 @@
 #ifndef _METER_H_
 #define _METER_H_
 
+#define METER_H_CVSID "$Id$"
+
 class XOSView;
 
 class Meter {

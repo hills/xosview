@@ -9,6 +9,8 @@
 #ifndef _Xrm_h
 #define _Xrm_h
 
+#define XRM_H_CVSID "$Id$"
+
 #include <X11/Xlib.h>
 #include <X11/Xresource.h>
 

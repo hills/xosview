@@ -9,6 +9,7 @@
 #include <iostream.h>
 #include <string.h>
 
+#define XWIN_H_CVSID "$Id$"
 
 class XWin;
 class Xrm;
