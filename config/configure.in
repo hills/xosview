@@ -80,6 +80,21 @@ AC_SUBST(USE_MOD_VERSIONS)
 dnl  Check for usleep().  Currently, only HP-UX doesn't have it.
 AC_CHECK_FUNCS(usleep)
 
+#
+# On hpux10 both x_includes and x_libraries seem to be set to ""
+# This causes compiler options like '-I' and '-L', which break
+# the build.  So, we avoid empty strings here.
+#
+if test -z "$x_includes"
+then
+    x_includes=.
+fi
+if test -z "$x_libraries"
+then
+   x_libraries=.
+fi
+
+
 AC_OUTPUT(\
   Makefile:config/Makefile.top.in \
   $host_os/Makefile:config/Makefile.$host_os.in \
