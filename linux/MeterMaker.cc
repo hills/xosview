@@ -57,8 +57,10 @@ void MeterMaker::makeMeters(void){
       push(new SerialMeter(_xos, (SerialMeter::Device)i));
 
   // check for the interrupt meter
-  if (_xos->isResourceTrue("interrupts"))
-    push(new IntMeter(_xos));
+  if (_xos->isResourceTrue("interrupts")) {
+    for (int i = 0 ; i < IntMeter::countCPUs() ; i++)
+      push(new IntMeter(_xos, i));
+  }
 
   if (_xos->isResourceTrue("battery"))
     push(new BtryMeter(_xos));

@@ -24,6 +24,9 @@ public:
 
   void checkevent( void );
   void draw( void );
+
+  int numBits(void) const { return numbits_; }
+  void setNumBits(int n);
   
   void checkResources( void );
 protected:

@@ -13,23 +13,29 @@
 CVSID("$Id$");
 CVSID_DOT_H(BITMETER_H_CVSID);
 
-
 BitMeter::BitMeter( XOSView *parent,
 		    const char *title, const char *legend, int numBits,
 		    int, int dousedlegends)
-: Meter( parent, title, legend, dousedlegends, dousedlegends ) {
-  numbits_ = numBits;
-
-  bits_ = new char[numbits_];
-  lastbits_ = new char[numbits_];
-
-  for ( int i = 0 ; i < numbits_ ; i++ )
-    bits_[i] = lastbits_[i] = 0;
+  : Meter( parent, title, legend, dousedlegends, dousedlegends ),
+  bits_(NULL), lastbits_(NULL)  {
+  setNumBits(numBits); 
 }
 
 BitMeter::~BitMeter( void ){
-  delete bits_;
-  delete lastbits_;
+  delete [] bits_;
+  delete [] lastbits_;
+}
+
+void BitMeter::setNumBits(int n){
+  numbits_ = n;
+  delete [] bits_;
+  delete [] lastbits_;
+
+  bits_ = new char[numbits_];
+  lastbits_ = new char[numbits_];
+  
+  for ( int i = 0 ; i < numbits_ ; i++ )
+      bits_[i] = lastbits_[i] = 0;
 }
 
 void BitMeter::checkResources( void ){

@@ -13,16 +13,20 @@
 
 class IntMeter : public BitMeter {
 public:
-  IntMeter( XOSView *parent,
-	    const char *title = "", const char *legend ="",
-	    int dolegends = 0, int dousedlegends = 0 );
+  IntMeter( XOSView *parent, int cpu = 0);
   ~IntMeter( void );
 
   void checkevent( void );
 
   void checkResources( void );
+
+  static float getLinuxVersion(void);
+  static int countCPUs(void);
+
 protected:
-  unsigned long irqs_[16], lastirqs_[16];
+  unsigned long irqs_[24], lastirqs_[24];
+  int _cpu;
+  bool _old;
 
   void getirqs( void );
 };
