@@ -11,7 +11,7 @@
 */
 /*  *****  THIS FILE is included by xosview.cc, and is never used
  *  on its own.  */
-static const char * const versionString = "xosview version "XOSVIEW_VERSION;
+static const char * const versionString = "xosview version 1.7.1";
 static const char * const version_cc_cvsID = "$Id$";
 
 /*  Version 1.7.0:  has pixmap support, OpenBSD interrupt meter,
