@@ -26,6 +26,8 @@
 CVSID("$Id$");
 CVSID_DOT_H(SWAPMETER_H_CVSID);
 
+static int doSwap = 1;
+
 SwapMeter::SwapMeter( XOSView *parent )
 : FieldMeterDecay( parent, 2, "SWAP", "USED/FREE" ){
 #ifdef HAVE_SWAPCTL
@@ -46,6 +48,7 @@ SwapMeter::SwapMeter( XOSView *parent )
   "running kernel is /netbsd, or use the -N flag for xosview to specify\n"
   "an alternate kernel file.\n"
   "\nThe SwapMeter has been disabled.\n");
+  doSwap = 0;
 #endif
   }
 }
@@ -71,12 +74,18 @@ void SwapMeter::checkevent( void ){
 void SwapMeter::getswapinfo( void ){
   int total_int, free_int;
 
+  if (doSwap) {
 #ifdef HAVE_SWAPCTL
-  if (useSwapCtl)
-    NetBSDGetSwapCtlInfo(&total_int, &free_int);
-  else
+    if (useSwapCtl)
+      NetBSDGetSwapCtlInfo(&total_int, &free_int);
+    else
 #endif
-    NetBSDGetSwapInfo (&total_int, &free_int);
+      NetBSDGetSwapInfo (&total_int, &free_int);
+  }
+  else {
+    total_int = 1;	/*  So the meter looks blank.  */
+    free_int = 1;
+  }
 
   total_ = total_int;
   if ( total_ == 0 )
