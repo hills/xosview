@@ -465,7 +465,9 @@ appropriate.
 
 xosview*cpu: (True or False)
 .RS
-If True then xosview will display a cpu meter.
+If True then xosview will display a cpu meter.  On linux SMP machines this
+will cause a seperate meter to be displayed for each cpu if Jerome Forissier's
+kernel patch has been applied.  See the 'README.linux' file for more details.
 .RE
 
 xosview*cpuUserColor: \fIcolor\fP
