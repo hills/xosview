@@ -127,6 +127,14 @@ dnl
 	AC_DEFINE(XOSVIEW_FREEBSD)
 ])
 
+AC_DEFUN(AC_XOSV_OPENBSD, [
+dnl
+dnl OpenBSD also needs to link with libkvm
+dnl
+        EXTRALIBS=-lkvm
+        INSTALL_ARGS='-s -g kmem -m 02555'
+	AC_DEFINE(XOSVIEW_OPENBSD)
+])
 
 AC_DEFUN(AC_XOSV_HPUX, [
 dnl
