@@ -11,6 +11,7 @@
 //
 // $Id$
 //
+#include "general.h"
 #include "memmeter.h"
 #include "xosview.h"
 
@@ -19,6 +20,8 @@
 #include <vm/vm_param.h>
 #include <stdlib.h>		//  For atoi().  BCG
 
+CVSID("$Id: ");
+CVSID_DOT_H(MEMMETER_H_CVSID);
 //  Once we figure out how to get the buffers field, change the next line.
 #define FREE_INDEX 3
 
@@ -27,8 +30,7 @@ MemMeter::MemMeter( XOSView *parent )
 //: FieldMeterDecay( parent, 3, "MEM", "USED/SHAR/FREE" ){
 }
 
-MemMeter::~MemMeter( void ){
-}
+MemMeter::~MemMeter( void ){ }
 
 void MemMeter::checkResources( void ){
   FieldMeter::checkResources();
@@ -40,6 +42,7 @@ void MemMeter::checkResources( void ){
   setfieldcolor( FREE_INDEX, parent_->getResource("memFreeColor") );
   priority_ = atoi (parent_->getResource("memPriority"));
   dodecay_ = !strcmp (parent_->getResource("memDecay"),"True");
+  SetUsedFormat (parent_->getResource("memUsedFormat"));
 }
 
 void MemMeter::checkevent( void ){
@@ -48,19 +51,19 @@ void MemMeter::checkevent( void ){
 }
 
 void MemMeter::getmeminfo (void) {
-
 //  Begin NetBSD-specific code...
   struct vmtotal meminfo;
   int params[] = {CTL_VM, VM_METER};
   unsigned meminfosize = sizeof (struct vmtotal);
   sysctl (params, 2, &meminfo, &meminfosize, NULL, NULL);
+  /*  Note that the numbers are in terms of 4K pages.  */
 
-  total_ = meminfo.t_free+meminfo.t_rm;
-  fields_[FREE_INDEX] = meminfo.t_free;
-  fields_[2] = meminfo.t_rmshr;
-  fields_[1] = meminfo.t_rm - meminfo.t_arm - meminfo.t_rmshr;
-  fields_[0] = meminfo.t_arm;
+  total_ = 4096*(meminfo.t_free+meminfo.t_rm);
+  fields_[FREE_INDEX] = 4096*meminfo.t_free;
+  fields_[2] = 4096*meminfo.t_rmshr;
+  fields_[1] = 4096*(meminfo.t_rm - meminfo.t_arm - meminfo.t_rmshr);
+  fields_[0] = 4096*meminfo.t_arm;
 //  End NetBSD-specific code...
 
-  FieldMeter::used( (int)((100 * (total_ - fields_[FREE_INDEX])) / total_) );
+  setUsed (total_ - fields_[FREE_INDEX], total_);
 }
