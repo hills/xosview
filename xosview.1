@@ -7,6 +7,40 @@ xosview \- X based system monitor
 .SH SYNOPSIS
 xosview [options]
 
+.\"  First, let's define some handy roff macros.
+.\"  A macro begins with .de <xx> where one will invoke this macro with .xx
+.\"  The macro definition ends with the .. line.
+.\"  I don't know what macro abbreviations are free, so I just chose a few,
+.\"  and haven't noticed a problem so far!  bgrayson
+
+.\"  There are several paragraphs that are repeated in the resource section.
+.\"  Rather than typing the whole stuff out each time, we define a few macros.
+
+.\"  The .pp macro takes a single argument (net, disk, etc), and
+.\" prints a paragraph description of a Priority resource.  Only the
+.\" header (xosview*diskPriority: \fIpriority\fP) needs to be specified in
+.\" addition to the .pp macro.
+.\"  Usage:   .pp load
+.de pp
+.RS
+This number (which must be an integer >= 1) sets the number of tenths of
+a second that the \\$1 meter waits between updates.  A value of 1 has xosview
+update the meter 10 times per second (the fastest).  A value of 600 would
+cause xosview to update the meter once a minute.
+.RE
+..
+
+.\"  The .dc macro is similar to the .pp macro, except that it is for
+.\" the decay resource paragraphs.
+.\"  Usage:  .dc net
+.de dc
+.RS
+If True then the \\$1 meter will be split vertically in two.  The top
+half will show the instantaneous state, while the bottom half will
+display a decaying average of the state.
+.RE
+..
+
 .SH DESCRIPTION
 \fIxosview\fP is a monitor which displays the status of several system based
 parameters.  These include CPU usage, load average, memory usage, swap 
@@ -723,19 +757,10 @@ This is the color that the network meter will use for the "idle" field.
 .RE
 
 xosview*netPriority: \fIpriority\fP
-.RS
-This number (which must be an integer >= 1) sets the number of times the 
-network meter will update per second.  The number of times this meter will 
-update per second is calculated as follows :  updates per sec = 10 / 
-\fIpriority\fP.  It can of couse be greater than 10.
-.RE
+.pp net
 
 xosview*netDecay: (True or False)
-.RS
-If True then the network meter will be split in two.  One half will show the
-instantaneous state and the other will display a decaying average of the
-state.
-.RE
+.dc net
 
 xosview*netUsedFormat:	  (float, percent or autoscale)
 .RS
