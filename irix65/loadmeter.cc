@@ -5,6 +5,7 @@
 //
 //  Most of this code was written by Werner Fink <werner@suse.de>.
 //  Only small changes were made on my part (M.R.)
+//  Small changes for Irix 6.5 port Stefan Eilemann <eile@sgi.com>
 //
 // $Id$
 //
@@ -14,7 +15,7 @@
 #include <unistd.h>
 
 #ifndef FSCALE
-#define FSCALE	(1 << 8)
+#define FSCALE  (1 << 8)
 #endif
 
 LoadMeter::LoadMeter(XOSView *parent)
@@ -25,9 +26,9 @@ LoadMeter::LoadMeter(XOSView *parent)
 
     if (gethostname (hostname, 255) != 0) {
         perror ("gethostname");
-		parent_->done(1);
-		return;
-	}
+        parent_->done(1);
+        return;
+    }
 }
 
 LoadMeter::~LoadMeter(void)
@@ -36,41 +37,41 @@ LoadMeter::~LoadMeter(void)
 
 void LoadMeter::checkResources(void)
 {
-	FieldMeterGraph::checkResources();
+    FieldMeterGraph::checkResources();
 
     procloadcol_ = parent_->allocColor(parent_->getResource( "loadProcColor" ));
     warnloadcol_ = parent_->allocColor(parent_->getResource( "loadWarnColor" ));
     critloadcol_ = parent_->allocColor(parent_->getResource( "loadCritColor" ));
 
-	setfieldcolor(0, parent_->getResource( "loadProcColor" ));
-	setfieldcolor(1, parent_->getResource("loadIdleColor"));
-	priority_ = atoi (parent_->getResource("loadPriority"));
-	useGraph_ = parent_->isResourceTrue("loadGraph");
+    setfieldcolor(0, parent_->getResource( "loadProcColor" ));
+    setfieldcolor(1, parent_->getResource("loadIdleColor"));
+    priority_ = atoi (parent_->getResource("loadPriority"));
+    useGraph_ = parent_->isResourceTrue("loadGraph");
     dodecay_ = parent_->isResourceTrue( "loadDecay" );
-	SetUsedFormat(parent_->getResource("loadUsedFormat"));
+    SetUsedFormat(parent_->getResource("loadUsedFormat"));
 
     warnThreshold = atoi (parent_->getResource("loadWarnThreshold"));
     critThreshold = atoi (parent_->getResource("loadCritThreshold"));
 
 
-	if (dodecay_){
+    if (dodecay_){
         //  Warning:  Since the loadmeter changes scale occasionally, old
         //  decay values need to be rescaled.  However, if they are rescaled,
         //  they could go off the edge of the screen.  Thus, for now, to
         //  prevent this whole problem, the load meter can not be a decay
         //  meter.  The load is a decaying average kind of thing anyway,
         //  so having a decaying load average is redundant.
-		cerr << "Warning:  The loadmeter can not be configured as a decay\n"
-		     << "  meter. See the source code (" <<__FILE__<< ") for further\n"
-		     << "  details.\n";
-		dodecay_ = 0;
-	}
+        cerr << "Warning:  The loadmeter can not be configured as a decay\n"
+             << "  meter. See the source code (" <<__FILE__<< ") for further\n"
+             << "  details.\n";
+        dodecay_ = 0;
+    }
 }
 
 void LoadMeter::checkevent(void)
 {
-	getloadinfo();
-	drawfields();
+    getloadinfo();
+    drawfields();
 }
 
 void LoadMeter::getloadinfo(void)
@@ -81,8 +82,8 @@ void LoadMeter::getloadinfo(void)
         return;
     }
 
-	fields_[0] = (float) res.avenrun[0]/FSCALE;
-	
+    fields_[0] = (float) res.avenrun[0]/FSCALE;
+    
     if ( fields_[0] < warnThreshold ) 
         alarmstate = 0;
     else
@@ -103,7 +104,7 @@ void LoadMeter::getloadinfo(void)
         if (dolegends_)
             drawlegend();
         lastalarmstate = alarmstate;
-	}
+    }
   
     if ( fields_[0]*5.0<total_ )
         total_ = fields_[0];
