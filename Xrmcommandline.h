@@ -49,9 +49,9 @@ static XrmOptionDescRec options[] = {
 //  on/off flag.  Now, we have -net for on/off, and networkBandwidth
 //  for bandwidth, with the alias networkBW, and network for backwards
 //  compatibility.
-{ "-network", "*networkBandwidth", XrmoptionSepArg, (caddr_t) NULL },
-{ "-networkBW", "*networkBandwidth", XrmoptionSepArg, (caddr_t) NULL },
-{ "-networkBandwidth", "*networkBandwidth", XrmoptionSepArg, (caddr_t) NULL },
+{ "-network", "*netBandwidth", XrmoptionSepArg, (caddr_t) NULL },
+{ "-networkBW", "*netBandwidth", XrmoptionSepArg, (caddr_t) NULL },
+{ "-networkBandwidth", "*netBandwidth", XrmoptionSepArg, (caddr_t) NULL },
 
 // Page Meter
 { "-page", "*page", XrmoptionNoArg, "False" },
