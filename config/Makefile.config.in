@@ -8,7 +8,7 @@
 #
 
 # version number for release
-VERS = 1.7.0
+VERS = 1.7.1
 
 TOP = @TOP_SRCDIR@
 
@@ -23,13 +23,13 @@ CXX           = @CXX@
 
 # Optimized CXXFLAGS
 CXXFLAGS      += $(CFLAGS) -Wall -O4 -pipe -I@x_includes@ \
-                -I$(TOP) -I$(TOP)/@host_dir@ @DEFS@
+                -DXOSVIEW_VERSION=\"$(VERS)\" -I$(TOP) -I$(TOP)/@host_dir@ @DEFS@
 # DEBUG CXXFLAGS
 #CXXFLAGS      += $(CFLAGS) -Wall -ggdb -pipe -I@x_includes@ \
-#                -I$(TOP) -I$(TOP)/@host_dir@ @DEFS@
+#                -DXOSVIEW_VERSION=\"$(VERS)\" -I$(TOP) -I$(TOP)/@host_dir@ @DEFS@
 # PROFILE CXXFLAGS
 #CXXFLAGS      += $(CFLAGS) -Wall -ggdb -pg -pipe -I@x_includes@ \
-#                -I$(TOP) -I$(TOP)/@host_dir@ @DEFS@
+#                -DXOSVIEW_VERSION=\"$(VERS)\" -I$(TOP) -I$(TOP)/@host_dir@ @DEFS@
 
 #-----------------------------------------------------------------
 # Link flags and libraries
