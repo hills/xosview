@@ -146,7 +146,7 @@ Listed from weakest to strongest:
   char rfilename[2048];
 
   // Get the app-defaults
-  strcpy(rfilename, "/usr/lib/X11/app-defaults/");
+  strcpy(rfilename, "/usr/X11R6/lib/X11/app-defaults/");
   strcat(rfilename, XrmQuarkToString(_class));
   if (rfilename != NULL)
     XrmCombineFileDatabase (rfilename, &_db, 1);
