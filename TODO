@@ -33,3 +33,5 @@ Revision: $Id$
     function that does the calculation, using SAMPLE_MSECS and
     priority_.  See the netbsd/diskmeter.cc code for what I think is the
     correct formula (it took me a few attempts to get it right!)
+  Fix depend stuff
+* Get autolookup of X stuff -- perhaps use xmkmf/imake in configure?
