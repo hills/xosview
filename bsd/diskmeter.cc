@@ -101,16 +101,17 @@ void DiskMeter::getstats( void ){
   }
   /*  Adjust this to bytes/second.  */
   fields_[0] = (currBytes-prevBytes)/IntervalTimeInSecs();
+  /*  Adjust in case of first call.  */
+  if (fields_[0] < 0) fields_[0] = 0.0;
 //  Adjust total_ if needed.
   if (fields_[0] > total_)
     total_ = fields_[0];
 
   fields_[1] = total_ - fields_[0];
   if (fields_[0] < 0.0)
-    fprintf (stderr, "fields[0] of %f is < 0!\n", fields_[0]);
+    fprintf (stderr, "diskmeter: fields[0] of %f is < 0!\n", fields_[0]);
   if (fields_[1] < 0.0)
-    fprintf (stderr, "fields[1] of %f is < 0!\n", fields_[1]);
-
+    fprintf (stderr, "diskmeter: fields[1] of %f is < 0!\n", fields_[1]);
     
   setUsed ( fields_[0], total_);
 #ifdef HAVE_DEVSTAT
