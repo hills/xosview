@@ -119,7 +119,6 @@ void NetMeter::checkeventNew(void)
 
     unsigned long in, out, ig;
     unsigned long totin = 0, totout = 0;
-    char buf[256];
     
     fields_[2] = maxpackets_;     // assume no
     fields_[0] = fields_[1] = 0;  // network activity
@@ -131,7 +130,8 @@ void NetMeter::checkeventNew(void)
 
     while (!ifs.eof())
         {
-        ifs >> buf >> in >> ig >> ig >> ig >> ig >> ig >> ig >> ig >> out;
+        ifs.ignore(1024, ':');
+        ifs >> in >> ig >> ig >> ig >> ig >> ig >> ig >> ig >> out;
 
         if (!ifs.eof())
             {
