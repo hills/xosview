@@ -29,17 +29,24 @@ DiskMeter::DiskMeter( XOSView *parent, float max )
   if (!kernelHasStats_)
   {
     warnx(
-  "The kernel does not seem to have the symbols needed for the DiskMeter.\n"
+  "!!! The kernel does not seem to have the symbols needed for the DiskMeter."
+	 );
 #if defined(XOSVIEW_NETBSD)
-  "  (A 1.2 kernel or above is probably needed)\n"
+    warnx(
+  "  (A 1.2 kernel or above is probably needed)"
+	 );
 #else
 # if defined(XOSVIEW_FREEBSD)
-  "  (You are probably running a kernel newer than 3.0-19980804-SNAP)\n"
+    warnx(
+  "  (You are probably running a kernel newer than 3.0-19980804-SNAP)"
+	 );
 # else
-  "  (You are probably running a newer or older kernel than any yet used with xosview)\n"
+    warnx(
+  "  (You are probably running a newer or older kernel than any yet used with xosview)"
+	 );
 # endif
 #endif
-  "The DiskMeter has been disabled.\n");
+  warnx("!!! The DiskMeter has been disabled.");
     disableMeter ();
   }
   prevBytes = 0;
