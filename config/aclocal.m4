@@ -28,7 +28,7 @@ changequote([, ])
 ]])
 
 AC_DEFUN(AC_XOSV_LINUX, [
-
+EXTRALIBS=$XPMLIB
 EXTRA_OUT_FILES="$EXTRA_OUT_FILES \
   linux/memstat/Makefile:config/Makefile.linux.memstat.in"
 
@@ -103,7 +103,7 @@ INSTALL_ARGS='-s -m 4755'
 
 AC_DEFUN(AC_XOSV_BSD_COMMON, [
 dnl  The BSD versions need to link with libkvm, and have the BSD install flags.
-	EXTRALIBS=-lkvm
+	EXTRALIBS="-lkvm $XPMLIB"
 	INSTALL_ARGS='-s -g kmem -m 02555'
 ])
 AC_DEFUN(AC_XOSV_NETBSD, [
@@ -113,7 +113,7 @@ dnl  Let's just be lazy -- set host_os to be netbsd.
 dnl
 dnl Netbsd needs to link with libkvm
 dnl
-        EXTRALIBS=-lkvm
+        EXTRALIBS="-lkvm $XPMLIB"
         INSTALL_ARGS='-s -g kmem -m 02555'
 	AC_DEFINE(XOSVIEW_NETBSD)
 ])
@@ -122,7 +122,7 @@ AC_DEFUN(AC_XOSV_FREEBSD, [
 dnl
 dnl FreeBSD also needs to link with libkvm
 dnl
-        EXTRALIBS=-lkvm
+        EXTRALIBS="-lkvm $XPMLIB $DEVSTATLIB"
         INSTALL_ARGS='-s -g kmem -m 02555'
 	AC_DEFINE(XOSVIEW_FREEBSD)
 ])
@@ -131,7 +131,7 @@ AC_DEFUN(AC_XOSV_OPENBSD, [
 dnl
 dnl OpenBSD also needs to link with libkvm
 dnl
-        EXTRALIBS=-lkvm
+        EXTRALIBS="-lkvm $XPMLIB"
         INSTALL_ARGS='-s -g kmem -m 02555'
 	AC_DEFINE(XOSVIEW_OPENBSD)
 ])

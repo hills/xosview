@@ -62,7 +62,7 @@ AC_CHECK_LIB(Xpm, main,AC_DEFINE(HAVE_XPM) XPMLIB=-lXpm)
 dnl  For FreeBSD, see if libdevstat exists.
 case $host_os in
 freebsd*)
-  AC_CHECK_LIB(devstat, main, AC_DEFINE(HAVE_DEVSTAT)) ;;
+  AC_CHECK_LIB(devstat, main, AC_DEFINE(HAVE_DEVSTAT) DEVSTATLIB=-ldevstat) ;;
 esac
 
 dnl
