@@ -76,10 +76,10 @@ AC_SUBST(AUTODEPEND)
 
 AC_CHECK_FUNCS(snprintf)
 
+CPPFLAGS='-I /usr/X11R6/include'
 AC_CHECK_HEADER(X11/xpm.h,
 AC_CHECK_LIB(Xpm, XpmCreateImageFromData, AC_DEFINE(HAVE_XPM) XPMLIB=-lXpm,,
 -lX11))
-
 dnl  For FreeBSD, see if libdevstat exists.
 case $host_os in
 freebsd*)
@@ -177,6 +177,9 @@ openbsd*) AC_XOSV_OPENBSD
 	dnl ])
 	host_dir=bsd
 	host_os=openbsd ;;
+bsdi*) AC_XOSV_BSDI
+	host_dir=bsd
+	host_os=bsdi ;;
 hpux*)    AC_XOSV_HPUX   
 	  host_dir=hpux
           host_os=hpux ;;

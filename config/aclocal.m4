@@ -190,6 +190,16 @@ dnl
 	AC_DEFINE(XOSVIEW_OPENBSD)
 ])
 
+AC_DEFUN(AC_XOSV_BSDI, [
+dnl
+dnl BSDI (surprise, surprise) also needs to link with libkvm
+dnl BSDI before 4.0 should probably have CXX=shlicc++ too so use
+dnl gmake CXX=shlicc++ on bsdi [23].x
+dnl
+	EXTRALIBS="-lkvm $XPMLIB"
+	INSTALL_ARGS='-s -g kmem -m 02555'
+	AC_DEFINE(XOSVIEW_BSDI)
+])
 AC_DEFUN(AC_XOSV_HPUX, [
 dnl
 dnl No special config options for HPUX.
