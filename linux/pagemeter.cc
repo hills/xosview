@@ -13,6 +13,7 @@
 
 
 static const char STATFILENAME[] = "/proc/stat";
+#define MAX_PROCSTAT_LENGTH 2048
 
 
 PageMeter::PageMeter( XOSView *parent, float max )
@@ -48,7 +49,7 @@ void PageMeter::checkevent( void ){
 
 void PageMeter::getpageinfo( void ){
   total_ = 0;
-  char buf[1024];
+  char buf[MAX_PROCSTAT_LENGTH];
   ifstream stats( STATFILENAME );
 
   if ( !stats ){

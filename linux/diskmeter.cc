@@ -12,6 +12,7 @@
 #include <stdlib.h>
 
 static const char STATFILENAME[] = "/proc/stat";
+#define MAX_PROCSTAT_LENGTH 2048
 
 DiskMeter::DiskMeter( XOSView *parent, float max ) : FieldMeterGraph(
   parent, 3, "DISK", "READ/WRITE/IDLE")
@@ -49,7 +50,7 @@ void DiskMeter::getdiskinfo( void )
     {
     IntervalTimerStop();
     total_ = maxspeed_;
-    char buf[1024];
+    char buf[MAX_PROCSTAT_LENGTH];
     ifstream stats( STATFILENAME );
 
     if ( !stats )
@@ -62,7 +63,7 @@ void DiskMeter::getdiskinfo( void )
     stats >> buf;
     while (strncmp(buf, "page", 9))
         {
-        stats.ignore(1024, '\n');
+        stats.ignore(MAX_PROCSTAT_LENGTH, '\n');
         stats >> buf;
         }
 

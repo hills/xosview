@@ -15,6 +15,7 @@
 #include <ctype.h>
 
 static const char STATFILENAME[] = "/proc/stat";
+#define MAX_PROCSTAT_LENGTH 2048
 
 CPUMeter::CPUMeter(XOSView *parent, const char *cpuID)
 : FieldMeterGraph( parent, 4, toUpper(cpuID), "USR/NICE/SYS/FREE" ) {
@@ -49,7 +50,7 @@ void CPUMeter::checkevent( void ){
 
 void CPUMeter::getcputime( void ){
   total_ = 0;
-  char tmp[1024];
+  char tmp[MAX_PROCSTAT_LENGTH];
   ifstream stats( STATFILENAME );
 
   if ( !stats ){
@@ -59,7 +60,7 @@ void CPUMeter::getcputime( void ){
 
   // read until we are at the right line.
   for (int i = 0 ; i < _lineNum ; i++)
-    stats.getline(tmp, 1024);
+    stats.getline(tmp, MAX_PROCSTAT_LENGTH);
 
   stats >>tmp >>cputime_[cpuindex_][0]  
 	      >>cputime_[cpuindex_][1]  
@@ -87,9 +88,9 @@ int CPUMeter::findLine(const char *cpuID){
   }
 
   int line = -1;
-  char buf[1024];
+  char buf[MAX_PROCSTAT_LENGTH];
   while (!stats.eof()){
-    stats.getline(buf, 1024);
+    stats.getline(buf, MAX_PROCSTAT_LENGTH);
     if (!stats.eof()){
       line++;
       if (!strncmp(cpuID, buf, strlen(cpuID)) && buf[strlen(cpuID)] == ' ')
@@ -112,9 +113,9 @@ int CPUMeter::countCPUs(void){
   }
 
   int cpuCount = 0;
-  char buf[1024];
+  char buf[MAX_PROCSTAT_LENGTH];
   while (!stats.eof()){
-    stats.getline(buf, 1024);
+    stats.getline(buf, MAX_PROCSTAT_LENGTH);
     if (!stats.eof()){
       if (!strncmp(buf, "cpu", 3) && buf[3] != ' ')
           cpuCount++;
@@ -137,8 +138,8 @@ const char *CPUMeter::cpuStr(int num){
 }
 
 const char *CPUMeter::toUpper(const char *str){
-  static char buffer[1024];
-  strncpy(buffer, str, 1024);
+  static char buffer[MAX_PROCSTAT_LENGTH];
+  strncpy(buffer, str, MAX_PROCSTAT_LENGTH);
   for (char *tmp = buffer ; *tmp != '\0' ; tmp++)
     *tmp = toupper(*tmp);
 
