@@ -84,8 +84,16 @@ xosview*pageUsedFormat: autoscale
 
 ! Network Meter Resources
 
-xosview*net:		  False
-xosview*netBandwidth:     2000
+xosview*net:		False
+!  Suitable for people with 28.8Kbaud with no compression, or 14.4
+!    with compression:
+!xosview*netBandwidth: 2000
+!  Suitable for people with up to 57.6Kbaud modems:
+xosview*netBandwidth: 5000
+!  Suitable for people with 10Mbits/sec Ethernet:  (could put 1250000)
+!xosview*netBandwidth: 1000000
+!  Suitable for people with 100Mbits/sec Ethernet (could be 12500000)
+!xosview*netBandwidth: 10000000
 xosview*netInColor:       SkyBlue
 xosview*netOutColor:      SlateBlue1
 xosview*netBackground:    aquamarine
