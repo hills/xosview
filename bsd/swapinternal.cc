@@ -75,7 +75,18 @@
 #include <sys/rlist.h>
 # endif
 #else
+
+#ifdef HAVE_SWAPCTL
+#include <sys/swap.h>
+#endif
+
+#ifndef HAVE_SWAPCTL
 #include <sys/map.h>		/*  For struct mapent.  */
+#endif
+#endif
+
+#ifdef USE_KVM_GETSWAPINFO
+#include <unistd.h>		/*  For getpagesize().  */
 #endif
 
 #ifdef USE_KVM_GETSWAPINFO
@@ -218,6 +229,9 @@ BSDInitSwapInfo()
 #endif
                 return (0);
         }
+#ifdef HAVE_SWAPCTL
+	return 0;
+#else
 #ifdef XOSVIEW_BSDI
         KGET(VM_SWAPSTATS, swapstats);
 #endif
@@ -269,6 +283,7 @@ BSDInitSwapInfo()
 #endif /* USE_KVM_GETSWAPINFO */
         once = 1;
         return (1);
+#endif
 }
 
 #ifdef XOSVIEW_FREEBSD
@@ -329,6 +344,7 @@ fetchswap()
 void
 fetchswap()
 {
+#ifndef HAVE_SWAPCTL
         int s, e, i=0;
         int elast;
 	struct mapent* localmp;
@@ -438,6 +454,7 @@ fetchswap()
                 }
 #endif
         }
+#endif
 }
 #endif /* XOSVIEW_FREEBSD */
 
