@@ -156,7 +156,7 @@ an abbreviation for all three of the free BSD operating systems
    all platforms: used | free
 
 \fBDisk Usage (bytes/sec)\fP
-   Linux  : transferred | idle
+   Linux  : in  |  out  | idle
    *BSD   : transferred | idle
    HPUX   : < Not Supported >
 
@@ -686,6 +686,16 @@ xosview*diskBandwidth: \fIbandwidth\fP
 .RS
 This number is used to specify the expected maximum bandwidth in bytes
 per second for the disk meter.
+.RE
+
+xosview*diskWriteColor: \fIcolor\fP
+.RS
+This color will be used for the linux meter to show writes.
+.RE
+
+xosview*diskReadColor: \fIcolor\fP
+.RS
+This color will be used for the linux meter to show reads.
 .RE
 
 .\"  Priority, decay, usedFormat resources:
