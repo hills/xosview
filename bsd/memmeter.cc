@@ -85,7 +85,7 @@ void MemMeter::getmeminfo (void) {
 
   // New code.  Use the cnt structure:
   struct vmmeter kvm_cnt;
-  NetBSDGetPageStats (&kvm_cnt);
+  BSDGetPageStats (&kvm_cnt);
 
   /*  Note that the numbers are in terms of pages,
       and we want fields_ in bytes.  */

@@ -40,7 +40,7 @@ CPUMeter::CPUMeter( XOSView *parent )
   //  The setting of the priority will be done in checkResources().  BCG
   dodecay_ = 0;
 
-  NetBSDCPUInit();
+  BSDCPUInit();
 }
 
 CPUMeter::~CPUMeter( void ){
@@ -75,7 +75,7 @@ void CPUMeter::getcputime( void ){
   //  Begin NetBSD-specific code...  BCG
   long tempCPU[CPUSTATES];
 
-  NetBSDGetCPUTimes (tempCPU);
+  BSDGetCPUTimes (tempCPU);
 
   cputime_[cpuindex_][0] = tempCPU[0];
   cputime_[cpuindex_][1] = tempCPU[1];

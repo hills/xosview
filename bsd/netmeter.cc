@@ -33,7 +33,7 @@ NetMeter::NetMeter( XOSView *parent, float max )
   netBandwidth_ = max;
   total_ = netBandwidth_;
   _lastBytesIn = _lastBytesOut = 0;
-  NetBSDGetNetInOut (&_lastBytesIn, &_lastBytesOut);
+  BSDGetNetInOut (&_lastBytesIn, &_lastBytesOut);
 
   char hostname[100];
   gethostname(hostname, 99);
@@ -67,8 +67,8 @@ void NetMeter::checkevent( void ){
 //  Begin NetBSD-specific code.  BCG
   long long nowBytesIn, nowBytesOut;
 
-//  The NetBSDGetNetInOut() function is in kernel.cc    BCG
-  NetBSDGetNetInOut (&nowBytesIn, &nowBytesOut);
+//  The BSDGetNetInOut() function is in kernel.cc    BCG
+  BSDGetNetInOut (&nowBytesIn, &nowBytesOut);
   float t = (1e6) / IntervalTimeInMicrosecs();
   fields_[0] = (float)(nowBytesIn - _lastBytesIn) * t;
   _lastBytesIn = nowBytesIn;

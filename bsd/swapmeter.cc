@@ -33,8 +33,8 @@ SwapMeter::SwapMeter( XOSView *parent )
 #ifdef HAVE_SWAPCTL
   useSwapCtl = 0;
 #endif
-  NetBSDSwapInit();	//  In kernel.cc
-  if (!NetBSDInitSwapInfo())
+  BSDSwapInit();	//  In kernel.cc
+  if (!BSDInitSwapInfo())
   {
 #ifdef HAVE_SWAPCTL
     //  Set up to use new swap code instead.
@@ -78,10 +78,10 @@ void SwapMeter::getswapinfo( void ){
   if (doSwap) {
 #ifdef HAVE_SWAPCTL
     if (useSwapCtl)
-      NetBSDGetSwapCtlInfo(&total_int, &free_int);
+      BSDGetSwapCtlInfo(&total_int, &free_int);
     else
 #endif
-      NetBSDGetSwapInfo (&total_int, &free_int);
+      BSDGetSwapInfo (&total_int, &free_int);
   }
   else {
     total_int = 1;	/*  So the meter looks blank.  */

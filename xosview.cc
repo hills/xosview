@@ -36,7 +36,7 @@ XOSView::XOSView( char * instName, int argc, char *argv[] ) : XWin(),
   xrm.loadAndMergeResources (argc, argv, display_); 
   XWinInit (argc, argv, NULL, &xrm);
 #ifdef XOSVIEW_NETBSD
-  NetBSDInit();	/*  Needs to be done before processing of -N option.  */
+  BSDInit();	/*  Needs to be done before processing of -N option.  */
 #endif
 
   checkArgs (argc, argv);  //  Check for any other unhandled args.

@@ -28,8 +28,8 @@ CVSID_DOT_H(PAGEMETER_H_CVSID);
 PageMeter::PageMeter( XOSView *parent, double total )
 : FieldMeterDecay( parent, 3, "PAGE", "IN/OUT/IDLE" ){
   total_ = total;
-  NetBSDPageInit();
-  NetBSDGetPageStats(&prev_);
+  BSDPageInit();
+  BSDGetPageStats(&prev_);
 }
 
 PageMeter::~PageMeter( void ){ }
@@ -55,7 +55,7 @@ void PageMeter::getpageinfo (void) {
 //  Begin NetBSD-specific code...
   struct vmmeter vm;
 
-  NetBSDGetPageStats(&vm);
+  BSDGetPageStats(&vm);
 #ifdef XOSVIEW_FREEBSD
   /* It depends, of course on what you want to measure.  I think, howver,
      that you want the sum of pages paged to swap (i.e. dirty pages) and

@@ -127,7 +127,7 @@ ValidSymbol (int index)
 
 
 void
-NetBSDInit()
+BSDInit()
 {
   kernelFileName[0] = '\0';
 }
@@ -181,11 +181,11 @@ OpenKDIfNeeded()
 
 // ------------------------  PageMeter functions  -----------------
 void
-NetBSDPageInit() { OpenKDIfNeeded(); }
+BSDPageInit() { OpenKDIfNeeded(); }
 
 void
-NetBSDGetPageStats(struct vmmeter* vmp) {
-  if (!vmp) errx(-1, "NetBSDGetPageStats():  passed pointer was null!\n");
+BSDGetPageStats(struct vmmeter* vmp) {
+  if (!vmp) errx(-1, "BSDGetPageStats():  passed pointer was null!\n");
   safe_kvm_read_symbol(VMMETER_SYM_INDEX, vmp, sizeof(struct vmmeter));
 }
 
@@ -202,15 +202,15 @@ FreeBSDGetBufspace(int* bfsp)
 // ------------------------  CPUMeter functions  ------------------
 
 void
-NetBSDCPUInit()
+BSDCPUInit()
 {
   OpenKDIfNeeded();
 }
 
 void
-NetBSDGetCPUTimes (long* timeArray)
+BSDGetCPUTimes (long* timeArray)
 {
-  if (!timeArray) errx (-1, "NetBSDGetCPUTimes():  passed pointer was null!\n");
+  if (!timeArray) errx (-1, "BSDGetCPUTimes():  passed pointer was null!\n");
   if (CPUSTATES != 5)
     errx (-1, "Error:  xosview for NetBSD expects 5 cpu states!\n");
   safe_kvm_read_symbol (CP_TIME_SYM_INDEX, timeArray, sizeof (long) * CPUSTATES);
@@ -219,13 +219,13 @@ NetBSDGetCPUTimes (long* timeArray)
 
 // ------------------------  NetMeter functions  ------------------
 void
-NetBSDNetInit()
+BSDNetInit()
 {
   OpenKDIfNeeded();
 }
 
 void
-NetBSDGetNetInOut (long long * inbytes, long long * outbytes)
+BSDGetNetInOut (long long * inbytes, long long * outbytes)
 {
   struct ifnet * ifnetp;
   struct ifnet ifnet;
@@ -266,7 +266,7 @@ NetBSDGetNetInOut (long long * inbytes, long long * outbytes)
 
 /*  ---------------------- Swap Meter stuff  -----------------  */
 int
-NetBSDSwapInit() {
+BSDSwapInit() {
   OpenKDIfNeeded();
   /*  Need to merge some of swapinteral.cc here, to be smart about
    *  missing kvm symbols (due to OS version mismatch, for example).
@@ -287,7 +287,7 @@ NetBSDSwapInit() {
 #include <stdlib.h>
 
 void
-NetBSDGetSwapCtlInfo(int *total, int *free)
+BSDGetSwapCtlInfo(int *total, int *free)
 {
   struct swapent *sep;
   int	totalinuse, totalsize;
@@ -320,7 +320,7 @@ NetBSDGetSwapCtlInfo(int *total, int *free)
 
 /*  ---------------------- Disk Meter stuff  -----------------  */
 int
-NetBSDDiskInit() {
+BSDDiskInit() {
   OpenKDIfNeeded(); 
 #ifdef XOSVIEW_FREEBSD
   return ValidSymbol(DK_NDRIVE_SYM_INDEX);
@@ -330,7 +330,7 @@ NetBSDDiskInit() {
 }
 
 void
-NetBSDGetDiskXFerBytes (unsigned long long *bytesXferred)
+BSDGetDiskXFerBytes (unsigned long long *bytesXferred)
 {
 #ifdef XOSVIEW_FREEBSD
   /* FreeBSD still has the old-style disk statistics in global arrays
@@ -380,13 +380,13 @@ static unsigned long kvm_intrptrs[NUM_INTR];
 #endif
 
 int
-NetBSDIntrInit() {
+BSDIntrInit() {
     OpenKDIfNeeded(); 
     return ValidSymbol(INTRCNT_SYM_INDEX) && ValidSymbol(EINTRCNT_SYM_INDEX);
 }
 
 void
-NetBSDGetIntrStats (unsigned long intrCount[NUM_INTR])
+BSDGetIntrStats (unsigned long intrCount[NUM_INTR])
 {
 #ifdef XOSVIEW_FREEBSD
     /* FreeBSD has an array of interrupt counts, indexed by device number.

@@ -30,42 +30,42 @@
 #define KERNEL_H_CVSID	"$Id$"
 
 void
-NetBSDInit();
+BSDInit();
 
 void
 SetKernelName(const char* const kernelName);
 
 void
-NetBSDPageInit();
+BSDPageInit();
 
 void
-NetBSDGetPageStats(struct vmmeter* vmp);
+BSDGetPageStats(struct vmmeter* vmp);
 
 void
-NetBSDCPUInit();
+BSDCPUInit();
 
 void
-NetBSDGetCPUTimes(long* timesArray);
+BSDGetCPUTimes(long* timesArray);
 
 void
-NetBSDNetInit();
+BSDNetInit();
 
 void
-NetBSDGetNetInOut (long long * inbytes, long long * outbytes);
+BSDGetNetInOut (long long * inbytes, long long * outbytes);
 
 int
-NetBSDSwapInit();
+BSDSwapInit();
 
 #ifdef HAVE_SWAPCTL
 void
-NetBSDGetSwapCtlInfo(int* total, int* free);
+BSDGetSwapCtlInfo(int* total, int* free);
 #endif
 
 int
-NetBSDDiskInit();
+BSDDiskInit();
 
 void
-NetBSDGetDiskXFerBytes (unsigned long long * bytes);
+BSDGetDiskXFerBytes (unsigned long long * bytes);
 
 #ifdef XOSVIEW_FREEBSD
 void
@@ -76,9 +76,9 @@ FreeBSDGetBufspace(int* bfsp);
 #define NUM_INTR	16
 
 int
-NetBSDIntrInit();
+BSDIntrInit();
 
 void
-NetBSDGetIntrStats (unsigned long intrCount[NUM_INTR]);
+BSDGetIntrStats (unsigned long intrCount[NUM_INTR]);
 
 #endif

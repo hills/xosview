@@ -26,7 +26,7 @@ DiskMeter::DiskMeter( XOSView *parent, float max )
   //  The setting of the priority will be done in checkResources().  BCG
   dodecay_ = 0;
 
-  kernelHasStats_ = NetBSDDiskInit();
+  kernelHasStats_ = BSDDiskInit();
   if (!kernelHasStats_)
   {
     warnx(
@@ -85,7 +85,7 @@ void DiskMeter::getstats( void ){
   total_ = maxBandwidth_;
 
   if (kernelHasStats_) {
-    NetBSDGetDiskXFerBytes (&currBytes);
+    BSDGetDiskXFerBytes (&currBytes);
 #if DEBUG
     printf ("currBytes is %#x %#0x\n", (int) (currBytes >> 32), (int)
 	    (currBytes & 0xffffffff));

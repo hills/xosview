@@ -51,5 +51,5 @@ void IntMeter::checkResources( void ){
 void 
 IntMeter::getirqs( void )
 {
-    NetBSDGetIntrStats (irqs_);
+    BSDGetIntrStats (irqs_);
 }

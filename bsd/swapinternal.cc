@@ -143,7 +143,7 @@ static int nfree;
         }
 
 int
-NetBSDInitSwapInfo()
+BSDInitSwapInfo()
 {
         static int once = 0;
         u_long ptr;
@@ -309,7 +309,7 @@ fetchswap()
 #endif /* XOSVIEW_FREEBSD */
 
 void
-NetBSDGetSwapInfo(int* total, int* free)
+BSDGetSwapInfo(int* total, int* free)
 {
         int i, avail, npfree, used=0, xsize, xfree;
 

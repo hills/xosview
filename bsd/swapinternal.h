@@ -9,10 +9,10 @@
 //  Header file for the swap internal/NetBSD-specific code.
 
 int
-NetBSDInitSwapInfo();
+BSDInitSwapInfo();
 
 void
-NetBSDGetSwapInfo(int* total, int* free);
+BSDGetSwapInfo(int* total, int* free);
 
 void
-NetBSDGetSwapCtlInfo(int* total, int* free);
+BSDGetSwapCtlInfo(int* total, int* free);
