@@ -11,12 +11,11 @@
 //
 // $Id$
 //
+#include <err.h>        //  For err() and warn(), etc.  BCG
+#include <stdlib.h>	//  For use of atoi  BCG
 #include "general.h"
 #include "diskmeter.h"
-#include "xosview.h"
-#include <err.h>        //  For err() and warn(), etc.  BCG
 #include "kernel.h"     //  For NetBSD-specific icky (but handy) kvm_ code.  BCG
-#include <stdlib.h>	//  For use of atoi  BCG
 
 CVSID("$Id$");
 CVSID_DOT_H(DISKMETER_H_CVSID);

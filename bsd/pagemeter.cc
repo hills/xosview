@@ -15,11 +15,9 @@
 //
 // $Id$
 //
+#include <stdlib.h>		//  For atoi().  BCG
 #include "general.h"
 #include "pagemeter.h"
-#include "xosview.h"
-
-#include <stdlib.h>		//  For atoi().  BCG
 #include "kernel.h"		//  For NetBSD Page functions.
 
 CVSID("$Id$");

@@ -14,13 +14,11 @@
 //
 // $Id$
 //
+#include <sys/dkstat.h>         //  For CPUSTATES #define.  BCG
+#include <stdlib.h>		//  For use of atoi  BCG
 #include "general.h"
 #include "cpumeter.h"
-#include "xosview.h"
-#include <sys/dkstat.h>         //  For CPUSTATES #define.  BCG
-#include <err.h>                //  For err() and warn(), etc.  BCG
 #include "kernel.h"             //  For NetBSD-specific icky kvm_ code.  BCG
-#include <stdlib.h>		//  For use of atoi  BCG
 
 CVSID("$Id$");
 CVSID_DOT_H(CPUMETER_H_CVSID);

@@ -14,14 +14,11 @@
 //
 // $Id$
 //
+#include <stdlib.h>		//  For atoi().  BCG
 #include "general.h"
 #include "swapmeter.h"
-#include "xosview.h"
-
-#include "swapinternal.h"
-#include "kernel.h"
-#include <err.h>			//  For warnx.  BCG
-#include <stdlib.h>		//  For atoi().  BCG
+#include "swapinternal.h"	/*  For *SwapInfo() functions.  */
+#include "kernel.h"		/*  For BSDSwapInit().  */
 
 CVSID("$Id$");
 CVSID_DOT_H(SWAPMETER_H_CVSID);

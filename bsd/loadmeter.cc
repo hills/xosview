@@ -15,11 +15,10 @@
 //
 // $Id$
 //
+#include <stdlib.h>  //  for getloadavg()
 #include "general.h"
 #include "loadmeter.h"
 #include "xosview.h"
-#include <stdlib.h>  //  for getloadavg()
-#include <stdio.h>
 
 CVSID("$Id$");
 CVSID_DOT_H(LOADMETER_H_CVSID);
