@@ -71,7 +71,7 @@ void NetMeter::checkevent( void ){
    *  (1+2^32) is still too big.  */
   if (nowBytesIn < _lastBytesIn) _lastBytesIn -= correction;
   if (nowBytesOut < _lastBytesOut) _lastBytesOut -= correction;
-  float t = (1e6) / IntervalTimeInMicrosecs();
+  float t = (1.0) / IntervalTimeInSecs();
   fields_[0] = (float)(nowBytesIn - _lastBytesIn) * t;
   _lastBytesIn = nowBytesIn;
   fields_[1] = (float)(nowBytesOut - _lastBytesOut) * t;

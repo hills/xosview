@@ -83,6 +83,9 @@ void PageMeter::getpageinfo (void) {
   prev_ = vm;
 # endif
 #endif
+  /*  NOTE:  This results in a meter display of pages, not pages
+   *  per second.  Divide by IntervalTimeInSecs() to convert to
+   *  pages/second.  */
 //  End NetBSD-specific code...
   if (total_ < fields_[0] + fields_[1])
     total_ = fields_[0] + fields_[1];
