@@ -83,8 +83,7 @@ static struct nlist nlst[] =
 #endif
 #define VMMETER_SYM_INDEX	2
 
-#ifndef XOSVIEW_FREEBSD	/*  FreeBSD doesn't have a diskmeter yet.  */
-
+#ifndef XOSVIEW_FREEBSD	/*  NetBSD has a disklist, which FreeBSD doesn't...  */
 { "_disklist" },
 #define DISKLIST_SYM_INDEX	3
 { "_disklist" },
