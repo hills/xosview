@@ -20,7 +20,13 @@
 #define PAGEMETER_H_CVSID "$Id$"
 
 #include "fieldmeterdecay.h"
+#if defined(UVM)
+#include <sys/param.h>
+#include <vm/vm.h>
+#include <uvm/uvm_extern.h>
+#else
 #include <sys/vmmeter.h>
+#endif
 
 class PageMeter : public FieldMeterDecay {
 public:
@@ -35,7 +41,11 @@ protected:
 
   void getpageinfo( void );
 private:
+#if defined(UVM)
+  struct uvmexp	prev_;
+#else
   struct vmmeter prev_;
+#endif
 };
 
 

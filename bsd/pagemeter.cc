@@ -29,7 +29,11 @@ PageMeter::PageMeter( XOSView *parent, double total )
 : FieldMeterDecay( parent, 3, "PAGE", "IN/OUT/IDLE" ){
   total_ = total;
   BSDPageInit();
+#ifdef UVM
+  BSDGetUVMPageStats(&prev_);
+#else
   BSDGetPageStats(&prev_);
+#endif
 }
 
 PageMeter::~PageMeter( void ){ }
@@ -53,9 +57,13 @@ void PageMeter::checkevent( void ){
 
 void PageMeter::getpageinfo (void) {
 //  Begin NetBSD-specific code...
+#if defined(UVM)
+  struct uvmexp uvm;
+  BSDGetUVMPageStats(&uvm);
+#else
   struct vmmeter vm;
-
   BSDGetPageStats(&vm);
+#endif
 #ifdef XOSVIEW_FREEBSD
   /* It depends, of course on what you want to measure.  I think, howver,
      that you want the sum of pages paged to swap (i.e. dirty pages) and
@@ -64,11 +72,18 @@ void PageMeter::getpageinfo (void) {
       				vm.v_swappgsin - prev_.v_swappgsin;
   fields_[1] = vm.v_vnodepgsout - prev_.v_vnodepgsout +
       				vm.v_swappgsout - prev_.v_swappgsout;
+  prev_ = vm;
 #else
+# if defined(UVM)
+  fields_[0] = uvm.pageins - prev_.pageins;
+  fields_[1] = uvm.pgswapout - prev_.pgswapout;
+  prev_ = uvm;
+# else
   fields_[0] = vm.v_pgpgin - prev_.v_pgpgin;
   fields_[1] = vm.v_pgpgout - prev_.v_pgpgout;
-#endif
   prev_ = vm;
+# endif
+#endif
 //  End NetBSD-specific code...
   if (total_ < fields_[0] + fields_[1])
     total_ = fields_[0] + fields_[1];
