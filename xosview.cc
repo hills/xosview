@@ -24,6 +24,26 @@ static const char * const versionString = "xosview version: " XOSVIEW_VERSION;
 
 static const char NAME[] = "xosview@";
 
+#define MIN(x,y)		\
+({				\
+    const typeof(x) _x = x;	\
+    const typeof(y) _y = y;	\
+				\
+    (void) (&_x == &_y); 	\
+				\
+    _x < _y ? _x : _y;		\
+})
+
+#define MAX(x,y)		\
+({				\
+    const typeof(x) _x = x;	\
+    const typeof(y) _y = y;	\
+				\
+    (void) (&_x == &_y); 	\
+				\
+    _x > _y ? _x : _y;		\
+})
+
 double MAX_SAMPLES_PER_SECOND = 10;
 
 CVSID("$Id$");
@@ -55,8 +75,15 @@ XOSView::XOSView( char * instName, int argc, char *argv[] ) : XWin(),
   BSDInit();	/*  Needs to be done before processing of -N option.  */
 #endif
 
+  hmargin_  = atoi(getResource("horizontalMargin"));
+  vmargin_  = atoi(getResource("verticalMargin"));
+  vspacing_ = atoi(getResource("verticalSpacing"));
+  hmargin_  = MAX(0, hmargin_);
+  vmargin_  = MAX(0, vmargin_);
+  vspacing_ = MAX(0, vspacing_);
+
   checkArgs (argc, argv);  //  Check for any other unhandled args.
-  xoff_ = 5;
+  xoff_ = hmargin_;
   yoff_ = 0;
   nummeters_ = 0;
   meters_ = NULL;
@@ -213,21 +240,39 @@ const char *XOSView::winname( void ){
   return getResourceOrUseDefault ("title", name);
 }
 
+
 void  XOSView::resize( void ){
-  int rightmargin = 5;
+  int spacing = vspacing_+1;
+  int topmargin = vmargin_;
+  int rightmargin = hmargin_;
   int newwidth = width_ - xoff_ - rightmargin;
-  int newheight = (height_ - (10 + 5 * (nummeters_ - 1) +
-			      nummeters_ * yoff_)) / nummeters_;
+/*
+  int newheight = (height_ - (10 + 5 * (nummeters_ - 1) + 
+                              nummeters_ * yoff_)) / nummeters_;
+*/
+  int newheight =
+        (height_ - 
+         (topmargin + topmargin + (nummeters_-1)*spacing + nummeters_*yoff_)
+        ) / nummeters_;
+  newheight = (newheight >= 2) ? newheight : 2;
+ 
 
   int counter = 1;
   MeterNode *tmp = meters_;
   while ( tmp != NULL ) {
+/*
     tmp->meter_->resize( xoff_, 5 * counter + counter * yoff_ +
-			 (counter - 1) * newheight, newwidth, newheight );
+                         (counter - 1) * newheight, newwidth, newheight );
+*/
+    tmp->meter_->resize( xoff_, 
+                         topmargin + counter*yoff_ + (counter-1)*(newheight+spacing),
+                        newwidth, newheight );
     tmp = tmp->next_;
+
     counter++;
   }
 }
+
 
 XOSView::~XOSView( void ){
   MeterNode *tmp = meters_;

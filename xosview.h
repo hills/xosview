@@ -57,6 +57,7 @@ protected:
   MeterNode *meters_;
   
   int caption_, legend_, xoff_, yoff_, nummeters_, usedlabels_;
+  int hmargin_, vmargin_, vspacing_;
   unsigned long sleeptime_, usleeptime_;
 
   int expose_flag_, exposed_once_flag_;

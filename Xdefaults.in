@@ -230,6 +230,10 @@ xosview*RAIDresynccompleteColor:  green
 xosview*RAIDPriority:         20
 xosview*RAIDUsedFormat:       percent
 
+xosview*horizontalMargin:      5
+xosview*verticalMargin:        5
+xosview*verticalSpacing:       5
+
 ! Lms Temp
 xosview*lmstemp:	False
 xosview*lmstempActColor:	blue

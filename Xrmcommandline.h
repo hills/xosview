@@ -20,6 +20,10 @@ static XrmOptionDescRec options[] = {
 { "-font", "*font", XrmoptionSepArg, (caddr_t) NULL },
 { "-title", "*title", XrmoptionSepArg, (caddr_t) NULL },
 { "-geometry", "*geometry", XrmoptionSepArg, (caddr_t) NULL },
+{ "-hmargin", "*horizontalMargin", XrmoptionSepArg, (caddr_t) NULL },
+{ "-vmargin", "*verticalMargin", XrmoptionSepArg, (caddr_t) NULL },
+{ "-vspacing", "*verticalSpacing", XrmoptionSepArg, (caddr_t) NULL },
+
 
 //  XOSView-specific resources:
 { "-labels", "*labels", XrmoptionNoArg, "False" },
