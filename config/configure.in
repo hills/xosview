@@ -71,9 +71,11 @@ dnl are exported by AC_OUTPUT.
 dnl
 AC_SUBST(EXTRALIBS)
 AC_SUBST(INSTALL_ARGS)
+AC_SUBST(USE_MOD_VERSIONS)
 
 AC_OUTPUT(\
   Makefile:config/Makefile.top.in \
   $host_os/Makefile:config/Makefile.$host_os.in \
-  Makefile.config:config/Makefile.config.in)
+  Makefile.config:config/Makefile.config.in \
+  $EXTRA_OUT_FILES)
 
