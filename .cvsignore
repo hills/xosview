@@ -1,0 +1,24 @@
+xosview
+
+##  Auto-generated stuff:
+configure
+config.log
+config.cache
+config.status
+Makefile
+Makefile.config
+Makefile.GNU.autodep
+defaultstring.cc
+
+##  Autodepend stuff:
+.main.o.d
+.xosview.o.d
+.bitmeter.o.d
+.fieldmeterdecay.o.d
+.fieldmeter.o.d
+.meter.o.d
+.defaultstring.o.d
+.Xrm.o.d
+.xwin.o.d
+.Host.o.d
+.llist.o.d
