@@ -1,6 +1,9 @@
   /*  $Id$  */
 Changes since xosview-1.4.*, in no particular order:
 
+Linux memory and swap meters now will work with linux 2.0 or 2.1
+  They will no longer work for pre 2.0 kernels.
+
 All meters can now be disabled individually.
 
 The overloaded 'network' resource has been deprecated, and replaced by
