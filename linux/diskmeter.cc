@@ -86,6 +86,8 @@ void DiskMeter::getdiskinfo( void )
     read_prev_ = read_curr;
     write_prev_ = write_curr;
 
-    setUsed((fields_[0]+fields_[1]) * IntervalTimeInMicrosecs()/1e6, total_);
+    //setUsed((fields_[0]+fields_[1]) * IntervalTimeInMicrosecs()/1e6, total_);
+    // give rate in units per second, not units per interval
+    setUsed((fields_[0]+fields_[1]), total_);
     IntervalTimerStart();
     }
