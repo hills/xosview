@@ -35,3 +35,11 @@ Revision: $Id$
     correct formula (it took me a few attempts to get it right!)
   Fix depend stuff
 * Get autolookup of X stuff -- perhaps use xmkmf/imake in configure?
+
+  Change the CacheColor stuff from Tom Pavel's patches to be a
+    new memWiredColor.
+
+  Change the names on all NetBSD* functions to just be BSD*,
+    since they are shared across multiple *BSD ports.
+
+  Merge in NetBSD interrupt support.
