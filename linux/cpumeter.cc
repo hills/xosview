@@ -11,6 +11,7 @@
 #include <fstream.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 #include <strstream.h>
 #include <ctype.h>
 
@@ -50,7 +51,7 @@ void CPUMeter::checkevent( void ){
 
 void CPUMeter::getcputime( void ){
   total_ = 0;
-  char tmp[MAX_PROCSTAT_LENGTH];
+  string tmp;
   ifstream stats( STATFILENAME );
 
   if ( !stats ){
@@ -60,7 +61,7 @@ void CPUMeter::getcputime( void ){
 
   // read until we are at the right line.
   for (int i = 0 ; i < _lineNum ; i++)
-    stats.getline(tmp, MAX_PROCSTAT_LENGTH);
+    getline(stats, tmp);
 
   stats >>tmp >>cputime_[cpuindex_][0]
 	      >>cputime_[cpuindex_][1]
@@ -88,12 +89,12 @@ int CPUMeter::findLine(const char *cpuID){
   }
 
   int line = -1;
-  char buf[MAX_PROCSTAT_LENGTH];
+  string buf;
   while (!stats.eof()){
-    stats.getline(buf, MAX_PROCSTAT_LENGTH);
+    getline(stats, buf);
     if (!stats.eof()){
       line++;
-      if (!strncmp(cpuID, buf, strlen(cpuID)) && buf[strlen(cpuID)] == ' ')
+      if (!strncmp(cpuID, buf.data(), strlen(cpuID)) && buf[strlen(cpuID)] == ' ')
         return line;
     }
   }
@@ -113,11 +114,11 @@ int CPUMeter::countCPUs(void){
   }
 
   int cpuCount = 0;
-  char buf[MAX_PROCSTAT_LENGTH];
+  string buf;
   while (!stats.eof()){
-    stats.getline(buf, MAX_PROCSTAT_LENGTH);
+    getline(stats, buf);
     if (!stats.eof()){
-      if (!strncmp(buf, "cpu", 3) && buf[3] != ' ')
+      if (!strncmp(buf.data(), "cpu", 3) && buf[3] != ' ')
           cpuCount++;
     }
   }
