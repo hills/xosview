@@ -11,10 +11,17 @@
 #include <stdlib.h>
 #include <stdio.h>	//  For snprintf().
 #include <ctype.h>
+#ifdef HAVE_IOSTREAM
+#include <iostream>
+#else
 #include <iostream.h>
+#endif
 #include <unistd.h>  //  for access(), etc.  BCG
 #include "snprintf.h"
 #include "general.h"
+#ifndef NULL
+#define NULL 0
+#endif
 #include "Xrm.h"
 #include "Xrmcommandline.h"
 
@@ -29,7 +36,7 @@ extern char *defaultXResourceString;
 bool Xrm::_initialized = false;
 
 Xrm::Xrm(const char *instanceName, int argc, char **argv){
-  cerr << " Error:  This constructor is not supported yet.\n";
+  std::cerr << " Error:  This constructor is not supported yet." << std::endl;
   exit (-1);
   _db = NULL;
   _class = _instance = NULLQUARK;
@@ -114,7 +121,7 @@ void Xrm::loadAndMergeResources(int& argc, char** argv, Display* display){
   }
   else
   {
-    cerr << "Error:  Xrm:loadAndMergeResources() called twice!\n";
+    std::cerr << "Error:  Xrm:loadAndMergeResources() called twice!" << std::endl;
     exit (-1);
   }
   //  This is ugly code.  According to X and Xt rules, many files need
@@ -227,14 +234,14 @@ void Xrm::initClassName(const char* name){
 
 
 //------------  Some debugging functions follow.  -----------------------
-inline ostream &operator<<(ostream &os, const XrmBinding &b){
+inline std::ostream &operator<<(std::ostream &os, const XrmBinding &b){
   switch (b){
   case XrmBindTightly:
     return os << ".";
   case XrmBindLoosely:
     return os << "*";
   default:
-    cerr <<"ostream operator<<(ostream &, const XrmBinding &) : "
+    std::cerr <<"std::ostream operator<<(std::ostream &, const XrmBinding &) : "
       <<"Unknown XrmBinding!";
     return os;
   }
@@ -242,7 +249,7 @@ inline ostream &operator<<(ostream &os, const XrmBinding &b){
   return os;
 }
 
-ostream &Xrm::dump(ostream &os) const {
+std::ostream &Xrm::dump(std::ostream &os) const {
   os <<"--- Xrm --- class: " <<XrmQuarkToString(_class)
      <<", instance: " <<XrmQuarkToString(_instance) <<"\n";
 
@@ -259,10 +266,10 @@ Bool Xrm::enumCB(XrmDatabase *, XrmBindingList bindings,
                  XrmQuarkList quarks, XrmRepresentation *type,
                  XrmValue *value, XPointer closure) {
   
-  ostream *os = (ostream *)closure;
+  std::ostream *os = (std::ostream *)closure;
   (void) type;  //  Avoid gcc warnings.
 
-  //cerr <<"type = " <<XrmQuarkToString(*type) <<endl;
+  //std::cerr <<"type = " <<XrmQuarkToString(*type) <<std::endl;
 
   int i = 0;
   while (quarks[i] != NULLQUARK){
