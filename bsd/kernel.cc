@@ -306,14 +306,23 @@ BSDNetInit() {
 void
 BSDGetNetInOut (long long * inbytes, long long * outbytes) {
 
-#if (__FreeBSD_version < 300000) //werner May/29/98 quick hack for current
 
   struct ifnet * ifnetp;
   struct ifnet ifnet;
   //char ifname[256];
 
+#if (__FreeBSD_version < 300000) //werner May/29/98 quick hack for current
+
   //  The "ifnet" symbol in the kernel points to a 'struct ifnet' pointer.
   safe_kvm_read (nlst[IFNET_SYM_INDEX].n_value, &ifnetp, sizeof(ifnetp));
+
+#else // FreeBSD > 3.0
+
+  struct ifnethead ifnethd;
+  safe_kvm_read (nlst[IFNET_SYM_INDEX].n_value, &ifnethd, sizeof(ifnethd));
+  ifnetp = ifnethd.tqh_first;
+
+#endif
 
   *inbytes = 0;
   *outbytes = 0;
@@ -334,7 +343,7 @@ BSDGetNetInOut (long long * inbytes, long long * outbytes) {
     //  Linked-list step taken from if.c in netstat source, line 120.
 #ifdef XOSVIEW_FREEBSD
 #if (__FreeBSD_version >= 300000) 
-    ifnetp = (struct ifnet*) ifnet.if_link.tqe_next; 
+    ifnetp = ifnet.if_link.tqe_next; 
 #else 
     ifnetp = (struct ifnet*) ifnet.if_next;
 #endif
@@ -342,11 +351,6 @@ BSDGetNetInOut (long long * inbytes, long long * outbytes) {
     ifnetp = (struct ifnet*) ifnet.if_list.tqe_next;
 #endif
   }
-
-#else
-  (void) inbytes;
-  (void) outbytes;
-#endif	//werner
 
 }
 
