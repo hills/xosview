@@ -68,7 +68,7 @@ install-man:
 	@echo "Use the 'install' target -- it installs the man page, too."
 	@#@INSTALL_DATA@ xosview.1 $(MANDIR)
 
-distrib: distclean
+distrib: checksource distclean
 	cd @top_srcdir@/..;tar cf `basename $(PWD)`.tar `basename $(PWD)`; \
         gzip -9 `basename $(PWD)`.tar
 
@@ -85,6 +85,19 @@ clean :
 	    cd config && $(MAKE) clean; fi'
 	rm -f xosview $(OBJS) $(DEPFILES) *~ defaultstring.cc
 
+checksource:
+	@#  Check that certain unsafe things aren't in any of the
+	@#  code.
+	@echo "***  Grep'ing for uses of strcmp, sprintf, strcat, strcmp,"
+	@echo "     strcasecmp instead of safer strncmp, snprintf, strncat,"
+	@echo "     strncmp, strncasecmp...."
+	@#  If egrep finds no matches, it returns as if it is an
+	@#  error.  Reverse that error code....
+	@sh -c 'egrep "strcmp|sprintf|strcat|strcmp|strcasecmp" \
+		*.cc *.h */*.cc */*.h; \
+		if [ $$? != 0 ]; then exit 0; else \
+		echo "***  Bad functions found -- error!"; exit 1; fi'
+
 distclean: clean
 	rm -f Makefile Makefile.config Makefile.GNU.autodep \
            @host_dir@/Makefile config.cache config.log config.status
@@ -92,7 +105,7 @@ distclean: clean
 	@#  object files.
 	sh -c 'objects=`find . -name "*.o" -print`; if [ x$objects != x ]; then \
 	  echo "The following object files still need to be removed:";\
-	  echo $objects; fi
+	  echo $objects; fi'
 
 
 maintainer-clean: distclean
