@@ -12,7 +12,11 @@
 //  Only supported for NetBSD so far.
 #include "btrymeter.h"
 #include "xosview.h"
+#ifdef HAVE_FSTREAM
+#include <fstream>
+#else
 #include <fstream.h>
+#endif
 #include <stdlib.h>
 
 #include <fcntl.h>
@@ -54,7 +58,7 @@ void BtryMeter::getpwrinfo( void ){
   int loadinfo = open(APMFILENAME, O_RDONLY, 0);
 
   if ( !loadinfo ){
-    cerr <<"Can not open file : " <<APMFILENAME <<endl;
+    std::cerr <<"Can not open file : " <<APMFILENAME << std::endl;
     parent_->done(1);
     return;
   }
