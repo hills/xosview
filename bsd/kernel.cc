@@ -34,6 +34,10 @@
 #include <net/if.h>             /*    NetMeter helper functions.  */
 #endif
 #include <sys/vmmeter.h>	/*  For struct vmmeter.  */
+#ifdef HAVE_SWAPCTL
+#include <unistd.h>
+#include <vm/vm_swap.h>
+#endif
 #include "kernel.h"		/*  To grab CVSID stuff.  */
 
 CVSID("$Id$");
