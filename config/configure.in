@@ -205,11 +205,10 @@ hpux*)    AC_XOSV_HPUX
 	  AC_GCC_EXTRA_CXXFLAGS
 	  host_dir=hpux
           host_os=hpux ;;
-irix*)    AC_XOSV_IRIX
-	dnl   Stefan:  Add a statement here that sets EXTRA_CXXFLAGS
-	dnl  appropriately for MipsPro compiler.
-        dnl   Stefan:  Add IRIX host_dir and host_os settings here.
-	;;
+irix6.5*)    AC_XOSV_IRIX65
+	EXTRA_CXXFLAGS=-O2
+	host_dir=irix65
+	host_os=irix65 ;;
 solaris2*)
 	AC_GCC_EXTRA_CXXFLAGS
 	EXTRALIBS="-R$x_libraries -lsocket -lnsl -lkstat $XPMLIB"

@@ -238,6 +238,9 @@ dnl No special config options for HPUX.
 dnl
 ])
 
-AC_DEFUN(AC_XOSV_IRIX, [
-	dnl	Nothing special for IRIX yet.
+AC_DEFUN(AC_XOSV_IRIX65, [
+	dnl	
+	EXTRALIBS="-lrpcsvc"
+    AC_DEFINE(_G_HAVE_BOOL)
+    AC_DEFINE(HAVE_SNPRINTF)
 ])
