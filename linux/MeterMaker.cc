@@ -42,7 +42,7 @@ void MeterMaker::makeMeters(void){
       push(new PageMeter(_xos, atof(_xos->getResource("pageBandwidth"))));
 
   // check for the net meter
-  if (strcmp(_xos->getResource("net"), "True"))
+  if (!strcmp(_xos->getResource("net"), "True"))
     push(new NetMeter(_xos, atof(_xos->getResource("netBandwidth"))));
 
   // check for the serial meters.
