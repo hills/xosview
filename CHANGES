@@ -1,4 +1,9 @@
   /*  $Id$  */
+Changes since xosview-1.6.0:
+  Interrupt meter now supports priority settings under *BSD.
+  Better UVM detection for *BSD.
+  Code cleanup/removal of unneeded #include's for *BSD.
+
 Changes since xosview-1.5.1, in no particular order:
 
   Much better support for FreeBSD, thanks to Tom Pavel!
