@@ -8,11 +8,11 @@
 //
 #include "cpumeter.h"
 #include "xosview.h"
-#include <fstream.h>
+#include <fstream>
 #include <stdlib.h>
 #include <string.h>
 #include <string>
-#include <strstream.h>
+#include <sstream>
 #include <ctype.h>
 
 static const char STATFILENAME[] = "/proc/stat";
@@ -51,11 +51,11 @@ void CPUMeter::checkevent( void ){
 
 void CPUMeter::getcputime( void ){
   total_ = 0;
-  string tmp;
-  ifstream stats( STATFILENAME );
+  std::string tmp;
+  std::ifstream stats( STATFILENAME );
 
   if ( !stats ){
-    cerr <<"Can not open file : " <<STATFILENAME <<endl;
+    std::cerr <<"Can not open file : " <<STATFILENAME << std::endl;
     exit( 1 );
   }
 
@@ -81,20 +81,21 @@ void CPUMeter::getcputime( void ){
 }
 
 int CPUMeter::findLine(const char *cpuID){
-  ifstream stats( STATFILENAME );
+  std::ifstream stats( STATFILENAME );
 
   if ( !stats ){
-    cerr <<"Can not open file : " <<STATFILENAME <<endl;
+    std::cerr <<"Can not open file : " <<STATFILENAME << std::endl;
     exit( 1 );
   }
 
   int line = -1;
-  string buf;
+  std::string buf;
   while (!stats.eof()){
     getline(stats, buf);
     if (!stats.eof()){
       line++;
-      if (!strncmp(cpuID, buf.data(), strlen(cpuID)) && buf[strlen(cpuID)] == ' ')
+      if (!strncmp(cpuID, buf.data(), strlen(cpuID))
+        && buf[strlen(cpuID)] == ' ')
         return line;
     }
   }
@@ -106,15 +107,15 @@ int CPUMeter::findLine(const char *cpuID){
 // If it finds that this patch has been applied to the current kernel
 // then returns the number of cpus that are on this machine.
 int CPUMeter::countCPUs(void){
-  ifstream stats( STATFILENAME );
+  std::ifstream stats( STATFILENAME );
 
   if ( !stats ){
-    cerr <<"Can not open file : " <<STATFILENAME <<endl;
+    std::cerr <<"Can not open file : " <<STATFILENAME << std::endl;
     exit( 1 );
   }
 
   int cpuCount = 0;
-  string buf;
+  std::string buf;
   while (!stats.eof()){
     getline(stats, buf);
     if (!stats.eof()){
@@ -128,12 +129,15 @@ int CPUMeter::countCPUs(void){
 
 const char *CPUMeter::cpuStr(int num){
   static char buffer[32];
-  ostrstream str(buffer, 32);
+  std::ostringstream str;
 
   str << "cpu";
   if (num != 0)
     str << (num - 1);
-  str << ends;
+  str << std::ends;
+
+  strncpy(buffer, str.str().c_str(), 32);
+  buffer[31] = '\0';
 
   return buffer;
 }

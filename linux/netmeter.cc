@@ -30,7 +30,7 @@
 #include "xosview.h"
 
 #include <unistd.h>
-#include <fstream.h>
+#include <fstream>
 #include <stdlib.h>
 #include <sys/socket.h>
 #include <sys/ioctl.h>
@@ -41,8 +41,8 @@
 #endif
 #include <netinet/in.h>
 #include <errno.h>
-#include <iostream.h>
-#include <iomanip.h>
+#include <iostream>
+#include <iomanip>
 
 NetMeter::NetMeter( XOSView *parent, float max )
   : FieldMeterGraph( parent, 3, "NET", "IN/OUT/IDLE" ){
@@ -60,10 +60,11 @@ NetMeter::~NetMeter( void ){
 
 void NetMeter::checkOSVersion(void)
     {
-    ifstream ifs("/proc/sys/kernel/osrelease");
+    std::ifstream ifs("/proc/sys/kernel/osrelease");
     if (!ifs)
         {
-        cerr <<"Can not open file : " << "/proc/sys/kernel/osrelease" <<endl;
+        std::cerr <<"Can not open file : " << "/proc/sys/kernel/osrelease"
+          << std::endl;
         exit(1);
         }
 
@@ -77,7 +78,7 @@ void NetMeter::checkOSVersion(void)
     if (major > 2 || (major == 2 && minor >= 1))
         {
 	// check presence of iacct and oacct chains
-        ifstream chains("/proc/net/ip_fwchains");
+        std::ifstream chains("/proc/net/ip_fwchains");
 	int n = 0;
 	char buf[1024];
 
@@ -119,7 +120,7 @@ void NetMeter::checkResources( void ){
 
   _ipsock = socket(AF_INET, SOCK_DGRAM, 0);
   if (_ipsock == -1) {
-    cerr <<"Can not open socket : " <<strerror( errno ) <<endl;
+    std::cerr <<"Can not open socket : " <<strerror( errno ) << std::endl;
     parent_->done(1);
     return;
   }
@@ -135,11 +136,11 @@ void NetMeter::checkevent(void)
 
 void NetMeter::checkeventNew(void)
     {
-    ifstream ifs(_netfilename);
+    std::ifstream ifs(_netfilename);
 
     if (!ifs)
         {
-        cerr <<"Can not open file : " <<_netfilename <<endl;
+        std::cerr <<"Can not open file : " <<_netfilename << std::endl;
         parent_->done(1);
         return;
         }
@@ -210,10 +211,10 @@ void NetMeter::checkeventOld(void)
     fields_[2] = maxpackets_;     // assume no
     fields_[0] = fields_[1] = 0;  // network activity
 
-    ifstream ifs(_netfilename);
+    std::ifstream ifs(_netfilename);
     if (!ifs)
         {
-        cerr <<"Can not open file : " << _netfilename <<endl;
+        std::cerr <<"Can not open file : " << _netfilename << std::endl;
         parent_->done(1);
         return;
         }
@@ -224,7 +225,8 @@ void NetMeter::checkeventOld(void)
     ifc.ifc_buf = buff;
     if (ioctl(_ipsock, SIOCGIFCONF, &ifc) < 0)
         {
-        cerr <<"Can not get interface list : " <<strerror( errno ) <<endl;
+        std::cerr <<"Can not get interface list : " <<strerror( errno )
+          << std::endl;
         parent_->done(1);
         return;
         }
@@ -237,10 +239,10 @@ void NetMeter::checkeventOld(void)
 
     while (ifs)
         {
-        ifs >> hex >> sa >> c >> sm >> c >> c >> da >> c >> dm;
+        ifs >> std::hex >> sa >> c >> sm >> c >> c >> da >> c >> dm;
         for (int index = 0 ; index < 7 ; index++)
             ifs.ignore(9999, ' ');
-        ifs >> dec >> bytes;
+        ifs >> std::dec >> bytes;
 
         ifs.ignore(9999, '\n');
 

@@ -14,7 +14,7 @@
 //
 #include "lmstemp.h"
 #include "xosview.h"
-#include <fstream.h>
+#include <fstream>
 #include <stdlib.h>
 #include <dirent.h>
 #include <sys/stat.h>
@@ -25,9 +25,10 @@ LmsTemp::LmsTemp( XOSView *parent, const char *filename, const char *label,
 		 const char *caption)
   : FieldMeter( parent, 3, label, caption, 1, 1, 0 ){
     if(!checksensors(filename)) {
-	cerr <<"Can not find file : " <<PROC_SENSORS <<"/*/" << filename <<endl;
+	std::cerr <<"Can not find file : " <<PROC_SENSORS <<"/*/" << filename
+          << std::endl;
     	parent_->done(1);
-  }
+    }
     char *p;
     if ((p = strrchr(caption,'/')) != 0)
       _highest = atoi(p+1);
@@ -65,7 +66,8 @@ int  LmsTemp::checksensors(const char* filename)
 	    {
 	      d2=opendir(dirname);
 	      if(!d2)
-		cerr << "The directory " <<dirname <<"exists but cannot be read.\n";
+		std::cerr << "The directory " <<dirname
+                  <<"exists but cannot be read.\n";
 	      else
 		{
 		  while((ent2=readdir(d2)))
@@ -135,10 +137,10 @@ void LmsTemp::checkevent( void ){
 //
 
 void LmsTemp::getlmstemp( void ){
-  ifstream file( _filename );
+  std::ifstream file( _filename );
 
   if ( !file ){
-    cerr <<"Can not open file : " <<file <<endl;
+    std::cerr <<"Can not open file : " <<file << std::endl;
     parent_->done(1);
     return;
   }

@@ -1,4 +1,4 @@
-//  
+//
 //  Copyright (c) 1994, 1995 by Mike Romberg ( romberg@fsl.noaa.gov )
 //
 //  This file may be distributed under terms of the GPL
@@ -10,7 +10,7 @@
 //
 #include "loadmeter.h"
 #include "xosview.h"
-#include <fstream.h>
+#include <fstream>
 #include <stdlib.h>
 
 static const char LOADFILENAME[] = "/proc/loadavg";
@@ -49,7 +49,7 @@ void LoadMeter::checkResources( void ){
     //  prevent this whole problem, the load meter can not be a decay
     //  meter.  The load is a decaying average kind of thing anyway,
     //  so having a decaying load average is redundant.
-    cerr << "Warning:  The loadmeter can not be configured as a decay\n"
+    std::cerr << "Warning:  The loadmeter can not be configured as a decay\n"
          << "  meter.  See the source code (" << __FILE__ << ") for further\n"
          << "  details.\n";
     dodecay_ = 0;
@@ -63,10 +63,10 @@ void LoadMeter::checkevent( void ){
 
 
 void LoadMeter::getloadinfo( void ){
-  ifstream loadinfo( LOADFILENAME );
+  std::ifstream loadinfo( LOADFILENAME );
 
   if ( !loadinfo ){
-    cerr <<"Can not open file : " <<LOADFILENAME <<endl;
+    std::cerr <<"Can not open file : " <<LOADFILENAME << std::endl;
     parent_->done(1);
     return;
   }
@@ -78,7 +78,7 @@ void LoadMeter::getloadinfo( void ){
   if ( fields_[0] >= critThreshold ) alarmstate = 2;
   else
   /* if fields_[0] >= warnThreshold */ alarmstate = 1;
-  
+
   if ( alarmstate != lastalarmstate ){
     if ( alarmstate == 0 ) setfieldcolor( 0, procloadcol_ );
     else
@@ -88,16 +88,16 @@ void LoadMeter::getloadinfo( void ){
     if (dolegends_) drawlegend();
     lastalarmstate = alarmstate;
   }
-  
+
   if ( fields_[0]*5.0<total_ )
     total_ = fields_[0];
   else
   if ( fields_[0]>total_ )
     total_ = fields_[0]*5.0;
-      
+
   if ( total_ < 1.0)
     total_ = 1.0;
-    
+
   fields_[1] = (float) (total_ - fields_[0]);
 
   setUsed(fields_[0], (float) 1.0);

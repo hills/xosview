@@ -1,4 +1,4 @@
-//  
+//
 //  Copyright (c) 1999 by Thomas Waldmann ( ThomasWaldmann@gmx.de )
 //  based on work of Mike Romberg ( romberg@fsl.noaa.gov )
 //
@@ -7,8 +7,8 @@
 
 #include "raidmeter.h"
 #include "xosview.h"
-#include <fstream.h>
-#include <strstream.h>
+#include <fstream>
+#include <sstream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -19,10 +19,9 @@ RAIDMeter::RAIDMeter( XOSView *parent, int raiddev)
   getRAIDstate();
   if(disknum<1)
     disableMeter();
-  ostrstream os;
-  os << "MD" << raiddev << ends;
-  legend(os.str());
-  delete[] os.str();
+  std::ostringstream os;
+  os << "MD" << raiddev << std::ends;
+  legend(os.str().c_str());
   if(disknum>=1){
     setfieldlegend("Done/ToDo");
     setNumBits(disknum);
@@ -34,7 +33,7 @@ RAIDMeter::~RAIDMeter( void ){
 }
 
 void RAIDMeter::checkevent( void ){
-    
+
   getRAIDstate();
 
   for ( int i = 0 ; i < disknum ; i++ ){
@@ -71,8 +70,10 @@ void RAIDMeter::checkResources( void ){
 int RAIDMeter::find1(char *key, char *findwhat, int num1){
   char buf[80];
   int rc;
-  ostrstream os(buf, 80);
-  os << findwhat << "." << num1 << ends;
+  std::ostringstream os;
+  os << findwhat << "." << num1 << std::ends;
+  strncpy(buf, os.str().c_str(), 80);
+  buf[79] = '\0';
   rc=!strncmp(buf,key, 80);
   return rc;
 }
@@ -80,8 +81,10 @@ int RAIDMeter::find1(char *key, char *findwhat, int num1){
 int RAIDMeter::find2(char *key, char *findwhat, int num1, int num2){
   char buf[80];
   int rc;
-  ostrstream os(buf, 80);
-  os << findwhat << "." << num1 << "." << num2 << ends;
+  std::ostringstream os;
+  os << findwhat << "." << num1 << "." << num2 << std::ends;
+  strncpy(buf, os.str().c_str(), 80);
+  buf[79] = '\0';
   rc=!strncmp(buf,key, 80);
   return rc;
 }
@@ -93,7 +96,7 @@ int RAIDMeter::raidparse(char *cp){
   key=strtok(cp," \n");
   val=strtok(NULL," \n");
   if(key==NULL) return 1;
-  
+
   if(find1(key,"md_state",_raiddev)){
     if(val) strcpy(state,val);
   }else
@@ -108,16 +111,16 @@ int RAIDMeter::raidparse(char *cp){
   }else
   if(find1(key,"md_resync_status",_raiddev)){
     if(val) strcpy(resync_state,val);
-  }  
-  return 0;             
+  }
+  return 0;
 }
 
 void RAIDMeter::getRAIDstate( void ){
-  ifstream raidfile( RAIDFILE );
+  std::ifstream raidfile( RAIDFILE );
   char l[256];
 
   if ( !raidfile ){
-    cerr <<"Can not open file : " <<RAIDFILE <<endl;
+    std::cerr <<"Can not open file : " <<RAIDFILE << std::endl;
     exit( 1 );
   }
 

@@ -1,4 +1,4 @@
-//  
+//
 //  Copyright (c) 1996 by Massimiliano Ghilardi ( ghilardi@cibs.sns.it )
 //
 //  This file may be distributed under terms of the GPL
@@ -8,7 +8,7 @@
 //
 #include "pagemeter.h"
 #include "xosview.h"
-#include <fstream.h>
+#include <fstream>
 #include <stdlib.h>
 
 
@@ -50,21 +50,21 @@ void PageMeter::checkevent( void ){
 void PageMeter::getpageinfo( void ){
   total_ = 0;
   char buf[MAX_PROCSTAT_LENGTH];
-  ifstream stats( STATFILENAME );
+  std::ifstream stats( STATFILENAME );
 
   if ( !stats ){
-    cerr <<"Cannot open file : " <<STATFILENAME <<endl;
+    std::cerr <<"Cannot open file : " <<STATFILENAME << std::endl;
     exit( 1 );
   }
 
   do {
     stats >>buf;
   } while (strncasecmp(buf, "swap", 5));
-	  
+
   stats >>pageinfo_[pageindex_][0] >>pageinfo_[pageindex_][1];
 
   int oldindex = (pageindex_+1)%2;
-  
+
   for ( int i = 0; i < 2; i++ ) {
     if ( pageinfo_[oldindex][i] == 0 )
       pageinfo_[oldindex][i] = pageinfo_[pageindex_][i];

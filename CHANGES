@@ -2,6 +2,9 @@
 
 Changes since xosview-1.8.0
 
+- Update linux port to build with gcc 3.2 and 3.3 (should still work
+  with 2.95.
+
 - Add -Wno-deprecated for gcc builds.  This avoids warnings about
   the new C++ header files.  This should be fixed for the next release.
 

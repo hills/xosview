@@ -1,4 +1,4 @@
-//  
+//
 //  Copyright (c) 1999 by Mike Romberg (romberg@fsl.noaa.gov)
 //
 //  This file may be distributed under terms of the GPL
@@ -8,7 +8,7 @@
 
 #include "diskmeter.h"
 #include "xosview.h"
-#include <fstream.h>
+#include <fstream>
 #include <stdlib.h>
 
 static const char STATFILENAME[] = "/proc/stat";
@@ -51,11 +51,11 @@ void DiskMeter::getdiskinfo( void )
     IntervalTimerStop();
     total_ = maxspeed_;
     char buf[MAX_PROCSTAT_LENGTH];
-    ifstream stats( STATFILENAME );
+    std::ifstream stats( STATFILENAME );
 
     if ( !stats )
         {
-        cerr <<"Can not open file : " <<STATFILENAME <<endl;
+        std::cerr <<"Can not open file : " <<STATFILENAME << std::endl;
         exit( 1 );
         }
 
@@ -71,17 +71,17 @@ void DiskMeter::getdiskinfo( void )
     unsigned long one, two;
     stats >> one >> two;
 
-    // assume each "unit" is 1k. 
-    // This is true for ext2, but seems to be 512 bytes 
+    // assume each "unit" is 1k.
+    // This is true for ext2, but seems to be 512 bytes
     // for vfat and 2k for cdroms
     // work in 512-byte blocks
-    
+
     // tw: strange, on my system, a ext2fs (read and write)
     // unit seems to be 2048. kernel 2.2.12 and the file system
     // is on a SW-RAID5 device (/dev/md0).
-    
+
     // So this is a FIXME - but how ???
-    
+
     float itim = IntervalTimeInMicrosecs();
     unsigned long read_curr = one * 2;  // FIXME!
     unsigned long write_curr = two * 2; // FIXME!
@@ -89,7 +89,7 @@ void DiskMeter::getdiskinfo( void )
     // avoid strange values at first call
     if(read_prev_ == 0) read_prev_ = read_curr;
     if(write_prev_ == 0) write_prev_ = write_curr;
-    
+
     // calculate rate in bytes per second
     fields_[0] = ((read_curr - read_prev_) * 1e6 * 512) / itim;
     fields_[1] = ((write_curr - write_prev_) * 1e6 * 512) / itim;
@@ -99,15 +99,15 @@ void DiskMeter::getdiskinfo( void )
         fields_[0] = 0.0;
     if (fields_[1] < 0.0)
         fields_[1] = 0.0;
-    
+
     if (fields_[0] + fields_[1] > total_)
        	total_ = fields_[0] + fields_[1];
 
     fields_[2] = total_ - (fields_[0] + fields_[1]);
-    
+
     read_prev_ = read_curr;
     write_prev_ = write_curr;
-    
+
     setUsed((fields_[0]+fields_[1]), total_);
     IntervalTimerStart();
     }

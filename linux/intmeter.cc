@@ -1,4 +1,4 @@
-//  
+//
 //  Copyright (c) 1994, 1995 by Mike Romberg ( romberg@fsl.noaa.gov )
 //
 //  This file may be distributed under terms of the GPL
@@ -9,19 +9,19 @@
 #include "intmeter.h"
 #include "xosview.h"
 #include "cpumeter.h"
-#include <fstream.h>
-#include <strstream.h>
+#include <fstream>
+#include <sstream>
 #include <stdlib.h>
 #ifdef __alpha__
 #include <asm/irq.h>
-#endif 
+#endif
 
 
 static const char *INTFILE     = "/proc/interrupts";
 static const char *VERSIONFILE = "/proc/version";
 
 IntMeter::IntMeter( XOSView *parent, int cpu)
-  : BitMeter( parent, "INTS", "", 1, 
+  : BitMeter( parent, "INTS", "", 1,
               0, 0 ), _cpu(cpu), _old(true) {
  if (getLinuxVersion() <= 2.0)
  	_old = true;
@@ -57,16 +57,16 @@ void IntMeter::checkResources( void ){
 }
 
 float IntMeter::getLinuxVersion(void) {
-    ifstream vfile(VERSIONFILE);
+    std::ifstream vfile(VERSIONFILE);
     if (!vfile) {
-      cerr << "Can not open file : " << VERSIONFILE << endl;
+      std::cerr << "Can not open file : " << VERSIONFILE << std::endl;
       exit(1);
     }
 
     char buffer[128];
     vfile >> buffer >> buffer >> buffer;
     *strrchr(buffer, '.') = '\0';
-    istrstream is(buffer, 128);
+    std::istringstream is(std::string(buffer, 128));
     float rval = 0.0;
     is >> rval;
 
@@ -78,16 +78,16 @@ int IntMeter::countCPUs(void) {
 }
 
 void IntMeter::getirqs( void ){
-  ifstream intfile( INTFILE );
+  std::ifstream intfile( INTFILE );
   int intno, count;
 
   if ( !intfile ){
-    cerr <<"Can not open file : " <<INTFILE <<endl;
+    std::cerr <<"Can not open file : " <<INTFILE << std::endl;
     exit( 1 );
   }
 
   if (!_old)
-      intfile.istream::ignore(1024, '\n');
+      intfile.ignore(1024, '\n');
 
   while ( !intfile.eof() ){
     intfile >>intno;
@@ -98,8 +98,8 @@ void IntMeter::getirqs( void ){
     if ( !intfile.eof() ){
       for (int i = 0 ; i <= _cpu ; i++)
           intfile >>count;
-      intfile.istream::ignore(1024, '\n');
-      
+      intfile.ignore(1024, '\n');
+
       irqs_[intno] = count;
     }
   }
@@ -113,10 +113,9 @@ void IntMeter::getirqs( void ){
 void IntMeter::updateirqcount( int n, bool init ){
    int old_bits=numBits();
    setNumBits(n+1);
-   ostrstream os;
-   os << "INTs (0-" << (n) << ")" << ends;
-   legend(os.str());
-   delete[] os.str();
+   std::ostringstream os;
+   os << "INTs (0-" << (n) << ")" << std::ends;
+   legend(os.str().c_str());
    unsigned long *old_irqs_=irqs_, *old_lastirqs_=lastirqs_;
    irqs_=new unsigned long[n+1];
    lastirqs_=new unsigned long[n+1];
@@ -146,16 +145,16 @@ void IntMeter::updateirqcount( int n, bool init ){
  * update the number of interrupts listed
  */
 void IntMeter::initirqcount( void ){
-  ifstream intfile( INTFILE );
+  std::ifstream intfile( INTFILE );
   int intno;
 
   if ( !intfile ){
-    cerr <<"Can not open file : " <<INTFILE <<endl;
+    std::cerr <<"Can not open file : " <<INTFILE << std::endl;
     exit( 1 );
   }
 
   if (!_old)
-      intfile.istream::ignore(1024, '\n');
+      intfile.ignore(1024, '\n');
 
   /* just looking for the highest number interrupt that
    * is in use, ignore the rest of the data
@@ -163,7 +162,7 @@ void IntMeter::initirqcount( void ){
   while ( !intfile.eof() ){
     intfile >>intno;
     if (!intfile) break;
-    intfile.istream::ignore(1024, '\n');
+    intfile.ignore(1024, '\n');
   }
   updateirqcount(intno, true);
 }
