@@ -81,7 +81,7 @@ void FieldMeter::setUsed (float val, float total)
     else
     {
       fprintf(stderr, "Warning:  %s meter had a zero total field!  Would have "
-	      "caused a div-by-zero exception.\n", total);
+	      "caused a div-by-zero exception.\n", name());
       used_ = 0.0;
     }
   }
