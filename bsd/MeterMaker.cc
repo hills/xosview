@@ -46,14 +46,15 @@ void MeterMaker::makeMeters(void){
     push(new CPUMeter(_xos));
   if (_xos->isResourceTrue("mem"))
     push(new MemMeter(_xos));
+  /*  Some FreeBSD meters are bogus or nonfunctional.  */
 #ifndef XOSVIEW_FREEBSD		/*  FreeBSD swap meter isn't done yet.  */
   if (_xos->isResourceTrue("swap"))
     push(new SwapMeter(_xos));
-#endif
 
   // check for the net meter
   if (_xos->isResourceTrue("net"))
     push(new NetMeter(_xos, atof(_xos->getResource("netBandwidth"))));
+#endif
 
 #ifndef XOSVIEW_FREEBSD		/*  FreeBSD diskmeter also isn't done.  */
   if (_xos->isResourceTrue("disk"))
