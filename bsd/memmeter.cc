@@ -84,6 +84,9 @@ void MemMeter::getmeminfo (void) {
   fields_[0] = 4096*meminfo.t_arm;
 #endif
 
+  /*  Initialize total_ to 0.0.  FreeBSD will then add some to
+   *  this, and later we'll add all the common fields to this.  */
+  total_ = 0.0;
 #if defined(UVM) & defined(XOSVIEW_NETBSD)
   struct uvmexp kvm_uvm_exp;
   BSDGetUVMPageStats(&kvm_uvm_exp);
@@ -104,9 +107,6 @@ void MemMeter::getmeminfo (void) {
   fields_[0] = kvm_cnt.v_active_count * pgsize;
   fields_[1] = kvm_cnt.v_inactive_count * pgsize;
   fields_[2] = kvm_cnt.v_wire_count * pgsize;
-  /*  Initialize total_ to 0.0.  FreeBSD will then add some to
-   *  this, and later we'll add all the common fields to this.  */
-  total_ = 0.0;
 # ifdef XOSVIEW_FREEBSD
   /* I believe v_cache_count is the right answer here, rather than the
      bufspace variable.  I think that bufspace is a subset of "cache" space
