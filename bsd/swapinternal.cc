@@ -1,3 +1,8 @@
+// For OpenBSD with HAVE_SWAPCTL, we don't need any of this file.
+// For others, include it to provide the old method of getting swap
+// info.
+#if !(defined(XOSVIEW_OPENBSD) && defined(HAVE_SWAPCTL))
+
 //  Copyright (c) 1995 by Brian Grayson (bgrayson@netbsd.org)
 //
 //  This code is borrowed HEAVILY from the vmstat source code in the
@@ -499,3 +504,5 @@ BSDGetSwapInfo(int* total, int* free)
         *free = 512*(avail-used);
 #endif /* USE_KVM_GETSWAPINFO */
 }
+
+#endif

@@ -8,11 +8,14 @@
 
 //  Header file for the swap internal/NetBSD-specific code.
 
+#if !(defined(XOSVIEW_OPENBSD) && defined(HAVE_SWAPCTL))
+// For OpenBSD with swapctl, don't provide the old method at all.
 int
 BSDInitSwapInfo();
 
 void
 BSDGetSwapInfo(int* total, int* free);
+#endif
 
 void
 BSDGetSwapCtlInfo(int* total, int* free);

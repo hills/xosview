@@ -199,10 +199,48 @@ freebsd[[4]]*) AC_XOSV_FREEBSD
 	dnl ])
 	host_dir=bsd
 	host_os=freebsd ;;
-openbsd*) AC_XOSV_OPENBSD
+openbsd2.[[0-5]]*) AC_XOSV_OPENBSD
 	AC_GCC_EXTRA_CXXFLAGS
-	dnl AC_MSG_WARN([
-	dnl ])
+	host_dir=bsd
+	host_os=openbsd ;;
+openbsd2.[[6-9]]*) AC_XOSV_OPENBSD
+	cat >> confdefs.h <<\EOF
+#define HAVE_SWAPCTL 1
+EOF
+	## Also check for the existence of UVM.  This is a nasty,
+	## complicated check.  This could be avoided by having the *BSD
+	## platform-specific Makefiles include <bsd.own.mk> on their own.
+
+	cat > confmkfile <<\EOF
+
+.include <bsd.own.mk>
+all:
+.if defined(UVM) && ${UVM:U} == YES
+	@echo UVMyes
+.endif
+EOF
+
+	uvmstring=`make -f confmkfile`
+	rm -f confmkfile
+	if test ! x$uvmstring = x ; then
+		cat >> confdefs.h <<\EOF
+#define UVM 1
+EOF
+	fi
+
+	AC_GCC_EXTRA_CXXFLAGS
+	host_dir=bsd
+	host_os=openbsd ;;
+openbsd*) AC_XOSV_OPENBSD
+	BTRYMETER=btrymeter.o
+	cat >> confdefs.h <<\EOF
+#define HAVE_SWAPCTL 1
+#define UVM 1
+#define HAVE_BATTERY_METER 1
+#define APM_BATT_ABSENT APM_BATTERY_ABSENT
+EOF
+
+	AC_GCC_EXTRA_CXXFLAGS
 	host_dir=bsd
 	host_os=openbsd ;;
 bsdi*) AC_XOSV_BSDI

@@ -90,7 +90,7 @@ void MemMeter::getmeminfo (void) {
   /*  Initialize total_ to 0.0.  FreeBSD will then add some to
    *  this, and later we'll add all the common fields to this.  */
   total_ = 0.0;
-#if defined(UVM) & defined(XOSVIEW_NETBSD)
+#if defined(UVM) && (defined(XOSVIEW_NETBSD) || defined(XOSVIEW_OPENBSD))
   struct uvmexp kvm_uvm_exp;
   BSDGetUVMPageStats(&kvm_uvm_exp);
   int pgsize = kvm_uvm_exp.pagesize;

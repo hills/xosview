@@ -126,7 +126,7 @@ an abbreviation for all three of the free BSD operating systems
 
 \fBCPU Usage\fP
    Linux  : user | nice | system | idle
-   *BSD   : user | nice | system | idle
+   *BSD   : user | nice | system | interrupt | idle
    IRIX   : user | system | interrupt | wait | idle
    HPUX   : user | nice | system | interrupt | idle
 
@@ -185,7 +185,7 @@ an abbreviation for all three of the free BSD operating systems
     Linux  : %left | %used
     NetBSD : %left | %used
     FreeBSD: < Not Supported >
-    OpenBSD: < Not Supported >
+    OpenBSD: %left | %used
     HPUX   : < Not Supported >
 
 \fBRAID status\fP
@@ -959,7 +959,7 @@ David W. Talmage (talmage@jefferson.cmf.nrl.navy.mil)
 Added battery-meter support to NetBSD.
 .RE
 
-Oleg Safiullin (form@vs.itam.nsc.ru)
+Oleg Safiullin (form@openbsd.org)
 .RS
 OpenBSD interrupt-meter support.
 .RE
