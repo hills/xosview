@@ -11,6 +11,8 @@
 
 #define METER_H_CVSID "$Id$"
 
+#include "xosview.h"	//  To grab MAX_SAMPLES_PER_SECOND.
+
 class XOSView;
 
 class Meter {
@@ -43,6 +45,8 @@ protected:
   int priority_, counter_;
   char *title_, *legend_;
   unsigned long textcolor_;
+  double samplesPerSecond() { return 1.0*MAX_SAMPLES_PER_SECOND/priority_; }
+  double secondsPerSample() { return 1.0/samplesPerSecond(); }
 
 private:
 };
