@@ -1,6 +1,9 @@
   /*  $Id$  */
 
 Changes since xosview-1.8.1
+ - Applied sourceforge patch 959433 which adds acpi support to
+   the linux battery meter.
+
  - Applied a patch similar to the sourceforge patch 586184 submitted
    by Mark Guertin.
 
