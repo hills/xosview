@@ -30,6 +30,9 @@ xosvstipple*intOnColor:		red
 xosvstipple*intOffColor:	aquamarine
 xosvstipple*diskUsedColor:	blue
 xosvstipple*diskIdleColor:	blue
+xosvstipple*pageInColor:	purple
+xosvstipple*pageOutColor:	purple
+xosvstipple*pageIdleColor:	purple
 
 xosvstipplebw*meterLabelColor:  black
 xosvstipplebw*usedLabelColor:   black
@@ -63,4 +66,7 @@ xosvstipplebw*intOnColor:       black
 xosvstipplebw*intOffColor:      white
 xosvstipplebw*diskUsedColor:	black
 xosvstipplebw*diskIdleColor:	black
+xosvstipplebw*pageInColor:	black
+xosvstipplebw*pageOutColor:	black
+xosvstipplebw*pageIdleColor:	black
 
