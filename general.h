@@ -1,6 +1,16 @@
 #ifndef General_h
 #define General_h
 
+//  Copyright (c) 1996, 1997 by Brian Grayson (bgrayson@ece.utexas.edu)
+//
+//  This file was written by Brian Grayson for the NetBSD and xosview
+//    projects.
+//  This file may be distributed under terms of the GPL or of the BSD
+//    copyright, whichever you choose.  The full copyright notices are
+//    contained in the files COPYING.GPL and COPYING.BSD, which you
+//    should have received.  If not, contact one of the xosview
+//    authors for a copy.
+//
 #define GENERAL_H_CVSID "$Id$"
 
   /*  This file should be included by every .cc file, after any system
@@ -55,6 +65,9 @@ enum bool { FALSE = 0, false = 0, TRUE = 1, true = 1 };
 	((unused)) modifier.  Notice that 2.4.5 can parse this, but will
 	not handle ((unused)).  So, for gcc 2.4.5 (and below), set
 	NO_ADD_ID_STR, or live with the warning messages.  */
+    /*  Notice that we need to use a unique-within-the-cpp'd-file
+     *  identifier for the char*'s, hence the definition of
+     *  CVSID_DOT_H2 etc., which are occasionally needed.  */
   #define CVSID(s) \
       static char* cvsid __attribute__ ((unused)) = (s)
   #define CVSID_DOT_H(s) \

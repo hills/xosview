@@ -1,4 +1,4 @@
-//  Copyright (c) 1995 by Brian Grayson (bgrayson@pine.ece.utexas.edu)
+//  Copyright (c) 1995 by Brian Grayson (bgrayson@ece.utexas.edu)
 //
 //  This code is borrowed HEAVILY from the vmstat source code in the
 //  NetBSD distribution.  As such, the NetBSD copyright claim/disclaimer
