@@ -15,7 +15,7 @@ MemMeter::MemMeter( XOSView *parent )
 : FieldMeterDecay( parent, 4, "MEM", "TEXT/USED/OTHER/FREE" ){
   struct pst_static pststatic;
 
-  pstat_getstatic( &pststatic, sizeof( struct pst_static ), 1, 1, 0 );
+  pstat_getstatic( &pststatic, sizeof( struct pst_static ), 1, 1);
   total_ = pststatic.physical_memory;
   _pageSize = pststatic.page_size;
 
