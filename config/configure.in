@@ -38,7 +38,29 @@ dnl options / configuration.
 dnl
 case $host_os in
 linux)   AC_XOSV_LINUX  ;;
-nethsd)  AC_XOSV_NETBSD ;;
+##  Check for known versions of NetBSD...
+dnl  Notice that we need to use [] to 'quote' the brackets --
+dnl    according to GNU m4 and autoconf, [ and ] are the
+dnl    quote characters.
+dnl  This check is ugly.  Maybe it should be hidden away in aclocal?
+dnl    bgrayson 9/96
+netbsd1.[[012]]*)  AC_XOSV_NETBSD ;;
+##  Also check for versions that have not been tested.
+netbsd*)  AC_MSG_WARN([
+***************  Warning  *****************
+  xosview has not been tested on $host_os.
+  So far, it is known to work on the following NetBSD versions:
+    netbsd1.0
+    netbsd1.1
+    netbsd1.2
+  If it works for version $host_os, please send mail to:
+	bgrayson@ece.utexas.edu.
+  If this message is in error, also notify bgrayson -- we're new
+to autoconf!
+  Thanks!
+*******************************************
+]); AC_XOSV_NETBSD ;;
+
 hpux)    AC_XOSV_HPUX   ;;
 *)       AC_MSG_ERROR([xosview has not been ported to $host_os :(.  Sorry.]) ;;
 esac
