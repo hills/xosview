@@ -64,7 +64,7 @@ XAPPLOADDIR=$(PREFIX_TO_USE)/lib/X11/app-defaults
 
 X11BASEDIR=`echo @x_includes@ | sed -e 's:/[^/]*$$::'`
 ##  If the variable PREFIX is _not_ set, use the X11 dir found above.
-PREFIX?=$(X11BASEDIR)
+PREFIX=$(X11BASEDIR)
 BINDIR=$(PREFIX)/bin
 MANDIR=$(PREFIX)/man/man1
 XAPPLOADDIR=$(PREFIX)/lib/X11/app-defaults
