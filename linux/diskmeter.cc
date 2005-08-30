@@ -19,22 +19,22 @@
 DiskMeter::DiskMeter( XOSView *parent, float max ) : FieldMeterGraph(
   parent, 3, "DISK", "READ/WRITE/IDLE"), _vmstat(false),
   _statFileName("/proc/stat")
-    {
+{
     read_prev_ = 0;
     write_prev_ = 0;
     maxspeed_ = max;
 
     struct stat buf;
     if (stat("/proc/vmstat", &buf) == 0
-      && buf.st_mode & S_IFREG)
-        {
+        && buf.st_mode & S_IFREG)
+    {
         _vmstat = true;
         _statFileName = "/proc/vmstat";
         getvmdiskinfo();
-        }
+    }
     else
         getdiskinfo();
-    }
+}
 
 DiskMeter::~DiskMeter( void )
     {
@@ -108,7 +108,7 @@ void DiskMeter::updateinfo(unsigned long one, unsigned long two,
 
 
 void DiskMeter::getvmdiskinfo(void)
-    {
+{
     IntervalTimerStop();
     total_ = maxspeed_;
     char buf[MAX_PROCSTAT_LENGTH];
@@ -143,34 +143,41 @@ void DiskMeter::getvmdiskinfo(void)
     stats >> two;
 
     updateinfo(one, two, 4);
-    }
+}
 
 void DiskMeter::getdiskinfo( void )
-    {
+{
     IntervalTimerStop();
     total_ = maxspeed_;
     char buf[MAX_PROCSTAT_LENGTH];
     std::ifstream stats(_statFileName);
 
     if ( !stats )
-        {
+    {
         std::cerr <<"Can not open file : " << _statFileName << std::endl;
         exit( 1 );
-        }
+    }
 
     // Find the line with 'page'
     stats >> buf;
-    while (strncmp(buf, "page", 9))
-        {
+    while (strncmp(buf, "disk_io:", 8))
+    {
         stats.ignore(MAX_PROCSTAT_LENGTH, '\n');
         stats >> buf;
         if (stats.eof())
             break;
-        }
-
-	// read values
-    unsigned long one, two;
-    stats >> one >> two;
-
-    updateinfo(one, two, 2);
     }
+
+    // read values
+    unsigned long one=0, two=0;
+    unsigned long junk,read1,write1;
+    stats >> buf;
+    while (7 == sscanf(buf,"(%lu,%lu):(%lu,%lu,%lu,%lu,%lu)",&junk,&junk,&junk,&junk,&read1,&junk,&write1))
+    {
+        one += read1;
+        two += write1;
+        stats >> buf;
+    }
+
+    updateinfo(one, two, 1);
+}
