@@ -29,7 +29,7 @@ protected:
 private:
   int _ipsock;
   Timer _timer;
-  unsigned long _lastBytesIn, _lastBytesOut;
+  unsigned long long _lastBytesIn, _lastBytesOut;
   char *_netfilename;
   bool _usechains;
   int _bytesInDev;

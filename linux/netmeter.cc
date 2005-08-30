@@ -148,8 +148,8 @@ void NetMeter::checkeventNew(void)
         }
 
     std::string str_in;
-    unsigned long in, out, ig;
-    unsigned long totin = 0, totout = 0;
+    unsigned long long in, out, ig;
+    unsigned long long totin = 0, totout = 0;
     char buf[1024];
 
     fields_[2] = maxpackets_;     // assume no
@@ -182,7 +182,7 @@ void NetMeter::checkeventNew(void)
                 continue;
               else
                 {
-                  in = strtoul(str_in.c_str(), NULL, 10);
+                  in = strtoull(str_in.c_str(), NULL, 10);
                   ifs >> ig >> ig >> ig >> ig >> ig >> ig >> ig >> out;
                 }
 
@@ -242,8 +242,8 @@ void NetMeter::checkeventOld(void)
         }
 
     char c;
-    unsigned long sa, da, sm, dm, bytes;
-    unsigned long tot_in = 0, tot_out = 0;
+    unsigned long long sa, da, sm, dm, bytes;
+    unsigned long long tot_in = 0, tot_out = 0;
 
     ifs.ignore(1024, '\n');
 
