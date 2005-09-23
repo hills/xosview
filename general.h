@@ -22,14 +22,17 @@
       whether or not the bool define exists.  However, for simplicity,
       let's just redefine them all.  The following lines are directly
       from g++-include's bool.h file.  bgrayson */
+  /* eile: The MIPSPro compiler on IRIX does not like the redefinition 
+     of 'bool'. Nowadays every c++ compiler should define bool anyway....
 
 #undef FALSE
 #undef false
 #undef TRUE
 #undef true
 enum bool { FALSE = 0, false = 0, TRUE = 1, true = 1 };
-#endif
+  */
 
+#endif
 
   /*  Let's add a handy macro for inserting the CVS id string into the
       .cc (and hence .o) files, so that 'ident' can be used on the

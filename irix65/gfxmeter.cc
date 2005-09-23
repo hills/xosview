@@ -9,6 +9,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <invent.h>
+#include <iostream>
+
+using namespace std;
 
 // GfxMeter display swapbuffers per second. max is base rate for one gfx pipe.
 

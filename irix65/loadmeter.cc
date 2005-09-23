@@ -13,10 +13,13 @@
 #include "xosview.h"
 #include <stdlib.h>
 #include <unistd.h>
+#include <iostream>
 
 #ifndef FSCALE
 #define FSCALE  (1 << 8)
 #endif
+
+using namespace std;
 
 LoadMeter::LoadMeter(XOSView *parent)
         : FieldMeterGraph( parent, 2, "LOAD", "PROCS/MIN", 1, 1, 0 )
