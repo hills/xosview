@@ -28,8 +28,12 @@ protected:
 
   void getloadinfo( void );
   unsigned long procloadcol_, warnloadcol_, critloadcol_;
+  void getspeedinfo( void );
+
 private:
-  int warnThreshold, critThreshold, alarmstate, lastalarmstate;
+   int warnThreshold, critThreshold, alarmstate, lastalarmstate;
+   int old_cpu_speed_, cur_cpu_speed_;
+   int do_cpu_speed;
 };
 
 

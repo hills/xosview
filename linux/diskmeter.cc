@@ -13,6 +13,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <dirent.h> 
+#include <errno.h>
+
 
 #define MAX_PROCSTAT_LENGTH 2048
 
@@ -24,16 +27,32 @@ DiskMeter::DiskMeter( XOSView *parent, float max ) : FieldMeterGraph(
     write_prev_ = 0;
     maxspeed_ = max;
 
+    _sysfs=_vmstat=false;
+    sysfs_read_prev_=sysfs_write_prev_=0L;
     struct stat buf;
+        
+    // first - try sysfs:
+    if (stat("/sys/block", &buf) == 0
+      && buf.st_mode & S_IFDIR) {
+        
+        _sysfs = true;
+        _statFileName = "/sys/block";
+        XOSDEBUG("diskmeter: using sysfs /sys/block\n");
+        getsysfsdiskinfo();
+
+    } else  // try vmstat:
     if (stat("/proc/vmstat", &buf) == 0
-        && buf.st_mode & S_IFREG)
-    {
+      && buf.st_mode & S_IFREG) {
+
         _vmstat = true;
+        _sysfs  = false;
         _statFileName = "/proc/vmstat";
         getvmdiskinfo();
-    }
-    else
+
+    } else // fall back to stat
         getdiskinfo();
+
+
 }
 
 DiskMeter::~DiskMeter( void )
@@ -57,11 +76,16 @@ void DiskMeter::checkevent( void )
     {
     if (_vmstat)
         getvmdiskinfo();
+    else if ( _sysfs )
+        getsysfsdiskinfo();
     else
         getdiskinfo();
+
     drawfields();
+
     }
 
+// IMHO the logic here is quite broken - but for backward compat UNCHANGED:
 void DiskMeter::updateinfo(unsigned long one, unsigned long two,
   int fudgeFactor)
     {
@@ -105,7 +129,6 @@ void DiskMeter::updateinfo(unsigned long one, unsigned long two,
     setUsed((fields_[0]+fields_[1]), total_);
     IntervalTimerStart();
     }
-
 
 void DiskMeter::getvmdiskinfo(void)
 {
@@ -181,3 +204,123 @@ void DiskMeter::getdiskinfo( void )
 
     updateinfo(one, two, 1);
 }
+
+// sysfs version - works with long-long !!
+// (no dependency on sector-size here )
+void DiskMeter::update_info(unsigned long long rsum, unsigned long long wsum)
+{
+    float itim = IntervalTimeInMicrosecs();
+
+    // avoid strange values at first call
+    // (by this - the first value displayed becomes zero)
+    if(sysfs_read_prev_ == 0L)  sysfs_read_prev_  = rsum;
+    if(sysfs_write_prev_ == 0L) sysfs_write_prev_ = wsum;
+
+    // convert rate from bytes/microsec into bytes/second
+    fields_[0] = ((rsum - sysfs_read_prev_ ) * 1e6 ) / itim;
+    fields_[1] = ((wsum - sysfs_write_prev_) * 1e6 ) / itim;
+
+    // fix overflow (conversion bug?)
+    if (fields_[0] < 0.0)
+        fields_[0] = 0.0;
+    if (fields_[1] < 0.0)
+        fields_[1] = 0.0;
+
+    // bump up max total:
+    if (fields_[0] + fields_[1] > total_)
+        total_ = fields_[0] + fields_[1];
+
+    fields_[2] = total_ - (fields_[0] + fields_[1]);
+
+    // save old vals for next round
+    sysfs_read_prev_  = rsum;
+    sysfs_write_prev_ = wsum;
+
+    setUsed((fields_[0]+fields_[1]), total_);
+    IntervalTimerStart();
+}
+
+
+
+// XXX: sysfs - read Documentation/iostats.txt !!!
+// extract stats from /sys/block/*/stat
+// each disk reports a 32bit u_int, which can WRAP around
+// XXX: currently sector-size is fixed 512bytes
+//      (would need a sysfs-val for sect-size)
+
+void DiskMeter::getsysfsdiskinfo( void )
+{
+        // field-3: sects read since boot (but can wrap!)
+        // field-7: sects written since boot (but can wrap!)
+        // just sum up everything in /sys/block/*/stat
+
+  std::string sysfs_dir = _statFileName;
+  std::string disk;
+  struct stat buf;
+  std::ifstream diskstat;
+
+  // the sum of all disks:
+  unsigned long long all_bytes_read,all_bytes_written;
+
+  // ... while this is only one disk's value:
+  unsigned long sec_read,sec_written;
+  unsigned long sect_size;
+
+  unsigned long dummy;
+
+  IntervalTimerStop();
+  total_ = maxspeed_;
+
+  DIR *dir = opendir(_statFileName);
+  if (dir==NULL) {
+    XOSDEBUG("sysfs: Cannot open directory : %s\n", _statFileName);
+    return;
+  }
+
+  // reset all sums
+  all_bytes_read=all_bytes_written=0L;
+  sect_size=0L;
+ 
+  // visit every /sys/block/*/stat and sum up the values:
+
+  for (struct dirent *dirent; (dirent = readdir(dir)) != NULL; ) {
+    if (strncmp(dirent->d_name, ".", 1) == 0
+        || strncmp(dirent->d_name, "..", 2) == 0)
+      continue;
+
+    disk = sysfs_dir + "/" + dirent->d_name;
+
+    if (stat(disk.c_str(), &buf) == 0 && buf.st_mode & S_IFDIR) {
+       // is a dir, locate 'stat' file in it
+       disk = disk + "/stat";
+       if (stat(disk.c_str(), &buf) == 0 && buf.st_mode & S_IFREG) {
+                //XOSDEBUG("disk stat: %s\n",disk.c_str() );
+                diskstat.open(disk.c_str());
+                if ( diskstat.good() ) {
+                   sec_read=sec_written=0L;
+                   diskstat >> dummy >> dummy >> sec_read >> dummy >> dummy >> dummy >> sec_written;
+
+                   sect_size = 512; // XXX: not always true
+
+                   // XXX: ignoring wrap around case for each disk
+                   // (would require saving old vals for each disk etc..)
+                   all_bytes_read    += (unsigned long long) sec_read * (unsigned long long) sect_size; 
+                   all_bytes_written += (unsigned long long) sec_written * (unsigned long long) sect_size; 
+
+                   //XOSDEBUG("disk stat: %s | read: %ld, written: %ld\n",disk.c_str(),sec_read,sec_written );
+                   diskstat.close(); diskstat.clear();
+                } else {
+                  XOSDEBUG("disk stat open: %s - errno=%d\n",disk.c_str(),errno );
+                }
+       } else {
+        XOSDEBUG("disk stat is not file: %s - errno=%d\n",disk.c_str(),errno );
+       }
+    } else {
+        XOSDEBUG("disk is not dir: %s - errno=%d\n",disk.c_str(),errno );
+    }
+  } // for
+  closedir(dir);
+  //XOSDEBUG("disk: read: %ld, written: %ld\n",all_sec_read, all_sec_written );
+  update_info(all_bytes_read, all_bytes_written);
+}
+

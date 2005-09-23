@@ -47,6 +47,7 @@ xosview*loadWarnThreshold:  2
 xosview*loadDecay:          False
 xosview*loadGraph:          False
 xosview*loadUsedFormat:     float
+xosview*loadCpuSpeed:       True
 
 ! Gfx Meter Resources ( Irix )
 
@@ -187,6 +188,12 @@ xosview*batteryLeftColor:   orange
 xosview*batteryUsedColor:   aquamarine
 xosview*batteryPriority:    50
 xosview*batteryUsedFormat:  percent
+xosview*batteryChargeColor: green
+xosview*batteryFullColor:   magenta
+xosview*batteryLowColor:    red
+xosview*batteryCritColor:   red
+xosview*batteryNoneColor:   grey
+
 
 ! Disk Meter Resources
 

@@ -29,8 +29,10 @@ Meter::Meter( XOSView *parent, const char *title, const char *legend,
 }
 
 Meter::~Meter( void ){
-  delete[] title_;
-  delete[] legend_;
+  if ( title_ )
+        delete[] title_;
+  if ( legend_ )
+        delete[] legend_;
 }
 
 void Meter::checkResources( void ){
@@ -38,7 +40,10 @@ void Meter::checkResources( void ){
 }
 
 void Meter::title( const char *title ){
-  delete[] title_;
+
+  if ( title_ )
+  	delete[] title_;
+
   int len = strlen(title);
   title_ = new char[len + 1];
   strncpy( title_, title, len );
@@ -46,7 +51,10 @@ void Meter::title( const char *title ){
 }
 
 void Meter::legend( const char *legend ){
-  delete[] legend_;
+
+  if ( legend_ )
+	  delete[] legend_;
+
   int len = strlen(legend);
   legend_ = new char[len + 1];
   strncpy( legend_, legend, len );

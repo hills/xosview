@@ -487,6 +487,10 @@ is already a time-averaged value!
 .\"  loadUsedFormat resource
 .uf load
 
+xosview*loadCpuSpeed:   (True or False)
+.RS
+Display the current CPU speed in the load meter.
+.RE
 
 \fBCPU Meter Resources\fP
 
@@ -849,8 +853,10 @@ N-th label for above temperatures, default is TMP.
 xosview*battery: (True or False)
 .RS
 If True then xosview will display a battery meter.  Linux users will need
-to have APM support in their kernels for this to work.  See the file
-README.linux which comes with the xosview distribution for more details.
+to have APM or ACPI support in their kernels for this to work.
+For both, APM and ACPI xosview shows the status/sum of all batteries.
+Additionally - the legend text gets changed/adjusted to reflect the
+current state (charging/low/critical/etc.) of the battery/batteries.
 .RE
 
 xosview*batteryLeftColor: \fIcolor\fP
@@ -862,6 +868,37 @@ xosview*batteryUsedColor: \fIcolor\fP
 .RS
 This is the color that will be used to show the amount of battery power used.
 .RE
+
+xosview*batteryChargeColor: \fIcolor\fP
+.RS
+This is the color that will be used as 'left' - if the batteries get charged.
+.RE
+
+xosview*batteryFullColor: \fIcolor\fP
+.RS
+This is the color that will be used as 'left' - if the batteries are fully charged.
+APM and ACPI does provide this info, but not all machines actually do so.
+.RE
+
+xosview*batteryLowColor: \fIcolor\fP
+.RS
+APM only - the 'left' color that will indicate a low battery.
+Depends on the machine - e.g. below 25% remaining capacity.
+.RE
+
+xosview*batteryCritColor: \fIcolor\fP
+.RS
+APM case: the 'left' color if APM indicates 'critical' state. (less than 5%)
+
+ACPI case: the 'left' color if the remaining capacity is below the alarm value.
+(which can be set by the user in /proc/acpi/battery/BAT[01]/alarm )
+.RE
+
+xosview*batteryNoneColor: \fIcolor\fP
+.RS
+If no battery is present - or all batteries get removed (while on AC).
+.RE
+
 
 .\"  Do the priority resource
 .pp battery
