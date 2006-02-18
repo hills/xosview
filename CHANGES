@@ -12,6 +12,9 @@ Changes since xosview-1.8.2
  - Fix battery meter for case where lack of APM report -1%.  Thanks
    to Gunnar Wolf.
 
+ - Allow netmeter to specify, via the Xresource xosview*netIface,
+   which network interface it will monitor.  Patch thanks to Gunnar Wolf.
+
 Changes since xosview-1.8.1
  - Applied sourceforge patch 927112 from Russell Reed which fixes
    the swapmeter when USESYSCALLS is defined.

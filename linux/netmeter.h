@@ -25,6 +25,7 @@ public:
   void checkResources( void );
 protected:
   float maxpackets_;
+  std::string netIface_;
 
 private:
   int _ipsock;

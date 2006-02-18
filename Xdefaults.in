@@ -138,6 +138,7 @@ xosview*netPriority:        2
 xosview*netDecay:           True
 xosview*netGraph:           True
 xosview*netUsedFormat:	    autoscale
+xosview*netIface:           False
 
 ! Linux-only resources:
 
