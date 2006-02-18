@@ -1,5 +1,5 @@
-//  
-//  Copyright (c) 1994, 1995 by Mike Romberg ( romberg@fsl.noaa.gov )
+//
+//  Copyright (c) 1994, 1995, 2006 by Mike Romberg ( mike.romberg@noaa.gov )
 //
 //  This file may be distributed under terms of the GPL
 //
@@ -19,7 +19,7 @@ public:
   NetMeter(XOSView *parent, float max);
   ~NetMeter( void );
 
-  const char *name( void ) const { return "NetMeter"; }  
+  const char *name( void ) const { return "NetMeter"; }
   void checkevent( void );
 
   void checkResources( void );

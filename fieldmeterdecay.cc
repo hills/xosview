@@ -1,6 +1,6 @@
-//  
-//  The original FieldMeter class is Copyright (c) 1994 by Mike Romberg 
-//    ( romberg@fsl.noaa.gov )
+//
+//  The original FieldMeter class is Copyright (c) 1994, 2006 by Mike Romberg
+//    ( mike.romberg@noaa.gov )
 //  Modifications from FieldMeter class done in Oct. 1995
 //    by Brian Grayson ( bgrayson@netbsd.org )
 //
@@ -23,7 +23,7 @@
 //       FieldMeter.
 //   3.  Change the constructor call to use FieldMeterDecay(), rather than
 //       FieldMeter().
-//   4.  Make the checkResources () function in the meter set the 
+//   4.  Make the checkResources () function in the meter set the
 //	 dodecay_ variable according to the, e.g., xosview*cpuDecay resource.
 
 #ifdef HAVE_IOSTREAM
@@ -84,7 +84,7 @@ void FieldMeterDecay::drawfields( int manditory ){
 
   int halfheight = height_ / 2;
   int decaytwidth, decayx = x_;
-  
+
   //  This code is supposed to make the average display look just like
   //  the ordinary display for the first drawfields, but it doesn't seem
   //  to work too well.  But it's better than setting all decay_ fields
@@ -92,7 +92,7 @@ void FieldMeterDecay::drawfields( int manditory ){
 
   if (firsttime_) {
     firsttime_ = 0;
-    for (int i = 0; i < numfields_; i++) 
+    for (int i = 0; i < numfields_; i++)
          {
                 decay_[i] = 1.0*fields_[i]/total_;
          }
@@ -122,7 +122,7 @@ void FieldMeterDecay::drawfields( int manditory ){
     decay_[i] = ALPHA*decay_[i] + (1-ALPHA)*(fields_[i]*1.0/total_);
 
     //  We want to round the widths, rather than truncate.
-    twidth = (int) (0.5 + (width_ * (float) fields_[i]) / total_); 
+    twidth = (int) (0.5 + (width_ * (float) fields_[i]) / total_);
     decaytwidth = (int) (0.5 + width_ * decay_[i]);
     if (decaytwidth < 0.0) {
         std::cerr << "Error:  FieldMeterDecay " << name() << ":  decaytwidth of ";

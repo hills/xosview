@@ -1,5 +1,5 @@
 //
-//  Copyright (c) 1994, 1995 by Mike Romberg ( romberg@fsl.noaa.gov )
+//  Copyright (c) 1994, 1995, 2006 by Mike Romberg ( mike.romberg@noaa.gov )
 //
 //  This file may be distributed under terms of the GPL
 //
@@ -62,7 +62,7 @@ void SwapMeter::getswapinfo( void ){
   syscall( SYS_sysinfo, &sinfo );
 #endif
 
-  unit = (sinfo.mem_unit ? sinfo.mem_unit : 1); 
+  unit = (sinfo.mem_unit ? sinfo.mem_unit : 1);
 
   total_ = sinfo.totalswap * unit;
   fields_[0] = (sinfo.totalswap - sinfo.freeswap) * unit;

@@ -1,6 +1,6 @@
-//  
-//  Copyright (c) 1999 Thomas Waldmann (ThomasWaldmann@gmx.de)
-//  based on work of Mike Romberg ( romberg@fsl.noaa.gov )
+//
+//  Copyright (c) 1999, 2006 Thomas Waldmann (ThomasWaldmann@gmx.de)
+//  based on work of Mike Romberg ( mike.romberg@noaa.gov )
 //
 //  This file may be distributed under terms of the GPL
 //
@@ -15,10 +15,10 @@ class BitFieldMeter : public Meter {
 public:
   BitFieldMeter( XOSView *parent, int numBits = 1, int numfields = 1,
 	      const char *title = "",
-	      const char *bitlegend = "", const char *fieldlegend = "", 
+	      const char *bitlegend = "", const char *fieldlegend = "",
 	      int docaptions = 0, int dolegends = 0, int dousedlegends = 0 );
   virtual ~BitFieldMeter( void );
-  
+
   virtual void drawfields( int manditory = 0 );
   void drawBits( int manditory = 0 );
 
@@ -35,7 +35,7 @@ public:
   void draw( void );
   void checkevent( void );
   void disableMeter ( void );
-  
+
   virtual void checkResources( void );
 
 protected:
@@ -50,7 +50,7 @@ protected:
   UsedType print_;
   int printedZeroTotalMesg_;
   int numWarnings_;
-  
+
   unsigned long onColor_, offColor_;
   char *bits_, *lastbits_;
   int numbits_;
@@ -79,4 +79,3 @@ protected:
 };
 
 #endif
-

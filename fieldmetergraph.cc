@@ -1,6 +1,6 @@
-//  
-//  The original FieldMeter class is Copyright (c) 1994 by Mike Romberg 
-//    ( romberg@fsl.noaa.gov )
+//
+//  The original FieldMeter class is Copyright (c) 1994, 2006 by Mike Romberg
+//    ( mike.romberg@noaa.gov )
 //
 //  Modifications from FieldMeter class done in Oct. 1995
 //    by Brian Grayson ( bgrayson@netbsd.org )
@@ -21,7 +21,7 @@
 //       FieldMeter().
 //   4.  Make the meter call FieldMeterGraph::checkResources(),
 //       to pick up graphNumCols resource.
-//   5.  Make the checkResources () function in the meter set the 
+//   5.  Make the checkResources () function in the meter set the
 //	 useGraph_ variable according to the, e.g., xosview*cpuGraph resource.
 
 #ifdef HAVE_FSTREAM
@@ -40,16 +40,16 @@ CVSID_DOT_H(FIELDMETERGRAPH_H_CVSID);
 
 FieldMeterGraph::FieldMeterGraph( XOSView *parent,
                 int numfields, const char *title,
-                const char *legend, int docaptions, int dolegends, 
+                const char *legend, int docaptions, int dolegends,
   int dousedlegends )
-: FieldMeterDecay (parent, numfields, title, legend, docaptions, 
+: FieldMeterDecay (parent, numfields, title, legend, docaptions,
   dolegends, dousedlegends)
 {
 
 	useGraph_ = 0;
 	heightfield_ = NULL;
 	firstTimeDrawn_ = 1;
-	
+
 	// set number of columns to a reasonable default in case we can't
 	// find the resource
 	setNumCols( 100 );
@@ -84,7 +84,7 @@ void FieldMeterGraph::drawfields( int manditory )
 		if( numfields_ > 0 && graphNumCols_ > 0 )
 		{
 			heightfield_ = new float [numfields_*graphNumCols_];
-	
+
 			for( i = 0; i < graphNumCols_; i++ )
 			{
 				for( j = 0; j < numfields_; j++ )
@@ -223,4 +223,3 @@ void FieldMeterGraph::setNumCols( int n )
 	heightfield_ = NULL;
 
 }
-

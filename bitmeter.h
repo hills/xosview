@@ -1,5 +1,5 @@
-//  
-//  Copyright (c) 1994, 1995 by Mike Romberg ( romberg@fsl.noaa.gov )
+//
+//  Copyright (c) 1994, 1995, 2006 by Mike Romberg ( mike.romberg@noaa.gov )
 //
 //  This file may be distributed under terms of the GPL
 //
@@ -17,7 +17,7 @@ class XOSView;
 
 class BitMeter : public Meter {
 public:
-  BitMeter( XOSView *parent,  
+  BitMeter( XOSView *parent,
 	    const char *title = "", const char *legend ="",
 	    int numBits = 1, int docaptions = 0, int dolegends = 0, int dousedlegends = 0 );
   virtual ~BitMeter( void );
@@ -28,7 +28,7 @@ public:
 
   int numBits(void) const { return numbits_; }
   void setNumBits(int n);
-  
+
   void checkResources( void );
 protected:
   unsigned long onColor_, offColor_;

@@ -1,5 +1,5 @@
 //
-//  Copyright (c) 1994, 1995 by Mike Romberg ( romberg@fsl.noaa.gov )
+//  Copyright (c) 1994, 1995, 2006 by Mike Romberg ( mike.romberg@noaa.gov )
 //
 //  This file may be distributed under terms of the GPL
 //
@@ -19,6 +19,8 @@
 
 static const char *INTFILE     = "/proc/interrupts";
 static const char *VERSIONFILE = "/proc/version";
+
+static 	int realintnum[1024];
 
 IntMeter::IntMeter( XOSView *parent, int cpu)
   : BitMeter( parent, "INTS", "", 1,
@@ -80,6 +82,7 @@ int IntMeter::countCPUs(void) {
 void IntMeter::getirqs( void ){
   std::ifstream intfile( INTFILE );
   int intno, count;
+  int	idx;
 
   if ( !intfile ){
     std::cerr <<"Can not open file : " <<INTFILE << std::endl;
@@ -90,7 +93,8 @@ void IntMeter::getirqs( void ){
       intfile.ignore(1024, '\n');
 
   while ( !intfile.eof() ){
-    intfile >>intno;
+    intfile >> idx;
+    intno = realintnum[idx];
     if(intno>=numBits())
     	updateirqcount(intno,false);
     if (!intfile) break;
@@ -114,7 +118,14 @@ void IntMeter::updateirqcount( int n, bool init ){
    int old_bits=numBits();
    setNumBits(n+1);
    std::ostringstream os;
-   os << "INTs (0-" << (n) << ")" << std::ends;
+
+   os << "INTs (0-16" ;
+   for (int i=16; i<1024; i++) {
+	if (realintnum[i])
+	   os << ", " << (i) ;
+   }
+   os << ")" << std::ends;
+
    legend(os.str().c_str());
    unsigned long *old_irqs_=irqs_, *old_lastirqs_=lastirqs_;
    irqs_=new unsigned long[n+1];
@@ -146,21 +157,35 @@ void IntMeter::updateirqcount( int n, bool init ){
  */
 void IntMeter::initirqcount( void ){
   std::ifstream intfile( INTFILE );
-  int intno;
+  int intno = 0;
+  int i, idx;
 
   if ( !intfile ){
     std::cerr <<"Can not open file : " <<INTFILE << std::endl;
     exit( 1 );
   }
 
-  if (!_old)
+  if (!_old) {
+      for (i=0; i<1024; i++)	// init index into int array
+	if (i < 16)		// first 16 map directly
+	    realintnum[i] = i;
+	else
+	    realintnum[i] = 0;
       intfile.ignore(1024, '\n');
+  }
 
   /* just looking for the highest number interrupt that
    * is in use, ignore the rest of the data
    */
+  idx = 16;
   while ( !intfile.eof() ){
-    intfile >>intno;
+    intfile >> i;
+    if (i < 16)
+	intno = i;
+    else {
+	intno = idx;
+	realintnum[i] = idx++;
+    }
     if (!intfile) break;
     intfile.ignore(1024, '\n');
   }

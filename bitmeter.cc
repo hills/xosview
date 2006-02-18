@@ -1,5 +1,5 @@
-//  
-//  Copyright (c) 1994, 1995 by Mike Romberg ( romberg@fsl.noaa.gov )
+//
+//  Copyright (c) 1994, 1995, 2006 by Mike Romberg ( mike.romberg@noaa.gov )
 //
 //  This file may be distributed under terms of the GPL
 //
@@ -18,7 +18,7 @@ BitMeter::BitMeter( XOSView *parent,
 		    int docaptions, int, int dousedlegends)
   : Meter( parent, title, legend, docaptions, dousedlegends, dousedlegends ),
   bits_(NULL), lastbits_(NULL), disabled_(false)  {
-  setNumBits(numBits); 
+  setNumBits(numBits);
 }
 
 BitMeter::~BitMeter( void ){
@@ -33,7 +33,7 @@ void BitMeter::setNumBits(int n){
 
   bits_ = new char[numbits_];
   lastbits_ = new char[numbits_];
-  
+
   for ( int i = 0 ; i < numbits_ ; i++ )
       bits_[i] = lastbits_[i] = 0;
 }
@@ -66,7 +66,7 @@ void BitMeter::drawBits( int manditory ){
       x2 = x_ + ((i + 1) * (width_+1)) / numbits_ - 1;
     else
       x2 = x_ + (width_+1) - 1;
-    
+
     if ( (bits_[i] != lastbits_[i]) || manditory ){
       if ( bits_[i] && pass )
 	parent_->setForeground( onColor_ );
@@ -75,7 +75,7 @@ void BitMeter::drawBits( int manditory ){
 
       parent_->drawFilledRectangle( x1, y_, x2 - x1, height_);
     }
-    
+
     lastbits_[i] = bits_[i];
 
     x1 = x2 + 2;
@@ -91,13 +91,13 @@ void BitMeter::draw( void ){
 
   if ( dolegends_ ){
     parent_->setForeground( textcolor_ );
-    
+
     int offset;
     if ( dousedlegends_ )
       offset = parent_->textWidth( "XXXXXXXXX" );
     else
       offset = parent_->textWidth( "XXXXX" );
-    
+
     parent_->drawString( x_ - offset + 1, y_ + height_, title_ );
     parent_->setForeground( onColor_ );
     if(docaptions_)

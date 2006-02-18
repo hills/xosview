@@ -1,5 +1,5 @@
-//  
-//  Copyright (c) 1994, 1995 by Mike Romberg ( romberg@fsl.noaa.gov )
+//
+//  Copyright (c) 1994, 1995, 2006 by Mike Romberg ( mike.romberg@noaa.gov )
 //
 //  This file may be distributed under terms of the GPL
 //
@@ -18,7 +18,7 @@ class XOSView;
 
 class Meter {
 public:
-  Meter( XOSView *parent, const char *title = "", const char *legend ="", 
+  Meter( XOSView *parent, const char *title = "", const char *legend ="",
 	 int docaptions = 0, int dolegends = 0, int dousedlegends = 0 );
   virtual ~Meter( void );
 
@@ -33,7 +33,7 @@ public:
   void docaptions( int val ) { docaptions_ = val; }
   void dolegends( int val ) { dolegends_ = val; }
   void dousedlegends( int val ) { dousedlegends_ = val; }
-  int requestevent( void ){ 
+  int requestevent( void ){
     if (priority_ == 0) {
       fprintf(stderr, "Warning:  meter %s had an invalid priority "
 	      "of 0.  Resetting to 1...\n", name());

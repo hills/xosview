@@ -1,5 +1,5 @@
 //
-//  Copyright (c) 1994, 1995, 2002 by Mike Romberg ( romberg@fsl.noaa.gov )
+//  Copyright (c) 1994, 1995, 2002, 2006 by Mike Romberg ( mike.romberg@noaa.gov )
 //
 //  This file may be distributed under terms of the GPL
 //
@@ -261,15 +261,15 @@ void  XOSView::resize( void ){
   int rightmargin = hmargin_;
   int newwidth = width_ - xoff_ - rightmargin;
 /*
-  int newheight = (height_ - (10 + 5 * (nummeters_ - 1) + 
+  int newheight = (height_ - (10 + 5 * (nummeters_ - 1) +
                               nummeters_ * yoff_)) / nummeters_;
 */
   int newheight =
-        (height_ - 
+        (height_ -
          (topmargin + topmargin + (nummeters_-1)*spacing + nummeters_*yoff_)
         ) / nummeters_;
   newheight = (newheight >= 2) ? newheight : 2;
- 
+
 
   int counter = 1;
   MeterNode *tmp = meters_;
@@ -278,7 +278,7 @@ void  XOSView::resize( void ){
     tmp->meter_->resize( xoff_, 5 * counter + counter * yoff_ +
                          (counter - 1) * newheight, newwidth, newheight );
 */
-    tmp->meter_->resize( xoff_, 
+    tmp->meter_->resize( xoff_,
                          topmargin + counter*yoff_ + (counter-1)*(newheight+spacing),
                         newwidth, newheight );
     tmp = tmp->next_;

@@ -1,5 +1,5 @@
 //
-//  Copyright (c) 1999 by Mike Romberg (romberg@fsl.noaa.gov)
+//  Copyright (c) 1999, 2006 by Mike Romberg (mike.romberg@noaa.gov)
 //
 //  This file may be distributed under terms of the GPL
 //
@@ -13,7 +13,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <dirent.h> 
+#include <dirent.h>
 #include <errno.h>
 
 
@@ -30,11 +30,11 @@ DiskMeter::DiskMeter( XOSView *parent, float max ) : FieldMeterGraph(
     _sysfs=_vmstat=false;
     sysfs_read_prev_=sysfs_write_prev_=0L;
     struct stat buf;
-        
+
     // first - try sysfs:
     if (stat("/sys/block", &buf) == 0
       && buf.st_mode & S_IFDIR) {
-        
+
         _sysfs = true;
         _statFileName = "/sys/block";
         XOSDEBUG("diskmeter: using sysfs /sys/block\n");
@@ -280,7 +280,7 @@ void DiskMeter::getsysfsdiskinfo( void )
   // reset all sums
   all_bytes_read=all_bytes_written=0L;
   sect_size=0L;
- 
+
   // visit every /sys/block/*/stat and sum up the values:
 
   for (struct dirent *dirent; (dirent = readdir(dir)) != NULL; ) {
@@ -304,8 +304,8 @@ void DiskMeter::getsysfsdiskinfo( void )
 
                    // XXX: ignoring wrap around case for each disk
                    // (would require saving old vals for each disk etc..)
-                   all_bytes_read    += (unsigned long long) sec_read * (unsigned long long) sect_size; 
-                   all_bytes_written += (unsigned long long) sec_written * (unsigned long long) sect_size; 
+                   all_bytes_read    += (unsigned long long) sec_read * (unsigned long long) sect_size;
+                   all_bytes_written += (unsigned long long) sec_written * (unsigned long long) sect_size;
 
                    //XOSDEBUG("disk stat: %s | read: %ld, written: %ld\n",disk.c_str(),sec_read,sec_written );
                    diskstat.close(); diskstat.clear();
@@ -323,4 +323,3 @@ void DiskMeter::getsysfsdiskinfo( void )
   //XOSDEBUG("disk: read: %ld, written: %ld\n",all_sec_read, all_sec_written );
   update_info(all_bytes_read, all_bytes_written);
 }
-

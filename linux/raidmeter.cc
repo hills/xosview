@@ -1,6 +1,6 @@
 //
-//  Copyright (c) 1999 by Thomas Waldmann ( ThomasWaldmann@gmx.de )
-//  based on work of Mike Romberg ( romberg@fsl.noaa.gov )
+//  Copyright (c) 1999, 2006 by Thomas Waldmann ( ThomasWaldmann@gmx.de )
+//  based on work of Mike Romberg ( mike.romberg@noaa.gov )
 //
 //  This file may be distributed under terms of the GPL
 //

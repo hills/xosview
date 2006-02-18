@@ -1,5 +1,5 @@
-//  
-//  Copyright (c) 1994, 1995 by Mike Romberg ( romberg@fsl.noaa.gov )
+//
+//  Copyright (c) 1994, 1995, 2006 by Mike Romberg ( mike.romberg@noaa.gov )
 //
 //  This file may be distributed under terms of the GPL
 //
@@ -22,7 +22,7 @@ public:
   static const char *getResourceName(Device dev);
 
   void checkevent( void );
-  
+
   void checkResources( void );
 
 private:

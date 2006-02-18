@@ -1,6 +1,6 @@
-//  
-//  Original FieldMeter class is Copyright (c) 1994 by Mike Romberg 
-//    ( romberg@fsl.noaa.gov )
+//
+//  Original FieldMeter class is Copyright (c) 1994, 2006 by Mike Romberg
+//    ( mike.romberg@noaa.gov )
 //  Modifications from FieldMeter class done in Oct. 1995
 //    by Brian Grayson ( bgrayson@netbsd.org )
 //
@@ -24,10 +24,10 @@
 class FieldMeterDecay : public FieldMeter {
 public:
   FieldMeterDecay( XOSView *parent, int numfields,
-              const char *title = "", const char *legend = "", 
+              const char *title = "", const char *legend = "",
               int docaptions = 0, int dolegends = 0, int dousedlegends = 0 );
   virtual ~FieldMeterDecay( void );
-  
+
   virtual void drawfields( int manditory = 0 );
 
 protected:

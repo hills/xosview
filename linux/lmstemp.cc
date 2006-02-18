@@ -1,12 +1,12 @@
 //
-//  Copyright (c) 2000 by Leopold Toetsch <lt@toetsch.at>
+//  Copyright (c) 2000, 2006 by Leopold Toetsch <lt@toetsch.at>
 //
 //  Read temperature entries from /proc/sys/dev/sensors/*/*
 //  and display actual and high temperature
 //  if actual >= high, actual temp changes color to indicate alarm
 //
 //  File based on btrymeter.* by
-//  Copyright (c) 1997 by Mike Romberg ( romberg@fsl.noaa.gov )
+//  Copyright (c) 1997 by Mike Romberg ( mike.romberg@noaa.gov )
 //
 //  This file may be distributed under terms of the GPL
 //

@@ -1,6 +1,6 @@
-//  
-//  Copyright (c) 1999 Thomas Waldmann ( ThomasWaldmann@gmx.de )
-//  based on work of Mike Romberg ( romberg@fsl.noaa.gov )
+//
+//  Copyright (c) 1999, 2006 Thomas Waldmann ( ThomasWaldmann@gmx.de )
+//  based on work of Mike Romberg ( mike.romberg@noaa.gov )
 //
 //  This file may be distributed under terms of the GPL
 //
@@ -35,7 +35,7 @@ BitFieldMeter::BitFieldMeter( XOSView *parent, int numBits, int numfields,
   colors_ = NULL;
   lastvals_ = NULL;
   lastx_ = NULL;
-  setNumBits(numBits); 
+  setNumBits(numBits);
   fieldLegend_ = NULL;
   setfieldlegend(FieldLegend);
   setNumFields(numfields);
@@ -75,7 +75,7 @@ void BitFieldMeter::setNumBits(int n){
 
   bits_ = new char[numbits_];
   lastbits_ = new char[numbits_];
-  
+
   for ( int i = 0 ; i < numbits_ ; i++ )
       bits_[i] = lastbits_[i] = 0;
 }
@@ -150,13 +150,13 @@ void BitFieldMeter::draw( void ){
   parent_->drawRectangle( x_ + width_/2 +3, y_ - 1, width_/2 - 2, height_ + 2 );
   if ( dolegends_ ){
     parent_->setForeground( textcolor_ );
-    
+
     int offset;
     if ( dousedlegends_ )
       offset = parent_->textWidth( "XXXXXXXXX" );
     else
       offset = parent_->textWidth( "XXXXX" );
-    
+
     parent_->drawString( x_ - offset + 1, y_ + height_, title_ );
 
     if(docaptions_){
@@ -172,7 +172,7 @@ void BitFieldMeter::draw( void ){
 void BitFieldMeter::drawfieldlegend( void ){
   char *tmp1, *tmp2, buff[100];
   int n, x = x_ + width_/2 + 4;
-  
+
   tmp1 = tmp2 = fieldLegend_;
   for ( int i = 0 ; i < numfields_ ; i++ ){
     n = 0;
@@ -247,17 +247,17 @@ void BitFieldMeter::drawused( int manditory ){
     /*  We don't need to check against 99.5 -- it all gets %.0f.  */
     /*else if (scaled_used < 99.5)*/
       /*snprintf (buf, 10, "%.0f%c", scaled_used, scale);*/
-    else 
+    else
       snprintf (buf, 10, "%.0f%c", scaled_used, scale);
   }
   else {
     snprintf( buf, 10, "%.1f", used_ );
   }
 
-  parent_->clear( x_ - xoffset, y_ + height_ - parent_->textHeight(), 
+  parent_->clear( x_ - xoffset, y_ + height_ - parent_->textHeight(),
 		 xoffset - onechar / 2, parent_->textHeight() + 1 );
   parent_->setForeground( usedcolor_ );
-  parent_->drawString( x_ - (strlen( buf ) + 1 ) * onechar + 2, 
+  parent_->drawString( x_ - (strlen( buf ) + 1 ) * onechar + 2,
 		      y_ + height_, buf );
 
   lastused_ = used_;
@@ -271,7 +271,7 @@ void BitFieldMeter::drawBits( int manditory ){
   int x1 = x_, w;
 
   w = (width_/2 - (numbits_+1)) / numbits_;
-  
+
   for ( int i = 0 ; i < numbits_ ; i++ ){
     if ( (bits_[i] != lastbits_[i]) || manditory ){
       if ( bits_[i] && pass )
@@ -280,7 +280,7 @@ void BitFieldMeter::drawBits( int manditory ){
 	parent_->setForeground( offColor_ );
       parent_->drawFilledRectangle( x1, y_, w, height_);
     }
-    
+
     lastbits_[i] = bits_[i];
 
     x1 += (w + 2);
@@ -292,7 +292,7 @@ void BitFieldMeter::drawfields( int manditory ){
 
   if ( total_ == 0 )
     return;
-  
+
   for ( int i = 0 ; i < numfields_ ; i++ ){
     /*  Look for bogus values.  */
     if (fields_[i] < 0.0) {
@@ -307,7 +307,7 @@ void BitFieldMeter::drawfields( int manditory ){
 	  "will not be displayed.\n", name());
     }
 
-    twidth = (int) (((width_/2 - 3) * (float) fields_[i]) / total_); 
+    twidth = (int) (((width_/2 - 3) * (float) fields_[i]) / total_);
 //    twidth = (int)((fields_[i] * width_) / total_);
     if ( (i == numfields_ - 1) && ((x + twidth) != (x_ + width_)) )
       twidth = width_ + x_ - x;

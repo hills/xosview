@@ -1,5 +1,5 @@
 //
-//  Copyright (c) 1999 by Mike Romberg (romberg@fsl.noaa.gov)
+//  Copyright (c) 1999, 2006 by Mike Romberg (mike.romberg@noaa.gov)
 //
 //  This file may be distributed under terms of the GPL
 //

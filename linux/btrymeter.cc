@@ -1,5 +1,5 @@
 //
-//  Copyright (c) 1997 by Mike Romberg ( romberg@fsl.noaa.gov )
+//  Copyright (c) 1997, 2006 by Mike Romberg ( mike.romberg@noaa.gov )
 //
 //  This file may be distributed under terms of the GPL
 //
@@ -169,7 +169,7 @@ void BtryMeter::checkevent( void ){
 	// (no other idea how to update the legend/labels)
 	parent_->reallydraw();
 
-   } 
+   }
 
 
   /* if the ACPI state changed - we need to update the colors,
@@ -179,7 +179,7 @@ void BtryMeter::checkevent( void ){
 
   if ( old_acpi_charge_state != acpi_charge_state ) {
 
-  	XOSDEBUG("ACPI: charge_state: old=%d, now=%d\n",old_acpi_charge_state,acpi_charge_state); 
+  	XOSDEBUG("ACPI: charge_state: old=%d, now=%d\n",old_acpi_charge_state,acpi_charge_state);
 
 	/* so let's eval the apm_battery_state in some more detail: */
 
@@ -212,7 +212,7 @@ void BtryMeter::checkevent( void ){
 	}
   	drawfields();
 	parent_->reallydraw();
-   } 
+   }
 
    drawfields();
 }
@@ -224,7 +224,7 @@ void BtryMeter::getpwrinfo( void ){
 	getacpiinfo(); return;
   }
   if ( use_apm ) {
-	getapminfo(); return; 
+	getapminfo(); return;
   }
 
   std::cerr <<"Cannot get battery information" << std::endl;
@@ -276,7 +276,7 @@ bool BtryMeter::getapminfo( void ){
            7) Remaining battery life (time units):
               Number of remaining minutes or seconds
               -1: Unknown
-           8) min = minutes; sec = seconds 
+           8) min = minutes; sec = seconds
 */
 
   if ( !loadinfo.good() ){
@@ -290,9 +290,9 @@ bool BtryMeter::getapminfo( void ){
   loadinfo >> buff >> buff >> buff >> buff >> std::hex >> battery_status >> buff >> fields_[0];
 
 
-  // XOSDEBUG("apm battery_status is: %d\n",battery_status); 
+  // XOSDEBUG("apm battery_status is: %d\n",battery_status);
 
-  // save previous state 
+  // save previous state
   // if there was no state-change - the gui won't do full redraw
 
   old_apm_battery_state=apm_battery_state;
@@ -354,7 +354,7 @@ bool BtryMeter::getacpiinfo( void ){
       // ok, worth to parse out all the fields
       if ( parse_battery( abs_battery_name ) ) {
 
-		// sum up: 
+		// sum up:
 
 		// clip values to get realistic on full-charged batteries
 
@@ -370,9 +370,9 @@ bool BtryMeter::getacpiinfo( void ){
 		// works only w. signed formats
 		acpi_charge_state|=battery.charging_state;
 
-	      found = true; // found at least one 
+	      found = true; // found at least one
       }
-    } 
+    }
   }
 
   closedir(dir);
@@ -382,7 +382,7 @@ bool BtryMeter::getacpiinfo( void ){
   // convert into percent vals
   // XOSDEBUG("acpi: total max=%d, remain=%d\n",acpi_sum_cap,acpi_sum_remain);
 
-  // below alarm ? 
+  // below alarm ?
   if ( acpi_sum_alarm >= acpi_sum_remain )
 		acpi_charge_state=-2;
 
@@ -392,7 +392,7 @@ bool BtryMeter::getacpiinfo( void ){
   } else {
 	  // none of the batts is present
 	  // (just pull out both while on AC)
-	  fields_[0] = 0; 
+	  fields_[0] = 0;
 	  acpi_charge_state=-3;
   }
 
@@ -405,7 +405,7 @@ bool BtryMeter::getacpiinfo( void ){
 }
 
 // present yes/no can change anytime !
-// by adding/removing a battery 
+// by adding/removing a battery
 bool BtryMeter::battery_present(const std::string& filename)
 {
   std::ifstream loadinfo( filename.c_str() );
@@ -419,12 +419,12 @@ bool BtryMeter::battery_present(const std::string& filename)
 	loadinfo >> argname >> argval;
 
 	//XOSDEBUG("batt ?: a=\"%s\" v=\"%s\"\n",argname.c_str(),argval.c_str() );
-	if ( argname == "present:" ) 
-           if ( argval == "yes" ) 
+	if ( argname == "present:" )
+           if ( argval == "yes" )
 		return true;
   }
-  XOSDEBUG("batt %s not present\n",filename.c_str() ); 
-  return false; 
+  XOSDEBUG("batt %s not present\n",filename.c_str() );
+  return false;
 }
 
 bool BtryMeter::parse_battery(const std::string& dirname)
@@ -460,10 +460,10 @@ bool BtryMeter::parse_battery(const std::string& dirname)
   loadinfo.open(filename.c_str() );
   while ( loadinfo.good() ) {
 
-	argname.clear(); 
+	argname.clear();
 	std::getline(loadinfo,argname,':');
 
-	argval.clear(); 
+	argval.clear();
 	std::getline(loadinfo,argval);
 
 	//XOSDEBUG("info: a=\"%s\" v=\"%s\"\n",argname.c_str(),argval.c_str() );
@@ -486,7 +486,7 @@ bool BtryMeter::parse_battery(const std::string& dirname)
   while ( loadinfo.good() ) {
 
 	// argname can contain spaces
-	argname.clear(); 
+	argname.clear();
 	std::getline(loadinfo,argname,':');
 
 	// argval should NOT contain blanks

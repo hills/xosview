@@ -1,5 +1,5 @@
-//  
-//  Copyright (c) 1994, 1995 by Mike Romberg ( romberg@fsl.noaa.gov )
+//
+//  Copyright (c) 1994, 1995, 2006 by Mike Romberg ( mike.romberg@noaa.gov )
 //
 //  This file may be distributed under terms of the GPL
 //
@@ -16,7 +16,7 @@ public:
   MemMeter( XOSView *parent );
   ~MemMeter( void );
 
-  const char *name( void ) const { return "MemMeter"; }  
+  const char *name( void ) const { return "MemMeter"; }
   void checkevent( void );
 
   void checkResources( void );
@@ -28,10 +28,10 @@ private:
 
   class LineInfo {
   public:
-    LineInfo(const char *id, float *val) 
+    LineInfo(const char *id, float *val)
       { _line = -1; _id = id; _val = val; _idlen = strlen(_id); }
     LineInfo(void) {};
-    
+
     int line(void) { return _line; }
     void line(int l) { _line = l; }
     const char *id(void) { return _id; }
@@ -45,7 +45,7 @@ private:
     int _idlen;
     float *_val;
   };
-  
+
   LineInfo *_MIlineInfos;
   int _numMIlineInfos;
 

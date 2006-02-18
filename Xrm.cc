@@ -1,5 +1,5 @@
-//  
-//  Copyright (c) 1994, 1995 by Mike Romberg ( romberg@fsl.noaa.gov )
+//
+//  Copyright (c) 1994, 1995, 2006 by Mike Romberg ( mike.romberg@noaa.gov )
 //
 //  This file may be distributed under terms of the GPL
 //
@@ -97,8 +97,12 @@ const char *Xrm::getResource(const char *rname) const{
     //  Let's try with a non-uppercased class name.
     char fcn_lower[1024];
     strncpy(fcn_lower, className(), 1024);
-    char* p = fcn_lower;
-    while (p && *p)  *p++ = tolower(*p);
+    char *p = fcn_lower;
+    while (p && *p)
+      {
+      *p = tolower(*p);
+      p++;
+      }
     snprintf(fcn, 1024, "%s.%s", fcn_lower, rname);
     XrmGetResource(_db, frn, fcn, &type, &val);
   }
@@ -171,7 +175,7 @@ Listed from weakest to strongest:
     char xappfile[1024];
     snprintf (xappfile, 1024, "%s/%s", xappdir, className());
     // this did not work for XAPPLRESDIR
-    //if (!access (xappfile, X_OK | R_OK))  
+    //if (!access (xappfile, X_OK | R_OK))
     if (!access (xappfile, R_OK))
     {
       XrmCombineFileDatabase (xappfile, &_db, 1);
@@ -228,7 +232,7 @@ void Xrm::initClassName(const char* name){
   if (className[0] == 'X')
       className[1] = toupper(className[1]);
 
-  _class = XrmStringToQuark(className);  
+  _class = XrmStringToQuark(className);
 }
 
 
@@ -256,7 +260,7 @@ std::ostream &Xrm::dump(std::ostream &os) const {
   XrmName names[] = { _instance, NULLQUARK };
   XrmClass classes[] = { _class, NULLQUARK };
 
-  XrmEnumerateDatabase(_db, names, classes, XrmEnumAllLevels, enumCB, 
+  XrmEnumerateDatabase(_db, names, classes, XrmEnumAllLevels, enumCB,
                        (XPointer)&os);
 
   return os;
@@ -265,7 +269,7 @@ std::ostream &Xrm::dump(std::ostream &os) const {
 Bool Xrm::enumCB(XrmDatabase *, XrmBindingList bindings,
                  XrmQuarkList quarks, XrmRepresentation *type,
                  XrmValue *value, XPointer closure) {
-  
+
   std::ostream *os = (std::ostream *)closure;
   (void) type;  //  Avoid gcc warnings.
 

@@ -1,5 +1,5 @@
-//  
-//  Copyright (c) 1994, 1995 by Mike Romberg ( romberg@fsl.noaa.gov )
+//
+//  Copyright (c) 1994, 1995, 2006 by Mike Romberg ( mike.romberg@noaa.gov )
 //
 //  This file may be distributed under terms of the GPL
 //
@@ -58,8 +58,8 @@ public:
   int addrLength(void) const { return _hent.h_length; }
 
   int numAddresses(void) const { return _numAddresses; }
-  struct in_addr *address(int num) const { 
-    return (in_addr *)_hent.h_addr_list[num]; 
+  struct in_addr *address(int num) const {
+    return (in_addr *)_hent.h_addr_list[num];
   }
 
   // Linux will choke and die inside of inet_ntoa() when

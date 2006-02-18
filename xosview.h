@@ -1,5 +1,5 @@
-//  
-//  Copyright (c) 1994, 1995 by Mike Romberg ( romberg@fsl.noaa.gov )
+//
+//  Copyright (c) 1994, 1995, 2006 by Mike Romberg ( mike.romberg@noaa.gov )
 //
 //  This file may be distributed under terms of the GPL
 //
@@ -55,7 +55,7 @@ protected:
   };
 
   MeterNode *meters_;
-  
+
   int caption_, legend_, xoff_, yoff_, nummeters_, usedlabels_;
   int hmargin_, vmargin_, vspacing_;
   unsigned long sleeptime_, usleeptime_;

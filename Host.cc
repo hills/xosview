@@ -1,5 +1,5 @@
-//  
-//  Copyright (c) 1994, 1995 by Mike Romberg ( romberg@fsl.noaa.gov )
+//
+//  Copyright (c) 1994, 1995, 2006 by Mike Romberg ( mike.romberg@noaa.gov )
 //
 //  This file may be distributed under terms of the GPL
 //
@@ -38,12 +38,12 @@ Host::Host(unsigned int addr){
 }
 
 bool Host::constuct(const struct in_addr *address){
-  struct hostent *hent = gethostbyaddr((char *)address, sizeof(in_addr), 
+  struct hostent *hent = gethostbyaddr((char *)address, sizeof(in_addr),
                                        AF_INET);
   bool tmp = check(hent);
 
   copy(hent);
-  
+
   return tmp;
 }
 
@@ -194,5 +194,5 @@ std::ostream &Host::print(std::ostream& os) const {
       os <<", ";
   }
 
-  return os;  
+  return os;
 }
