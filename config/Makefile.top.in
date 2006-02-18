@@ -48,7 +48,7 @@ xosview: $(OBJS) @top_srcdir@/@host_dir@/libmeter.a
 ##    --prefix=<path>, which will change the next line.
 PREFIX_TO_USE=@prefix@
 BINDIR=$(PREFIX_TO_USE)/bin
-MANDIR=$(PREFIX_TO_USE)/man/man1
+MANDIR=$(PREFIX_TO_USE)/share/man/man1
 XAPPLOADDIR=$(PREFIX_TO_USE)/lib/X11/app-defaults
 PACKAGENAME=xosview-$(VERS)
 DISTRIBDIR=@top_srcdir@/../$(PACKAGENAME)
