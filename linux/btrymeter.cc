@@ -227,10 +227,16 @@ void BtryMeter::getpwrinfo( void ){
 	getapminfo(); return;
   }
 
-  std::cerr <<"Cannot get battery information" << std::endl;
-  std::cerr <<"If using APM, have you loaded the `apm' module?" << std::endl;
-  std::cerr <<"If using ACPI, have you loaded the `battery' module?" << std::endl;
-  parent_->done(1);
+  // We can hit this spot in any of two cases:
+  // - We have an ACPI system and the battery is removed
+  // - We have neither ACPI nor APM in the system
+  // We report an empty battery (i.e., we are running off AC power) instead of
+  // original behavior of just exiting the program.
+  // (Refer to Debian bug report #281565)
+  total_ = 100;
+  fields_[0] = 0;
+  fields_[1] = 100;
+  setUsed(fields_[0], total_);
 }
 
 
@@ -297,6 +303,12 @@ bool BtryMeter::getapminfo( void ){
 
   old_apm_battery_state=apm_battery_state;
   apm_battery_state=battery_status;
+
+  // If the battery status is reported as a negative number, it means we are
+  // running on AC power and no battery status is available - Report it as
+  // completely empty (0). (Refer to Debian bug report #281565)
+  if (fields_[0] < 0) 
+    fields_[0] = 0;
 
   total_ = 100;
 
