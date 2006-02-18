@@ -145,7 +145,7 @@ void LmsTemp::getlmstemp( void ){
     return;
   }
 
-  int dummy, high;
+  double dummy, high;
   total_ = _highest;  // Max temp
   file >> high >> dummy >> fields_[0];
   fields_[1] = high - fields_[0];
