@@ -19,10 +19,10 @@ static const char STATFILENAME[] = "/proc/stat";
 #define MAX_PROCSTAT_LENGTH 4096
 
 CPUMeter::CPUMeter(XOSView *parent, const char *cpuID)
-: FieldMeterGraph( parent, 4, toUpper(cpuID), "USR/NICE/SYS/FREE" ) {
+: FieldMeterGraph( parent, 7, toUpper(cpuID), "US/NI/SY/ID/WA/HI/SI" ) {
   _lineNum = findLine(cpuID);
   for ( int i = 0 ; i < 2 ; i++ )
-    for ( int j = 0 ; j < 4 ; j++ )
+    for ( int j = 0 ; j < 7 ; j++ )
       cputime_[i][j] = 0;
   cpuindex_ = 0;
 
@@ -38,6 +38,9 @@ void CPUMeter::checkResources( void ){
   setfieldcolor( 1, parent_->getResource( "cpuNiceColor" ) );
   setfieldcolor( 2, parent_->getResource( "cpuSystemColor" ) );
   setfieldcolor( 3, parent_->getResource( "cpuFreeColor" ) );
+  setfieldcolor( 4, parent_->getResource( "cpuWaitColor" ) );
+  setfieldcolor( 5, parent_->getResource( "cpuInterruptColor" ) );
+  setfieldcolor( 6, parent_->getResource( "cpuSoftIntColor" ) );
   priority_ = atoi (parent_->getResource( "cpuPriority" ) );
   dodecay_ = parent_->isResourceTrue( "cpuDecay" );
   useGraph_ = parent_->isResourceTrue( "cpuGraph" );
@@ -69,10 +72,13 @@ void CPUMeter::getcputime( void ){
   stats >>tmp >>cputime_[cpuindex_][0]
 	      >>cputime_[cpuindex_][1]
 	      >>cputime_[cpuindex_][2]
-	      >>cputime_[cpuindex_][3];
+	      >>cputime_[cpuindex_][3]
+	      >>cputime_[cpuindex_][4]
+	      >>cputime_[cpuindex_][5]
+	      >>cputime_[cpuindex_][6];
 
   int oldindex = (cpuindex_+1)%2;
-  for ( int i = 0 ; i < 4 ; i++ ){
+  for ( int i = 0 ; i < 7 ; i++ ){
     fields_[i] = cputime_[cpuindex_][i] - cputime_[oldindex][i];
     total_ += fields_[i];
   }
