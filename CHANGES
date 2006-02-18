@@ -18,6 +18,9 @@ Changes since xosview-1.8.2
  - Add patch for additional cpu fields in linux for 2.6 kernel.  Patch thanks
    to Hendrik Fehr.
 
+ - Add various pathes from the NetBSD project.  Pathes contributed by Roland
+   Illig.
+
 Changes since xosview-1.8.1
  - Applied sourceforge patch 927112 from Russell Reed which fixes
    the swapmeter when USESYSCALLS is defined.

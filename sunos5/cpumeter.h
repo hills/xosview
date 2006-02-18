@@ -12,7 +12,7 @@
 
 class CPUMeter : public FieldMeterGraph {
  public:
-	CPUMeter(XOSView *parent, kstat_ctl_t *kcp, const int cpuid = 0);
+	CPUMeter(XOSView *parent, kstat_ctl_t *kcp, int cpuid = 0);
 	~CPUMeter(void);
 
 	const char *name(void) const { return "CPUMeter"; }

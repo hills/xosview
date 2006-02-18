@@ -1,4 +1,4 @@
-//  
+//
 // $Id$
 //  Initial port performed by Greg Onufer (exodus@cheers.bungi.com)
 //
@@ -8,7 +8,7 @@
 #include <unistd.h>
 #include <ctype.h>
 #include <string.h>
-#include <strstream.h>
+#include <sstream>
 
 CPUMeter::CPUMeter(XOSView *parent, kstat_ctl_t *_kc, int cpuid)
 	: FieldMeterGraph(parent, CPU_STATES, toUpper(cpuStr(cpuid)),
@@ -90,20 +90,20 @@ const char *CPUMeter::toUpper(const char *str)
 }
 
 const char *CPUMeter::cpuStr(int num)
-{
-        static char buffer[32];
-	std::ostringstream str;
+    {
+    static char buffer[32];
+    std::ostringstream str;
 
-	        str << "cpu";
-	        if (num != 0)
-	                  str << (num - 1);
-	str << std::ends;
+    str << "cpu";
+    if (num != 0)
+        str << (num - 1);
+    str << std::ends;
 
-	        strncpy(buffer, str.str().c_str(), 32);
-	        buffer[31] = '\0';
+    strncpy(buffer, str.str().c_str(), 32);
+    buffer[31] = '\0';
 
-	return buffer;
-}
+    return buffer;
+    }
 
 int CPUMeter::countCPUs(kstat_ctl_t *kc)
 {

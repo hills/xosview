@@ -8,6 +8,8 @@
 #include <kstat.h>
 /*#include <sys/loadavg.h>*/
 
+using std::cerr;
+
 LoadMeter::LoadMeter(XOSView *parent, kstat_ctl_t *_kc)
 	: FieldMeterGraph(parent, 2, "LOAD", "PROCS/MIN", 1, 1, 0)
 {

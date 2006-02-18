@@ -817,11 +817,11 @@ BSDGetDiskXFerBytes (unsigned long long *bytesXferred) {
 #if defined(NETBSD_1_6A)
   // Use the new sysctl to do this for us.
   int mib[3] = {CTL_HW, HW_DISKSTATS, sizeof(struct disk_sysctl)};
-  size_t sysctl_size = NetBSD_N_Drives * sizeof(struct disk_sysctl);
+  size_t sysctl_sz = NetBSD_N_Drives * sizeof(struct disk_sysctl);
   struct disk_sysctl drive_stats[NetBSD_N_Drives];
 
   // Do the sysctl.
-  if (sysctl(mib, 3, drive_stats, &sysctl_size, NULL, 0) < 0) {
+  if (sysctl(mib, 3, drive_stats, &sysctl_sz, NULL, 0) < 0) {
     err(1, "sysctl hw.diskstats failed");
   }
 

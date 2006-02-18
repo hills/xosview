@@ -22,7 +22,7 @@ static const char * const versionString = "xosview version: " XOSVIEW_VERSION;
 
 static const char NAME[] = "xosview@";
 
-#ifdef sgi
+#if !defined(__GNUC__)
 
 #define MIN(x,y)		\
 (				\

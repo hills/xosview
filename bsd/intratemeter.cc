@@ -48,7 +48,7 @@ void IrqRateMeter::checkResources( void ){
   dodecay_ = parent_->isResourceTrue("irqrateDecay");
   useGraph_ = parent_->isResourceTrue("irqrateGraph");
   SetUsedFormat (parent_->getResource("irqrateUsedFormat"));
-  total_ = 100;
+  total_ = 2000;
 
   //  Now, grab a sample.  I don't know if this is needed here.  BCG
   BSDGetIntrStats (lastirqs_);
