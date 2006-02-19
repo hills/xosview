@@ -76,6 +76,8 @@ protected:
   void keyPressEvent( XKeyEvent &event );
   void visibilityEvent( XVisibilityEvent &event );
   void unmapEvent( XUnmapEvent &event);
+  void checkVersion(int argc, char *argv[]) const;
+
 private:
 
   bool _isvisible;

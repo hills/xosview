@@ -66,6 +66,11 @@ CVSID_DOT_H(XOSVIEW_H_CVSID);
 
 XOSView::XOSView( char * instName, int argc, char *argv[] ) : XWin(),
 						xrm(Xrm("xosview", instName)){
+  // Check for version arguments first.  This allows
+  // them to work without the need for a connection
+  // to the X server
+  checkVersion(argc, argv);
+
   setDisplayName (xrm.getDisplayName( argc, argv));
   openDisplay();  //  So that the Xrm class can contact the display for its
 		  //  default values.
@@ -148,6 +153,17 @@ XOSView::XOSView( char * instName, int argc, char *argv[] ) : XWin(),
   dolegends();
   resize();
 }
+
+void XOSView::checkVersion(int argc, char *argv[]) const
+    {
+    for (int i = 0 ; i < argc ; i++)
+        if (!strncasecmp(argv[i], "-v", 2)
+          || !strncasecmp(argv[i], "--version", 10))
+            {
+            std::cerr << versionString << std::endl;
+            exit(0);
+            }
+    }
 
 void XOSView::figureSize ( void ) {
   if ( legend_ ){
@@ -390,9 +406,6 @@ void XOSView::checkArgs (int argc, char** argv) const
   while (argc > 0 && argv && *argv)
   {
     switch (argv[0][1]) {
-      case 'v':
-      		std::cerr << versionString << std::endl;
-		exit(0);
       case 'n': //  Check for -name option that was already parsed
 		//  and acted upon by main().
 		if (!strncasecmp(*argv, "-name", 6))
@@ -412,11 +425,6 @@ void XOSView::checkArgs (int argc, char** argv) const
 		}
 		break;
 #endif
-      case '-':  /*  Check for --version argument.  */
-              if (!strncasecmp(*argv, "--version", 10)) {
-	        std::cerr << versionString << std::endl;
-		exit(0);
-	      }
 	      /*  Fall through to default/error case.  */
       default:
       		std::cerr << "Ignoring unknown option '" << argv[0] << "'.\n";

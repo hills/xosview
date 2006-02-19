@@ -21,6 +21,8 @@ Changes since xosview-1.8.2
  - Add various pathes from the NetBSD project.  Pathes contributed by Roland
    Illig.
 
+ - Fix bug 854215 (-v and --version still needed to connect to X server)
+
 Changes since xosview-1.8.1
  - Applied sourceforge patch 927112 from Russell Reed which fixes
    the swapmeter when USESYSCALLS is defined.
