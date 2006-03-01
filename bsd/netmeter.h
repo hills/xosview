@@ -33,8 +33,11 @@ public:
   void checkevent( void );
 
   void checkResources( void );
+
+  void BSDGetNetInOut (long long * inbytes, long long * outbytes);
 protected:
   float netBandwidth_;
+  std::string netIface_;
 
 private:
   //  NetBSD:  Use long long, so we won't run into problems after 4 GB

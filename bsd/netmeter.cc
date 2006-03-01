@@ -38,6 +38,7 @@ NetMeter::NetMeter( XOSView *parent, float max )
     netBandwidth_ = max;
     total_ = netBandwidth_;
     _lastBytesIn = _lastBytesOut = 0;
+    netIface_ = "False";
     BSDGetNetInOut (&_lastBytesIn, &_lastBytesOut);
   }
 }
@@ -56,6 +57,7 @@ void NetMeter::checkResources( void ){
     dodecay_ = parent_->isResourceTrue("netDecay");
     useGraph_ = parent_->isResourceTrue("netGraph");
     SetUsedFormat (parent_->getResource("netUsedFormat"));
+    netIface_ = parent_->getResource( "netIface" );
   }
 }
 
