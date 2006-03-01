@@ -2,6 +2,9 @@
 
 Changes since xosview-1.8.3
 
+  - Modify linux serialmeter startup to allow for a port number instead of
+    True/False.  Patch provided by Horst Wente.
+
   - netIface support for NetBSD.  Patch from  Bernd Ernesti.
 
 Changes since xosview-1.8.2
