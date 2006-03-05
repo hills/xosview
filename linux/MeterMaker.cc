@@ -25,6 +25,7 @@
 
 #include <stdlib.h>
 #include <sstream>
+#include <iomanip>
 
 MeterMaker::MeterMaker(XOSView *xos){
   _xos = xos;
@@ -83,7 +84,7 @@ void MeterMaker::makeMeters(void){
       if ( !(ok = _xos->isResourceTrue(res)) )
           {
           std::istringstream is(_xos->getResource(res));
-          is >> std::hex >> val;
+          is >> std::setbase(0) >> val;
           if (!is)
               ok = false;
           else
