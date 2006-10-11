@@ -1,6 +1,6 @@
 //  
 // $Id$
-//  Initial port performed by Stefan Eilemann (eile@sgi.com)
+//  Initial port performed by Stefan Eilemann (eilemann@gmail.com)
 //
 #ifndef _MEMMETER_H_
 #define _MEMMETER_H_

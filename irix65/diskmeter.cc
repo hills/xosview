@@ -1,6 +1,6 @@
 //  
 // $Id$
-//  Initial port performed by Stefan Eilemann (eile@sgi.com)
+//  Initial port performed by Stefan Eilemann (eilemann@gmail.com)
 //
 
 #include "diskmeter.h"

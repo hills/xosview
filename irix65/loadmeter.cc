@@ -5,7 +5,7 @@
 //
 //  Most of this code was written by Werner Fink <werner@suse.de>.
 //  Only small changes were made on my part (M.R.)
-//  Small changes for Irix 6.5 port Stefan Eilemann <eile@sgi.com>
+//  Small changes for Irix 6.5 port Stefan Eilemann <eilemann@gmail.com>
 //
 // $Id$
 //
