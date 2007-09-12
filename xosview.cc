@@ -64,7 +64,7 @@ CVSID("$Id$");
 CVSID_DOT_H(XOSVIEW_H_CVSID);
 
 
-XOSView::XOSView( char * instName, int argc, char *argv[] ) : XWin(),
+XOSView::XOSView( const char * instName, int argc, char *argv[] ) : XWin(),
 						xrm(Xrm("xosview", instName)){
   // Check for version arguments first.  This allows
   // them to work without the need for a connection
@@ -106,7 +106,7 @@ XOSView::XOSView( char * instName, int argc, char *argv[] ) : XWin(),
   yoff_ = 0;
   nummeters_ = 0;
   meters_ = NULL;
-  name_ = "xosview";
+  name_ = const_cast<char *>("xosview");
   _isvisible = false;
   _ispartiallyvisible = false;
   exposed_once_flag_ = 0;

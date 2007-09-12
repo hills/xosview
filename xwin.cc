@@ -17,11 +17,12 @@ CVSID_DOT_H(XWIN_H_CVSID);
 
 //  argc is a reference, so that the changes to argc by XrmParseCommand are
 //  noticed by the caller (XOSView, in this case).  BCG
-XWin::XWin(){
+XWin::XWin() {
 }
 //-----------------------------------------------------------------------------
 
-XWin::XWin( int argc, char *argv[], int x, int y, int width, int height ){
+XWin::XWin( int argc, char *argv[], int x, int y, int width, int height ) {
+
   std::cerr << "This constructor call is not supported! (" << __FILE__
        << ":" << __LINE__ << ")" << std::endl;
   exit (-1);
@@ -47,10 +48,10 @@ void XWin::XWinInit (int argc, char** argv, char* geometry, Xrm* xrm) {
   width_ = height_ = x_ = y_ = 0;
   xrmptr_ = xrm;
 
-  name_ = "";
+  name_ = (char *)malloc(0);
   font_ = NULL;
-  done_ = 0;  
-  
+  done_ = 0;
+
   // Set up the default Events
   events_ = NULL;
   addEvent( new Event( this, ConfigureNotify, &XWin::configureEvent ) );
@@ -69,7 +70,7 @@ XWin::~XWin( void ){
     delete event;
     event = save;
   }
-  
+
   XFree( title_.value );
   XFree( iconname_.value );
   XFree( sizehints_ );
@@ -95,10 +96,10 @@ void XWin::init( int argc, char **argv ){
 #ifdef HAVE_XPM
   doPixmap=getPixmap(&background_pixmap);
 #endif
-  
-  window_ = XCreateSimpleWindow(display_, DefaultRootWindow(display_), 
+
+  window_ = XCreateSimpleWindow(display_, DefaultRootWindow(display_),
 				sizehints_->x, sizehints_->y,
-				sizehints_->width, sizehints_->height, 
+				sizehints_->width, sizehints_->height,
 				1,
 				fgcolor_, bgcolor_);
 
@@ -111,7 +112,7 @@ void XWin::init( int argc, char **argv ){
   gcv.background = bgcolor_;
   gc_ = XCreateGC(display_, window_,
 		  (GCFont | GCForeground | GCBackground), &gcv);
-                
+
   // Set main window's attributes (colormap, bit_gravity)
   xswa.colormap = colormap_;
   xswa.bit_gravity = NorthWestGravity;
@@ -128,8 +129,8 @@ void XWin::init( int argc, char **argv ){
   if(isResourceTrue("transparent"))
   {
         XSetWindowBackgroundPixmap(display_,window_,ParentRelative);
-  }         
-  
+  }
+
   // add the events
   Event *tmp = events_;
   while ( tmp != NULL ){
@@ -215,13 +216,13 @@ void XWin::openDisplay( void ){
     exit(1);
   }
 
-  colormap_ = DefaultColormap( display_, screen() );  
+  colormap_ = DefaultColormap( display_, screen() );
 }
 //-----------------------------------------------------------------------------
 
 void XWin::setColors( void ){
-  XColor               color;  
-  
+  XColor               color;
+
   // Main window's background color
   if (XParseColor(display_, colormap_, getResource("background"),
 		  &color) == 0 ||
@@ -318,10 +319,10 @@ void XWin::getGeometry( void ){
 	  sizehints_->height, sizehints_->x, sizehints_->y);
 
   // Process the geometry specification
-  bitmask =  XGeometry(display_, DefaultScreen(display_), 
-		       getResourceOrUseDefault("geometry", geometry_), 
+  bitmask =  XGeometry(display_, DefaultScreen(display_),
+		       getResourceOrUseDefault("geometry", geometry_),
                        default_geometry,
-		       0, 
+		       0,
 		       1, 1, 0, 0, &(sizehints_->x), &(sizehints_->y),
 		       &(sizehints_->width), &(sizehints_->height));
 
@@ -363,7 +364,7 @@ void XWin::ignoreEvents( long mask ){
 
 void XWin::checkevent( void ){
   XEvent event;
-  
+
   while ( XEventsQueued( display_, QueuedAfterReading ) ){
     XNextEvent( display_, &event );
 
@@ -432,7 +433,7 @@ std::cerr << "Function not implemented!\n";  //  BCG  FIXME  Need to make this.
 
 unsigned long XWin::allocColor( const char *name ){
   XColor exact, closest;
-  
+
   if ( XAllocNamedColor( display_, colormap(), name, &closest, &exact ) == 0 )
     std::cerr <<"XWin::allocColor() : failed to alloc : " <<name <<std::endl;
 
@@ -538,5 +539,3 @@ XWin::Event::Event( XWin *parent, int event, EventCallBack callBack ){
     break;
   }
 }
-
-

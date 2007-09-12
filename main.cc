@@ -1,5 +1,5 @@
 //
-//  Copyright (c) 1994, 1995, 2006 by Mike Romberg ( mike.romberg@noaa.gov )
+//  Copyright (c) 1994, 1995, 2006, 2007 by Mike Romberg ( mike.romberg@noaa.gov )
 //
 //  This file may be distributed under terms of the GPL
 //
@@ -14,7 +14,7 @@ CVSID("$Id$");
 int main( int argc, char *argv[] ) {
   /*  Icky.  Need to check for -name option here.  */
   char** argp = argv;
-  char* instanceName = "xosview";	// Default value.
+  const char* instanceName = "xosview";	// Default value.
   while (argp && *argp)
   {
     if (!strncmp(*argp, "-name", 6))

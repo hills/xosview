@@ -22,7 +22,7 @@
       whether or not the bool define exists.  However, for simplicity,
       let's just redefine them all.  The following lines are directly
       from g++-include's bool.h file.  bgrayson */
-  /* eile: The MIPSPro compiler on IRIX does not like the redefinition 
+  /* eile: The MIPSPro compiler on IRIX does not like the redefinition
      of 'bool'. Nowadays every c++ compiler should define bool anyway....
 
 #undef FALSE
@@ -66,13 +66,13 @@ enum bool { FALSE = 0, false = 0, TRUE = 1, true = 1 };
      *  identifier for the char*'s, hence the definition of
      *  CVSID_DOT_H2 etc., which are occasionally needed.  */
   #define CVSID(s) \
-      static char* cvsid __attribute__ ((unused)) = (s)
+      static const char* cvsid __attribute__ ((unused)) = (s)
   #define CVSID_DOT_H(s) \
-      static char* cvsid_dot_h __attribute__ ((unused)) = (s)
+      static const char* cvsid_dot_h __attribute__ ((unused)) = (s)
   #define CVSID_DOT_H2(s) \
-      static char* cvsid_dot_h2 __attribute__ ((unused)) = (s)
+      static const char* cvsid_dot_h2 __attribute__ ((unused)) = (s)
   #define CVSID_DOT_H3(s) \
-      static char* cvsid_dot_h3 __attribute__ ((unused)) = (s)
+      static const char* cvsid_dot_h3 __attribute__ ((unused)) = (s)
 #else
     /*  Don't put the CVS Id strings in the .o files -- the
 	compiler will probably print tons of warning about
