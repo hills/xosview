@@ -67,7 +67,7 @@ void RAIDMeter::checkResources( void ){
 
 // parser for /proc/mdstat
 
-int RAIDMeter::find1(char *key, char *findwhat, int num1){
+int RAIDMeter::find1(const char *key, const char *findwhat, int num1){
   char buf[80];
   int rc;
   std::ostringstream os;
@@ -78,7 +78,8 @@ int RAIDMeter::find1(char *key, char *findwhat, int num1){
   return rc;
 }
 
-int RAIDMeter::find2(char *key, char *findwhat, int num1, int num2){
+int RAIDMeter::find2(const char *key, const char *findwhat,
+  int num1, int num2){
   char buf[80];
   int rc;
   std::ostringstream os;

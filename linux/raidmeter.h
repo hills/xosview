@@ -35,8 +35,8 @@ protected:
 
   unsigned long doneColor_, todoColor_, completeColor_;
 
-  int find1(char *key, char *findwhat, int num1);
-  int find2(char *key, char *findwhat, int num1, int num2);
+  int find1(const char *key, const char *findwhat, int num1);
+  int find2(const char *key, const char *findwhat, int num1, int num2);
 
   int raidparse(char *cp);
 

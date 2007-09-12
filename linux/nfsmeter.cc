@@ -32,11 +32,11 @@
 #define MAX(_a, _b) ((_a) > (_b) ? (_a) : (_b))
 #endif
 
-#define NFSSVCSTAT  "/proc/net/rpc/nfsd"
-#define NFSCLTSTAT  "/proc/net/rpc/nfs"
+static const char *NFSSVCSTAT = "/proc/net/rpc/nfsd";
+static const char * NFSCLTSTAT = "/proc/net/rpc/nfs";
 
 NFSMeter::NFSMeter(XOSView *parent, const char *name, int nfields,
-		char *fields, const char *statfile)
+		const char *fields, const char *statfile)
   : FieldMeterGraph( parent, nfields, name, fields ){
 	_statfile = statfile;
 	_statname = name;

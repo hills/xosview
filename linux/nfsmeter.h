@@ -1,4 +1,4 @@
-//  
+//
 //
 //  This file may be distributed under terms of the GPL
 //
@@ -16,14 +16,14 @@ class Host;
 class NFSMeter : public FieldMeterGraph {
 public:
 	NFSMeter(
-		XOSView *parent, 
-		const char *name, 
-		int   nfields, 
-		char *files, 
+		XOSView *parent,
+		const char *name,
+		int   nfields,
+		const char *files,
 		const char *statfile);
   ~NFSMeter( void );
 
-  const char *name( void ) const { return _statname; }  
+  const char *name( void ) const { return _statname; }
   void checkResources( void );
   void starttimer(void) { return _timer.start(); };
   void stoptimer(void) { return _timer.stop(); };

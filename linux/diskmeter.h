@@ -40,7 +40,7 @@ class DiskMeter : public FieldMeterGraph
         unsigned long int write_prev_;
         float maxspeed_;
         bool _vmstat;
-        char *_statFileName;
+        const char *_statFileName;
     };
 
 #endif

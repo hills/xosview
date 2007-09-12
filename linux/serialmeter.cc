@@ -112,7 +112,7 @@ const char *SerialMeter::getResourceName(Device dev){
 }
 
 unsigned short int SerialMeter::getPortBase(Device dev) const {
-  static char *deviceFile[] = { "/dev/ttyS0",
+  static const char *deviceFile[] = { "/dev/ttyS0",
                                 "/dev/ttyS1",
                                 "/dev/ttyS2",
                                 "/dev/ttyS3",
