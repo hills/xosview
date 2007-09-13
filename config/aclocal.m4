@@ -82,8 +82,6 @@ changequote([, ])
 
 AC_DEFUN(AC_XOSV_LINUX, [
 EXTRALIBS=$XPMLIB
-EXTRA_OUT_FILES="$EXTRA_OUT_FILES \
-  linux/memstat/Makefile:config/Makefile.linux.memstat.in"
 
 dnl
 dnl Define GNULIBC for the new GNU libc for linux
@@ -112,65 +110,7 @@ AC_DEFINE(USESYSCALLS)
 echo "enabled  Linux system calls by default"
 )
 
-dnl
-dnl Add a switch which will build the memstat kernel module
-dnl
-AC_ARG_ENABLE([linux-memstat],
-[  --enable-linux-memstat  build the linux memstat kernel module],
-
-if test "$enableval" = "no"
-then
-        MEMSTAT=
-        echo "disabled the Linux memstat module"
-else
-        AC_SYS_LINUX_VERS
-        MEMSTAT=MemStat
-        echo "enabled  the Linux $LVERSION memstat module"
-
-dnl
-dnl If this module is to be built then check to see if we can
-dnl use MODVERSIONS.
-dnl
-AC_MSG_CHECKING(for MODVERSIONS)
-AC_EGREP_CPP(yes,
-[#include <linux/config.h>
-#ifdef CONFIG_MODVERSIONS
-yes
-#endif
-], [USE_MOD_VERSIONS=-DMODVERSIONS] AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
-SMP_LINUX
 INSTALL_ARGS='-m 755'
-fi
-,
-AC_SYS_LINUX_VERS
-if test "$LVERSION" = "2.0" -o "$LVERSION" = "2.2"
-then
-        MEMSTAT=MemStat
-        echo "enabled  the Linux $LVERSION memstat module by default"
-dnl
-dnl If this module is to be built then check to see if we can
-dnl use MODVERSIONS.
-dnl
-dnl        AC_CHECK_HEADER(linux/modversions.h, [USE_MOD_VERSIONS=-DMODVERSIONS])
-        AC_MSG_CHECKING(for MODVERSIONS)
-        AC_EGREP_CPP(yes,
-[#include <linux/config.h>
-#ifdef CONFIG_MODVERSIONS
-yes
-#endif
-], [USE_MOD_VERSIONS=-DMODVERSIONS] AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
-        SMP_LINUX
-else
-        MEMSTAT=
-        echo "disabled the Linux $LVERSION memstat module by default"
-fi
-)
-INSTALL_ARGS='-m 755'
-if test "$smp" = "yes"
-then
-LINUX_SMP="-D__SMP__"
-fi
-AC_SUBST(LINUX_SMP)
 ]
 	NetMeter_Default_Setting=False
 )

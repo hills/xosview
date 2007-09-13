@@ -58,14 +58,11 @@ vpath %.cc $(TOP)
 
 #-----------------------------------------------------------------------
 
-all : libmeter.a @MEMSTAT@
+all : libmeter.a
 
-MemStat:
-	$(MAKE) -C memstat
 
 clean :
 	rm -f $(OBJS) $(DEPFILES) libmeter.a *~
-	if test "@MEMSTAT@" = "MemStat"; then $(MAKE) -C memstat clean; fi
 
 libmeter.a : $(OBJS)
 	ar cvr libmeter.a $(OBJS)

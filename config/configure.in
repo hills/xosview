@@ -9,8 +9,10 @@ AC_PROG_CXX
 ICE_CXX_BOOL
 ICE_CXX_LONG_LONG
 AC_PATH_X
-CXXFLAGS="$CXXFLAGS -I$x_includes"
-case $host_os in
+if test -n "$x_includes" ; then
+    CXXFLAGS="$CXXFLAGS -I$x_includes"
+fi
+case "$host_os" in
 linux*)
   LIBS="-L$x_libraries $LIBS"
   ELF_LINK_FLAGS="" ;;
