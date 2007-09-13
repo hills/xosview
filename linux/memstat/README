@@ -1,6 +1,0 @@
-  This directory containes the source for a linux kernel module.  The
-module here will cause a new entry (/proc/memstat) to show up in the 
-proc filesystem.  The code for the memstat module is very similar to the
-code which produces the /proc/meminfo output.  There is one difference.
-/proc/memstat has output which allows xosview to display the percentage
-of memory which is shared.  See README.linux for further details.
