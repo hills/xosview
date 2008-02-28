@@ -55,7 +55,7 @@ fi
 
 dnl	For gcc-based (or primarily-gcc) OS's, set EXTRA_CXXFLAGS to -Wall -O4
 AC_DEFUN(AC_GCC_EXTRA_CXXFLAGS, [
-	EXTRA_CXXFLAGS="-Wall -O4"
+	EXTRA_CXXFLAGS="-W -Wall -O3"
 ])
 
 AC_DEFUN(SMP_LINUX,
