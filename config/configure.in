@@ -83,7 +83,7 @@ dnl
 
 
 case "$host_os" in
-linux*)
+linux*|gnu*)
   LIBS="-L$x_libraries $LIBS"
   ELF_LINK_FLAGS="" ;;
 *)
@@ -345,6 +345,10 @@ solaris2*)
 	EXTRALIBS="-R$x_libraries -lsocket -lnsl -lkstat $XPMLIB"
 	host_dir=sunos5
 	host_os=sunos5 ;;
+gnu*)	AC_XOSV_GNU
+	AC_GCC_EXTRA_CXXFLAGS
+	host_dir=gnu
+	host_os=gnu ;;
 *)       AC_MSG_ERROR([xosview has not been ported to $host_os :(.  Sorry.]) ;;
 esac
 
