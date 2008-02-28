@@ -10,7 +10,9 @@ xosvstipple*cpuUserColor:       red
 xosvstipple*cpuNiceColor:       red
 xosvstipple*cpuSystemColor:     red
 xosvstipple*cpuInterruptColor:  red
+xosvstipple*cpuSInterruptColor: red
 xosvstipple*cpuFreeColor:       red
+xosvstipple*cpuStolenColor:     red
 xosvstipple*memUsedColor:	orange
 xosvstipple*memSharedColor:	orange
 xosvstipple*memBufferColor:	orange
@@ -47,7 +49,9 @@ xosvstipplebw*cpuUserColor:	black
 xosvstipplebw*cpuNiceColor:	black
 xosvstipplebw*cpuSystemColor:	black
 xosvstipplebw*cpuInterruptColor:black
+xosvstipplebw*cpuSInterruptColor:black
 xosvstipplebw*cpuFreeColor:	black
+xosvstipplebw*cpuStolenColor:	black
 xosvstipplebw*memUsedColor:	black
 xosvstipplebw*memSharedColor:	black
 xosvstipplebw*memBufferColor:	black

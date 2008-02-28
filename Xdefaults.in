@@ -70,9 +70,11 @@ xosview*cpuUserColor:       seagreen
 xosview*cpuNiceColor:       yellow
 xosview*cpuSystemColor:     orange
 xosview*cpuInterruptColor:  red
+xosview*cpuSInterruptColor: orange red
 xosview*cpuSoftIntColor:    red
 xosview*cpuWaitColor:       lightblue
 xosview*cpuFreeColor:       aquamarine
+xosview*cpuStolenColor:     blue
 xosview*cpuPriority:        1
 xosview*cpuDecay:           True
 xosview*cpuGraph:           True
