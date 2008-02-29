@@ -115,6 +115,13 @@ __END_DECLS
 // in __NetBSD_Version__ for us if needed.
 #if defined(XOSVIEW_NETBSD) && defined(__NetBSD_Version__) && (__NetBSD_Version__ >= 106010000)
 #define NETBSD_1_6A
+#ifdef HW_DISKSTATS
+static int dmib[3] = {CTL_HW, HW_DISKSTATS, sizeof(struct disk_sysctl)};
+#endif
+#ifdef HW_IOSTATS
+static int dmib[3] = {CTL_HW, HW_IOSTATS, sizeof(struct io_sysctl)};
+#include <sys/iostat.h>
+#endif
 #endif
 
 #include "general.h"
@@ -401,6 +408,8 @@ BSDGetCPUTimes (long* timeArray) {
   static int mib[] = { CTL_KERN, KERN_CPUSTATS };
 #endif
 #if defined(XOSVIEW_NETBSD) && (__NetBSD_Version__ >= 104260000)
+  uint64_t cp_time[CPUSTATES];
+  size_t size = sizeof(cp_time[0]) * CPUSTATES;
   static int mib[] = { CTL_KERN, KERN_CP_TIME };
 #endif
 
@@ -408,14 +417,11 @@ BSDGetCPUTimes (long* timeArray) {
   if (CPUSTATES != 5)
     errx (-1, "Error:  xosview for *BSD expects 5 cpu states!\n");
 #if defined(__NetBSD_Version__) && __NetBSD_Version__ > 104260000 /* > 1.4Z */
-  struct schedstate_percpu ssp;
-  size_t size = sizeof(ssp.spc_cp_time);
-  if (sysctl(mib, 2, ssp.spc_cp_time, &size, NULL, 0) < 0) {
-    fprintf(stderr, "can't get schedstate_percpu: %s\n", strerror(errno));
-    memset(&ssp, 0, sizeof(ssp));
+  if (sysctl(mib, 2, cp_time, &size, NULL, 0) < 0) {
+    fprintf(stderr, "xosview: sysctl kern.cp_time failed: %s\n", strerror(errno));
+    bzero(&cp_time, size);
   }
-  for (size = 0; size < CPUSTATES; size++)
-    timeArray[size] = (long) ssp.spc_cp_time[size];
+  bcopy (cp_time, timeArray, size);
 #else
 #ifdef XOSVIEW_BSDI
   if (sysctl(mib, 2, &cpu, &size, NULL, 0) < 0) {
@@ -780,13 +786,12 @@ BSDDiskInit() {
 #ifdef NETBSD_1_6A
   // Do a sysctl with a NULL data pointer to get the size that would
   // have been returned, and use that to figure out # drives.
-  int mib[3] = {CTL_HW, HW_DISKSTATS, sizeof(struct disk_sysctl)};
   size_t size;
-  if (sysctl(mib, 3, NULL, &size, NULL, 0) < 0) {
+  if (sysctl(dmib, 3, NULL, &size, NULL, 0) < 0) {
     warnx("!!! The DiskMeter sysctl failed.  Disabling DiskMeter.");
     return 0;
   }
-  NetBSD_N_Drives = size / sizeof(struct disk_sysctl);
+  NetBSD_N_Drives = size / dmib[2];
   return 1;
 #endif
   return ValidSymbol(DISKLIST_SYM_INDEX);
@@ -823,19 +828,29 @@ BSDGetDiskXFerBytes (unsigned long long *bytesXferred) {
 #else
 #if defined(NETBSD_1_6A)
   // Use the new sysctl to do this for us.
-  int mib[3] = {CTL_HW, HW_DISKSTATS, sizeof(struct disk_sysctl)};
-  size_t sysctl_sz = NetBSD_N_Drives * sizeof(struct disk_sysctl);
+  size_t sysctl_sz = NetBSD_N_Drives * dmib[2];
+#ifdef HW_DISKSTATS
   struct disk_sysctl drive_stats[NetBSD_N_Drives];
+#endif
+#ifdef HW_IOSTATS
+  struct io_sysctl drive_stats[NetBSD_N_Drives];
+#endif
 
   // Do the sysctl.
-  if (sysctl(mib, 3, drive_stats, &sysctl_sz, NULL, 0) < 0) {
+  if (sysctl(dmib, 3, drive_stats, &sysctl_sz, NULL, 0) < 0) {
     err(1, "sysctl hw.diskstats failed");
   }
 
   // Now accumulate the total.
   unsigned long long xferred = 0;
   for (unsigned int i = 0; i < NetBSD_N_Drives; i++) {
+#ifdef HW_DISKSTATS
     xferred += drive_stats[i].dk_rbytes + drive_stats[i].dk_wbytes;
+#endif
+#ifdef HW_IOSTATS
+    if (drive_stats[i].type == IOSTAT_DISK)
+	xferred += drive_stats[i].rbytes + drive_stats[i].wbytes;
+#endif
   }
   *bytesXferred = xferred;
 #else

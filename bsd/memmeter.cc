@@ -91,8 +91,15 @@ void MemMeter::getmeminfo (void) {
    *  this, and later we'll add all the common fields to this.  */
   total_ = 0.0;
 #if defined(UVM) && (defined(XOSVIEW_NETBSD) || defined(XOSVIEW_OPENBSD))
+#ifdef VM_UVMEXP2
+  int params[] = {CTL_VM, VM_UVMEXP2};
+  struct uvmexp_sysctl kvm_uvm_exp;
+  size_t kvm_uvm_exp_size = sizeof (kvm_uvm_exp);
+  sysctl (params, 2, &kvm_uvm_exp, &kvm_uvm_exp_size, NULL, 0);
+#else
   struct uvmexp kvm_uvm_exp;
   BSDGetUVMPageStats(&kvm_uvm_exp);
+#endif
   int pgsize = kvm_uvm_exp.pagesize;
   fields_[0] = kvm_uvm_exp.active*pgsize;
   fields_[1] = kvm_uvm_exp.inactive*pgsize;

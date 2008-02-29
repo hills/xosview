@@ -48,7 +48,11 @@ protected:
   void getpageinfo( void );
 private:
 #if defined(UVM)
+# ifdef VM_UVMEXP2
+  struct uvmexp_sysctl prev_;
+# else
   struct uvmexp	prev_;
+# endif
 #else
   struct vmmeter prev_;
 #endif

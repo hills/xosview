@@ -20,6 +20,10 @@
 #include "pagemeter.h"
 #include "kernel.h"		//  For NetBSD Page functions.
 
+#if defined(UVM) && defined (VM_UVMEXP2)
+#include <sys/sysctl.h>         /*  Needed for uvmexp_sysctl.  */
+#endif
+
 CVSID("$Id$");
 CVSID_DOT_H(PAGEMETER_H_CVSID);
 
@@ -28,7 +32,13 @@ PageMeter::PageMeter( XOSView *parent, double total )
   total_ = total;
   BSDPageInit();
 #ifdef UVM
+# ifdef VM_UVMEXP2
+  int params[] = {CTL_VM, VM_UVMEXP2};
+  size_t prev_size = sizeof (prev_);
+  sysctl (params, 2, &prev_, &prev_size, NULL, 0);
+# else
   BSDGetUVMPageStats(&prev_);
+# endif
 #else
   BSDGetPageStats(&prev_);
 #endif
@@ -57,8 +67,15 @@ void PageMeter::checkevent( void ){
 void PageMeter::getpageinfo (void) {
 //  Begin NetBSD-specific code...
 #if defined(UVM)
+# ifdef VM_UVMEXP2
+  int params[] = {CTL_VM, VM_UVMEXP2};
+  struct uvmexp_sysctl uvm;
+  size_t uvm_size = sizeof (uvm);
+  sysctl (params, 2, &uvm, &uvm_size, NULL, 0);
+# else
   struct uvmexp uvm;
   BSDGetUVMPageStats(&uvm);
+# endif
 #else
   struct vmmeter vm;
   BSDGetPageStats(&vm);
