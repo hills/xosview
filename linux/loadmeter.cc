@@ -1,5 +1,5 @@
 //
-//  Copyright (c) 1994, 1995, 2006 by Mike Romberg ( mike.romberg@noaa.gov )
+//  Copyright (c) 1994, 1995, 2006, 2008 by Mike Romberg ( mike.romberg@noaa.gov )
 //
 //  This file may be distributed under terms of the GPL
 //
@@ -13,6 +13,7 @@
 #include <fstream>
 #include <sstream>
 #include <stdlib.h>
+#include <math.h>
 
 static const char LOADFILENAME[] = "/proc/loadavg";
 static const char SPEEDFILENAME[] = "/proc/cpuinfo";
@@ -149,6 +150,9 @@ void LoadMeter::getspeedinfo( void ){
         //XOSDEBUG("SPEED: %s\n",argval.c_str() );
         old_cpu_speed_ = cur_cpu_speed_;
         cur_cpu_speed_ = atoi(argval.c_str());
+        // Make it a round number
+        cur_cpu_speed_ = 100 * (int) nearbyint ( ((double) cur_cpu_speed_ )
+          / 100 );
         break;
     }
   }
