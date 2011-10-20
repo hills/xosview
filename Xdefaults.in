@@ -203,6 +203,16 @@ xosview*batteryLowColor:    red
 xosview*batteryCritColor:   red
 xosview*batteryNoneColor:   grey
 
+! Wireless Meter Resources
+
+xosview*wireless:            True
+xosview*PoorQualityColor:    red
+xosview*FairQualityColor:    yellow
+xosview*GoodQualityColor:    green
+xosview*wirelessUsedColor:   blue
+xosview*wirelessPriority:    1 
+xosview*wirelessUsedFormat:  autoscale
+xosview*wirelessDecay:       True
 
 ! Disk Meter Resources
 

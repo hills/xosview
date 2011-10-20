@@ -193,6 +193,13 @@ an abbreviation for all three of the free BSD operating systems
     array(s).
     Linux  : Disk0 Disk1 Disk2 .. DiskN | Rebuild Progress
 
+\fBWireless Link\fP
+    Shows the current Linkquality
+    of wireless connections.
+    Linux  : linkquality | of 30,60 or 90
+    *BSD   : < Not Supported >
+    HPUX   : < Not Supported >
+
 .SH OPTIONS
 
 Most of these command line options are just a convenient way to set one or
@@ -278,6 +285,9 @@ setting xosview*usedlabels to "True".
 
 .\"  Handle -/+gfx
 .pm gfx
+
+.\"  Handle -/+wireless
+.pm wireless
 
 .\"  Handle -/+net
 .pm net
@@ -906,6 +916,43 @@ If no battery is present - or all batteries get removed (while on AC).
 .pp battery
 .uf battery
 
+\fBWireless Meter Resources\fP
+
+
+xosview*wireless: (True or False)
+.RS
+If True then xosview will display the link-Quality of wireless connections.
+Note that the graph will *never* schow up, if you don't have any wireless
+Devices, or no wireless extensions in Kernel (/proc/net/wireless).
+Default is true.
+.RE
+
+xosview*PoorQualityColor: \fIcolor\fP
+.RS
+This is the color for the Link-Graph with Quality between 0 and 6.
+.RE
+
+xosview*FairQualityColor: \fIcolor\fP
+.RS
+This is the color for the Link-Graph with Quality between 7 and 14.
+.RE
+
+xosview*GoodQualityColor: \fIcolor\fP
+.RS
+This is the color for the Link-Graph with Quality higher than 14.
+.RE
+
+xosview*wirelessUsedColor: \fIcolor\fP
+.RS
+This is the background color.
+.RE
+
+.\"  Do the priority resource
+.pp wireless
+.dc wireless
+.uf wireless
+
+
 \fBDisk Meter Resources\fP
 
 .\"  Do the disk: True resource.
@@ -1127,6 +1174,11 @@ FreeBSD 4.* updates, and a few other suggestions.
 Christos Zoulas (christos@netbsd.org)
 .RS
 C++ standard compliance and other NetBSD fixes.
+.RE
+
+Tim Ehlers (tehlers@gwdg.de)
+.RS
+Wireless Link-Meter for Linux.
 .RE
 
 And many others who have sent in small fixes and improvements.

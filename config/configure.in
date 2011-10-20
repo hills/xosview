@@ -364,6 +364,15 @@ netbsd)
   ;;
 esac
 
+  #  Only enable the wireless meter if it appears we support it.
+  if test -e /proc/net/wireless ; then
+    WIRELESSMETER=wirelessmeter.o
+    AC_DEFINE(HAVE_WIRELESS_METER) 
+    AC_MSG_WARN([/proc/net/wireless detected -- enabling the wireless meter!])
+  else
+    AC_MSG_WARN([no /proc/net/wireless -- disabling the wireless meter.])
+  fi
+
 dnl
 dnl The netbsd and linux ports modify these variables which
 dnl are exported by AC_OUTPUT.

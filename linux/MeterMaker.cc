@@ -18,6 +18,8 @@
 #include "serialmeter.h"
 #include "loadmeter.h"
 #include "btrymeter.h"
+#include "wirelessmeter.h"
+#include <fstream>
 #include "diskmeter.h"
 #include "raidmeter.h"
 #include "lmstemp.h"
@@ -25,6 +27,7 @@
 
 #include <stdlib.h>
 
+using namespace std;
 
 MeterMaker::MeterMaker(XOSView *xos){
   _xos = xos;
@@ -52,6 +55,19 @@ void MeterMaker::makeMeters(void){
     push(new MemMeter(_xos));
   if (_xos->isResourceTrue("disk"))
       push(new DiskMeter(_xos, atof(_xos->getResource("diskBandwidth"))));
+
+  // check for the wireless meter
+static const char WLFILENAME[] = "/proc/net/wireless";
+ifstream stats( WLFILENAME );
+if ( stats ) {
+  if (_xos->isResourceTrue("wireless")){
+    int wirelessCount = WirelessMeter::countdevices();
+    int start = (wirelessCount == 0) ? 0 : 1;
+	if (wirelessCount != 0) {
+    for (int i = start ; i <= wirelessCount ; i++)
+      push(new WirelessMeter(_xos, i, WirelessMeter::wirelessStr(i)));
+  } } }
+
   // check for the RAID meter
   if (_xos->isResourceTrue("RAID")){
     int RAIDCount = atoi(_xos->getResource("RAIDdevicecount"));

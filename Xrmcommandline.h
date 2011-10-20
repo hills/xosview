@@ -48,6 +48,9 @@ static XrmOptionDescRec options[] = {
 // Batterymeter resources
 { "-battery", "*battery", XrmoptionNoArg, "False" },
 { "+battery", "*battery", XrmoptionNoArg, "True" },
+// Wirelessmeter resources
+{ "-wireless", "*wireless", XrmoptionNoArg, "False" },
+{ "+wireless", "*wireless", XrmoptionNoArg, "True" },
 //  GFX resources
 { "-gfx", "*gfx", XrmoptionNoArg, "False" },
 { "+gfx", "*gfx", XrmoptionNoArg, "True" },

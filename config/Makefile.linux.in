@@ -22,6 +22,7 @@ nfsmeter.o \
 intmeter.o \
 loadmeter.o \
 btrymeter.o \
+wirelessmeter.o \
 diskmeter.o \
 raidmeter.o \
 lmstemp.o \
