@@ -130,7 +130,7 @@ void IntMeter::updateirqcount( int n, bool init ){
    /* If we are in init, set it to zero,
     * otherwise copy over the old set */
    if( init ) {
-	   for( int i=0; i < n; i++)
+	   for( int i=0; i < numBits(); i++)
 		irqs_[i]=lastirqs_[i]=0;
    }
    else {

@@ -213,8 +213,12 @@ void DiskMeter::update_info(unsigned long long rsum, unsigned long long wsum)
 
     // avoid strange values at first call
     // (by this - the first value displayed becomes zero)
-    if(sysfs_read_prev_ == 0L)  sysfs_read_prev_  = rsum;
-    if(sysfs_write_prev_ == 0L) sysfs_write_prev_ = wsum;
+    if(sysfs_read_prev_ == 0L)
+    { 
+        sysfs_read_prev_  = rsum;
+        sysfs_write_prev_ = wsum;
+        itim = 1; 	// itim is garbage here too. Valgrind complains.
+    }
 
     // convert rate from bytes/microsec into bytes/second
     fields_[0] = ((rsum - sysfs_read_prev_ ) * 1e6 ) / itim;
