@@ -11,13 +11,14 @@
 #include "cpumeter.h"
 #include <fstream>
 #include <sstream>
+#include <map>
 #include <stdlib.h>
 
 
 static const char *INTFILE     = "/proc/interrupts";
 static const char *VERSIONFILE = "/proc/version";
 
-static 	int realintnum[1024];
+std::map<int,int> realintnum;
 
 IntMeter::IntMeter( XOSView *parent, int cpu)
   : BitMeter( parent, "INTS", "", 1,
@@ -114,10 +115,11 @@ void IntMeter::updateirqcount( int n, bool init ){
    setNumBits(n+1);
    std::ostringstream os;
 
-   os << "INTs (0-16" ;
-   for (int i=16; i<1024; i++) {
-	if (realintnum[i])
-	   os << ", " << (i) ;
+   os << "INTs (0-15" ;
+   for (std::map<int,int>::const_iterator it = realintnum.upper_bound(15),
+                                          end = realintnum.end();
+                                          it != end; ++it) {
+         os << ", " << it->first ;
    }
    os << ")" << std::ends;
 
@@ -128,7 +130,7 @@ void IntMeter::updateirqcount( int n, bool init ){
    /* If we are in init, set it to zero,
     * otherwise copy over the old set */
    if( init ) {
-	   for( int i=0; i < n; i++)
+	   for( int i=0; i < numBits(); i++)
 		irqs_[i]=lastirqs_[i]=0;
    }
    else {
@@ -161,12 +163,9 @@ void IntMeter::initirqcount( void ){
   }
 
   if (!_old) {
-      for (i=0; i<1024; i++)	// init index into int array
-	if (i < 16)		// first 16 map directly
-	    realintnum[i] = i;
-	else
-	    realintnum[i] = 0;
-      intfile.ignore(1024, '\n');
+    for (i=0; i<16; i++)
+      realintnum[i] = i;
+    intfile.ignore(1024, '\n');
   }
 
   /* just looking for the highest number interrupt that
@@ -175,13 +174,14 @@ void IntMeter::initirqcount( void ){
   idx = 16;
   while ( !intfile.eof() ){
     intfile >> i;
+    /* break when reaching non-numeric special interrupts */
+    if (!intfile) break;
     if (i < 16)
 	intno = i;
     else {
 	intno = idx;
 	realintnum[i] = idx++;
     }
-    if (!intfile) break;
     intfile.ignore(1024, '\n');
   }
   updateirqcount(intno, true);

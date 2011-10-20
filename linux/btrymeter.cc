@@ -27,17 +27,21 @@ extern int errno;
 
 static const char APMFILENAME[] = "/proc/apm";
 static const char ACPIBATTERYDIR[] = "/proc/acpi/battery";
+static const char SYSPOWERDIR[] = "/sys/class/power_supply";
 
 BtryMeter::BtryMeter( XOSView *parent )
   : FieldMeter( parent, 2, "BTRY", "AVAIL/USED", 1, 1, 0 ){
 
-  // find out ONCE whether to use ACPI or APM
-  use_acpi = use_apm = false;
+  // find out ONCE whether to use ACPI, APM or sysfs
+  use_acpi = use_apm = use_syspower = false;
   if ( has_apm() ) {
-	use_apm=true; use_acpi=false;
+      use_apm=true; use_acpi=false; use_syspower=false;
   }
   if ( has_acpi() ) {
-	use_acpi=true; use_apm=false;
+      use_acpi=true; use_apm=false; use_syspower=false;
+  }
+  if ( has_syspower() ) {
+      use_acpi=false; use_apm=false; use_syspower=true;
   }
 
   old_apm_battery_state = apm_battery_state = 0xFF;
@@ -87,7 +91,7 @@ bool BtryMeter::has_acpi( void ){
      return false;
   }
   if ( S_ISDIR(stbuf.st_mode) ) {
-     XOSDEBUG("exists and is a DIR.\n");
+     XOSDEBUG("%s exists and is a DIR.\n", ACPIBATTERYDIR);
   } else {
      XOSDEBUG("no ACPI dir\n");
      return false;
@@ -98,6 +102,27 @@ bool BtryMeter::has_acpi( void ){
 
 }
 
+// determine if /sys/class/power_supply exists and is a DIR
+// (XXX: too lazy -  no tests for actual readability is done)
+bool BtryMeter::has_syspower( void ){
+
+  struct stat stbuf;
+
+  if ( stat(SYSPOWERDIR, &stbuf) != 0 ) {
+     XOSDEBUG("has_syspower(): stat failed: %d\n",errno);
+     return false;
+  }
+  if ( S_ISDIR(stbuf.st_mode) ) {
+     XOSDEBUG("%s exists and is a DIR.\n", SYSPOWERDIR);
+  } else {
+     XOSDEBUG("no /sys/class/power_supply dir\n");
+     return false;
+  }
+
+  // declare syspower as usable
+  return true;
+
+}
 
 void BtryMeter::checkResources( void ){
   FieldMeter::checkResources();
@@ -220,8 +245,8 @@ void BtryMeter::checkevent( void ){
 
 void BtryMeter::getpwrinfo( void ){
 
-  if ( use_acpi ) {
-	getacpiinfo(); return;
+  if ( use_acpi || use_syspower ) {
+	getacpi_or_sys_info(); return;
   }
   if ( use_apm ) {
 	getapminfo(); return;
@@ -330,11 +355,20 @@ bool BtryMeter::getapminfo( void ){
 // but munging it into something usefull is ugly
 // esp. as you can have more than one battery ...
 
-bool BtryMeter::getacpiinfo( void ){
+bool BtryMeter::getacpi_or_sys_info( void ){
 
-  DIR *dir = opendir(ACPIBATTERYDIR);
+  DIR *dir = NULL;
+  std::string abs_battery_dir;
+
+  if (use_acpi) {
+    abs_battery_dir = ACPIBATTERYDIR;
+  } else {
+    abs_battery_dir = SYSPOWERDIR;
+  }
+
+  dir = opendir(abs_battery_dir.c_str());
   if (dir==NULL) {
-    XOSDEBUG("ACPI: Cannot open directory : %s\n", ACPIBATTERYDIR);
+    XOSDEBUG("ACPI/SYS: Cannot open directory : %s\n", abs_battery_dir.c_str());
     return false;
   }
 
@@ -351,7 +385,6 @@ bool BtryMeter::getacpiinfo( void ){
 
   acpi_charge_state=0; // assume charged
 
-  std::string abs_battery_dir = ACPIBATTERYDIR;
   for (struct dirent *dirent; (dirent = readdir(dir)) != NULL; ) {
     if (strncmp(dirent->d_name, ".", 1) == 0
     	|| strncmp(dirent->d_name, "..", 2) == 0)
@@ -359,12 +392,15 @@ bool BtryMeter::getacpiinfo( void ){
 
     std::string abs_battery_name = abs_battery_dir + "/" + dirent->d_name;
 
-    XOSDEBUG("ACPI Batt: %s\n", dirent->d_name);
+    XOSDEBUG("ACPI/SYS Batt: %s\n", dirent->d_name);
 
     // still can happen that it's not present:
-    if ( battery_present( abs_battery_name + "/info" ) ) {
-      // ok, worth to parse out all the fields
-      if ( parse_battery( abs_battery_name ) ) {
+    if ( (use_acpi &&
+          (acpi_battery_present(abs_battery_name + "/info" )) &&
+          (acpi_parse_battery(abs_battery_name))) ||
+         (use_syspower &&
+          (sys_battery_present(abs_battery_name + "/present" )) &&
+          (sys_parse_battery(abs_battery_name))) ) {
 
 		// sum up:
 
@@ -385,7 +421,6 @@ bool BtryMeter::getacpiinfo( void ){
 	      found = true; // found at least one
       }
     }
-  }
 
   closedir(dir);
 
@@ -418,7 +453,7 @@ bool BtryMeter::getacpiinfo( void ){
 
 // present yes/no can change anytime !
 // by adding/removing a battery
-bool BtryMeter::battery_present(const std::string& filename)
+bool BtryMeter::acpi_battery_present(const std::string& filename)
 {
   std::ifstream loadinfo( filename.c_str() );
 
@@ -439,7 +474,7 @@ bool BtryMeter::battery_present(const std::string& filename)
   return false;
 }
 
-bool BtryMeter::parse_battery(const std::string& dirname)
+bool BtryMeter::acpi_parse_battery(const std::string& dirname)
 {
   // actually there are THREE files to check:
   // 'alarm', 'info' and 'state'
@@ -534,4 +569,112 @@ bool BtryMeter::parse_battery(const std::string& dirname)
   }
 
 return true;
+}
+
+// present yes/no can change anytime !
+// by adding/removing a battery
+bool BtryMeter::sys_battery_present(const std::string& filename)
+{
+  std::ifstream loadinfo( filename.c_str() );
+  std::string value;
+
+  while ( loadinfo.good() ) {
+
+	value.clear();
+	loadinfo >> value;
+
+    if (value == "1")
+	  return true;
+  }
+  XOSDEBUG("batt %s not present\n",filename.c_str() );
+  return false;
+}
+
+bool BtryMeter::sys_parse_battery(const std::string& dirname)
+{
+  std::string filename;
+  std::ifstream loadinfo;
+  std::string value;
+  struct stat stbuf;
+
+  filename = dirname + "/alarm";
+  loadinfo.open(filename.c_str() );
+  while ( loadinfo.good() ) {
+	value.clear();
+	loadinfo >> value;
+	//XOSDEBUG("alarm (%s): v=\"%s\"\n", filename.c_str(), value.c_str() );
+    battery.alarm = atoi(value.c_str());
+    break;
+  }
+  loadinfo.close();
+  loadinfo.clear();
+
+  filename = dirname + "/energy_full_design";
+  if (stat(filename.c_str(),&stbuf)!=0)
+     filename=dirname+"/charge_full_design";
+  loadinfo.open(filename.c_str() );
+  while ( loadinfo.good() ) {
+	value.clear();
+	loadinfo >> value;
+	//XOSDEBUG("design_capacity (%s): v=\"%s\"\n", filename.c_str(), value.c_str() );
+    battery.design_capacity = atoi(value.c_str());
+    break;
+  }
+  loadinfo.close();
+  loadinfo.clear();
+
+  filename = dirname + "/energy_full";
+  if (stat(filename.c_str(),&stbuf)!=0)
+     filename=dirname+"/charge_full";
+  loadinfo.open(filename.c_str() );
+  if (!loadinfo.good()) {
+	loadinfo.close();
+	loadinfo.clear();
+	filename=dirname+"/charge_full_design";
+	loadinfo.open(filename.c_str());
+  }
+
+  while ( loadinfo.good() ) {
+	value.clear();
+	loadinfo >> value;
+	//XOSDEBUG("last_full_capacity (%s): v=\"%s\"\n", filename.c_str(), value.c_str() );
+    battery.last_full_capacity = atoi(value.c_str());
+    break;
+  }
+  loadinfo.close();
+  loadinfo.clear();
+
+  filename = dirname + "/energy_now";
+  if (stat(filename.c_str(),&stbuf)!=0)
+     filename=dirname+"/charge_now";
+  loadinfo.open(filename.c_str() );
+  while ( loadinfo.good() ) {
+	value.clear();
+	loadinfo >> value;
+	//XOSDEBUG("remaining_capacity (%s): v=\"%s\"\n", filename.c_str(), value.c_str() );
+    battery.remaining_capacity = atoi(value.c_str());
+    break;
+  }
+  loadinfo.close();
+  loadinfo.clear();
+
+  filename = dirname + "/status";
+  loadinfo.open(filename.c_str() );
+  while ( loadinfo.good() ) {
+	value.clear();
+	loadinfo >> value;
+	//XOSDEBUG("status (%s): v=\"%s\"\n", filename.c_str(), value.c_str() );
+
+    if ( value == "Full" )
+        battery.charging_state=0;
+    if ( value == "Discharging" )
+        battery.charging_state=-1;
+    if ( value == "Charging" )
+        battery.charging_state=1;
+    break;
+  }
+  loadinfo.close();
+  loadinfo.clear();
+
+  return true;
 }

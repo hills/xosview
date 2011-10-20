@@ -11,11 +11,7 @@
 #include <stdlib.h>
 #include <stdio.h>	//  For snprintf().
 #include <ctype.h>
-#ifdef HAVE_IOSTREAM
 #include <iostream>
-#else
-#include <iostream.h>
-#endif
 #include <unistd.h>  //  for access(), etc.  BCG
 #include "snprintf.h"
 #include "general.h"
@@ -161,20 +157,20 @@ Listed from weakest to strongest:
     XrmCombineFileDatabase (rfilename, &_db, 1);
   result = snprintf(rfilename, sizeof rfilename, "/usr/lib/X11/app-defaults/%s",
     XrmQuarkToString(_class));
-  if (result >= 0 && result < (int)sizeof(rfilename))
+  if (result >= 0 && result < sizeof rfilename)
     XrmCombineFileDatabase (rfilename, &_db, 1);
-  result = snprintf(rfilename, (int)sizeof rfilename, "/usr/X11R6/lib/X11/app-defaults/%s",
+  result = snprintf(rfilename, sizeof rfilename, "/usr/X11R6/lib/X11/app-defaults/%s",
     XrmQuarkToString(_class));
-  if (result >= 0 && result < (int)sizeof(rfilename))
+  if (result >= 0 && result < sizeof rfilename)
     XrmCombineFileDatabase (rfilename, &_db, 1);
   //  Try a few more, for SunOS/Solaris folks.
   result = snprintf(rfilename, sizeof rfilename, "/usr/openwin/lib/X11/app-defaults/%s",
     XrmQuarkToString(_class));
-  if (result >= 0 && result < (int)sizeof(rfilename))
+  if (result >= 0 && result < sizeof rfilename)
     XrmCombineFileDatabase (rfilename, &_db, 1);
   result = snprintf(rfilename, sizeof rfilename, "/usr/local/X11R6/lib/X11/app-defaults/%s",
       XrmQuarkToString(_class));
-  if (result >= 0 && result < (int)sizeof(rfilename))
+  if (result >= 0 && result < sizeof rfilename)
     XrmCombineFileDatabase (rfilename, &_db, 1);
 
   //  Now, check for an XOSView file in the XAPPLRESDIR directory...

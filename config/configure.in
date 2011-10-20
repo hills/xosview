@@ -1,5 +1,5 @@
 dnl
-dnl $Id$
+dnl $Id: configure.in,v 1.52 2002/02/18 02:11:13 bgrayson Exp $
 dnl
 AC_INIT(xosview.1)
 CF_TOP_SRCDIR
@@ -367,6 +367,15 @@ netbsd)
   fi
   ;;
 esac
+
+  #  Only enable the wireless meter if it appears we support it.
+  if test -e /proc/net/wireless ; then
+    WIRELESSMETER=wirelessmeter.o
+    AC_DEFINE(HAVE_WIRELESS_METER) 
+    AC_MSG_WARN([/proc/net/wireless detected -- enabling the wireless meter!])
+  else
+    AC_MSG_WARN([no /proc/net/wireless -- disabling the wireless meter.])
+  fi
 
 dnl
 dnl The netbsd and linux ports modify these variables which

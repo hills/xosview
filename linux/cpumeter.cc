@@ -19,10 +19,10 @@ static const char STATFILENAME[] = "/proc/stat";
 #define MAX_PROCSTAT_LENGTH 4096
 
 CPUMeter::CPUMeter(XOSView *parent, const char *cpuID)
-: FieldMeterGraph( parent, 8, toUpper(cpuID), "USR/NICE/SYS/SI/HI/WIO/FREE/ST" ) {
+: FieldMeterGraph( parent, 9, toUpper(cpuID), "USR/NICE/SYS/SI/HI/WIO/FREE/GST/ST" ) {
   _lineNum = findLine(cpuID);
   for ( int i = 0 ; i < 2 ; i++ )
-    for ( int j = 0 ; j < 8 ; j++ )
+    for ( int j = 0 ; j < 9 ; j++ )
       cputime_[i][j] = 0;
   cpuindex_ = 0;
 
@@ -41,7 +41,8 @@ void CPUMeter::checkResources( void ){
   setfieldcolor( 4, parent_->getResource( "cpuInterruptColor" ) );
   setfieldcolor( 5, parent_->getResource( "cpuWaitColor" ) );
   setfieldcolor( 6, parent_->getResource( "cpuFreeColor" ) );
-  setfieldcolor( 7, parent_->getResource( "cpuStolenColor" ) );
+  setfieldcolor( 7, parent_->getResource( "cpuGuestColor" ) );
+  setfieldcolor( 8, parent_->getResource( "cpuStolenColor" ) );
   priority_ = atoi (parent_->getResource( "cpuPriority" ) );
   dodecay_ = parent_->isResourceTrue( "cpuDecay" );
   useGraph_ = parent_->isResourceTrue( "cpuGraph" );
@@ -77,18 +78,21 @@ void CPUMeter::getcputime( void ){
 	      >>cputime_[cpuindex_][4]
 	      >>cputime_[cpuindex_][5]
 	      >>cputime_[cpuindex_][6]
-	      >>cputime_[cpuindex_][7];
+	      >>cputime_[cpuindex_][7]
+	      >>cputime_[cpuindex_][8];
 
   int oldindex = (cpuindex_+1)%2;
-  for ( int i = 0 ; i < 8 ; i++ ){
-    static int cputime_to_field[8] = { 0, 1, 2, 6, 5, 4, 3, 7 };
+  for ( int i = 0 ; i < 9 ; i++ ){
+    static int cputime_to_field[9] = { 0, 1, 2, 6, 5, 4, 3, 8, 7 };
     int field = cputime_to_field[i];
     fields_[field] = cputime_[cpuindex_][i] - cputime_[oldindex][i];
     total_ += fields_[field];
   }
+  fields_[0] -= fields_[7];
+  total_ -= fields_[7];
 
   if (total_){
-    setUsed (total_ - (fields_[5] + fields_[6] + fields_[7]), total_);
+    setUsed (total_ - (fields_[5] + fields_[6] + fields_[7] + fields_[8]), total_);
     cpuindex_ = (cpuindex_ + 1) % 2;
   }
 }

@@ -1,6 +1,4 @@
-'\" t
-.\" @(#)xosview.1	1.8.3 1/99 "
-.TH XOSVIEW 1.8.3 "$Date$"
+.TH "XOSVIEW" 1 "$Date$" "" ""
 .UC
 .SH NAME
 xosview \- X based system monitor
@@ -195,51 +193,58 @@ an abbreviation for all three of the free BSD operating systems
     array(s).
     Linux  : Disk0 Disk1 Disk2 .. DiskN | Rebuild Progress
 
+\fBWireless Link\fP
+    Shows the current Linkquality
+    of wireless connections.
+    Linux  : linkquality | of 30,60 or 90
+    *BSD   : < Not Supported >
+    HPUX   : < Not Supported >
+
 .SH OPTIONS
 
 Most of these command line options are just a convenient way to set one or
 more of xosview's resources.  Please see the \fBRESOURCES\fP section for
 more details on what the resource is for.
 
--v
+\-v
 .RS
 Displays the version number.
 .RE
 
--name \fIname\fP
+\-name \fIname\fP
 .RS
-Sets the Resource name xosview will use (same as the -name option
+Sets the Resource name xosview will use (same as the \-name option
 for typical X applications like xterm).  When performing resource
 lookups, xosview will look under \fIname\fP, and then under
 ``xosview''.  For an example, perform the following (as
 documented in README.netbsd):
 .RS
-  xrdb -merge Xdefaults.stipple
-  xosview -name xosvstipple &
-  xosview -name xosvstipplebw &
+  xrdb \-merge Xdefaults.stipple
+  xosview \-name xosvstipple &
+  xosview \-name xosvstipplebw &
 .RE
 
 .RE
 
--display \fIdisplay\fP
+\-display \fIdisplay\fP
 .RS
 Sets the X display to \fIdisplay\fP.  This option overrides the
 xosview*display resource.
 .RE
 
--font \fIfont\fP
+\-font \fIfont\fP
 .RS
 Specifies the font xosview will use for labels.  This option overrides the
 xosview*font resource.
 .RE
 
--title \fItitle\fP
+\-title \fItitle\fP
 .RS
 This option sets the name xosview will tell the window manager to use for
 the X window and icon.  This option overrides the xosview*title resource.
 .RE
 
--geometry \fIgeometry_string\fP
+\-geometry \fIgeometry_string\fP
 .RS
 Sets the X geometry to \fIgeometry_string\fP.  This option overrides the
 xosview*geometry resource.
@@ -251,7 +256,7 @@ xosview*geometry resource.
 .\"  Handle -/+labels
 .pm labels
 
--usedlabels
+\-usedlabels
 .RS
 This option overrides the xosview*usedlabels resource.  It is equivalent to
 setting xosview*usedlabels to "False".
@@ -281,25 +286,28 @@ setting xosview*usedlabels to "True".
 .\"  Handle -/+gfx
 .pm gfx
 
+.\"  Handle -/+wireless
+.pm wireless
+
 .\"  Handle -/+net
 .pm net
 
--network \fImaxbandwidth\fP
+\-network \fImaxbandwidth\fP
 .RE
--networkBW \fImaxbandwidth\fP
+\-networkBW \fImaxbandwidth\fP
 .RE
--networkBandwidth \fImaxbandwidth\fP
+\-networkBandwidth \fImaxbandwidth\fP
 .RS
 These options override the xosview*netBandwidth resource.  They cause
 xosview to display a meter that will shows network usage, with a maximum
 bandwidth of \fBmaxbandwidth\fP.  Notice that setting the bandwidth to
-0 no longer disables the meter -- use the ``-net'' option instead.
+0 no longer disables the meter \-\- use the ``\-net'' option instead.
 .RE
 
-.\"  Handle -/+page
+.\"  Handle \-/+page
 .pm page
 
--pagespeed \fIval\fP
+\-pagespeed \fIval\fP
 .RS
 This option overrides the xosview*pageBandWidth resource.  The resource
 xosview*pageBandWidth will be set to \fIval\fP.
@@ -311,25 +319,25 @@ xosview*pageBandWidth will be set to \fIval\fP.
 .\"  Handle -/+ int
 .pm int
 
--ints +ints
+\-ints +ints
 .RE
--interrupts +interrupts
+\-interrupts +interrupts
 .RS
-Equivalent to -int and +int.
+Equivalent to \-int and +int.
 .RE
 
 .pm irqrate
 
--intrate +intrate
+\-intrate +intrate
 .RS
-Equivalent to -irqrate and +irqrate.
+Equivalent to \-irqrate and +irqrate.
 .RE
 
 .\"  Handle -/+lmstemp
 .pm lmstemp
 .RE
 
--xrm \fIresource_string\fP
+\-xrm \fIresource_string\fP
 .RS
 This switch allows any of xosview's resources to be set on the command line.
 An example of how the xosview*memFreeColor could be set using this option is
@@ -337,7 +345,7 @@ shown below (Note the use of " to prevent the shell from expanding
 \'*\' or from creating two separate arguments, \'xosview*memfreeColor:\'
 and \'purple\'):
 .RS
--xrm "xosview*memFreeColor: purple"
+\-xrm "xosview*memFreeColor: purple"
 .RE
 .RE
 
@@ -499,7 +507,7 @@ Display the current CPU speed in the load meter.
 xosview*cpu: (True or False)
 .RS
 If True then xosview will display a cpu meter.  On linux SMP machines this
-will cause a seperate meter to be displayed for each cpu if Jerome Forissier's
+will cause a separate meter to be displayed for each cpu if Jerome Forissier's
 kernel patch has been applied.  See the 'README.linux' file for more
 details. On IRIX 6.5, the resource cpuFormat decides which meters are
 created for multiple CPUs.
@@ -519,9 +527,6 @@ created for multiple CPUs.
 .uf cpu
 
 xosview*cpuFormat: (single, all, both or auto)
-.RS
-IRIX only.
-.RE
 .RS
 If single, only a cumulative meter for all CPU is created. All creates a
 meter for each CPU, but no cumulative meter. Both creates one cumulative
@@ -670,7 +675,7 @@ xosview*netBandwidth: \fImaxBytes\fP
 This number is used to specify the expected maximum bandwidth
 (in bytes / sec) for the meter.  When the expected maximum bandwidth
 (\fImaxBytes\fP) is exceeded then the network meter will display the
-relative percentage of network usage (25% incomming, 75% outgoing).
+relative percentage of network usage (25% incoming, 75% outgoing).
 .RE
 
 xosview*netIface: \fIinterface\fP
@@ -838,7 +843,7 @@ xosview*lmstemp\fIN\fP:	\fIfilename\fP
 Name of temperature file from /proc/sys/dev/sensors/*/*, N=1..
 .br
 Note if more files with same name exists, only the first is found. There is
-currently no possiblity to configure equal named files on different busses
+currently no possibility to configure equal named files on different busses
 (which would be rarely necessary, I hope).
 .br
 eg.
@@ -910,6 +915,43 @@ If no battery is present - or all batteries get removed (while on AC).
 .\"  Do the priority resource
 .pp battery
 .uf battery
+
+\fBWireless Meter Resources\fP
+
+
+xosview*wireless: (True or False)
+.RS
+If True then xosview will display the link-Quality of wireless connections.
+Note that the graph will *never* schow up, if you don't have any wireless
+Devices, or no wireless extensions in Kernel (/proc/net/wireless).
+Default is true.
+.RE
+
+xosview*PoorQualityColor: \fIcolor\fP
+.RS
+This is the color for the Link-Graph with Quality between 0 and 6.
+.RE
+
+xosview*FairQualityColor: \fIcolor\fP
+.RS
+This is the color for the Link-Graph with Quality between 7 and 14.
+.RE
+
+xosview*GoodQualityColor: \fIcolor\fP
+.RS
+This is the color for the Link-Graph with Quality higher than 14.
+.RE
+
+xosview*wirelessUsedColor: \fIcolor\fP
+.RS
+This is the background color.
+.RE
+
+.\"  Do the priority resource
+.pp wireless
+.dc wireless
+.uf wireless
+
 
 \fBDisk Meter Resources\fP
 
@@ -1132,6 +1174,11 @@ FreeBSD 4.* updates, and a few other suggestions.
 Christos Zoulas (christos@netbsd.org)
 .RS
 C++ standard compliance and other NetBSD fixes.
+.RE
+
+Tim Ehlers (tehlers@gwdg.de)
+.RS
+Wireless Link-Meter for Linux.
 .RE
 
 And many others who have sent in small fixes and improvements.

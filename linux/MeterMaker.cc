@@ -18,14 +18,19 @@
 #include "serialmeter.h"
 #include "loadmeter.h"
 #include "btrymeter.h"
+#include "wirelessmeter.h"
+#include <fstream>
 #include "diskmeter.h"
 #include "raidmeter.h"
 #include "lmstemp.h"
 #include "nfsmeter.h"
 
 #include <stdlib.h>
+
 #include <sstream>
 #include <iomanip>
+
+using namespace std;
 
 MeterMaker::MeterMaker(XOSView *xos){
   _xos = xos;
@@ -38,15 +43,34 @@ void MeterMaker::makeMeters(void){
 
   // Standard meters (usually added, but users could turn them off)
   if (_xos->isResourceTrue("cpu")){
-    int cpuCount = CPUMeter::countCPUs();
-    int start = (cpuCount == 0) ? 0 : 1;
-    for (int i = start ; i <= cpuCount ; i++)
+    int start, end;
+    if (strncmp (_xos->getResource("cpuFormat"),"single",2) == 0)
+      start = end = 0;
+    else {
+      end = CPUMeter::countCPUs();
+      start = (end == 0 ||
+               strncmp (_xos->getResource("cpuFormat"),"both",2) == 0) ? 0 : 1;
+    }
+    for (int i = start ; i <= end ; i++)
       push(new CPUMeter(_xos, CPUMeter::cpuStr(i)));
   }
   if (_xos->isResourceTrue("mem"))
     push(new MemMeter(_xos));
   if (_xos->isResourceTrue("disk"))
       push(new DiskMeter(_xos, atof(_xos->getResource("diskBandwidth"))));
+
+  // check for the wireless meter
+static const char WLFILENAME[] = "/proc/net/wireless";
+ifstream stats( WLFILENAME );
+if ( stats ) {
+  if (_xos->isResourceTrue("wireless")){
+    int wirelessCount = WirelessMeter::countdevices();
+    int start = (wirelessCount == 0) ? 0 : 1;
+	if (wirelessCount != 0) {
+    for (int i = start ; i <= wirelessCount ; i++)
+      push(new WirelessMeter(_xos, i, WirelessMeter::wirelessStr(i)));
+  } } }
+
   // check for the RAID meter
   if (_xos->isResourceTrue("RAID")){
     int RAIDCount = atoi(_xos->getResource("RAIDdevicecount"));

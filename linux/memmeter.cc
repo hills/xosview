@@ -15,7 +15,7 @@ static const char MEMFILENAME[] = "/proc/meminfo";
 static const char MEMSTATFNAME[] = "/proc/memstat";
 
 MemMeter::MemMeter( XOSView *parent )
-: FieldMeterGraph( parent, 4, "MEM", "USED+SHAR/BUFF/CACHE/FREE" ){
+: FieldMeterGraph( parent, 7, "MEM", "USED/BUFF/SLAB/MAP/PT/CACHE/FREE" ){
   _shAdj = -1;
 
   // Check and see if the memstat module has been loaded
@@ -43,8 +43,11 @@ void MemMeter::checkResources( void ){
   if (_shAdj == 0)
     setfieldcolor( 1, parent_->getResource( "memSharedColor" ) );
   setfieldcolor( 2 + _shAdj, parent_->getResource( "memBufferColor" ) );
-  setfieldcolor( 3 + _shAdj, parent_->getResource( "memCacheColor" ) );
-  setfieldcolor( 4 + _shAdj, parent_->getResource( "memFreeColor" ) );
+  setfieldcolor( 3 + _shAdj, parent_->getResource( "memSlabColor" ) );
+  setfieldcolor( 4 + _shAdj, parent_->getResource( "memMapColor" ) );
+  setfieldcolor( 5 + _shAdj, parent_->getResource( "memPTColor" ) );
+  setfieldcolor( 6 + _shAdj, parent_->getResource( "memCacheColor" ) );
+  setfieldcolor( 7 + _shAdj, parent_->getResource( "memFreeColor" ) );
   priority_ = atoi (parent_->getResource( "memPriority" ) );
   dodecay_ = parent_->isResourceTrue( "memDecay" );
   useGraph_ = parent_->isResourceTrue( "memGraph" );
@@ -54,11 +57,12 @@ void MemMeter::checkResources( void ){
 void MemMeter::checkevent( void ){
   getmeminfo();
   /* for debugging (see below)
-  printf("t %4.1f used %4.1f share %4.1f buffer %4.1f cache %4.1f free %4.1f\n",
+  printf("t %4.1f used %4.1f buffer %4.1f slab %4.1f map %4.1f pt %4.1f cache %4.1f free %4.1f\n",
          total_/1024.0/1024.0,
          fields_[0]/1024.0/1024.0, fields_[1]/1024.0/1024.0,
 	 fields_[2]/1024.0/1024.0, fields_[3]/1024.0/1024.0,
-	 fields_[4]/1024.0/1024.0);
+	 fields_[4]/1024.0/1024.0, fields_[5]/1024.0/1024.0,
+	 fields_[6]/1024.0/1024.0);
   */
   drawfields();
 }
@@ -76,11 +80,11 @@ void MemMeter::getmeminfo( void ){
                               // without this fix "used" sometimes gets < 0 !
     fields_[0] = total_ - fields_[4] - fields_[3] - fields_[2] - fields_[1];
   }else{
-    fields_[0] = total_ - fields_[3] - fields_[2] - fields_[1];
+    fields_[0] = total_ - fields_[6] - fields_[5] - fields_[4] - fields_[3] - fields_[2] - fields_[1];
   }
 
   if (total_)
-    FieldMeterDecay::setUsed (total_ - fields_[4 + _shAdj], total_);
+    FieldMeterDecay::setUsed (total_ - fields_[7 + _shAdj], total_);
 }
 
 MemMeter::LineInfo *MemMeter::findLines(LineInfo *tmplate, int len,
@@ -116,9 +120,12 @@ MemMeter::LineInfo *MemMeter::findLines(LineInfo *tmplate, int len,
 void MemMeter::initLineInfo(void){
   static LineInfo infos[] = {
     LineInfo("MemTotal", &total_),
-    LineInfo("MemFree", &fields_[4 + _shAdj]),
+    LineInfo("MemFree", &fields_[7 + _shAdj]),
     LineInfo("Buffers", &fields_[2 + _shAdj]),
-    LineInfo("Cached", &fields_[3 + _shAdj])
+    LineInfo("Slab", &fields_[3 + _shAdj]),
+    LineInfo("Mapped", &fields_[4 + _shAdj]),
+    LineInfo("PageTables", &fields_[5 + _shAdj]),
+    LineInfo("Cached", &fields_[6 + _shAdj])
   };
   _numMIlineInfos = sizeof(infos) / sizeof(LineInfo);
 

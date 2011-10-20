@@ -33,7 +33,7 @@ LmsTemp::LmsTemp( XOSView *parent, const char *filename, const char *label,
 	    parent_->done(1);
 	}
     }
-    char *p;
+    const char *p;
     if ((p = strrchr(caption,'/')) != 0)
       _highest = atoi(p+1);
     else

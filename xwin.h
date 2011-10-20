@@ -12,7 +12,7 @@
 #ifdef HAVE_IOSTREAM
 #include <iostream>
 #else
-#include <iostream.h>
+#include <iostream>
 #endif
 #include <string.h>
 

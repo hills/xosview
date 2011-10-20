@@ -43,15 +43,20 @@ protected:
 private:
 
   bool getapminfo( void );
-  bool getacpiinfo( void );
+  bool getacpi_or_sys_info( void );
 
   bool use_apm;
   bool use_acpi;
+  bool use_syspower;
 
-  bool battery_present(const std::string& filename);
-  bool parse_battery(const std::string& filename);
+  bool acpi_battery_present(const std::string& filename);
+  bool acpi_parse_battery(const std::string& filename);
+  bool sys_battery_present(const std::string& filename);
+  bool sys_parse_battery(const std::string& filename);
+
   bool has_acpi(void);
   bool has_apm(void);
+  bool has_syspower(void);
 
   int apm_battery_state;
   int old_apm_battery_state;
