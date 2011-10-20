@@ -25,7 +25,7 @@ public:
   static const char *cpuStr(int num);
 protected:
   int _lineNum;
-  long cputime_[2][8];
+  long cputime_[2][9];
   int cpuindex_;
 
   void getcputime(void);
