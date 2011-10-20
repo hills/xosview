@@ -11,13 +11,14 @@
 #include "cpumeter.h"
 #include <fstream>
 #include <sstream>
+#include <map>
 #include <stdlib.h>
 
 
 static const char *INTFILE     = "/proc/interrupts";
 static const char *VERSIONFILE = "/proc/version";
 
-static 	int realintnum[1024];
+std::map<int,int> realintnum;
 
 IntMeter::IntMeter( XOSView *parent, int cpu)
   : BitMeter( parent, "INTS", "", 1,
@@ -114,10 +115,11 @@ void IntMeter::updateirqcount( int n, bool init ){
    setNumBits(n+1);
    std::ostringstream os;
 
-   os << "INTs (0-16" ;
-   for (int i=16; i<1024; i++) {
-	if (realintnum[i])
-	   os << ", " << (i) ;
+   os << "INTs (0-15" ;
+   for (std::map<int,int>::const_iterator it = realintnum.upper_bound(15),
+                                          end = realintnum.end();
+                                          it != end; ++it) {
+         os << ", " << it->first ;
    }
    os << ")" << std::ends;
 
@@ -161,12 +163,9 @@ void IntMeter::initirqcount( void ){
   }
 
   if (!_old) {
-      for (i=0; i<1024; i++)	// init index into int array
-	if (i < 16)		// first 16 map directly
-	    realintnum[i] = i;
-	else
-	    realintnum[i] = 0;
-      intfile.ignore(1024, '\n');
+    for (i=0; i<16; i++)
+      realintnum[i] = i;
+    intfile.ignore(1024, '\n');
   }
 
   /* just looking for the highest number interrupt that
