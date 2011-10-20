@@ -76,24 +76,25 @@ void SwapMeter::getswapinfo( void ){
 
   if (total_)
     setUsed (fields_[0], total_);
+
 }
 #else
 void SwapMeter::getswapinfo( void ){
   std::ifstream meminfo( MEMFILENAME );
   if ( !meminfo ){
-    std::cerr <<"Con not open file : " <<MEMFILENAME << std::endl;
+    std::cerr <<"Cannot open file : " <<MEMFILENAME << std::endl;
     exit( 1 );
   }
 
   total_ = fields_[0] = fields_[1] = 0;
 
   char buf[256];
-  char ignore[256];
+  string ignore;
 
   // Get the info from the "standard" meminfo file.
   while (!meminfo.eof()){
     meminfo.getline(buf, 256);
-    istrstream line(buf, 256);
+    std::istringstream line(std::string(buf, 256));
 
     if(!strncmp("SwapTotal", buf, strlen("SwapTotal")))
         line >> ignore >> total_;
