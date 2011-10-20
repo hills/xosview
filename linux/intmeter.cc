@@ -65,12 +65,10 @@ float IntMeter::getLinuxVersion(void) {
       exit(1);
     }
 
-    char buffer[128];
-    vfile >> buffer >> buffer >> buffer;
-    *strrchr(buffer, '.') = '\0';
-    std::istringstream is(std::string(buffer, 128));
-    float rval = 0.0;
-    is >> rval;
+    std::string dump;
+    float rval;
+    vfile >> dump >> dump; // Drop the first two words
+    vfile >> rval; // Drops everything but #.# (float regex)
 
     return rval;
 }
