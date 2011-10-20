@@ -6,11 +6,7 @@
 //
 // $Id$
 //
-#ifdef HAVE_IOSTREAM
 #include <iostream>
-#else
-#include <iostream.h>
-#endif
 #include "general.h"
 #include "llist.h"
 

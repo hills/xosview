@@ -6,16 +6,8 @@
 //
 // $Id$
 //
-#ifdef HAVE_IOSTREAM
 #include <iostream>
-#else
-#include <iostream.h>
-#endif
-#ifdef HAVE_FSTREAM
 #include <fstream>
-#else
-#include <fstream.h>
-#endif
 #include <stdlib.h>
 #include "snprintf.h"
 #include "general.h"

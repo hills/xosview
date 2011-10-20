@@ -12,11 +12,7 @@
 #define TIMEVAL_H_CVSID "$Id$"
 
 #include <sys/time.h>
-#ifdef HAVE_IOSTREAM
 #include <iostream>
-#else
-#include <iostream.h>
-#endif
 
 class TimeVal {
 public:

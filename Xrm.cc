@@ -11,11 +11,7 @@
 #include <stdlib.h>
 #include <stdio.h>	//  For snprintf().
 #include <ctype.h>
-#ifdef HAVE_IOSTREAM
 #include <iostream>
-#else
-#include <iostream.h>
-#endif
 #include <unistd.h>  //  for access(), etc.  BCG
 #include "snprintf.h"
 #include "general.h"
