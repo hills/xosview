@@ -7,7 +7,7 @@
 
 #include "diskmeter.h"
 #include "xosview.h"
-#include <fstream.h>
+#include <fstream>
 #include <stdlib.h>
 
 
