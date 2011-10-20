@@ -174,13 +174,14 @@ void IntMeter::initirqcount( void ){
   idx = 16;
   while ( !intfile.eof() ){
     intfile >> i;
+    /* break when reaching non-numeric special interrupts */
+    if (!intfile) break;
     if (i < 16)
 	intno = i;
     else {
 	intno = idx;
 	realintnum[i] = idx++;
     }
-    if (!intfile) break;
     intfile.ignore(1024, '\n');
   }
   updateirqcount(intno, true);
