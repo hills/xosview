@@ -152,20 +152,29 @@ Listed from weakest to strongest:
 
   //  Merge in the system resource database.
   char rfilename[2048];
+  int result;
 
   // Get the app-defaults
-  snprintf(rfilename, 2048, "/usr/X11R6/lib/X11/app-defaults/%s",
-      XrmQuarkToString(_class));
+  result = snprintf(rfilename, sizeof rfilename, "/etc/X11/app-defaults/%s",
+    XrmQuarkToString(_class));
   if (rfilename != NULL)
+    XrmCombineFileDatabase (rfilename, &_db, 1);
+  result = snprintf(rfilename, sizeof rfilename, "/usr/lib/X11/app-defaults/%s",
+    XrmQuarkToString(_class));
+  if (result >= 0 && result < sizeof rfilename)
+    XrmCombineFileDatabase (rfilename, &_db, 1);
+  result = snprintf(rfilename, sizeof rfilename, "/usr/X11R6/lib/X11/app-defaults/%s",
+    XrmQuarkToString(_class));
+  if (result >= 0 && result < sizeof rfilename)
     XrmCombineFileDatabase (rfilename, &_db, 1);
   //  Try a few more, for SunOS/Solaris folks.
-  snprintf(rfilename, 2048, "/usr/openwin/lib/X11/app-defaults/%s",
-      XrmQuarkToString(_class));
-  if (rfilename != NULL)
+  result = snprintf(rfilename, sizeof rfilename, "/usr/openwin/lib/X11/app-defaults/%s",
+    XrmQuarkToString(_class));
+  if (result >= 0 && result < sizeof rfilename)
     XrmCombineFileDatabase (rfilename, &_db, 1);
-  snprintf(rfilename, 2048, "/usr/local/X11R6/lib/X11/app-defaults/%s",
+  result = snprintf(rfilename, sizeof rfilename, "/usr/local/X11R6/lib/X11/app-defaults/%s",
       XrmQuarkToString(_class));
-  if (rfilename != NULL)
+  if (result >= 0 && result < sizeof rfilename)
     XrmCombineFileDatabase (rfilename, &_db, 1);
 
   //  Now, check for an XOSView file in the XAPPLRESDIR directory...
