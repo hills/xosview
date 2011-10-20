@@ -12,9 +12,6 @@
 #include <fstream>
 #include <sstream>
 #include <stdlib.h>
-#ifdef __alpha__
-#include <asm/irq.h>
-#endif
 
 
 static const char *INTFILE     = "/proc/interrupts";
