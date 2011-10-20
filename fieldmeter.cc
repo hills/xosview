@@ -297,7 +297,7 @@ void FieldMeter::setNumFields(int n){
   delete[] colors_;
   delete[] lastvals_;
   delete[] lastx_;
-  fields_ = new float[numfields_];
+  fields_ = new double[numfields_];
   colors_ = new unsigned long[numfields_];
   lastvals_ = new int[numfields_];
   lastx_ = new int[numfields_];

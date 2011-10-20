@@ -28,7 +28,7 @@ private:
 
   class LineInfo {
   public:
-    LineInfo(const char *id, float *val)
+    LineInfo(const char *id, double *val)
       { _line = -1; _id = id; _val = val; _idlen = strlen(_id); }
     LineInfo(void) {};
 
@@ -43,7 +43,7 @@ private:
     int _line;
     const char *_id;
     int _idlen;
-    float *_val;
+    double *_val;
   };
 
   LineInfo *_MIlineInfos;
