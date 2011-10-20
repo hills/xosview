@@ -469,6 +469,10 @@ void XOSView::visibilityEvent( XVisibilityEvent &event ){
       _ispartiallyvisible, _isvisible);
 }
 
-void XOSView::unmapEvent( XUnmapEvent & ){
-  _isvisible = false;
+void XOSView::unmapEvent( XUnmapEvent & ev ){
+  /* unclutter creates a subwindow of our window if it hides the cursor,
+     we get the unmap event if the cursor is moved again. Don't treat it
+     as main window unmap */
+  if(ev.window == window_)
+    _isvisible = false;
 }
