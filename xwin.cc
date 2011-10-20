@@ -124,11 +124,13 @@ void XWin::init( int argc, char **argv ){
 	XSetWindowBackgroundPixmap(display_,window_,background_pixmap);
   }
 
-  // Do transparency if requested
-  if(isResourceTrue("transparent"))
-  {
-        XSetWindowBackgroundPixmap(display_,window_,ParentRelative);
-  }         
+  // Transparency disabled for Debian builds as it just gets garbled up
+  // (see Debian bug #130633)
+  //   // Do transparency if requested
+  //   if(isResourceTrue("transparent"))
+  //   {
+  //         XSetWindowBackgroundPixmap(display_,window_,ParentRelative);
+  //   }
   
   // add the events
   Event *tmp = events_;

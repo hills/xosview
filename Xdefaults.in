@@ -21,6 +21,7 @@
 !xosview*display:
 xosview*captions:           True
 xosview*labels:             True
+! Transparency disabled in Debian builds - See bug #130633
 xosview*transparent:        False
 xosview*meterLabelColor:    wheat
 xosview*usedlabels:         True
