@@ -28,10 +28,11 @@ public:
 protected:
 
   void getlmstemp( void );
-  int  checksensors(const char* filename);
+  int  checksensors(int isproc, const char *dir, const char* filename);
 private:
   char _filename[80];
   int _highest;
+  int _isproc;
 };
 
 
