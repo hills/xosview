@@ -9,6 +9,10 @@
 #ifndef _SERIALMETER_H_
 #define _SERIALMETER_H_
 
+// hack for not having linux/serial_reg.h, (Debian bug #427599)
+#define UART_LSR        5
+#define UART_MSR        6
+
 #include "bitmeter.h"
 
 class SerialMeter : public BitMeter {
