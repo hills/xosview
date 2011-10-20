@@ -245,6 +245,10 @@ AC_DEFUN(AC_XOSV_IRIX65, [
     AC_DEFINE(HAVE_SNPRINTF)
 ])
 
+AC_DEFUN(AC_XOSV_GNU, [
+EXTRALIBS=$XPMLIB
+])
+
 dnl MY_C_SWITCH(switch)
 dnl -------------------
 dnl try to compile and link a simple C program with the switch compile switch

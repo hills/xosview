@@ -1,0 +1,43 @@
+#
+# GNU Makefile template
+#
+#
+# $Id$
+#
+include ../Makefile.config
+@AUTODEPRULE_SUBDIR@
+
+#arch=$(shell uname -m)
+#export arch
+
+CXXFLAGS += -I@top_srcdir@
+
+CXXOBJS = \
+memmeter.o \
+swapmeter.o \
+pagemeter.o \
+loadmeter.o \
+MeterMaker.o
+
+OBJS = $(CXXOBJS) get_def_pager.o
+
+ARCH = @host_cpu@
+
+CFILES := $(CXXOBJS:.o=.cc) get_def_pager.c
+DEPFILES := $(OBJS:%=.%.d)
+
+vpath %.h $(TOP)
+vpath %.cc $(TOP)
+
+#-----------------------------------------------------------------------
+
+all : libmeter.a
+
+clean :
+	rm -f $(OBJS) $(DEPFILES) libmeter.a *~
+
+libmeter.a : $(OBJS)
+	ar cvr libmeter.a $(OBJS)
+	@RANLIB@ $@
+
+@AUTODEPEND@
