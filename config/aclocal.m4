@@ -112,7 +112,6 @@ echo "enabled  Linux system calls by default"
 
 INSTALL_ARGS='-m 755'
 ]
-	NetMeter_Default_Setting=False
 )
 
 
@@ -136,7 +135,6 @@ dnl Netbsd needs to link with libkvm
 dnl
         EXTRALIBS="-lkvm $XPMLIB"
         INSTALL_ARGS='-s -g kmem -m 02555'
-	NetMeter_Default_Setting=True
 	AC_DEFINE(XOSVIEW_NETBSD)
 ])
 
@@ -146,7 +144,6 @@ dnl FreeBSD also needs to link with libkvm
 dnl
         EXTRALIBS="-lkvm $XPMLIB $DEVSTATLIB"
         INSTALL_ARGS='-s -g kmem -m 02555'
-	NetMeter_Default_Setting=True
 	AC_DEFINE(XOSVIEW_FREEBSD)
 ])
 
@@ -156,7 +153,6 @@ dnl OpenBSD also needs to link with libkvm
 dnl
         EXTRALIBS="-lkvm $XPMLIB"
         INSTALL_ARGS='-s -g kmem -m 02555'
-	NetMeter_Default_Setting=True
 	AC_DEFINE(XOSVIEW_OPENBSD)
 ])
 
@@ -168,7 +164,6 @@ dnl gmake CXX=shlicc++ on bsdi [23].x
 dnl
 	EXTRALIBS="-lkvm $XPMLIB"
 	INSTALL_ARGS='-s -g kmem -m 02555'
-	NetMeter_Default_Setting=True
 	AC_DEFINE(XOSVIEW_BSDI)
 ])
 

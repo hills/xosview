@@ -132,7 +132,7 @@ xosview*pageUsedFormat:     autoscale
 
 ! Network Meter Resources
 
-xosview*net:		    @NetMeter_Default_Setting@
+xosview*net:		    True
 xosview*netBandwidth:       10000000  ! for 100Mbit/s
 xosview*netInColor:         SkyBlue
 xosview*netOutColor:        SlateBlue1
