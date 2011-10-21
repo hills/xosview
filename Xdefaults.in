@@ -133,12 +133,7 @@ xosview*pageUsedFormat:     autoscale
 ! Network Meter Resources
 
 xosview*net:		    @NetMeter_Default_Setting@
-xosview*netBandwidth:       7500  ! for 64kbps ISDN
-!xosview*netBandwidth:       5000  ! for up to 57.6kbps modems
-!xosview*netBandwidth:       2000  ! for 28.8kbps modems (no compression)
-!                                  ! or  14.4kbps modems (with compression)
-!xosview*netBandwidth:    1000000  ! for 10Mbit/s Ethernet (could be 1250000)
-!xosview*netBandwidth:   10000000  ! for 100Mbit/s Ethernet (could be 12500000)
+xosview*netBandwidth:       10000000  ! for 100Mbit/s
 xosview*netInColor:         SkyBlue
 xosview*netOutColor:        SlateBlue1
 xosview*netBackground:      aquamarine
@@ -221,8 +216,7 @@ xosview*diskUsedColor:	    seagreen
 xosview*diskIdleColor:	    aquamarine
 xosview*diskWriteColor:     SlateBlue1
 xosview*diskReadColor:      SkyBlue
-xosview*diskBandwidth:      10000000 ! 10MB/s should be reasonable today for
-                                     ! both IDE and SCSI
+xosview*diskBandwidth:      100000000 ! 100MB/s
 xosview*diskPriority:	    10
 xosview*diskDecay:	    True
 xosview*diskUsedFormat:     autoscale
