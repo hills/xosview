@@ -204,7 +204,7 @@ void FieldMeter::drawused( int manditory ){
 	{scale='M'; scaled_used = used_/1024/1024;}
     else if (used_ >= 999.5)
 	{scale='K'; scaled_used = used_/1024;}
-    else {scale=' '; scaled_used = used_;}
+    else {scale='\0'; scaled_used = used_;}
       /*  For now, we can only print 3 characters, plus the optional
        *  suffix, without overprinting the legends.  Thus, we can
        *  print 965, or we can print 34, but we can't print 34.7 (the
@@ -215,11 +215,19 @@ void FieldMeter::drawused( int manditory ){
       snprintf (buf, 10, "-");
     else if (scaled_used == 0.0)
       snprintf (buf, 10, "0");
-    else if (scaled_used < 9.95)  //  9.95 or above would get
-				  //  rounded to 10.0, which is too wide.
-      snprintf (buf, 10, "%.1f%c", scaled_used, scale);
-    else
-      snprintf (buf, 10, "%.0f%c", scaled_used, scale);
+    else if (scaled_used < 9.95) {
+      //  9.95 or above would get
+      //  rounded to 10.0, which is too wide.
+      if (scale)
+	snprintf (buf, 10, "%.1f%c", scaled_used, scale);
+      else
+	snprintf (buf, 10, "%.1f", scaled_used);
+    } else {
+      if (scale)
+        snprintf (buf, 10, "%.0f%c", scaled_used, scale);
+      else
+        snprintf (buf, 10, "%.0f", scaled_used);
+    }
   }
   else {
     snprintf( buf, 10, "%.1f", used_ );
