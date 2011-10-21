@@ -218,9 +218,6 @@ void FieldMeter::drawused( int manditory ){
     else if (scaled_used < 9.95)  //  9.95 or above would get
 				  //  rounded to 10.0, which is too wide.
       snprintf (buf, 10, "%.1f%c", scaled_used, scale);
-    /*  We don't need to check against 99.5 -- it all gets %.0f.  */
-    /*else if (scaled_used < 99.5)*/
-      /*snprintf (buf, 10, "%.0f%c", scaled_used, scale);*/
     else
       snprintf (buf, 10, "%.0f%c", scaled_used, scale);
   }
