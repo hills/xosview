@@ -19,7 +19,7 @@ static const char STATFILENAME[] = "/proc/stat";
 #define MAX_PROCSTAT_LENGTH 4096
 
 CPUMeter::CPUMeter(XOSView *parent, const char *cpuID)
-: FieldMeterGraph( parent, 9, toUpper(cpuID), "USR/NICE/SYS/SI/HI/WIO/FREE/GST/ST" ) {
+: FieldMeterGraph( parent, 9, toUpper(cpuID), "USR/NICE/SYS/SI/HI/WIO/GST/ST/FREE" ) {
   _lineNum = findLine(cpuID);
   for ( int i = 0 ; i < 2 ; i++ )
     for ( int j = 0 ; j < 9 ; j++ )
@@ -40,9 +40,9 @@ void CPUMeter::checkResources( void ){
   setfieldcolor( 3, parent_->getResource( "cpuSInterruptColor" ) );
   setfieldcolor( 4, parent_->getResource( "cpuInterruptColor" ) );
   setfieldcolor( 5, parent_->getResource( "cpuWaitColor" ) );
-  setfieldcolor( 6, parent_->getResource( "cpuFreeColor" ) );
-  setfieldcolor( 7, parent_->getResource( "cpuGuestColor" ) );
-  setfieldcolor( 8, parent_->getResource( "cpuStolenColor" ) );
+  setfieldcolor( 6, parent_->getResource( "cpuGuestColor" ) );
+  setfieldcolor( 7, parent_->getResource( "cpuStolenColor" ) );
+  setfieldcolor( 8, parent_->getResource( "cpuFreeColor" ) );
   priority_ = atoi (parent_->getResource( "cpuPriority" ) );
   dodecay_ = parent_->isResourceTrue( "cpuDecay" );
   useGraph_ = parent_->isResourceTrue( "cpuGraph" );
@@ -83,13 +83,13 @@ void CPUMeter::getcputime( void ){
 
   int oldindex = (cpuindex_+1)%2;
   for ( int i = 0 ; i < 9 ; i++ ){
-    static int cputime_to_field[9] = { 0, 1, 2, 6, 5, 4, 3, 8, 7 };
+    static int cputime_to_field[9] = { 0, 1, 2, 8, 5, 4, 3, 7, 6 };
     int field = cputime_to_field[i];
     fields_[field] = cputime_[cpuindex_][i] - cputime_[oldindex][i];
     total_ += fields_[field];
   }
-  fields_[0] -= fields_[7];
-  total_ -= fields_[7];
+  fields_[0] -= fields_[6];
+  total_ -= fields_[6];
 
   if (total_){
     setUsed (total_ - (fields_[5] + fields_[6] + fields_[7] + fields_[8]), total_);
