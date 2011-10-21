@@ -74,10 +74,8 @@ void LoadMeter::checkevent( void ){
         XOSDEBUG("SPEED: %d\n",cur_cpu_speed_);
         legnd << "PROCS/MIN" << " " << cur_cpu_speed_ << " MHz"<< std::ends;
             legend( legnd.str().c_str() );
-        if (dolegends_) {
-                        drawlegend();
-                        parent_->reallydraw();
-                }
+        if (dolegends_)
+	  drawlegend();
      }
   }
 

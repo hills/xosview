@@ -189,11 +189,7 @@ void BtryMeter::checkevent( void ){
 		break;
 	}
 
-  	drawfields();
-	// force redraw of whole widget
-	// (no other idea how to update the legend/labels)
-	parent_->reallydraw();
-
+	drawlegend();
    }
 
 
@@ -235,8 +231,7 @@ void BtryMeter::checkevent( void ){
 		legend( "AC/Charging");
 		break;
 	}
-  	drawfields();
-	parent_->reallydraw();
+	drawlegend();
    }
 
    drawfields();
