@@ -20,7 +20,7 @@ using namespace std;
 static const char WLFILENAME[] = "/proc/net/wireless";
 
 WirelessMeter::WirelessMeter( XOSView *parent, int ID, const char *wlID)
-  : FieldMeterGraph ( parent, 2, wlID, "/Link-Quality", 1, 1, 0 ), _number(ID) {
+	: FieldMeterGraph ( parent, 2, wlID, "LINK/LEVEL", 1, 1, 0 ), _number(ID) {
   lastqualitystate = -1;
   strcpy(devname, "0");
 }
@@ -160,7 +160,7 @@ const char *WirelessMeter::wirelessStr(int num){
   static char buffer[32];
   std::ostringstream str;
   
-  str << "WL";
+  str << "WLAN";
   if (num != 1)
     str << (num);
   str << std::ends;
