@@ -190,6 +190,7 @@ void BtryMeter::checkevent( void ){
 	}
 
 	drawlegend();
+	drawfields(1);
    }
 
 
@@ -232,9 +233,8 @@ void BtryMeter::checkevent( void ){
 		break;
 	}
 	drawlegend();
+	drawfields(1);
    }
-
-   drawfields();
 }
 
 
