@@ -102,7 +102,7 @@ public:
 
   const char *getResource( const char *name );
   const char *getResourceOrUseDefault( const char *name, const char* defaultVal );
-  const int isResourceTrue( const char* name ) {
+  int isResourceTrue( const char* name ) {
     return (!strncasecmp(getResource(name),"True", 5)); }
   void dumpResources(std::ostream &os );
 
