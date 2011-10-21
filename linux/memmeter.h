@@ -3,9 +3,7 @@
 //
 //  This file may be distributed under terms of the GPL
 //
-//
-// $Id$
-//
+
 #ifndef _MEMMETER_H_
 #define _MEMMETER_H_
 

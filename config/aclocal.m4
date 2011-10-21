@@ -3,8 +3,6 @@ dnl This file containes a macro for each os xosview has been ported to.
 dnl Each macro can add specific config options that apply to only that
 dnl specific port.
 dnl
-dnl $Id$
-dnl
 
 dnl Make an absolute symbol for the top of the configuration.
 dnl

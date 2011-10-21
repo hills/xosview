@@ -15,8 +15,7 @@
 //    should have received.  If not, contact one of the xosview
 //    authors for a copy.
 //
-// $Id$
-//
+
 #include <stdlib.h>		//  For atoi().  BCG
 #include "general.h"
 #include "memmeter.h"
@@ -28,9 +27,6 @@
 							OpenBSD need this?  */
 # include <sys/vmmeter.h>
 #endif
-
-CVSID("$Id$");
-CVSID_DOT_H(MEMMETER_H_CVSID);
 
 MemMeter::MemMeter( XOSView *parent )
 #ifdef  XOSVIEW_FREEBSD

@@ -1,6 +1,3 @@
-//
-// $Id$
-//
 #ifndef _XWIN_H_
 #define _XWIN_H_
 
@@ -15,8 +12,6 @@
 #include <iostream>
 #endif
 #include <string.h>
-
-#define XWIN_H_CVSID "$Id$"
 
 class XWin;
 class Xrm;

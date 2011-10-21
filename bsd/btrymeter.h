@@ -5,9 +5,7 @@
 //  Ported to NetBSD by David W. Talmage
 //  (talmage@jefferson.cmf.nrl.navy.mil)
 //
-//
-// $Id$
-//
+
 #ifndef _BTRYMETER_H_
 #define _BTRYMETER_H_
 

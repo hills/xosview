@@ -3,9 +3,7 @@
 //
 //  This file may be distributed under terms of the GPL
 //
-//
-// $Id$
-//
+
 #include "MeterMaker.h"
 #include "xosview.h"
 

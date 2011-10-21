@@ -10,8 +10,7 @@
 //    should have received.  If not, contact one of the xosview
 //    authors for a copy.
 //
-// $Id$
-//
+
 #include <stdlib.h>
 #include "general.h"
 #include "MeterMaker.h"
@@ -30,10 +29,6 @@
 #include "intratemeter.h"
 //  This one is not yet supported under *BSD.
 //#include "serialmeter.h"
-
-CVSID_DOT_H2(PLLIST_H_CVSID);
-CVSID_DOT_H(METERMAKER_H_CVSID);
-CVSID("$Id$");
 
 MeterMaker::MeterMaker(XOSView *xos){
   _xos = xos;

@@ -3,13 +3,9 @@
 //
 //  This file may be distributed under terms of the GPL
 //
-//
-// $Id$
-//
+
 #ifndef __LLIST_H__
 #define __LLIST_H__
-
-#define LLIST_H_CVSID "$Id$"
 
 #include <stdio.h>
 

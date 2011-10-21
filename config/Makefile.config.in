@@ -4,8 +4,6 @@
 # The configure script should set up this file for most all cases.
 # One can override compile / link options here if needed.
 #
-# $Id$
-#
 
 # version number for release
 VERS = 1.8.3

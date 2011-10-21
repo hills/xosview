@@ -15,8 +15,7 @@
 //    should have received.  If not, contact one of the xosview
 //    authors for a copy.
 //
-// $Id$
-//
+
 #ifndef XOSVIEW_NETBSD
 /*  NetBSD pulls in stdio.h via one of the other includes, but
  *  the other BSDs don't.  */
@@ -125,11 +124,7 @@ static int dmib[3] = {CTL_HW, HW_IOSTATS, sizeof(struct io_sysctl)};
 #endif
 
 #include "general.h"
-#include "kernel.h"		/*  To grab CVSID stuff.  */
 #include "netmeter.h"		/*  For netIface_  */
-
-CVSID("$Id$");
-CVSID_DOT_H(KERNEL_H_CVSID);
 
 
 // ------------------------  local variables  ---------------------

@@ -3,9 +3,7 @@
 //
 //  This file may be distributed under terms of the GPL
 //
-//
-// $Id$
-//
+
 #ifndef _CPUMETER_H_
 #define _CPUMETER_H_
 

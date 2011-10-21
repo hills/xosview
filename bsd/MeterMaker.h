@@ -10,12 +10,9 @@
 //    should have received.  If not, contact one of the xosview
 //    authors for a copy.
 //
-// $Id$
-//
+
 #ifndef _MeterMaker_h
 #define _MeterMaker_h
-
-#define METERMAKER_H_CVSID "$Id$"
 
 #include "pllist.h"
 

@@ -9,16 +9,12 @@
 //    should have received.  If not, contact one of the xosview
 //    authors for a copy.
 //
-// $Id$
-//
+
 #include <err.h>        //  For err() and warn(), etc.  BCG
 #include <stdlib.h>	//  For use of atoi  BCG
 #include "general.h"
 #include "diskmeter.h"
 #include "kernel.h"     //  For NetBSD-specific icky (but handy) kvm_ code.  BCG
-
-CVSID("$Id$");
-CVSID_DOT_H(DISKMETER_H_CVSID);
 
 DiskMeter::DiskMeter( XOSView *parent, float max )
 : FieldMeterGraph( parent, 2, "DISK", "XFER/IDLE" ){

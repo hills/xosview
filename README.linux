@@ -185,5 +185,3 @@ ipchains -A output -j oacct
         cat /proc/mdstat to see new layout.
 
 Mike Romberg (mike.romberg@noaa.gov)
-
-Revision: $Id$

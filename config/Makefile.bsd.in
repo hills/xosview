@@ -1,9 +1,7 @@
 #
 # NetBSD Makefile template
 #
-#
-# $Id$
-#
+
 include ../Makefile.config
 @AUTODEPRULE_SUBDIR@
 

@@ -3,9 +3,7 @@
 //
 //  This file may be distributed under terms of the GPL
 //
-//
-// $Id$
-//
+
 #ifndef _BTRYMETER_H_
 #define _BTRYMETER_H_
 

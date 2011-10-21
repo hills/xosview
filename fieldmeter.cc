@@ -3,9 +3,7 @@
 //
 //  This file may be distributed under terms of the GPL
 //
-//
-// $Id$
-//
+
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>
@@ -13,9 +11,6 @@
 #include "general.h"
 #include "fieldmeter.h"
 #include "xosview.h"
-
-CVSID("$Id$");
-CVSID_DOT_H(FIELDMETER_H_CVSID);
 
 FieldMeter::FieldMeter( XOSView *parent, int numfields, const char *title,
                         const char *legend, int docaptions, int dolegends,

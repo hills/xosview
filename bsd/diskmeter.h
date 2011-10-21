@@ -10,12 +10,9 @@
 //    should have received.  If not, contact one of the xosview
 //    authors for a copy.
 //
-// $Id$
-//
+
 #ifndef _DISKMETER_H_
 #define _DISKMETER_H_
-
-#define DISKMETER_H_CVSID "$Id$"
 
 #include "fieldmetergraph.h"
 #include <sys/types.h>		//  For u_int64_t

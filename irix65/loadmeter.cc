@@ -7,8 +7,7 @@
 //  Only small changes were made on my part (M.R.)
 //  Small changes for Irix 6.5 port Stefan Eilemann <eilemann@gmail.com>
 //
-// $Id$
-//
+
 #include "loadmeter.h"
 #include "xosview.h"
 #include <stdlib.h>

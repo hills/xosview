@@ -3,9 +3,6 @@
 //
 //  This file may be distributed under terms of the GPL
 //
-//
-// $Id$
-//
 
 #include <string.h>
 #include <stdlib.h>
@@ -20,11 +17,6 @@
 #endif
 #include "Xrm.h"
 #include "Xrmcommandline.h"
-
-CVSID("$Id$");
-CVSID_DOT_H(XRM_H_CVSID);
-CVSID_DOT_H2(XRMCOMMANDLINE_H_CVSID);
-
 
 extern char *defaultXResourceString;
 

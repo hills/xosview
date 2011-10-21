@@ -1,9 +1,7 @@
 #
 # Top level Makefile Template for xosview.
 #
-#
-# $Id$
-#
+
 include Makefile.config
 
 OBJS = \

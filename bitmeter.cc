@@ -3,15 +3,10 @@
 //
 //  This file may be distributed under terms of the GPL
 //
-//
-// $Id$
-//
+
 #include "general.h"
 #include "bitmeter.h"
 #include "xosview.h"
-
-CVSID("$Id$");
-CVSID_DOT_H(BITMETER_H_CVSID);
 
 BitMeter::BitMeter( XOSView *parent,
 		    const char *title, const char *legend, int numBits,

@@ -12,8 +12,6 @@
 //    should have received.  If not, contact one of the xosview
 //    authors for a copy.
 //
-// $Id$
-//
 
 // In order to use the FieldMeterDecay class in place of a FieldMeter class in
 // a meter file (say, cpumeter.cc), make the following changes:
@@ -33,9 +31,6 @@
 #include "fieldmeter.h"
 #include "fieldmeterdecay.h"
 #include "xosview.h"
-
-CVSID("$Id$");
-CVSID_DOT_H(FIELDMETERDECAY_H_CVSID);
 
 FieldMeterDecay::FieldMeterDecay( XOSView *parent,
                 int numfields, const char *title,

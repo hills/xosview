@@ -3,9 +3,7 @@
 //
 //  This file may be distributed under terms of the GPL
 //
-//
-// $Id$
-//
+
 #ifndef _SWAPMETER_H_
 #define _SWAPMETER_H_
 

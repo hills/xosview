@@ -12,8 +12,7 @@
 //    should have received.  If not, contact one of the xosview
 //    authors for a copy.
 //
-// $Id$
-//
+
 #include <stdlib.h>		//  For atoi().  BCG
 #ifndef HAVE_SWAPCTL
 # include <err.h>		//  For warnx().
@@ -22,9 +21,6 @@
 #include "swapmeter.h"
 #include "swapinternal.h"	/*  For *SwapInfo() functions.  */
 #include "kernel.h"		/*  For BSDSwapInit().  */
-
-CVSID("$Id$");
-CVSID_DOT_H(SWAPMETER_H_CVSID);
 
 static int doSwap = 1;
 

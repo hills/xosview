@@ -7,16 +7,12 @@
 //    should have received.  If not, contact one of the xosview
 //    authors for a copy.
 //
-// $Id$
-//
+
 #include <err.h>		//  For warnx.
 #include <stdlib.h>	//  For atoi.
 #include "general.h"
 #include "intratemeter.h"
 #include "xosview.h"
-
-CVSID("$Id$");
-CVSID_DOT_H(IRQRATEMETER_H_CVSID);
 
 IrqRateMeter::IrqRateMeter( XOSView *parent )
   : FieldMeterGraph( parent, 2, "IRQs", "IRQs per sec/IDLE", 1, 1, 0 ){

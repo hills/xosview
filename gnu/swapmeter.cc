@@ -4,9 +4,6 @@
 //
 //  This file may be distributed under terms of the GPL
 //
-//
-// $Id$
-//
 
 #include "swapmeter.h"
 #include "xosview.h"

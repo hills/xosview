@@ -3,13 +3,9 @@
 //
 //  This file may be distributed under terms of the GPL
 //
-//
-// $Id$
-//
+
 #ifndef _FIELDMETER_H_
 #define _FIELDMETER_H_
-
-#define FIELDMETER_H_CVSID "$Id$"
 
 #include "meter.h"
 #include "timer.h"

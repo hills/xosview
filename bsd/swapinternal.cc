@@ -11,8 +11,6 @@
 //  header from the version from which this file was created, are included
 //  below:
 //
-// $Id$
-//
 //  NOTE THAT THIS FILE IS UNDER THE BSD COPYRIGHT, AND NOT GPL!
 //
 

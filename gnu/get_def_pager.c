@@ -3,9 +3,6 @@
 //
 //  This file may be distributed under terms of the GPL
 //
-//
-// $Id$
-//
 
 #define _GNU_SOURCE
 #include <fcntl.h>

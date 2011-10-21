@@ -13,10 +13,6 @@
 //    should have received.  If not, contact one of the xosview
 //    authors for a copy.
 //
-// $Id$
-//
-
-#define KERNEL_H_CVSID	"$Id$"
 
 void
 BSDInit();

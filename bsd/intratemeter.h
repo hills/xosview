@@ -7,12 +7,9 @@
 //    should have received.  If not, contact one of the xosview
 //    authors for a copy.
 //
-// $Id$
-//
+
 #ifndef _IRQRATEMETER_H_
 #define _IRQRATEMETER_H_
-
-#define IRQRATEMETER_H_CVSID "$Id$"
 
 #include "fieldmetergraph.h"
 #include "kernel.h"

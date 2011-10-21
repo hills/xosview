@@ -3,15 +3,11 @@
 //
 //  This file may be distributed under terms of the GPL
 //
-//
-// $Id$
-//
+
 #ifndef _Xrm_h
 #define _Xrm_h
 
 #include "bool.h"
-
-#define XRM_H_CVSID "$Id$"
 
 #include <X11/Xlib.h>
 #include <X11/Xresource.h>

@@ -3,13 +3,9 @@
 //
 //  This file may be distributed under terms of the GPL
 //
-//
-// $Id$
-//
+
 #ifndef _pllist_h
 #define _pllist_h
-
-#define PLLIST_H_CVSID "$Id$"
 
 #include "llist.h"
 

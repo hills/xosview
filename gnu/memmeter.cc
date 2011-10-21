@@ -4,8 +4,7 @@
 //
 //  This file may be distributed under terms of the GPL
 //
-// $Id$
-//
+
 #include "memmeter.h"
 #include "xosview.h"
 #include <fstream>

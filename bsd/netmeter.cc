@@ -12,18 +12,12 @@
 //    should have received.  If not, contact one of the xosview
 //    authors for a copy.
 //
-// $Id$
-//
+
 #include <err.h>		//  For warnx.
 #include <stdlib.h>		//  For atoi().  BCG
 #include "general.h"
 #include "netmeter.h"
 #include "kernel.h"
-
-CVSID("$Id$");
-CVSID_DOT_H(NETMETER_H_CVSID);
-CVSID_DOT_H2(TIMER_H_CVSID);
-CVSID_DOT_H3(TIMEVAL_H_CVSID);
 
 NetMeter::NetMeter( XOSView *parent, float max )
   : FieldMeterGraph( parent, 3, "NET", "IN/OUT/IDLE" ){

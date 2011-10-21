@@ -3,9 +3,7 @@
 //
 //  This file may be distributed under terms of the GPL
 //
-//
-// $Id$
-//
+
 #ifndef _PAGEMETER_H_
 #define _PAGEMETER_H_
 

@@ -12,12 +12,9 @@
 //    should have received.  If not, contact one of the xosview
 //    authors for a copy.
 //
-// $Id$
-//
+
 #ifndef _NETMETER_H_
 #define _NETMETER_H_
-
-#define NETMETER_H_CVSID "$Id$"
 
 #include "fieldmetergraph.h"
 #include "timer.h"

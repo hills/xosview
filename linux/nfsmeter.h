@@ -2,9 +2,7 @@
 //
 //  This file may be distributed under terms of the GPL
 //
-//
-// $Id$
-//
+
 #ifndef _NFSMETER_H_
 #define _NFSMETER_H_
 

@@ -4,9 +4,7 @@
 //
 //  This file may be distributed under terms of the GPL
 //
-//
-// $Id$
-//
+
 #include "pagemeter.h"
 #include "xosview.h"
 #include <fstream>

@@ -2,8 +2,6 @@
 //  Rewritten for Solaris by Arno Augustin 1999
 //  augustin@informatik.uni-erlangen.de
 //
-// $Id$
-//
 
 
 #include "netmeter.h"

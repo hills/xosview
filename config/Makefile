@@ -1,7 +1,3 @@
-#
-# $Id$
-#
-
 all: ../configure
 
 ../configure: configure.in aclocal.m4

@@ -3,9 +3,7 @@
 //
 //  This file may be distributed under terms of the GPL
 //
-//
-// $Id$
-//
+
 #include "btrymeter.h"
 #include "xosview.h"
 #include <fstream>

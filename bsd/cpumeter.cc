@@ -12,8 +12,7 @@
 //    should have received.  If not, contact one of the xosview
 //    authors for a copy.
 //
-// $Id$
-//
+
 #if defined(XOSVIEW_NETBSD)
 #include <sys/param.h>		// Needed for __NetBSD_Version__
 #endif
@@ -28,9 +27,6 @@
 #else
 #include <sys/dkstat.h>
 #endif
-
-CVSID("$Id$");
-CVSID_DOT_H(CPUMETER_H_CVSID);
 
 CPUMeter::CPUMeter( XOSView *parent )
 #if defined(XOSVIEW_FREEBSD) || defined(XOSVIEW_BSDI) || \

@@ -13,8 +13,7 @@
 //    should have received.  If not, contact one of the xosview
 //    authors for a copy.
 //
-// $Id$
-//
+
 #include <stdlib.h>		//  For atoi().  BCG
 #include "general.h"
 #include "pagemeter.h"
@@ -23,9 +22,6 @@
 #if defined(UVM) && defined (VM_UVMEXP2)
 #include <sys/sysctl.h>         /*  Needed for uvmexp_sysctl.  */
 #endif
-
-CVSID("$Id$");
-CVSID_DOT_H(PAGEMETER_H_CVSID);
 
 PageMeter::PageMeter( XOSView *parent, double total )
 : FieldMeterGraph( parent, 3, "PAGE", "IN/OUT/IDLE" ){

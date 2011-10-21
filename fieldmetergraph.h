@@ -12,8 +12,6 @@
 #ifndef _FIELDMETERGRAPH_H_
 #define _FIELDMETERGRAPH_H_
 
-#define FIELDMETERGRAPH_H_CVSID "$Id$"
-
 #include "meter.h"
 #include "fieldmeterdecay.h"
 

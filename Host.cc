@@ -3,16 +3,11 @@
 //
 //  This file may be distributed under terms of the GPL
 //
-//
-// $Id$
-//
+
 #include <stdlib.h>
 #include <string.h>
 #include "general.h"
 #include "Host.h"
-
-CVSID("$Id$");
-CVSID_DOT_H(HOST_H_CVSID);
 
 #if defined(__hpux__) || defined(__hpux)
 extern int h_errno;

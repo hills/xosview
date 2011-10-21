@@ -3,8 +3,5 @@
 //
 //  This file may be distributed under terms of the GPL
 //
-//
-// $Id$
-//
 
 extern mach_port_t get_def_pager(void);

@@ -3,15 +3,10 @@
 //
 //  This file may be distributed under terms of the GPL
 //
-//
-// $Id$
-//
+
 #include "general.h"
 #include "meter.h"
 #include "xosview.h"
-
-CVSID("$Id$");
-CVSID_DOT_H(METER_H_CVSID);
 
 Meter::Meter( XOSView *parent, const char *title, const char *legend,
               int docaptions, int dolegends, int dousedlegends ) {

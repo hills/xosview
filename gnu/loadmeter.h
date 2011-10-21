@@ -7,8 +7,7 @@
 //  Most of this code was written by Werner Fink <werner@suse.de>
 //  Only small changes were made on my part (M.R.)
 //
-// $Id$
-//
+
 #ifndef _LOADMETER_H_
 #define _LOADMETER_H_
 

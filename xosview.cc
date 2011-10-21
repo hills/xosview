@@ -3,9 +3,7 @@
 //
 //  This file may be distributed under terms of the GPL
 //
-//
-// $Id$
-//
+
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/time.h>
@@ -59,10 +57,6 @@ static const char NAME[] = "xosview@";
 #endif // sgi
 
 double MAX_SAMPLES_PER_SECOND = 10;
-
-CVSID("$Id$");
-CVSID_DOT_H(XOSVIEW_H_CVSID);
-
 
 XOSView::XOSView( const char * instName, int argc, char *argv[] ) : XWin(),
 						xrm(Xrm("xosview", instName)){

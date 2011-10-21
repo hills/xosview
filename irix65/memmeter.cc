@@ -1,5 +1,4 @@
 //  
-// $Id$
 //  Initial port performed by Stefan Eilemann (eilemann@gmail.com)
 //
 #include "memmeter.h"

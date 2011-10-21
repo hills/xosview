@@ -12,16 +12,11 @@
 //    should have received.  If not, contact one of the xosview
 //    authors for a copy.
 //
-//
-// $Id$
-//
+
 #include <stdlib.h>  //  for getloadavg()
 #include "general.h"
 #include "loadmeter.h"
 #include "xosview.h"
-
-CVSID("$Id$");
-CVSID_DOT_H(LOADMETER_H_CVSID);
 
 LoadMeter::LoadMeter( XOSView *parent )
   : FieldMeterGraph( parent, 2, "LOAD", "PROCS per MIN/IDLE", 1, 1, 0 ){

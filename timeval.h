@@ -3,13 +3,9 @@
 //
 //  This file may be distributed under terms of the GPL
 //
-//
-// $Id$
-//
+
 #ifndef _TIMEVAL_H_
 #define _TIMEVAL_H_
-
-#define TIMEVAL_H_CVSID "$Id$"
 
 #include <sys/time.h>
 #include <iostream>

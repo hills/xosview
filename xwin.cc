@@ -1,7 +1,3 @@
-//
-// $Id$
-//
-
 #include <X11/Xatom.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -9,9 +5,6 @@
 #include "general.h"
 #include "xwin.h"
 #include "Xrm.h"
-
-CVSID("$Id$");
-CVSID_DOT_H(XWIN_H_CVSID);
 
 //-----------------------------------------------------------------------------
 

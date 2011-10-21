@@ -6,9 +6,6 @@
 //
 //  This file may be distributed under terms of the GPL
 //
-//
-// $Id$
-//
 
 #include "nfsmeter.h"
 #include "xosview.h"

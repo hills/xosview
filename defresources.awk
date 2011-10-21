@@ -2,9 +2,6 @@
 # This is a simple awk program which will generate defaultstring.cc
 # from an X resource file.
 #
-#
-# "$Id$"
-#
 
 #
 # insert the "header" for defaultstring.cc
@@ -15,19 +12,9 @@ BEGIN {
   print "// This file is generated automagically from Xdefaults";
   print "// using the awk program found in defresources.awk.";
   print "// This file will be rebuilt when Xdefaults is modified.";
-  print "//";
-  print "// $Id$";
-  print "//";
-  print "//\n\n";
+  print "//\n";
   print "#include \"general.h\"\n";
   print "\n";
-  print "CVSID(\"$Id$\");\n";
-  #  By including all of the Xdefaults file below, we also pick up the
-  #    CVS Id from the Xdefaults file.
-  #  However, it'd be nice if some file had the CVS Id for the
-  #    general.h file.  Let's let this .cc file do that, since it doesn't
-  #    have an associated header file.
-  print "CVSID_DOT_H(GENERAL_H_CVSID);\n";
   printf "char *defaultXResourceString = \"";
 }
 

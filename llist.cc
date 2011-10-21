@@ -3,15 +3,10 @@
 //
 //  This file may be distributed under terms of the GPL
 //
-//
-// $Id$
-//
+
 #include <iostream>
 #include "general.h"
 #include "llist.h"
-
-CVSID("$Id$");
-CVSID_DOT_H(LLIST_H_CVSID);
 
 LList::LNode::LNode( void *data ){
   data_ = data;
