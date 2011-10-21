@@ -126,7 +126,7 @@ void LoadMeter::getloadinfo( void ){
   setUsed(fields_[0], (float) 1.0);
 }
 // just check /proc/cpuinfo for the speed of cpu0
-// (be ignorant on multi-cpus being on different speeds)
+// (average multi-cpus on different speeds)
 // display is intended mainly for laptops ...
 // (yes - i know about devices/system/cpu/cpu0/cpufreq )
 void LoadMeter::getspeedinfo( void ){
@@ -138,6 +138,9 @@ void LoadMeter::getspeedinfo( void ){
   std::string argname;
   std::string argval;
 
+  unsigned int total_cpu = 0;
+  unsigned int ncpus = 0;
+
   speedinfo.open(SPEEDFILENAME );
   while ( speedinfo.good() ) {
     argname.clear();
@@ -148,14 +151,17 @@ void LoadMeter::getspeedinfo( void ){
 
     if ( argname.substr(0,7) == "cpu MHz" ) {
         //XOSDEBUG("SPEED: %s\n",argval.c_str() );
-        old_cpu_speed_ = cur_cpu_speed_;
-        cur_cpu_speed_ = atoi(argval.c_str());
-        // Make it a round number
-        cur_cpu_speed_ = 100 * (int) nearbyint ( ((double) cur_cpu_speed_ )
-          / 100 );
-        break;
+        total_cpu += atoi(argval.c_str());
+	ncpus++;
     }
   }
+
+  old_cpu_speed_ = cur_cpu_speed_;
+  if (ncpus > 0)
+    cur_cpu_speed_ = total_cpu / ncpus;
+  else
+    cur_cpu_speed_ = 0;
+
   speedinfo.close(); speedinfo.clear();
 
 }
