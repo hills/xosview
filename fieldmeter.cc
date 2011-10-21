@@ -143,6 +143,9 @@ void FieldMeter::drawlegend( void ){
   char *tmp1, *tmp2, buff[100];
   int n, x = x_;
 
+  parent_->clear( x_, y_ - 5 - parent_->textHeight(),
+                  width_ + 5, parent_->textHeight() + 4 );
+
   tmp1 = tmp2 = legend_;
   for ( int i = 0 ; i < numfields_ ; i++ ){
     n = 0;
