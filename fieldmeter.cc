@@ -166,7 +166,7 @@ void FieldMeter::drawlegend( void ){
 
 void FieldMeter::drawused( int manditory ){
   if ( !manditory )
-    if ( (lastused_ == used_) )
+    if ( lastused_ == used_ )
       return;
 
   parent_->setStippleN(0);	/*  Use all-bits stipple.  */

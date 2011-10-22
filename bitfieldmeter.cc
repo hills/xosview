@@ -194,7 +194,7 @@ void BitFieldMeter::drawfieldlegend( void ){
 
 void BitFieldMeter::drawused( int manditory ){
   if ( !manditory )
-    if ( (lastused_ == used_) )
+    if ( lastused_ == used_ )
       return;
 
   parent_->setStippleN(0);	/*  Use all-bits stipple.  */
