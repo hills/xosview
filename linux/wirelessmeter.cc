@@ -97,6 +97,7 @@ if (!strncmp(devname, "0", 1)) {
     if ( qualitystate == 0 ) setfieldcolor( 0, poorqualcol_ );
     if ( qualitystate == 1 ) setfieldcolor( 0, fairqualcol_ );
     if ( qualitystate == 2 ) setfieldcolor( 0, goodqualcol_ );
+    drawlegend();
     lastqualitystate = qualitystate;
   }
 
