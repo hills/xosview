@@ -30,7 +30,7 @@ public:
 private:
   XrmDatabase _db;
   XrmClass _class, _instance;
-  char* _display_name;  //  Used solely for getting the display's resources.
+  const char* _display_name;  //  Used solely for getting the display's resources.
 
   //void getArgs(int argc, char **argv);
   static Bool enumCB(XrmDatabase *, XrmBindingList bindings,

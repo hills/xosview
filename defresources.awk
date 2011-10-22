@@ -15,7 +15,7 @@ BEGIN {
   print "//\n";
   print "#include \"general.h\"\n";
   print "\n";
-  printf "char *defaultXResourceString = \"";
+  printf "const char *defaultXResourceString = \"";
 }
 
 #
