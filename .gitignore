@@ -1,6 +1,7 @@
 xosview
-.*.swp
-.purify
+*.d
+*.o
+ii_files
 
 ##  Auto-generated stuff:
 ChangeLog
@@ -13,17 +14,3 @@ Makefile.config
 Makefile.GNU.autodep
 defaultstring.cc
 Xdefaults
-
-##  Autodepend stuff:
-.main.o.d
-.xosview.o.d
-.bitmeter.o.d
-.fieldmeterdecay.o.d
-.fieldmeter.o.d
-.meter.o.d
-.defaultstring.o.d
-.Xrm.o.d
-.xwin.o.d
-.Host.o.d
-.llist.o.d
-ii_files
