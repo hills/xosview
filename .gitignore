@@ -14,3 +14,7 @@ Makefile.config
 Makefile.GNU.autodep
 defaultstring.cc
 Xdefaults
+
+linux/Makefile
+bsd/Makefile
+gnu/Makefile
