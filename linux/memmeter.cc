@@ -77,6 +77,7 @@ void MemMeter::getmeminfo( void ){
                               // without this fix "used" sometimes gets < 0 !
     fields_[0] = total_ - fields_[4] - fields_[3] - fields_[2] - fields_[1];
   }else{
+    fields_[4] -= fields_[3]; // mapped comes from cache
     fields_[0] = total_ - fields_[5] - fields_[4] - fields_[3] - fields_[2] - fields_[1];
   }
 
