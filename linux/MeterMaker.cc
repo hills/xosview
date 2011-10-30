@@ -41,16 +41,28 @@ void MeterMaker::makeMeters(void){
 
   // Standard meters (usually added, but users could turn them off)
   if (_xos->isResourceTrue("cpu")){
-    int start, end;
-    if (strncmp (_xos->getResource("cpuFormat"),"single",2) == 0)
-      start = end = 0;
-    else {
-      end = CPUMeter::countCPUs();
-      start = (end == 0 ||
-               strncmp (_xos->getResource("cpuFormat"),"both",2) == 0) ? 0 : 1;
+    bool single, both, all;
+    unsigned int cpuCount = CPUMeter::countCPUs();
+
+    single = (strncmp(_xos->getResource("cpuFormat"), "single", 2) == 0);
+    both = (strncmp(_xos->getResource("cpuFormat"), "both", 2) == 0);
+    all = (strncmp(_xos->getResource("cpuFormat"), "all", 2) == 0);
+
+    if (strncmp(_xos->getResource("cpuFormat"), "auto", 2) == 0) {
+      if (cpuCount == 1) {
+	single = true;
+      } else {
+	all = true;
+      }
     }
-    for (int i = start ; i <= end ; i++)
-      push(new CPUMeter(_xos, CPUMeter::cpuStr(i)));
+
+    if (single || both)
+      push(new CPUMeter(_xos, CPUMeter::cpuStr(0)));
+
+    if (all || both) {
+      for (unsigned int i = 1; i <= cpuCount; i++)
+	push(new CPUMeter(_xos, CPUMeter::cpuStr(i)));
+    }
   }
   if (_xos->isResourceTrue("mem"))
     push(new MemMeter(_xos));
