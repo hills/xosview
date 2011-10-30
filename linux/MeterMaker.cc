@@ -49,7 +49,7 @@ void MeterMaker::makeMeters(void){
     all = (strncmp(_xos->getResource("cpuFormat"), "all", 2) == 0);
 
     if (strncmp(_xos->getResource("cpuFormat"), "auto", 2) == 0) {
-      if (cpuCount == 1) {
+      if (cpuCount == 1 || cpuCount > 4) {
 	single = true;
       } else {
 	all = true;
