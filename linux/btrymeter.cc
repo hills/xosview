@@ -50,6 +50,11 @@ BtryMeter::BtryMeter( XOSView *parent )
 BtryMeter::~BtryMeter( void ){
 }
 
+// determine if any usable source of battery information
+bool BtryMeter::has_source( void ){
+  return has_apm() || has_acpi() || has_syspower();
+}
+
 // determine if /proc/apm exists and is readable
 bool BtryMeter::has_apm( void ){
 

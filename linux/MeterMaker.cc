@@ -139,7 +139,7 @@ if ( stats ) {
   }
 
   // check for the battery meter
-  if (_xos->isResourceTrue("battery"))
+  if (_xos->isResourceTrue("battery") && BtryMeter::has_source())
     push(new BtryMeter(_xos));
 
   // check for the LmsTemp meter

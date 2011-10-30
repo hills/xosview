@@ -34,7 +34,7 @@ public:
   };
   acpi_batt battery;
 
-
+  static bool has_source( void );
 protected:
 
   void getpwrinfo( void );
@@ -52,9 +52,9 @@ private:
   bool sys_battery_present(const std::string& filename);
   bool sys_parse_battery(const std::string& filename);
 
-  bool has_acpi(void);
-  bool has_apm(void);
-  bool has_syspower(void);
+  static bool has_acpi(void);
+  static bool has_apm(void);
+  static bool has_syspower(void);
 
   int apm_battery_state;
   int old_apm_battery_state;

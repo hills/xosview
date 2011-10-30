@@ -185,7 +185,7 @@ xosview*irqrateGraph:	False
 
 ! Battery Meter Resources
 
-xosview*battery:            False
+xosview*battery:            True
 xosview*batteryLeftColor:   orange
 xosview*batteryUsedColor:   aquamarine
 xosview*batteryPriority:    50
