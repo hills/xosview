@@ -528,10 +528,10 @@ created for multiple CPUs.
 
 xosview*cpuFormat: (single, all, both or auto)
 .RS
-If single, only a cumulative meter for all CPU is created. All creates a
-meter for each CPU, but no cumulative meter. Both creates one cumulative
-meter and one per cpu. auto behaves like single on uniprocessor system,
-and like both on multiprocessor systems.
+If `single', only a cumulative meter for all CPU usage is created.
+`all' creates a meter for each CPU, but no cumulative meter. `both'
+creates one cumulative meter and one for each CPU. `auto' makes a
+choice based on the number of CPUs found.
 .RE
 
 
