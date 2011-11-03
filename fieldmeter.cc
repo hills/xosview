@@ -127,16 +127,18 @@ void FieldMeter::draw( void ){
       offset = parent_->textWidth( "XXXXX" );
 
     parent_->drawString( x_ - offset + 1, y_ + height_, title_ );
-    if(docaptions_)
-      drawlegend();
   }
 
+  drawlegend();
   drawfields( 1 );
 }
 
 void FieldMeter::drawlegend( void ){
   char *tmp1, *tmp2, buff[100];
   int n, x = x_;
+
+  if (!docaptions_ || !dolegends_)
+    return;
 
   parent_->clear( x_, y_ - 5 - parent_->textHeight(),
                   width_ + 5, parent_->textHeight() + 4 );

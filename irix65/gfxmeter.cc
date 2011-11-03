@@ -108,8 +108,7 @@ void GfxMeter::getgfxinfo(void)
                 setfieldcolor( 0, warngfxcol_ );
             else
                 setfieldcolor( 0, critgfxcol_ );
-        if (dolegends_)
-            drawlegend();
+	drawlegend();
         lastalarmstate = alarmstate;
     }
   

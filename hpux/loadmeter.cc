@@ -62,13 +62,13 @@ void LoadMeter::getloadinfo( void ){
   if ( fields_[0] > alarmThreshold ) {
     if (total_ == alarmThreshold ) {
       setfieldcolor( 0, warnloadcol_ );
-      if (dolegends_) drawlegend();
+      drawlegend();
     }
     total_ = fields_[1] = 20;
   } else {
     if (total_ == 20 ) {
       setfieldcolor( 0, procloadcol_ );
-      if (dolegends_) drawlegend();
+      drawlegend();
     }
     total_ = fields_[1] = alarmThreshold;
   }

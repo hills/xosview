@@ -73,8 +73,7 @@ void LoadMeter::checkevent( void ){
         XOSDEBUG("SPEED: %d\n",cur_cpu_speed_);
         legnd << "PROCS/MIN" << " " << cur_cpu_speed_ << " MHz"<< std::ends;
             legend( legnd.str().c_str() );
-        if (dolegends_)
-	  drawlegend();
+	drawlegend();
      }
   }
 
@@ -105,7 +104,7 @@ void LoadMeter::getloadinfo( void ){
     if ( alarmstate == 1 ) setfieldcolor( 0, warnloadcol_ );
     else
     /* if alarmstate == 2 */ setfieldcolor( 0, critloadcol_ );
-    if (dolegends_) drawlegend();
+    drawlegend();
     lastalarmstate = alarmstate;
   }
 

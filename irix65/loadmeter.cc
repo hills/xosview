@@ -103,8 +103,7 @@ void LoadMeter::getloadinfo(void)
                 setfieldcolor( 0, warnloadcol_ );
             else
                 setfieldcolor( 0, critloadcol_ );
-        if (dolegends_)
-            drawlegend();
+	drawlegend();
         lastalarmstate = alarmstate;
     }
   

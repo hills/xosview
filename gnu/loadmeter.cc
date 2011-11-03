@@ -91,7 +91,7 @@ void LoadMeter::getloadinfo( void ){
     if ( alarmstate == 1 ) setfieldcolor( 0, warnloadcol_ );
     else
     /* if alarmstate == 2 */ setfieldcolor( 0, critloadcol_ );
-    if (dolegends_) drawlegend();
+    drawlegend();
     lastalarmstate = alarmstate;
   }
 
