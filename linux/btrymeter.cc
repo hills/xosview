@@ -105,26 +105,35 @@ bool BtryMeter::has_acpi( void ){
 
 }
 
-// determine if /sys/class/power_supply exists and is a DIR
-// (XXX: too lazy -  no tests for actual readability is done)
+/*
+ * Look for something resembling a battery in /sys/class/power_supply
+ */
+
 bool BtryMeter::has_syspower( void ){
+  bool found;
+  DIR *dir;
+  struct dirent *dp;
 
-  struct stat stbuf;
+  dir = opendir(SYSPOWERDIR);
+  if (dir == NULL)
+      return false;
 
-  if ( stat(SYSPOWERDIR, &stbuf) != 0 ) {
-     XOSDEBUG("has_syspower(): stat failed: %d\n",errno);
-     return false;
+  found = false;
+  while (!found) {
+      dp = readdir(dir);
+      if (dp == NULL)
+          break;
+
+      if (strncmp(dp->d_name, "BAT", 3) == 0) {
+          found = true;
+          break;
+      }
   }
-  if ( S_ISDIR(stbuf.st_mode) ) {
-     XOSDEBUG("%s exists and is a DIR.\n", SYSPOWERDIR);
-  } else {
-     XOSDEBUG("no /sys/class/power_supply dir\n");
-     return false;
-  }
 
-  // declare syspower as usable
-  return true;
+  if (closedir(dir) != 0)
+      abort();
 
+  return found;
 }
 
 void BtryMeter::checkResources( void ){
