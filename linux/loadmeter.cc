@@ -9,6 +9,7 @@
 
 #include "loadmeter.h"
 #include "xosview.h"
+#include "cpumeter.h"
 #include <fstream>
 #include <sstream>
 #include <stdlib.h>
@@ -44,8 +45,19 @@ void LoadMeter::checkResources( void ){
   dodecay_ = parent_->isResourceTrue( "loadDecay" );
   SetUsedFormat (parent_->getResource("loadUsedFormat"));
 
-  warnThreshold = atoi (parent_->getResource("loadWarnThreshold"));
-  critThreshold = atoi (parent_->getResource("loadCritThreshold"));
+  const char *warn = parent_->getResource("loadWarnThreshold");
+  if (strncmp(warn, "auto", 2) == 0) {
+      warnThreshold = CPUMeter::countCPUs();
+  } else {
+      warnThreshold = atoi(warn);
+  }
+
+  const char *crit = parent_->getResource("loadCritThreshold");
+  if (strncmp(crit, "auto", 2) == 0) {
+      critThreshold = warnThreshold * 4;
+  } else {
+      critThreshold = atoi(crit);
+  }
 
   do_cpu_speed  = parent_->isResourceTrue( "loadCpuSpeed" );
 

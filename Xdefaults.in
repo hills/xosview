@@ -42,8 +42,8 @@ xosview*loadWarnColor:      orange
 xosview*loadProcColor:      seagreen
 xosview*loadIdleColor:      aquamarine
 xosview*loadPriority:       20
-xosview*loadCritThreshold:  5
-xosview*loadWarnThreshold:  2
+xosview*loadCritThreshold:  auto  ! auto or number
+xosview*loadWarnThreshold:  auto  ! auto or number
 xosview*loadDecay:          False
 xosview*loadGraph:          False
 xosview*loadUsedFormat:     float
