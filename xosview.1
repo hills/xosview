@@ -496,15 +496,22 @@ created for multiple CPUs.
 
 .\"  cpuUserColor, cpuNiceColor, cpuSystemColor, cpuInterruptColor, cpuFreeColor
 .cc cpu User "cpu user time"
+
 .cc cpu Nice "cpu nice time"
+
 .cc cpu System "cpu system time"
+
 .cc cpu Interrupt "cpu interrupt time"
+
 .cc cpu Free "cpu idle time"
 
 .\"  Priority, decay, usedFormat resources:
 .pp cpu
+
 .dc cpu
+
 .dg cpu
+
 .uf cpu
 
 xosview*cpuFormat: (single, all, both or auto)
@@ -525,20 +532,32 @@ choice based on the number of CPUs found.
 
 .\"  mem{Used,Share,Buffer,...}Color resources
 .cc mem Used "used memory"
+
 .cc mem Shared "shared memory"
+
 .cc mem Buffer "buffer memory"
+
 .cc mem Cache "cache memory"
+
 .cc mem Free "free memory"
+
 .cc mem Shared "shared memory"
+
 .cc mem Text "HP text memory"
+
 .cc mem Other "HP ``other'' memory"
+
 .cc mem Active "NetBSD active memory"
+
 .cc mem Inactive "NetBSD inactive memory"
 
 .\"  Priority, decay, usedFormat resources:
 .pp mem
+
 .dc mem
+
 .dg mem
+
 .uf mem
 
 
@@ -549,12 +568,16 @@ choice based on the number of CPUs found.
 
 .\"  swap{Used,Free}Color resources.
 .cc swap Used "used swap"
+
 .cc swap Free "free swap"
 
 .\"  Priority, decay, usedFormat resources:
 .pp swap
+
 .dc swap
+
 .dg swap
+
 .uf swap
 
 
@@ -573,13 +596,18 @@ percentage of page swapping (25% in, 75% out).
 
 .\"  page{In,Out,Idle}Color:
 .cc page In page-in
+
 .cc page Out page-out
+
 .cc page Idle idle
 
 .\"  Priority, decay, usedFormat resources:
 .pp page
+
 .dc page
+
 .dg page
+
 .uf page
 
 
@@ -678,8 +706,11 @@ This is the color that the network meter will use for the "idle" field.
 
 .\"  Priority, decay, usedFormat resources:
 .pp net
+
 .dc net
+
 .dg net
+
 .uf net
 
 \fBNFSStats (Client) Resources\fP
@@ -743,9 +774,7 @@ xosview*NFSDStatIdleColor: \fIcolor\fP
 The color to be used for idle stats.
 .RE
 
-
 \fBSerial Meter Resources\fP
-
 
 xosview*serial(0-9): (True, False, or portBase)
 .RS
@@ -773,9 +802,7 @@ This is the color the serial meter will use for bits that are not set.
 .\"  Do the priority resource
 .pp serial
 
-
 \fBInterrupt Meter Resources\fP
-
 
 xosview*interrupts: (True or False)
 .RS
@@ -794,7 +821,6 @@ This is the color that will be used to show "inactive" interrupts.
 
 .\"  Do the priority resource
 .pp int
-
 
 \fBLm Sensors Temperature Resources\fP
 
@@ -840,6 +866,7 @@ N-th label for above temperatures, default is TMP.
 .RE
 
 .pp lmstemp
+
 .uf lmstemp
 
 \fBBattery Meter Resources\fP
@@ -896,6 +923,7 @@ If no battery is present - or all batteries get removed (while on AC).
 
 .\"  Do the priority resource
 .pp battery
+
 .uf battery
 
 \fBWireless Meter Resources\fP
@@ -931,7 +959,9 @@ This is the background color.
 
 .\"  Do the priority resource
 .pp wireless
+
 .dc wireless
+
 .uf wireless
 
 
@@ -942,6 +972,7 @@ This is the background color.
 
 .\"  disk colors
 .cc disk Used "bytes transferred (in or out)"
+
 .cc disk Idle idle
 
 xosview*diskBandwidth: \fIbandwidth\fP
@@ -962,8 +993,11 @@ This color will be used for the linux meter to show reads.
 
 .\"  Priority, decay, usedFormat resources:
 .pp disk
+
 .dc disk
+
 .dg disk
+
 .uf disk
 
 \fBRAID Meter Resources\fP
