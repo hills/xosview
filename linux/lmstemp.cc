@@ -66,7 +66,9 @@ int  LmsTemp::checksensors(int isproc, const char *dir, const char* filename)
 	    continue;
 
 	  snprintf(dirname, 64, "%s/%s",dir ,ent1->d_name);
-	  if (!isproc) strcat(dirname, "/device");
+	  if (!isproc)
+	    strncat(dirname, "/device", sizeof(dirname) - strlen(dirname) - 1);
+
 	  if(stat(dirname,&buf)==0 && S_ISDIR(buf.st_mode))
 	    {
 	      d2=opendir(dirname);
@@ -84,7 +86,7 @@ int  LmsTemp::checksensors(int isproc, const char *dir, const char* filename)
 			continue;
 
 		      if((isproc && !strncmp(ent2->d_name, filename, strlen(filename))) ||
-			 (!isproc && !strncmp(ent2->d_name, filename, strlen(filename)) && !strcmp(ent2->d_name+strlen(filename), "_input")))
+			 (!isproc && !strncmp(ent2->d_name, filename, strlen(filename)) && !strncmp(ent2->d_name+strlen(filename), "_input", 6)))
 			{
 			  if (!isproc)
 			      f[strlen(f)-6] = '\0';

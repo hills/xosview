@@ -146,7 +146,7 @@ const char *CPUMeter::cpuStr(int num){
   std::ostringstream str;
 
   if (num != 0)
-    sprintf(buffer, "cpu%d", num - 1);
+    snprintf(buffer, sizeof(buffer), "cpu%d", num - 1);
   else
     strcpy(buffer, "cpu");
 
