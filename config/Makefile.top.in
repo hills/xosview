@@ -77,8 +77,6 @@ distrib: checksource distclean
 	cd $(DISTRIBDIR); rm -rf `find . -name "CVS"`
 	cd @top_srcdir@/..; tar cf $(PACKAGENAME).tar $(PACKAGENAME)
 	gzip -f9 @top_srcdir@/../$(PACKAGENAME).tar
-	cd @top_srcdir@/..; uuencode $(PACKAGENAME).tar.gz \
-          $(PACKAGENAME).tar.gz > $(PACKAGENAME).tar.gz.uue
 
 #  The next one is only used by bgrayson to set up the local
 #  mirrors of the xosview distributions.
