@@ -18,7 +18,7 @@ static const char STATFILENAME[] = "/proc/stat";
 #define MAX_PROCSTAT_LENGTH 4096
 
 CPUMeter::CPUMeter(XOSView *parent, const char *cpuID)
-: FieldMeterGraph( parent, 9, toUpper(cpuID), "USR/NICE/SYS/SI/HI/WIO/GST/ST/FREE" ) {
+: FieldMeterGraph( parent, 9, toUpper(cpuID), "USR/NICE/SYS/SI/HI/WIO/GST/ST/IDLE" ) {
   _lineNum = findLine(cpuID);
   for ( int i = 0 ; i < 2 ; i++ )
     for ( int j = 0 ; j < 9 ; j++ )
