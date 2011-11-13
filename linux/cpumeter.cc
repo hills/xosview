@@ -87,6 +87,8 @@ void CPUMeter::getcputime( void ){
     fields_[field] = cputime_[cpuindex_][i] - cputime_[oldindex][i];
     total_ += fields_[field];
   }
+
+  // Guest time already included in user time
   fields_[0] -= fields_[6];
   total_ -= fields_[6];
 
