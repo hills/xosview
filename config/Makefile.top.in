@@ -85,9 +85,6 @@ clean :
 checksource:
 	@#  Check that certain unsafe things aren't in any of the
 	@#  code.
-	@echo "***  Grep'ing for uses of strcmp, sprintf, strcat, strcmp,"
-	@echo "     strcasecmp instead of safer strncmp, snprintf, strncat,"
-	@echo "     strncmp, strncasecmp...."
 	@#  If egrep finds no matches, it returns as if it is an
 	@#  error.  Reverse that error code....
 	@#  We also should not check snprintf.cc, which calls vsprintf.
