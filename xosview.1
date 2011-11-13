@@ -104,20 +104,19 @@ The \\$1 meter will use this color to display the \\$3 field.
 ..
 .\"  ================  End of Macros  =============================
 .SH DESCRIPTION
-\fIxosview\fP is a monitor which displays the status of several system based
-parameters.  These include CPU usage, load average, memory usage, swap
-space usage, network usage, interrupts, and serial port status.  Each of
-these is displayed as a horizontal bar which is separated into color coded
-regions.  Each region represents a percentage of the resource which is being
-put to a particular use.  Typing a 'q' in the window will terminate xosview.
+\fIxosview\fP is a monitor which displays the status of several system
+based parameters.  These include CPU usage, load average, memory, swap
+space, network usage and more.  Each resource is displayed as a
+horizontal bar which is separated into color coded regions showing how
+much of the resource which is being put to a particular use.
 
-At the moment \fIxosview\fP runs on eight platforms (Linux,
-NetBSD, FreeBSD, OpenBSD, some Solaris systems, IRIX 6.5, HPUX and GNU).
-Not all of the meters described below are supported on all
-platforms.  Some of the meters may appear different depending upon the
-platform \fIxosview\fP is running on.  Note that *BSD is used as
-an abbreviation for all three of the free BSD operating systems
-(NetBSD, FreeBSD, OpenBSD).
+\fIxosview\fP runs on several platforms (Linux, NetBSD, FreeBSD,
+OpenBSD, some Solaris systems, IRIX 6.5, HPUX and GNU).  Not all of
+the meters described below are supported on all platforms.  Some of
+the meters may appear different depending upon the platform
+\fIxosview\fP is running on.  Note that *BSD is used as an
+abbreviation for all three of the free BSD operating systems (NetBSD,
+FreeBSD, OpenBSD).
 
 \fBLoad\fP
    all platforms  :  load
@@ -199,6 +198,8 @@ an abbreviation for all three of the free BSD operating systems
     Linux  : linkquality | of 30,60 or 90
     *BSD   : < Not Supported >
     HPUX   : < Not Supported >
+
+Typing a 'q' in the window will terminate xosview.
 
 .SH OPTIONS
 
