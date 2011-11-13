@@ -5,6 +5,14 @@ Changes since xosview-1.8.3
 
   - netIface support for NetBSD.  Patch from  Bernd Ernesti.
 
+  - Move repository to Git
+
+  - Merged patches from Debian distribution
+
+  - Several bugfixes
+
+  - Improvements to defaults
+
 Changes since xosview-1.8.2
  - NFSDStats ans NFSStats Graph, Decay and UsedMode are now configurable
 
