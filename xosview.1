@@ -123,13 +123,13 @@ an abbreviation for all three of the free BSD operating systems
    all platforms  :  load
 
 \fBCPU Usage\fP
-   Linux  : user | nice | system | idle
+   Linux  : user | nice | system | soft-interrupt | interrupt | io-wait | guest | stolen | idle
    *BSD   : user | nice | system | interrupt | idle
    IRIX   : user | system | interrupt | wait | idle
    HPUX   : user | nice | system | interrupt | idle
 
 \fBMemory Usage\fP
-   Linux  : used | shared | buffers | free
+   Linux  : used | buffers | slab | map | cache | free
    NetBSD : active | inactive | wired | free
    FreeBSD: active | inactive | wired | buffer | free
    OpenBSD: active | inactive | wired | free
