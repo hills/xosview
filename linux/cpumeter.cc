@@ -7,6 +7,7 @@
 #include "cpumeter.h"
 #include "xosview.h"
 #include <fstream>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <string>
@@ -142,13 +143,10 @@ const char *CPUMeter::cpuStr(int num){
   static char buffer[32];
   std::ostringstream str;
 
-  str << "cpu";
   if (num != 0)
-    str << (num - 1);
-  str << std::ends;
-
-  strncpy(buffer, str.str().c_str(), 32);
-  buffer[31] = '\0';
+    sprintf(buffer, "cpu%d", num - 1);
+  else
+    strcpy(buffer, "cpu");
 
   return buffer;
 }
