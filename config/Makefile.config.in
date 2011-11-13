@@ -6,7 +6,7 @@
 #
 
 # version number for release
-VERS = 1.8.3
+VERS = 1.9.0
 
 TOP = @TOP_SRCDIR@
 
