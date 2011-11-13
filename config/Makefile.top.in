@@ -70,19 +70,8 @@ install-man:
 	@echo "Use the 'install' target -- it installs the man page, too."
 	@#@INSTALL_DATA@ xosview.1 $(MANDIR)
 
-distrib: checksource distclean
-	cd @top_srcdir@/..; rm -rf $(PACKAGENAME)
-	mkdir $(DISTRIBDIR)
-	(cd @top_srcdir@; tar cf - *) | (cd $(DISTRIBDIR); tar xf -)
-	cd $(DISTRIBDIR); rm -rf `find . -name "CVS"`
-	cd @top_srcdir@/..; tar cf $(PACKAGENAME).tar $(PACKAGENAME)
-	gzip -f9 @top_srcdir@/../$(PACKAGENAME).tar
-
-#  The next one is only used by bgrayson to set up the local
-#  mirrors of the xosview distributions.
-distrib-and-copy: distrib
-	cp ../$(PACKAGENAME).tar.gz `echo ~bgrayson/public_html/xosview`
-	scp ../$(PACKAGENAME).tar.gz omni:~bgrayson/public_html/xosview
+dist: checksource
+	./mkdist $(VERS)
 
 clean :
 	@echo "***  Cleaning..."
@@ -106,20 +95,5 @@ checksource:
 		`echo *.cc *.h */*.cc */*.h | sed -e 's/snprintf.cc//'`; \
 		if [ $$? != 0 ]; then exit 0; else \
 		echo "***  Bad functions found -- error!"; exit 1; fi'
-
-distclean: clean
-	@#  Also check _all_ subdirs, not just the configured one, for
-	@#  object files.
-	@echo "***  Checking for any missed .o files..."
-	@sh -c 'objects=`find . -name "*.o" -print`; if [ x"$$objects" != x ]; then \
-	  echo "The following object files still need to be removed:";\
-	  echo $$objects; exit 1; fi'
-	@echo "***  Removing all Makefiles..."
-	@rm -f Makefile Makefile.config Makefile.GNU.autodep \
-           @host_dir@/Makefile config.cache config.log config.status
-
-
-maintainer-clean: distclean
-	rm -f configure
 
 @AUTODEPEND@
