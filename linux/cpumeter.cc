@@ -93,7 +93,7 @@ void CPUMeter::getcputime( void ){
   total_ -= fields_[6];
 
   if (total_){
-    setUsed (total_ - (fields_[5] + fields_[6] + fields_[7] + fields_[8]), total_);
+    setUsed (total_ - fields_[8], total_); // any non-idle time
     cpuindex_ = (cpuindex_ + 1) % 2;
   }
 }
