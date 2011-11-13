@@ -118,8 +118,7 @@ the meters may appear different depending upon the platform
 abbreviation for all three of the free BSD operating systems (NetBSD,
 FreeBSD, OpenBSD).
 
-\fBLoad\fP
-   all platforms  :  load
+\fBLoad\fP: Kernel reported load average
 
 \fBCPU Usage\fP
    Linux  : user | nice | system | soft-interrupt | interrupt | io-wait | guest | stolen | idle
@@ -132,72 +131,53 @@ FreeBSD, OpenBSD).
    NetBSD : active | inactive | wired | free
    FreeBSD: active | inactive | wired | buffer | free
    OpenBSD: active | inactive | wired | free
-   IRIX   : kernel | fs   | user    | free
-   HPUX   : text | used   | other   | free
+   IRIX   : kernel | fs | user | free
+   HPUX   : text | used | other | free
    GNU    : active | inactive | wired | free
 
 \fBSwap Usage\fP
-   all platforms except IRIX: used | free
+   Linux  : used | free
+   *BSD   : used | free
+   HPUX   : used | free
+   GNU    : used | free
 
-\fBDisk Usage (bytes/sec)\fP
-   Linux  : in  |  out  | idle
+\fBDisk Usage\fP: Throughput to/from local disk, per second
+   Linux  : in | out | idle
    *BSD   : transferred | idle
-   HPUX   : < Not Supported >
 
-\fBPage Swapping from/to disk\fP
-   all platforms except IRIX  : in | out | idle
+\fBPage Swapping\fP: Pages to/from swap, per second
+   Linux  : in | out | idle
+   *BSD   : in | out | idle
+   HPUX   : in | out | idle
+   GNU    : in | out | idle
 
-\fBNET Usage\fP
-    bytes/sec
-    Linux  : in | out | idle
-    *BSD   : in | out | idle
-    HPUX   : < Not Supported >
+\fBNetwork Usage\fP
+   Linux  : in | out | idle
+   *BSD   : in | out | idle
 
-\fBGFX Usage\fP
-    swapbuffers/sec
-    IRIX   : number of swapbuffers
+\fBGFX Usage\fP: Framebuffer exchanges, per second
+   IRIX   : swapbuffers
 
-\fBInterrupts\fP
-    "leds" which blink when an interrupt occurs.
-    Linux  : IRQs 0 - 15
-    *BSD   : IRQs 0 - 15 (or fewer, depending on architecture)
-    HPUX   : < Not Supported >
+\fBInterrupts\fP: "leds" which blink when an interrupt occurs
+   Linux  : IRQs
+   *BSD   : IRQs
 
-\fBInterrupt rate\fP
-    interrupts per second
-    Linux  : < Not Supported >
-    *BSD   : interrupts | free
-    HPUX   : < Not Supported >
+\fBInterrupt Rate\fP: Per second
+   *BSD   : interrupts | free
 
-\fBSerial Port Status\fP
-    "leds" which show the serial port parameters.
-    Linux  : Both the Line Status Register
-             (LSR) and Modem Status Register
-             (MSR) are displayed.
-    *BSD   : < Not Supported >
-    HPUX   : < Not Supported >
+\fBSerial Port Status\fP: "leds" which show the serial port parameters
+   Linux  : LSR and MSR
 
 \fBBattery Level\fP
-    Shows the current condition of the
-    battery (for laptops).
-    Linux  : %left | %used
-    NetBSD : %left | %used
-    FreeBSD: < Not Supported >
-    OpenBSD: %left | %used
-    HPUX   : < Not Supported >
+   Linux  : available | used
+   NetBSD : available | used
+   OpenBSD: available | used
 
-\fBRAID status\fP
-    Shows the state of disks contained in your (software)
-    RAID1/4/5 array(s) and the rebuild state of the
-    array(s).
-    Linux  : Disk0 Disk1 Disk2 .. DiskN | Rebuild Progress
+\fBRAID\fP: State of disks in a software RAID array
+   Linux  : disk0 disk1 disk2 ... diskN | rebuild
 
 \fBWireless Link\fP
-    Shows the current Linkquality
-    of wireless connections.
-    Linux  : linkquality | of 30,60 or 90
-    *BSD   : < Not Supported >
-    HPUX   : < Not Supported >
+   Linux  : quality
 
 Typing a 'q' in the window will terminate xosview.
 
