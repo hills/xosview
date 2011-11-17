@@ -56,6 +56,9 @@ private:
   static bool has_apm(void);
   static bool has_syspower(void);
 
+  void handle_apm_state(void);
+  void handle_acpi_state(void);
+
   int apm_battery_state;
   int old_apm_battery_state;
 

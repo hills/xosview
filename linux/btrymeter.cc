@@ -146,107 +146,103 @@ void BtryMeter::checkResources( void ){
   SetUsedFormat(parent_->getResource( "batteryUsedFormat" ) );
 }
 
+void BtryMeter::handle_apm_state( void ){
+  switch ( apm_battery_state ) {
+  case 0: /* high (e.g. over 25% on my box) */
+    XOSDEBUG("battery_status HIGH\n");
+    setfieldcolor( 0, parent_->getResource("batteryLeftColor"));
+    legend("High AVAIL/USED");
+    break;
+
+  case 1: /* low  ( e.g. under 25% on my box ) */
+    XOSDEBUG("battery_status LOW\n");
+    setfieldcolor( 0, parent_->getResource("batteryLowColor"));
+    legend("LOW avail/used");
+    break;
+
+  case 2: /* critical ( less than  5% on my box ) */
+    XOSDEBUG("battery_status CRITICAL\n");
+    setfieldcolor( 0, parent_->getResource("batteryCritColor"));
+    legend( "Crit LOW/Used");
+    break;
+
+  case 3: /* Charging */
+    XOSDEBUG("battery_status CHARGING\n");
+    setfieldcolor( 0, parent_->getResource("batteryChargeColor"));
+    legend( "AC/Charging");
+    break;
+
+  case 4: /* selected batt not present */
+    /* no idea how this state ever could happen with APM */
+    XOSDEBUG("battery_status not present\n");
+    setfieldcolor( 0, parent_->getResource("batteryNoneColor"));
+    legend( "Not Present/N.A.");
+    break;
+
+  case 255: /* unknown - do nothing - maybe not APM */
+    // on my system this state comes if you pull both batteries
+    // ( while on AC of course :-)) )
+    XOSDEBUG("apm battery_state not known\n");
+    setfieldcolor( 0, parent_->getResource("batteryNoneColor"));
+    legend( "Unknown/N.A.");
+    break;
+  }
+}
+
+void BtryMeter::handle_acpi_state( void ){
+  switch ( acpi_charge_state ) {
+  case 0:  // charged
+    XOSDEBUG("battery_status CHARGED\n");
+    setfieldcolor( 0, parent_->getResource("batteryFullColor"));
+    legend( "CHARGED/FULL");
+    break;
+
+  case -1: // discharging
+    XOSDEBUG("battery_status DISCHARGING\n");
+    setfieldcolor( 0, parent_->getResource("batteryLeftColor"));
+    legend( "AVAIL/USED");
+    break;
+
+  case -2: // discharging - below alarm
+    XOSDEBUG("battery_status ALARM DISCHARGING\n");
+    setfieldcolor( 0, parent_->getResource("batteryCritColor"));
+    legend( "LOW/ALARM");
+    break;
+
+  case -3: // not present
+    XOSDEBUG("battery_status NOT PRESENT\n");
+    setfieldcolor( 0, parent_->getResource("batteryNoneColor"));
+    legend( "NONE/NONE");
+    break;
+
+  case 1:  // charging
+    XOSDEBUG("battery_status CHARGING\n");
+    setfieldcolor( 0, parent_->getResource("batteryChargeColor"));
+    legend( "AC/Charging");
+    break;
+  }
+}
+
+/*
+ * All redraws come from this function (not children)
+ */
+
 void BtryMeter::checkevent( void ){
 
   getpwrinfo();
 
-
-  /* if the APM state changed - we need to update the colors,
-     AND force a legend redraw - otherwise not ...
-     ... and the apm-state won't change if we don't have APM
-  */
   if ( old_apm_battery_state != apm_battery_state ) {
-
-	/* so let's eval the apm_battery_state in some more detail: */
-
-	switch ( apm_battery_state ) {
-
-	case 0: /* high (e.g. over 25% on my box) */
-		XOSDEBUG("battery_status HIGH\n");
-		setfieldcolor( 0, parent_->getResource("batteryLeftColor"));
-		legend("High AVAIL/USED");
-		break;
-
-	case 1: /* low  ( e.g. under 25% on my box ) */
-		XOSDEBUG("battery_status LOW\n");
-		setfieldcolor( 0, parent_->getResource("batteryLowColor"));
-		legend("LOW avail/used");
-		break;
-
-	case 2: /* critical ( less than  5% on my box ) */
-		XOSDEBUG("battery_status CRITICAL\n");
-		setfieldcolor( 0, parent_->getResource("batteryCritColor"));
-		legend( "Crit LOW/Used");
-		break;
-
-	case 3: /* Charging */
-		XOSDEBUG("battery_status CHARGING\n");
-		setfieldcolor( 0, parent_->getResource("batteryChargeColor"));
-		legend( "AC/Charging");
-		break;
-
-	case 4: /* selected batt not present */
-		/* no idea how this state ever could happen with APM */
-		XOSDEBUG("battery_status not present\n");
-		setfieldcolor( 0, parent_->getResource("batteryNoneColor"));
-		legend( "Not Present/N.A.");
-	 	break;
-
-	case 255: /* unknown - do nothing - maybe not APM */
-		// on my system this state comes if you pull both batteries
-		// ( while on AC of course :-)) )
-		XOSDEBUG("apm battery_state not known\n");
-		setfieldcolor( 0, parent_->getResource("batteryNoneColor"));
-		legend( "Unknown/N.A.");
-		break;
-	}
-
-	drawlegend();
-	drawfields(1);
-   }
-
-
-  /* if the ACPI state changed - we need to update the colors,
-     AND force a legend redraw - otherwise not ...
-     ... and the acpi-state won't change if we don't have acpi
-  */
+    /* APM only changes if we have APM */
+    handle_apm_state();
+    drawlegend();
+    drawfields(1);
+  }
 
   if ( old_acpi_charge_state != acpi_charge_state ) {
-
-  	XOSDEBUG("ACPI: charge_state: old=%d, now=%d\n",old_acpi_charge_state,acpi_charge_state);
-
-	/* so let's eval the apm_battery_state in some more detail: */
-
-	switch ( acpi_charge_state ) {
-	case 0:  // charged
-		XOSDEBUG("battery_status CHARGED\n");
-		setfieldcolor( 0, parent_->getResource("batteryFullColor"));
-		legend( "CHARGED/FULL");
-		break;
-	case -1: // discharging
-		XOSDEBUG("battery_status DISCHARGING\n");
-		setfieldcolor( 0, parent_->getResource("batteryLeftColor"));
-		legend( "AVAIL/USED");
-		break;
-	case -2: // discharging - below alarm
-		XOSDEBUG("battery_status ALARM DISCHARGING\n");
-		setfieldcolor( 0, parent_->getResource("batteryCritColor"));
-		legend( "LOW/ALARM");
-		break;
-	case -3: // not present
-		XOSDEBUG("battery_status NOT PRESENT\n");
-		setfieldcolor( 0, parent_->getResource("batteryNoneColor"));
-		legend( "NONE/NONE");
-		break;
-	case 1:  // charging
-		XOSDEBUG("battery_status CHARGING\n");
-		setfieldcolor( 0, parent_->getResource("batteryChargeColor"));
-		legend( "AC/Charging");
-		break;
-	}
-	drawlegend();
-	drawfields(1);
-   }
+    handle_acpi_state();
+    drawlegend();
+    drawfields(1);
+  }
 }
 
 
