@@ -1,3 +1,7 @@
+Changes since xosview-1.9.0
+
+  - Fix a bug where battery meter was not redrawn
+
 Changes since xosview-1.8.3
 
   - Modify linux serialmeter startup to allow for a port number instead of
