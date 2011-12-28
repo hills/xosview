@@ -1,28 +1,24 @@
-  To build xosview:
+This version of xosview is distributed from the following sites:
 
-    Xosview now uses gnu autoconfig.  There is hope that this will make
-    building and installing it easier.  Still, this is the first attempt.
-    So, if you find any trouble feel free to point it out.
+  http://www.pogo.org.uk/~mark/xosview/
+  https://github.com/hills/xosview
 
-    In general, you should be able to build xosview by following these
-    steps:
+xosview uses GNU autoconfig. In general, you should be able to build
+by following these steps:
 
-    ./configure
-    make
-    make install    
+  $ ./autogen.sh    # only required if buildling from repository
+  $ ./configure
+  $ make
+  $ make install
 
-    Versions 1.4 and later require gcc to compile.  Versions of gcc earlier 
-    than 2.7.0 may fail to build xosview.  Please see the README file for
-    your the platform you are building on for further details.
+Edit Makefile.config for your setup, if you wish to change anything
+from the default settings, such as the optimization flags. This of
+course, should be done before one runs make.
 
-    Edit Makefile.config for your setup, if you wish to change
-    anything from the default settings, such as the optimization
-    flags.  This of course, should be done before one runs make.
+Please see the README file for your platform for any special
+instructions for running xosview on that platform.
 
-  To run xosview :
+See the man page for information on the xosview display and how to
+customize it.
 
-    Please see the README file for your platform for any special 
-    instructions for running xosview on that platform.
-
-    See the man page for information on the xosview display and
-    how you can customize it.
+See the COPYING file for licensing terms.
