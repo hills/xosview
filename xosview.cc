@@ -16,7 +16,7 @@
 #include "kernel.h"
 #endif
 
-static const char * const versionString = "xosview version: " XOSVIEW_VERSION;
+static const char * const versionString = "xosview version: Git";
 
 static const char NAME[] = "xosview@";
 

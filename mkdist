@@ -1,35 +1,16 @@
 #!/bin/sh
 #
-# Make an xosview distribution from a Git repo, baking in the version
-# number and configure script
+# Make an xosview distribution from a Git repo
 #
 
 set -e
 
-VERSION="$1"
-
-if [ -z "$VERSION" ]; then
-	echo "usage: $0 < version>" >&2
-	exit 1
-fi
-
-T=`mktemp -dt xosview-mkdist.XXXXXX`
-trap 'rm -r $T' 0
-
-# Extract a clean HEAD from Git
-
-D="xosview-$VERSION"
-git archive --prefix="$D/" HEAD | tar -xC "$T"
-
-# Pre-configure using GNU autoconf
-
-(cd "$T/$D" && ./autogen.sh)
-
-# Final compressed archive
+V=`git describe`
+D="xosview-$V"
 
 mkdir -p dist
-A="dist/xosview-$VERSION.tar.gz"
-tar -cC "$T" "$D" | gzip --best > "$A"
+A="dist/$D.tar.gz"
+git archive --prefix="$D/" HEAD | gzip --best > "$A"
 
 echo "Created $A" >&2
 exit 0

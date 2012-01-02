@@ -1,7 +1,0 @@
-##  This rule doesn't work for BSD-style make, but it's fine for
-##  GNU make.
-.%.o.d: %.cc
-	@echo building dependencies for $<
-	@$(CXX) -MM $(CXXFLAGS) $< > $@.$$$$; \
-           sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
-           rm -f $@.$$$$

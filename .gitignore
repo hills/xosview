@@ -5,17 +5,5 @@ ii_files
 dist
 
 ##  Auto-generated stuff:
-ChangeLog
-configure
-config.log
-config.cache
-config.status
-Makefile
-Makefile.config
-Makefile.GNU.autodep
 defaultstring.cc
 Xdefaults
-
-linux/Makefile
-bsd/Makefile
-gnu/Makefile
