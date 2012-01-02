@@ -86,7 +86,7 @@ void SwapMeter::getswapinfo( void ){
   total_ = fields_[0] = fields_[1] = 0;
 
   char buf[256];
-  string ignore;
+  std::string ignore;
 
   // Get the info from the "standard" meminfo file.
   while (!meminfo.eof()){
