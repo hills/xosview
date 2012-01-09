@@ -13,7 +13,6 @@
 #include <netdb.h>
 #include <arpa/inet.h>
 #include <iostream>
-#include "bool.h"
 
 class Host {
 public:

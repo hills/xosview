@@ -2,7 +2,7 @@
 
 INSTALL = install
 
-CPPFLAGS += -I. -DHAVE_BOOL=1
+CPPFLAGS += -I.
 LDLIBS += -lX11
 
 # Installation paths
