@@ -1,7 +1,7 @@
 #include <X11/Xatom.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <unistd.h>
-#include "snprintf.h"
 #include "general.h"
 #include "xwin.h"
 #include "Xrm.h"

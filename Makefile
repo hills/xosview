@@ -2,7 +2,7 @@
 
 INSTALL = install
 
-CPPFLAGS += -I. -DHAVE_SNPRINTF=1 -DHAVE_BOOL=1
+CPPFLAGS += -I. -DHAVE_BOOL=1
 LDLIBS += -lX11
 
 # Installation paths
@@ -23,7 +23,6 @@ OBJS = Host.o \
 	llist.o \
 	main.o \
 	meter.o \
-	snprintf.o \
 	xosview.o \
 	xwin.o
 

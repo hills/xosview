@@ -7,7 +7,6 @@
 //
 #include <fstream>
 #include <stdlib.h>
-#include "snprintf.h"
 #include "general.h"
 #include "bitfieldmeter.h"
 #include "xosview.h"
