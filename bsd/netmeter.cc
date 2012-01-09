@@ -15,7 +15,6 @@
 
 #include <err.h>		//  For warnx.
 #include <stdlib.h>		//  For atoi().  BCG
-#include "general.h"
 #include "netmeter.h"
 #include "kernel.h"
 

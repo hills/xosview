@@ -7,7 +7,6 @@
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>
-#include "general.h"
 #include "fieldmeter.h"
 #include "xosview.h"
 

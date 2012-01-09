@@ -12,7 +12,6 @@
 //
 
 #include <stdlib.h>
-#include "general.h"
 #include "MeterMaker.h"
 #include "xosview.h"
 #ifdef HAVE_BATTERY_METER

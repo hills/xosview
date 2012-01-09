@@ -6,7 +6,6 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include "general.h"
 #include "Host.h"
 
 #if defined(__hpux__) || defined(__hpux)

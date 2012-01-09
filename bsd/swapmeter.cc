@@ -17,7 +17,6 @@
 #ifndef HAVE_SWAPCTL
 # include <err.h>		//  For warnx().
 #endif
-#include "general.h"
 #include "swapmeter.h"
 #include "swapinternal.h"	/*  For *SwapInfo() functions.  */
 #include "kernel.h"		/*  For BSDSwapInit().  */

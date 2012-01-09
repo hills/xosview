@@ -15,7 +15,6 @@
 //
 
 #include <stdlib.h>		//  For atoi().  BCG
-#include "general.h"
 #include "pagemeter.h"
 #include "kernel.h"		//  For NetBSD Page functions.
 

@@ -7,7 +7,6 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/time.h>
-#include "general.h"
 #include "xosview.h"
 #include "meter.h"
 #include "MeterMaker.h"

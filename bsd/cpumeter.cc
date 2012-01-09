@@ -17,7 +17,6 @@
 #include <sys/param.h>		// Needed for __NetBSD_Version__
 #endif
 #include <stdlib.h>		//  For use of atoi  BCG
-#include "general.h"
 #include "cpumeter.h"
 #include "kernel.h"             //  For NetBSD-specific icky kvm_ code.  BCG
 

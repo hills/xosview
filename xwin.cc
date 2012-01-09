@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
-#include "general.h"
 #include "xwin.h"
 #include "Xrm.h"
 

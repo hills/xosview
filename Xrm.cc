@@ -10,7 +10,6 @@
 #include <ctype.h>
 #include <iostream>
 #include <unistd.h>  //  for access(), etc.  BCG
-#include "general.h"
 #ifndef NULL
 #define NULL 0
 #endif

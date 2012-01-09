@@ -10,7 +10,6 @@
 
 #include <err.h>		//  For warnx.
 #include <stdlib.h>	//  For atoi.
-#include "general.h"
 #include "intratemeter.h"
 #include "xosview.h"
 

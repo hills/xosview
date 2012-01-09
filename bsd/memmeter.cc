@@ -17,7 +17,6 @@
 //
 
 #include <stdlib.h>		//  For atoi().  BCG
-#include "general.h"
 #include "memmeter.h"
 #include "kernel.h"		/*  For BSD*() helpers.  */
 

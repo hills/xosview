@@ -13,8 +13,6 @@ BEGIN {
   print "// using the awk program found in defresources.awk.";
   print "// This file will be rebuilt when Xdefaults is modified.";
   print "//\n";
-  print "#include \"general.h\"\n";
-  print "\n";
   printf "const char *defaultXResourceString = \"";
 }
 

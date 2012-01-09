@@ -123,7 +123,6 @@ static int dmib[3] = {CTL_HW, HW_IOSTATS, sizeof(struct io_sysctl)};
 #endif
 #endif
 
-#include "general.h"
 #include "netmeter.h"		/*  For netIface_  */
 
 

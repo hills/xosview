@@ -24,7 +24,6 @@
 
 #include <fstream>
 #include <math.h>		//  For fabs()
-#include "general.h"
 #include "fieldmeter.h"
 #include "fieldmetergraph.h"
 #include "xosview.h"

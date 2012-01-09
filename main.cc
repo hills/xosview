@@ -4,7 +4,6 @@
 //  This file may be distributed under terms of the GPL
 //
 
-#include "general.h"
 #include "xosview.h"
 
 int main( int argc, char *argv[] ) {

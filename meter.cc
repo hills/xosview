@@ -4,7 +4,6 @@
 //  This file may be distributed under terms of the GPL
 //
 
-#include "general.h"
 #include "meter.h"
 #include "xosview.h"
 

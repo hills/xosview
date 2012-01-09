@@ -5,7 +5,6 @@
 //
 
 #include <iostream>
-#include "general.h"
 #include "llist.h"
 
 LList::LNode::LNode( void *data ){

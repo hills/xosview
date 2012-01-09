@@ -14,7 +14,6 @@
 //
 
 #include <stdlib.h>  //  for getloadavg()
-#include "general.h"
 #include "loadmeter.h"
 #include "xosview.h"
 
