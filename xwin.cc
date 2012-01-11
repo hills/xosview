@@ -89,11 +89,12 @@ void XWin::init( int argc, char **argv ){
 #ifdef HAVE_XPM
   doPixmap=getPixmap(&background_pixmap);
 #endif
+  borderwidth_ = atoi(getResourceOrUseDefault("borderwidth", "1"));
 
   window_ = XCreateSimpleWindow(display_, DefaultRootWindow(display_),
 				sizehints_->x, sizehints_->y,
 				sizehints_->width, sizehints_->height,
-				1,
+				borderwidth_,
 				fgcolor_, bgcolor_);
 
 

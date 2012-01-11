@@ -121,6 +121,7 @@ protected:
     Event *next_;
   };
 
+  int borderwidth_;             //  width of border
   int x_, y_;                   //  position of the window
   int width_, height_;          //  width and height of the window
   Display       *display_;      //  Connection to X display
