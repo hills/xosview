@@ -25,7 +25,7 @@ xosview*transparent:        False
 xosview*meterLabelColor:    wheat
 xosview*usedlabels:         True
 xosview*usedLabelColor:     wheat
-xosview*borderwidth:        0
+xosview*borderwidth:        1
 xosview*font:               7x13bold
 xosview*background:         navy
 xosview*foreground:         wheat
