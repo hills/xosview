@@ -6,7 +6,7 @@ This version of xosview is distributed from the following sites:
 xosview uses GNU autoconfig. In general, you should be able to build
 by following these steps:
 
-  $ ./autogen.sh    # only required if buildling from repository
+  $ ./autogen.sh    # only required if building from repository
   $ ./configure
   $ make
   $ make install
