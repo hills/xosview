@@ -79,15 +79,11 @@ XWin::~XWin( void ){
 void XWin::init( int argc, char **argv ){
   XGCValues            gcv;
   XSetWindowAttributes xswa;
-  Pixmap	       background_pixmap;
-  int		       doPixmap = 0;
 
   setFont();
   setColors();
   getGeometry();
-#ifdef HAVE_XPM
-  doPixmap=getPixmap(&background_pixmap);
-#endif
+
   borderwidth_ = atoi(getResourceOrUseDefault("borderwidth", "1"));
 
   window_ = XCreateSimpleWindow(display_, DefaultRootWindow(display_),
@@ -112,11 +108,15 @@ void XWin::init( int argc, char **argv ){
   XChangeWindowAttributes(display_, window_,
 			  (CWColormap | CWBitGravity), &xswa);
 
+#ifdef HAVE_XPM
+  Pixmap background_pixmap;
+
   // If there is a pixmap file, set it as the background
-  if(doPixmap)
+  if(getPixmap(&background_pixmap))
   {
 	XSetWindowBackgroundPixmap(display_,window_,background_pixmap);
   }
+#endif
 
   // Do transparency if requested
   if(isResourceTrue("transparent"))
