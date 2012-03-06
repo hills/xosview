@@ -3,20 +3,32 @@ This version of xosview is distributed from the following sites:
   http://www.pogo.org.uk/~mark/xosview/
   https://github.com/hills/xosview
 
-xosview uses GNU autoconfig. In general, you should be able to build
-by following these steps:
+The build no longer uses GNU autoconfig.  Control is via Makefile
+variables. In general, you should be able to build on Linux using:
 
-  $ ./autogen.sh    # only required if building from repository
-  $ ./configure
   $ make
   $ make install
 
-Edit Makefile.config for your setup, if you wish to change anything
-from the default settings, such as the optimization flags. This of
-course, should be done before one runs make.
+To change the target prefix, use, for example:
+
+  $ make install PREFIX=/usr
+
+For more fine-grained control, see the Makefile for available
+variables.
+
+To specify a particular platform, use one of:
+
+  $ make PLATFORM=linux
+  $ make PLATFORM=bsd
+  $ make PLATFORM=irix65
+  $ make PLATFORM=sunos5
 
 Please see the README file for your platform for any special
 instructions for running xosview on that platform.
+
+The Makefile picks up additional variables from a .config file in the
+source code directory.  You may prefer to use this if you are doing
+several builds for testing and debugging.
 
 See the man page for information on the xosview display and how to
 customize it.
