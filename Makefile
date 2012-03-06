@@ -1,16 +1,20 @@
 -include .config
 
-INSTALL = install
-
-CPPFLAGS += -Wall -I.
-LDLIBS += -lX11
+INSTALL ?= install
 
 # Installation paths
 
-BINDIR = $(PREFIX)/bin
-EXECDIR = $(PREFIX)/libexec
-MANDIR = $(PREFIX)/share/man
-DOCDIR = $(PREFIX)/share/doc
+PREFIX ?= /usr/local
+
+BINDIR ?= $(PREFIX)/bin
+EXECDIR ?= $(PREFIX)/libexec
+MANDIR ?= $(PREFIX)/share/man
+DOCDIR ?= $(PREFIX)/share/doc
+
+# Required build arguments
+
+CPPFLAGS += -Wall -I.
+LDLIBS += -lX11
 
 OBJS = Host.o \
 	Xrm.o \
