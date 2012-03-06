@@ -95,6 +95,8 @@ xosview:	$(OBJS)
 defaultstring.cc:	Xdefaults defresources.awk
 		gawk -f defresources.awk Xdefaults > defaultstring.cc
 
+Xrm.o:		CXXFLAGS += -Wno-write-strings
+
 .PHONY:		dist install clean
 
 dist:
