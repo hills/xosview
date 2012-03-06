@@ -1,6 +1,7 @@
 -include .config
 
 INSTALL ?= install
+PLATFORM ?= linux
 
 # Installation paths
 
@@ -32,7 +33,7 @@ OBJS = Host.o \
 
 # Optional platform type
 
-ifdef LINUX
+ifeq ($(PLATFORM), linux)
 OBJS += linux/MeterMaker.o \
 	linux/btrymeter.o \
 	linux/cpumeter.o \
@@ -51,7 +52,7 @@ OBJS += linux/MeterMaker.o \
 CPPFLAGS += -Ilinux/
 endif
 
-ifdef BSD
+ifeq ($(PLATFORM), bsd)
 OBJS += bsd/MeterMaker.o \
         bsd/btrymeter.o \
         bsd/cpumeter.o \
@@ -68,7 +69,7 @@ OBJS += bsd/MeterMaker.o \
 CPPFLAGS += -Ibsd/
 endif
 
-ifdef IRIX65
+ifeq ($(PLATFORM), irix65)
 OBJS += irix65/MeterMaker.o \
         irix65/cpumeter.o \
         irix65/diskmeter.o \
@@ -79,7 +80,7 @@ OBJS += irix65/MeterMaker.o \
 CPPFLAGS += -Iirix65/
 endif
 
-ifdef SUNOS5
+ifeq ($(PLATFORM), sunos5)
 OBJS += sunos5/MeterMaker.o \
         sunos5/cpumeter.o \
         sunos5/diskmeter.o \
