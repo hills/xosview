@@ -143,7 +143,7 @@ Listed from weakest to strongest:
   // Get the app-defaults
   result = snprintf(rfilename, sizeof rfilename, "/etc/X11/app-defaults/%s",
     XrmQuarkToString(_class));
-  if (rfilename != NULL)
+  if (result >= 0 && result < sizeof rfilename)
     XrmCombineFileDatabase (rfilename, &_db, 1);
   result = snprintf(rfilename, sizeof rfilename, "/usr/lib/X11/app-defaults/%s",
     XrmQuarkToString(_class));
