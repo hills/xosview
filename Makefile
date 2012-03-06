@@ -2,7 +2,7 @@
 
 INSTALL = install
 
-CPPFLAGS += -I.
+CPPFLAGS += -Wall -I.
 LDLIBS += -lX11
 
 # Installation paths
