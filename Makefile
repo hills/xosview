@@ -14,7 +14,7 @@ DOCDIR ?= $(PREFIX)/share/doc
 
 # Optional build arguments; user may wish to override
 
-OPTFLAGS ?= -Wall
+OPTFLAGS ?= -Wall -O3
 
 # Required build arguments
 
