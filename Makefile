@@ -12,9 +12,13 @@ EXECDIR ?= $(PREFIX)/libexec
 MANDIR ?= $(PREFIX)/share/man
 DOCDIR ?= $(PREFIX)/share/doc
 
+# Optional build arguments; user may wish to override
+
+OPTFLAGS ?= -Wall
+
 # Required build arguments
 
-CPPFLAGS += -Wall -I.
+CPPFLAGS += $(OPTFLAGS) -I.
 LDLIBS += -lX11
 
 OBJS = Host.o \
