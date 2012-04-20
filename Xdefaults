@@ -190,7 +190,7 @@ xosview*batteryLeftColor:   orange
 xosview*batteryUsedColor:   aquamarine
 xosview*batteryPriority:    50
 xosview*batteryUsedFormat:  percent
-xosview*batteryChargeColor: green
+xosview*batteryChargeColor: seagreen
 xosview*batteryFullColor:   magenta
 xosview*batteryLowColor:    red
 xosview*batteryCritColor:   red
