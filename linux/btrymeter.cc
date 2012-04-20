@@ -437,7 +437,7 @@ bool BtryMeter::getacpi_or_sys_info( void ){
   // XOSDEBUG("acpi: total max=%d, remain=%d\n",acpi_sum_cap,acpi_sum_remain);
 
   // below alarm ?
-  if ( acpi_sum_alarm >= acpi_sum_remain )
+  if ( acpi_sum_alarm >= acpi_sum_remain && acpi_charge_state != 1 )
 		acpi_charge_state=-2;
 
   // if NONE of the batts is present:
