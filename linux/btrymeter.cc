@@ -194,19 +194,19 @@ void BtryMeter::handle_acpi_state( void ){
   case 0:  // charged
     XOSDEBUG("battery_status CHARGED\n");
     setfieldcolor( 0, parent_->getResource("batteryFullColor"));
-    legend( "CHARGED/FULL");
+    legend( "CHRG/FULL");
     break;
 
   case -1: // discharging
     XOSDEBUG("battery_status DISCHARGING\n");
     setfieldcolor( 0, parent_->getResource("batteryLeftColor"));
-    legend( "AVAIL/USED");
+    legend( "CHRG/USED");
     break;
 
   case -2: // discharging - below alarm
     XOSDEBUG("battery_status ALARM DISCHARGING\n");
     setfieldcolor( 0, parent_->getResource("batteryCritColor"));
-    legend( "LOW/ALARM");
+    legend( "CHRG/USED");
     break;
 
   case -3: // not present
@@ -218,7 +218,7 @@ void BtryMeter::handle_acpi_state( void ){
   case 1:  // charging
     XOSDEBUG("battery_status CHARGING\n");
     setfieldcolor( 0, parent_->getResource("batteryChargeColor"));
-    legend( "AC/Charging");
+    legend( "CHRG/AC");
     break;
   }
 }
