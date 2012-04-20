@@ -1,16 +1,3 @@
-! **********************************************************************
-! **********************************************************************
-! **  DO NOT EDIT Xdefaults!!!!
-! **
-! **  Only make changes to the file Xdefaults.in, and re-run ./configure
-! **  to regenerate Xdefaults.
-! **
-! **  Thanks,
-! **    the Management :)    (bgrayson)
-! **
-! **********************************************************************
-! **********************************************************************
-!
 !  xosview resources (override into your .Xdefaults file)
 
 ! General Resources
