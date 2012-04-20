@@ -18,7 +18,7 @@ xosview*background:         navy
 xosview*foreground:         wheat
 xosview*enableStipple:	    False ! Change to true to try beta stipple support.
 xosview*samplesPerSec:      10
-xosview*graphNumCols:       128   ! number of samples shown in a graph
+xosview*graphNumCols:       135   ! number of samples shown in a graph
 
 ! Load Meter Resources
 ! We don't need to enable the Decay option, as it is already time-averaged.
