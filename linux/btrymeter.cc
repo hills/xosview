@@ -28,7 +28,7 @@ static const char ACPIBATTERYDIR[] = "/proc/acpi/battery";
 static const char SYSPOWERDIR[] = "/sys/class/power_supply";
 
 BtryMeter::BtryMeter( XOSView *parent )
-  : FieldMeter( parent, 2, "BTRY", "AVAIL/USED", 1, 1, 0 ){
+  : FieldMeter( parent, 2, "BTRY", "CHRG/USED", 1, 1, 0 ){
 
   // find out ONCE whether to use ACPI, APM or sysfs
   use_acpi = use_apm = use_syspower = false;
