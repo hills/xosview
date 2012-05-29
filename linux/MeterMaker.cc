@@ -21,6 +21,8 @@
 #include "diskmeter.h"
 #include "raidmeter.h"
 #include "lmstemp.h"
+#include "acpitemp.h"
+#include "coretemp.h"
 #include "nfsmeter.h"
 
 #include <stdlib.h>
@@ -142,6 +144,40 @@ if ( stats ) {
   if (_xos->isResourceTrue("battery") && BtryMeter::has_source())
     push(new BtryMeter(_xos));
 
+  // Check for the Intel Core temperature meter
+  if (_xos->isResourceTrue("coretemp")) {
+    char caption[25];
+    snprintf(caption, 25, "ACT/HIGH/%s", _xos->getResourceOrUseDefault( "coretempHighest", "100" ) );
+    const char *displayType = _xos->getResourceOrUseDefault( "coretempDisplayType", "separate" );
+    for (uint i = 1 ; ; i++) {
+      char s[80];
+      snprintf(s, 80, "coretemp%dPackage", i);
+      const char *dummy = _xos->getResourceOrUseDefault(s, NULL);
+      if (i > 1 && ( !dummy || !*dummy ))
+        break;
+      int pkg = ( dummy ? atoi(dummy) : 0 );
+      snprintf(s, 80, "coretemp%dDisplayType", i);
+      displayType = _xos->getResourceOrUseDefault( s, displayType );
+      if (strncmp(displayType, "separate", 1) == 0) {
+        unsigned int cpuCount = CoreTemp::countCpus(pkg);
+        char name[10];
+        for (uint cpu = 0; cpu < cpuCount; cpu++) {
+          sprintf(name, "CPU%d", cpu);
+          push(new CoreTemp(_xos, name, caption, pkg, cpu));
+        }
+      }
+      else if (strncmp(displayType, "average", 1) == 0)
+        push(new CoreTemp(_xos, "CPU", caption, pkg, -1));
+      else if (strncmp(displayType, "maximum", 1) == 0)
+        push(new CoreTemp(_xos, "CPU", caption, pkg, -2));
+      else {
+        std::cerr << "Unknown value of coretempDisplayType: " << displayType << std::endl;
+        std::cerr << "Supported types are: separate, average and maximum." << std::endl;
+        _xos->done(1);
+      }
+    }
+  }
+
   // check for the LmsTemp meter
   if (_xos->isResourceTrue("lmstemp")){
     char caption[80];
@@ -156,6 +192,26 @@ if ( stats ) {
       snprintf(s, 20, "lmstempLabel%d", i);
       const char *lab = _xos->getResourceOrUseDefault(s, "TMP");
       push(new LmsTemp(_xos, res, lab, caption));
+    }
+  }
+
+  // check for the ACPITemp meter
+  if (_xos->isResourceTrue("acpitemp")) {
+    char caption[80];
+    snprintf(caption, 80, "ACT/HIGH/%s", _xos->getResourceOrUseDefault("acpitempHighest", "100"));
+    for (int i = 1 ; ; i++) {
+      char s[20];
+      snprintf(s, 20, "acpitemp%d", i);
+      const char *tempfile = _xos->getResourceOrUseDefault(s, NULL);
+      if (!tempfile || !*tempfile)
+        break;
+      snprintf(s, 20, "acpihigh%d", i);
+      const char *highfile = _xos->getResourceOrUseDefault(s, NULL);
+      if (!highfile || !*highfile)
+        break;
+      snprintf(s, 20, "acpitempLabel%d", i);
+      const char *lab = _xos->getResourceOrUseDefault(s, "TMP");
+      push(new ACPITemp(_xos, tempfile, highfile, lab, caption));
     }
   }
 }

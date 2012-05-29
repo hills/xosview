@@ -52,7 +52,9 @@ OBJS += linux/MeterMaker.o \
 	linux/raidmeter.o \
 	linux/serialmeter.o \
 	linux/swapmeter.o \
-	linux/wirelessmeter.o
+	linux/wirelessmeter.o \
+	linux/acpitemp.o \
+	linux/coretemp.o
 CPPFLAGS += -Ilinux/
 endif
 
@@ -69,7 +71,8 @@ OBJS += bsd/MeterMaker.o \
         bsd/netmeter.o \
         bsd/pagemeter.o \
         bsd/swapinternal.o \
-        bsd/swapmeter.o
+        bsd/swapmeter.o \
+        bsd/coretemp.o
 CPPFLAGS += -Ibsd/
 endif
 

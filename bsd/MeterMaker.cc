@@ -1,4 +1,4 @@
-//  
+//
 //  Copyright (c) 1994, 1995 by Mike Romberg ( romberg@fsl.noaa.gov )
 //  Copyright (c) 1995, 1996, 1997-2002 by Brian Grayson (bgrayson@netbsd.org)
 //
@@ -26,6 +26,7 @@
 #include "pagemeter.h"
 #include "intmeter.h"
 #include "intratemeter.h"
+#include "coretemp.h"
 //  This one is not yet supported under *BSD.
 //#include "serialmeter.h"
 
@@ -64,6 +65,28 @@ void MeterMaker::makeMeters(void){
   if (_xos->isResourceTrue("irqrate"))
   {
       push(new IrqRateMeter(_xos));
+  }
+
+  if (_xos->isResourceTrue("coretemp"))
+  {
+    char caption[25];
+    snprintf(caption, 25, "TEMPERATURE (C)/%s", _xos->getResourceOrUseDefault( "coretempHighest", "100" ) );
+    std::string displayType = _xos->getResourceOrUseDefault("coretempDisplayType", "separate");
+    if (displayType == "separate") {
+      char name[5];
+      for (int i=0; i<CoreTemp::countCpus(); i++) {
+        sprintf(name, "TMP%d", i);
+        push(new CoreTemp(_xos, name, caption, i));
+      }
+    }
+    else if (displayType == "average")
+      push(new CoreTemp(_xos, "TEMP", caption, -1));
+    else if (displayType == "maximum")
+      push(new CoreTemp(_xos, "TEMP", caption, -2));
+    else {
+      std::cerr << "Unknown value of coretempDisplayType: " << displayType << std::endl;
+      _xos->done(1);
+    }
   }
 
 #ifdef HAVE_BATTERY_METER

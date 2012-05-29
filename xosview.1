@@ -179,6 +179,11 @@ FreeBSD, OpenBSD).
 \fBWireless Link\fP
    Linux  : quality
 
+\fBTemperature sensors\fP
+   Shows readings from temperature sensors.
+   Linux  : ACPI or i2c/hwmon or Intel Core sensor
+   FreeBSD: Intel Core sensor
+
 Typing a 'q' in the window will terminate xosview.
 
 .SH OPTIONS
@@ -868,6 +873,107 @@ N-th label for above temperatures, default is TMP.
 .pp lmstemp
 
 .uf lmstemp
+
+\fBACPI Temperature Resources\fP
+
+.xt acpitemp
+
+xosview*acpitempHighest: 100
+.RS
+Highest temp value displayed, default 100. If acpihigh\fIN\fP is given,
+the value is read from there instead.
+.RE
+
+xosview*acpitempActColor:  \fIcolor\fP
+.RS
+Color of actual temperature.
+.RE
+
+xosview*acpitempHighColor:  \fIcolor\fP
+.RS
+Color above alarm temperature, also used to indicate alarm.
+.RE
+
+xosview*acpitempIdleColor:   \fIcolor\fP
+.RS
+Color between actual and alarm temperatures.
+.RE
+
+xosview*acpitemp\fIN\fP: \fIfilename\fP
+.RS
+Name of temperature file from /proc/acpi/thermal_zone or
+/sys/devices/virtual/thermal
+.br
+Note that the last directory part must be given, e.g. TZ0/temperature.
+Absolute path can also be used.
+.RE
+
+xosview*acpihigh\fIN\fP:    \fIfilename\fP
+.RS
+Name of high value/trip point file from /proc/acpi/thermal_zone or
+/sys/devices/virtual/thermal
+.RE
+
+xosview*acpitempLabel\fIN\fP:  \fILabelstring\fP
+.RS
+N-th label for above temperatures, default is TMP.
+.RE
+
+.pp acpitemp
+.uf acpitemp
+
+\fBIntel Core Temperature Sensor Resources\fP
+
+.xt coretemp
+
+xosview*coretempHighest: 100
+.RS
+Highest temp value displayed, default 100. On Linux, the value is read from
+sysfs if none is given.
+.RE
+
+xosview*coretempActColor:  \fIcolor\fP
+.RS
+Color of actual temperature.
+.RE
+
+xosview*coretempHighColor:  \fIcolor\fP
+.RS
+Color above alarm temperature, also used to indicate alarm.
+.RE
+
+xosview*coretempIdleColor:   \fIcolor\fP
+.RS
+Color between actual and alarm temperatures.
+.RE
+
+xosview*coretemp\fIN\fPPackage:   0
+.RS
+The number of physical CPU for meter N. Currently only one physical CPU can
+be shown per meter.
+.RE
+
+xosview*coretemp\fIN\fPDisplayType: (separate, average or maximum)
+.RS
+This resource tells xosview how to display the temperature for meter N. The
+formats work as follows:
+
+\fBseparate\fP:
+.RS
+Display one meter for each CPU core of a multi-core CPU. This is the default.
+.RE
+\fBaverage\fP:
+.RS
+Display average temperature of a multi-core CPU.
+.RE
+\fBmaximum\fP:
+.RS
+Display the highest core temperature of a multi-core CPU.
+.RE
+.RE
+
+.pp coretemp
+.uf coretemp
 
 \fBBattery Meter Resources\fP
 

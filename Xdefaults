@@ -190,7 +190,7 @@ xosview*PoorQualityColor:    red
 xosview*FairQualityColor:    orange
 xosview*GoodQualityColor:    seagreen
 xosview*wirelessUsedColor:   aquamarine
-xosview*wirelessPriority:    1 
+xosview*wirelessPriority:    1
 xosview*wirelessUsedFormat:  autoscale
 xosview*wirelessDecay:       True
 
@@ -258,3 +258,22 @@ xosview*NFSStatIdleColor:       aquamarine
 xosview*NFSStatDecay:		True
 xosview*NFSStatGraph:		False
 xosview*NFSStatUsedFormat:	percent
+
+xosview*acpitemp:                 False
+xosview*acpitempActColor:         blue
+xosview*acpitempHighColor:        red
+xosview*acpitempIdleColor:        aquamarine
+! xosview*acpitempHighest:         100
+xosview*acpitemp1:                CPU
+xosview*acpitemp2:                MB
+xosview*acpitempPriority:         20
+xosview*acpitempUsedFormat:       autoscale
+
+xosview*coretemp:                 False
+xosview*coretempActColor:         blue
+xosview*coretempHighColor:        red
+xosview*coretempIdleColor:        aquamarine
+xosview*coretempPriority:         20
+xosview*coretempUsedFormat:       autoscale
+xosview*coretempDisplayType:      separate    ! separate, maximum or average
+! xosview*coretemp1Package:         0
