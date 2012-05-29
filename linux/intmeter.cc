@@ -112,14 +112,33 @@ void IntMeter::updateirqcount( int n, bool init ){
    setNumBits(n+1);
    std::ostringstream os;
 
-   os << "INTs (0-15" ;
-   for (std::map<int,int>::const_iterator it = realintnum.upper_bound(15),
-                                          end = realintnum.end();
-                                          it != end; ++it) {
-         os << ", " << it->first ;
-   }
-   os << ")" << std::ends;
-
+  os << "0";
+  if (realintnum.upper_bound(15) == realintnum.end()) // only 16 ints
+    os << "-15";
+  else {
+    int prev = 15, prev2 = 14;
+    for (std::map<int,int>::const_iterator it = realintnum.upper_bound(15),
+                                           end = realintnum.end();
+                                           it != end; ++it) {
+      if ( &*it == &*realintnum.rbegin() ) { // last element
+        if ( it->first == prev + 1 )
+          os << "-" ;
+        else
+          os << "," ;
+        os << it->first;
+      }
+      else {
+        if ( it->first != prev + 1 ) {
+          if ( prev == prev2 + 1 )
+            os << "-" << prev;
+          os << "," << it->first ;
+        }
+      }
+      prev2 = prev;
+      prev = it->first;
+    }
+    os << std::ends;
+  }
    legend(os.str().c_str());
    unsigned long *old_irqs_=irqs_, *old_lastirqs_=lastirqs_;
    irqs_=new unsigned long[n+1];
