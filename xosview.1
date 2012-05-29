@@ -859,11 +859,11 @@ Color between actual and alarm temperatures.
 
 xosview*lmstemp\fIN\fP:	\fIfilename\fP
 .RS
-Name of temperature file from /proc/sys/dev/sensors/*/*, N=1..
+Name of temperature file from /proc/sys/dev/sensors/*/* or
+/sys/class/hwmon/*/*, N=1... Also absolute path is accepted.
 .br
-Note if more files with same name exists, only the first is found. There is
-currently no possibility to configure equal named files on different busses
-(which would be rarely necessary, I hope).
+Note if more files with same name exists, only the first is found unless
+absolute path is used.
 .br
 eg.
 .br

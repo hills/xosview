@@ -190,12 +190,14 @@ if ( stats ) {
     for (int i = 1 ; ; i++) {
       char s[20];
       snprintf(s, 20, "lmstemp%d", i);
-      const char *res = _xos->getResourceOrUseDefault(s, NULL);
-      if(!res || !*res)
-	break;
+      const char *tempfile = _xos->getResourceOrUseDefault(s, NULL);
+      if (!tempfile || !*tempfile)
+        break;
+      snprintf(s, 20, "lmshigh%d", i);
+      const char *highfile = _xos->getResourceOrUseDefault(s, NULL);
       snprintf(s, 20, "lmstempLabel%d", i);
       const char *lab = _xos->getResourceOrUseDefault(s, "TMP");
-      push(new LmsTemp(_xos, res, lab, caption));
+      push(new LmsTemp(_xos, tempfile, highfile, lab, caption));
     }
   }
 
