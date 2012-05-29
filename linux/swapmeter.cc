@@ -48,8 +48,8 @@ void SwapMeter::checkevent( void ){
 }
 
 
-#ifdef USESYSCALLS
 void SwapMeter::getswapinfo( void ){
+#ifdef USESYSCALLS
   struct sysinfo sinfo;
   unsigned long unit;
 
@@ -73,10 +73,7 @@ void SwapMeter::getswapinfo( void ){
 
   if (total_)
     setUsed (fields_[0], total_);
-
-}
 #else
-void SwapMeter::getswapinfo( void ){
   std::ifstream meminfo( MEMFILENAME );
   if ( !meminfo ){
     std::cerr <<"Cannot open file : " <<MEMFILENAME << std::endl;
@@ -86,18 +83,31 @@ void SwapMeter::getswapinfo( void ){
   total_ = fields_[0] = fields_[1] = 0;
 
   char buf[256];
-  std::string ignore;
+  std::string ignore, unit;
 
   // Get the info from the "standard" meminfo file.
   while (!meminfo.eof()){
     meminfo.getline(buf, 256);
     std::istringstream line(std::string(buf, 256));
 
-    if(!strncmp("SwapTotal", buf, strlen("SwapTotal")))
-        line >> ignore >> total_;
-
-    if(!strncmp("SwapFree", buf, strlen("SwapFree")))
-        line >> ignore >> fields_[1];
+    if(!strncmp("SwapTotal", buf, strlen("SwapTotal"))){
+      line >> ignore >> total_ >> unit;
+      if (strncasecmp(unit.c_str(), "kB", 2) == 0)
+        total_ *= 1024.0;
+      if (strncasecmp(unit.c_str(), "MB", 2) == 0)
+        total_ *= 1024.0*1024.0;
+      if (strncasecmp(unit.c_str(), "GB", 2) == 0)
+        total_ *= 1024.0*1024.0*1024.0;
+    }
+    if(!strncmp("SwapFree", buf, strlen("SwapFree"))){
+      line >> ignore >> fields_[1] >> unit;
+      if (strncasecmp(unit.c_str(), "kB", 2) == 0)
+        fields_[1] *= 1024.0;
+      if (strncasecmp(unit.c_str(), "MB", 2) == 0)
+        fields_[1] *= 1024.0*1024.0;
+      if (strncasecmp(unit.c_str(), "GB", 2) == 0)
+        fields_[1] *= 1024.0*1024.0*1024.0;
+    }
   }
 
   fields_[0] = total_ - fields_[1];
@@ -110,5 +120,5 @@ void SwapMeter::getswapinfo( void ){
 
   if (total_)
     setUsed (fields_[0], total_);
-}
 #endif
+}
