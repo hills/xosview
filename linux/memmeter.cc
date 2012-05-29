@@ -161,7 +161,7 @@ void MemMeter::getmemstat(const char *fname, LineInfo *infos, int ninfos){
     std::string ignore;
     line >> ignore >> val;
     /*  All stats are in KB.  */
-    infos[inum].setVal(val*1024.0);	/*  Multiply by 1024 bytes per K  */
+    infos[inum].setVal((double)val*1024.0);	/*  Multiply by 1024 bytes per K  */
 
     inum++;
     if (inum >= ninfos)
