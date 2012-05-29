@@ -16,6 +16,8 @@
 //    authors for a copy.
 //
 
+#include "kernel.h"
+
 #ifndef XOSVIEW_NETBSD
 /*  NetBSD pulls in stdio.h via one of the other includes, but
  *  the other BSDs don't.  */
@@ -229,12 +231,20 @@ static struct nlist nlst[] =
 #else
 { "_intrnames" },
 #define INTRNAMES_SYM_INDEX    4
+#if __FreeBSD_version < 900040
 { "_eintrnames" },
+#else
+{ "_sintrnames" },
+#endif
 #define EINTRNAMES_SYM_INDEX   5
 #endif /* FreeBSD < 5.x */
 { "_intrcnt" },
 #define INTRCNT_SYM_INDEX 	6
+#if __FreeBSD_version < 900040
 { "_eintrcnt" },
+#else
+{ "_sintrcnt" },
+#endif
 #define EINTRCNT_SYM_INDEX 	7
 
 #ifndef HAVE_DEVSTAT
@@ -281,7 +291,7 @@ safe_kvm_read (u_long kernel_addr, void* user_addr, size_t nbytes) {
   if ((retval = kvm_read (kd, kernel_addr, user_addr, nbytes))==-1)
     err(-1, "kvm_read() of kernel address %#lx", kernel_addr);
   if (retval != (int) nbytes) {
-    warnx("safe_kvm_read(%#lx) returned %d bytes, not %d!",
+    warnx("safe_kvm_read(%#lx) returned %d bytes, not %ld!",
 	kernel_addr, retval, nbytes);
   }
 }
@@ -574,7 +584,7 @@ BSDSwapInit() {
 //
 
 void
-BSDGetSwapCtlInfo(unsigned long long *totalp, unsigned long long *freep) {
+BSDGetSwapCtlInfo(int64_t *totalp, int64_t *freep) {
   unsigned long long	totalinuse, totalsize;
   int rnswap, nswap = swapctl(SWAP_NSWAP, 0, 0);
   struct swapent *swapiter;
@@ -683,10 +693,11 @@ DevStat_Init(void) {
 
 	/* only interested in disks */
 	matches = NULL;
+	char da[3] = "da";
 #if __FreeBSD_version >= 500000
-	if (devstat_buildmatch("da", &matches, &num_matches) != 0) {
+	if (devstat_buildmatch(da, &matches, &num_matches) != 0) {
 #else
-	if (buildmatch("da", &matches, &num_matches) != 0) {
+	if (buildmatch(da, &matches, &num_matches) != 0) {
 #endif
 		nodisk++;
 		return;
@@ -962,14 +973,6 @@ BSDGetDiskXFerBytes (unsigned long long *bytesXferred) {
 
 /*  ---------------------- Interrupt Meter stuff  -----------------  */
 
-#if (!defined(XOSVIEW_OPENBSD) || !(defined(__pc532__) && defined(__i386__))) && !defined(XOSVIEW_BSDI) && !defined(NETBSD_1_6A)
-static unsigned long kvm_intrcnt[128];// guess at space needed
-#endif
-
-#ifdef XOSVIEW_FREEBSD
-static unsigned long kvm_intrptrs[NUM_INTR];
-#endif
-
 #ifdef XOSVIEW_BSDI
 #if _BSDI_VERSION >= 199802 /* BSD/OS 4.x */
 static intr_info_t intrs[NISRC];
@@ -998,23 +1001,50 @@ BSDIntrInit() {
     return ValidSymbol(ALLEVENTS_SYM_INDEX);
 #else
     // Make sure the intr counter array is nonzero in size.
+#if defined(XOSVIEW_FREEBSD) && __FreeBSD_version > 900039
+    int nintr;
+    safe_kvm_read(nlst[EINTRCNT_SYM_INDEX].n_value, &nintr, sizeof(nintr));
+    return ValidSymbol(INTRCNT_SYM_INDEX) && ValidSymbol(EINTRCNT_SYM_INDEX) && (nintr > 0);
+#else
     return ValidSymbol(INTRCNT_SYM_INDEX) && ValidSymbol(EINTRCNT_SYM_INDEX) && ((SymbolValue(EINTRCNT_SYM_INDEX) - SymbolValue(INTRCNT_SYM_INDEX)) > 0);
+#endif
 #endif
 #endif
 }
 
-#if (!defined(XOSVIEW_OPENBSD) || !(defined(__pc532__) || defined(__i386__))) && !defined (XOSVIEW_BSDI)
 int
 BSDNumInts() {
-  int nintr;
+  int nintr, inamlen;
   OpenKDIfNeeded();
-  nintr = (nlst[EINTRCNT_SYM_INDEX].n_value -
-	   nlst[INTRCNT_SYM_INDEX].n_value)   / sizeof(int);
-#if defined(__i386__)
+  nintr = (nlst[EINTRCNT_SYM_INDEX].n_value - nlst[INTRCNT_SYM_INDEX].n_value) / sizeof(unsigned long);
 # if defined(XOSVIEW_FREEBSD)
-  /*  I'm not sure exactly how FreeBSD/i386 does things, but just do
-   *  16 for now.  bgrayson  */
-  return 16;
+#  if __FreeBSD_version > 900039
+  safe_kvm_read(nlst[EINTRCNT_SYM_INDEX].n_value, &nintr, sizeof(nintr));
+  nintr /= sizeof(unsigned long);
+#  endif
+#  if defined(__i386__) || defined(__x86_64__)
+#   if __FreeBSD_version > 900039
+  safe_kvm_read(nlst[EINTRNAMES_SYM_INDEX].n_value, &inamlen, sizeof(inamlen));
+#   else
+  inamlen = nlst[EINTRNAMES_SYM_INDEX].n_value - nlst[INTRNAMES_SYM_INDEX].n_value;
+#   endif
+  char *intrs = (char *)malloc((size_t)inamlen);
+  if (!intrs)
+    errx(-1, "malloc failed for intrnames\n");
+  safe_kvm_read(nlst[INTRNAMES_SYM_INDEX].n_value, intrs, (size_t)inamlen);
+  char *intrnames = intrs;
+  free(intrs);
+  int nbr = 0;
+  int count = 0;
+  for (int i=0; i<nintr; i++) {
+    while ( intrnames[0] != '\0' ) {
+      sscanf(intrnames, "irq%d", &nbr);
+      if ( nbr > count )
+        count = nbr;
+      intrnames += strlen(intrnames) + 1;
+    }
+  }
+  return count;
 # else
   /*  On the 386 platform, we count stray interrupts between
    *  intrct and eintrcnt, also, but we don't want to show these.  */
@@ -1024,26 +1054,38 @@ BSDNumInts() {
   return nintr;
 #endif
 }
-#endif /* XOSVIEW_OPENBSD */
 
 void
-BSDGetIntrStats (unsigned long intrCount[NUM_INTR]) {
-#if defined(XOSVIEW_FREEBSD) && defined(__i386__)
-#if __FreeBSD_version < 500000
+BSDGetIntrStats (unsigned long *intrCount) {
+#if defined(XOSVIEW_FREEBSD) && ( defined(__i386__) || defined(__x86_64__) )
+# if __FreeBSD_version < 500000
     /* FreeBSD has an array of interrupt counts, indexed by device number.
        These are also indirected by IRQ num with intr_countp: */
-    safe_kvm_read (nlst[INTRCOUNTP_SYM_INDEX].n_value,
-		   kvm_intrptrs, sizeof(kvm_intrptrs));
-    size_t len =
-	nlst[EINTRCNT_SYM_INDEX].n_value - nlst[INTRCNT_SYM_INDEX].n_value;
-    safe_kvm_read (nlst[INTRCNT_SYM_INDEX].n_value, kvm_intrcnt, len);
-
-    for (int i=0; i < NUM_INTR; i++) {
-	int idx = (kvm_intrptrs[i] - nlst[INTRCNT_SYM_INDEX].n_value) /
-	    sizeof(unsigned long);
-	intrCount[i] = kvm_intrcnt[idx];
+  unsigned long *intrcnt, *intrcnt2;
+  char *intrnames, *intrnames2;
+  int nintr = nlst[EINTRCNT_SYM_INDEX].n_value - nlst[INTRCNT_SYM_INDEX].n_value;
+  int inamlen = nlst[EINTRNAMES_SYM_INDEX].n_value - nlst[INTRNAMES_SYM_INDEX].n_value;
+  intrcnt2 = intrcnt = (unsigned long *)malloc((size_t)nintr);
+  if (!intrcnt)
+    errx(-1, "malloc failed for intrcnt\n");
+  intrnames2 = intrnames = (char *)malloc((size_t)inamlen);
+  if (!intrnames)
+    errx(-1, "malloc failed for intrnames\n");
+  safe_kvm_read(nlst[INTRCNT_SYM_INDEX].n_value, intrcnt, (size_t)nintr);
+  safe_kvm_read(nlst[INTRNAMES_SYM_INDEX].n_value, intrnames, (size_t)inamlen);
+  nintr /= sizeof(unsigned long);
+  int i;
+  while (--nintr >= 0) {
+    if (intrnames[0] != '\0') {
+      sscanf(intrnames, "irq%d", &i);
+      intrCount[i] = *intrcnt;
     }
-#else /* FreeBSD 5.x and 6.x */
+    intrcnt++;
+    intrnames += strlen(intrnames) + 1;
+  }
+  free(intrcnt2);
+  free(intrnames2);
+# else /* FreeBSD >= 5.x */
       /* This code is stolen from vmstat */
     unsigned long *kvm_intrcnt, *base_intrcnt;
     char *kvm_intrname, *base_intrname;
@@ -1051,8 +1093,13 @@ BSDGetIntrStats (unsigned long intrCount[NUM_INTR]) {
     unsigned int i, nintr;
     int d;
 
-    intrcntlen = (nlst[EINTRCNT_SYM_INDEX].n_value - nlst[INTRCNT_SYM_INDEX].n_value);
+#  if __FreeBSD_version > 900039
+    safe_kvm_read (nlst[EINTRCNT_SYM_INDEX].n_value, &intrcntlen, sizeof(intrcntlen));
+    safe_kvm_read (nlst[EINTRNAMES_SYM_INDEX].n_value, &inamlen, sizeof(inamlen));
+#  else
+    intrcntlen = nlst[EINTRCNT_SYM_INDEX].n_value - nlst[INTRCNT_SYM_INDEX].n_value;
     inamlen = nlst[EINTRNAMES_SYM_INDEX].n_value - nlst[INTRNAMES_SYM_INDEX].n_value;
+#  endif
     nintr = intrcntlen / sizeof(unsigned long);
 
     if (((kvm_intrcnt = (unsigned long *)malloc(intrcntlen)) == NULL) ||
@@ -1067,16 +1114,16 @@ BSDGetIntrStats (unsigned long intrCount[NUM_INTR]) {
     safe_kvm_read (nlst[INTRNAMES_SYM_INDEX].n_value, kvm_intrname, inamlen);
 
     /* kvm_intrname has the ASCII names of the IRQs, every null-terminated
-     * string corresponds to a value in the kvm_intrcnt array */
+     * string corresponds to a value in the kvm_intrcnt array
+     * e.g. irq1: atkbd0   */
     for (i=0; i < nintr; i++) {
-	if (kvm_intrname[0] != '\0' && (*kvm_intrcnt != 0)) {
+	  if (kvm_intrname[0] != '\0') {
 	  /* Figure out which irq we have here */
-	    if (1 == sscanf(kvm_intrname, "irq%d:", &d))
-	      if (d < NUM_INTR)
-		intrCount[d] = *kvm_intrcnt;
-	}
-	kvm_intrcnt++;
-	kvm_intrname += strlen(kvm_intrname) + 1;
+		if (sscanf(kvm_intrname, "irq%d", &d) == 1)
+		  intrCount[d] = *kvm_intrcnt;
+	  }
+	  kvm_intrcnt++;
+	  kvm_intrname += strlen(kvm_intrname) + 1;
     }
 
     // Doh! somebody needs to free this stuff too... (pavel 20-Jan-2006)

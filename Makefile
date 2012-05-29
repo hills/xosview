@@ -73,7 +73,8 @@ OBJS += bsd/MeterMaker.o \
         bsd/swapinternal.o \
         bsd/swapmeter.o \
         bsd/coretemp.o
-CPPFLAGS += -Ibsd/
+CPPFLAGS += -Ibsd/ -I/usr/local/include
+LDFLAGS += -L/usr/local/lib
 endif
 
 ifeq ($(PLATFORM), irix65)

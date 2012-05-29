@@ -11,6 +11,7 @@
 //    authors for a copy.
 //
 
+#include "defines.h"
 #include <stdlib.h>
 #include "MeterMaker.h"
 #include "xosview.h"

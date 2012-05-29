@@ -1,7 +1,7 @@
-//  
+//
 //  Copyright (c) 1994, 1995 by Mike Romberg ( romberg@fsl.noaa.gov )
 //
-//  NetBSD port:  
+//  NetBSD port:
 //  Copyright (c) 1995, 1996, 1997-2002 by Brian Grayson (bgrayson@netbsd.org)
 //
 //  This file was written by Brian Grayson for the NetBSD and xosview
@@ -13,12 +13,13 @@
 //    authors for a copy.
 //
 
-#if defined(XOSVIEW_NETBSD)
-#include <sys/param.h>		// Needed for __NetBSD_Version__
-#endif
 #include <stdlib.h>		//  For use of atoi  BCG
 #include "cpumeter.h"
 #include "kernel.h"             //  For NetBSD-specific icky kvm_ code.  BCG
+
+#if defined(XOSVIEW_NETBSD)
+#include <sys/param.h>		// Needed for __NetBSD_Version__
+#endif
 
 //  For CPUSTATES #define.  BCG
 #if defined(XOSVIEW_NETBSD) && (__NetBSD_Version__ >= 104260000)
@@ -104,7 +105,7 @@ void CPUMeter::getcputime( void ){
 #endif /* XOSVIEW_FREEBSD */
   //  End NetBSD-specific code...  BCG
 
-  
+
   int oldindex = (cpuindex_+1)%2;
   for ( int i = 0 ; i <= FREE_INDEX ; i++ ){
     fields_[i] = cputime_[cpuindex_][i] - cputime_[oldindex][i];

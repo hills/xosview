@@ -13,13 +13,13 @@
 //    authors for a copy.
 //
 
+#include "kernel.h"		/*  For BSDSwapInit().  */
 #include <stdlib.h>		//  For atoi().  BCG
 #ifndef HAVE_SWAPCTL
 # include <err.h>		//  For warnx().
 #endif
 #include "swapmeter.h"
 #include "swapinternal.h"	/*  For *SwapInfo() functions.  */
-#include "kernel.h"		/*  For BSDSwapInit().  */
 
 static int doSwap = 1;
 

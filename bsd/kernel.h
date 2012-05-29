@@ -14,6 +14,8 @@
 //    authors for a copy.
 //
 
+#include "defines.h"
+
 void
 BSDInit();
 
@@ -80,6 +82,6 @@ int
 BSDNumInts();
 
 void
-BSDGetIntrStats (unsigned long intrCount[NUM_INTR]);
+BSDGetIntrStats (unsigned long *intrCount);
 
 #endif

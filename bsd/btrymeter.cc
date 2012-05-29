@@ -1,4 +1,4 @@
-//  
+//
 //  BSD version based on the Linux version by Mike:
 //  Copyright (c) 1997 by Mike Romberg ( romberg@fsl.noaa.gov )
 //
@@ -8,7 +8,10 @@
 //  <talmage@jefferson.cmf.nrl.navy.mil>
 //
 //  Only supported for NetBSD so far.
+
 #include "btrymeter.h"
+#ifdef HAVE_BATTERY_METER
+
 #include "xosview.h"
 #ifdef HAVE_FSTREAM
 #include <fstream>
@@ -68,7 +71,7 @@ void BtryMeter::getpwrinfo( void ){
 
       fields_[0] = (float)buff.battery_life;	// percent left
       fields_[1] = 100.0 - fields_[0];		// percent used
-      minutes_left = (float)buff.minutes_left; 
+      minutes_left = (float)buff.minutes_left;
 
       //    minutes_left = (percent_left/100.0) * max_minutes;
       //    minutes_left / (percent_left/100.0) = max_minutes;
@@ -79,7 +82,7 @@ void BtryMeter::getpwrinfo( void ){
         minutes_left = (float)0.01;
       }
       max_left = minutes_left * 100.0 / fields_[0];
-  
+
       //
       // Set total_ so that the graphing methods know to set the
       // relative sizes of the percent left and percent used graphs.
@@ -99,3 +102,5 @@ void BtryMeter::getpwrinfo( void ){
 
   close(loadinfo);
 }
+
+#endif  // HAVE_BATTERY_METER

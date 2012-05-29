@@ -1,6 +1,7 @@
 // For OpenBSD (or NetBSD with HAVE_SWAPCTL), we don't need any of this file.
 // For others, include it to provide the old method of getting swap
 // info.
+#include "defines.h"
 #if !(defined(XOSVIEW_OPENBSD) || defined(HAVE_SWAPCTL))
 
 //  Copyright (c) 1995 by Brian Grayson (bgrayson@netbsd.org)
@@ -459,7 +460,7 @@ fetchswap()
 void
 BSDGetSwapInfo(int64_t* total, int64_t* free)
 {
-	int i, npfree, xsize, xfree;
+	int npfree, xsize, xfree;
 	int64_t avail, used=0;
 
 	fetchswap();
@@ -474,9 +475,9 @@ BSDGetSwapInfo(int64_t* total, int64_t* free)
 #else /* USE_KVM_GETSWAPINFO */
         avail = npfree = 0;
 #ifdef XOSVIEW_BSDI
-        for (i = 0; i < swapstats.swap_nswdev; i++) {
+        for (int i = 0; i < swapstats.swap_nswdev; i++) {
 #else
-        for (i = 0; i < nswdev; i++) {
+        for (int i = 0; i < nswdev; i++) {
 #endif
                 /*
                  * Don't report statistics for partitions which have not
