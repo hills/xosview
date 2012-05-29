@@ -24,7 +24,7 @@ public:
 protected:
   float maxpackets_;
   std::string netIface_;
-
+  bool ignored_;
 private:
   int _ipsock;
   Timer _timer;

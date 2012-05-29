@@ -49,6 +49,7 @@ NetMeter::NetMeter( XOSView *parent, float max )
   maxpackets_ = max;
   _lastBytesIn = _lastBytesOut = 0;
   _usechains = false;
+  ignored_ = false;
 
   checkOSVersion();
 }
@@ -117,6 +118,10 @@ void NetMeter::checkResources( void ){
   dodecay_ = parent_->isResourceTrue( "netDecay" );
   SetUsedFormat (parent_->getResource("netUsedFormat"));
   netIface_ = parent_->getResource( "netIface" );
+  if (netIface_[0] == '-') {
+    ignored_ = true;
+    netIface_.erase(0, netIface_.find_first_not_of("- "));
+  }
 
   _ipsock = socket(AF_INET, SOCK_DGRAM, 0);
   if (_ipsock == -1) {
@@ -175,7 +180,7 @@ void NetMeter::checkeventNew(void)
 
 	  while (ifs)
 	      {
-		if (netIface_ == "False" ) 
+		if (netIface_ == "False" )
 		  {
 		    ifs.ignore(1024, ':');
 		  }
@@ -185,7 +190,7 @@ void NetMeter::checkeventNew(void)
 		    ifname = buf;
 		    ifs.ignore(1, ':');
 		    ifname.erase(0, ifname.find_first_not_of(" ") );
-		    if (ifname != netIface_) 
+		    if ( (!ignored_ && ifname != netIface_) || (ignored_ && ifname == netIface_) )
 		      {
 			ifs.ignore(1024,'\n');
 			continue;
