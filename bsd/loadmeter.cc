@@ -1,4 +1,4 @@
-//  
+//
 //  Copyright (c) 1994, 1995 by Mike Romberg ( romberg@fsl.noaa.gov )
 //  Copyright (c) 1995, 1996, 1997-2002 by Brian Grayson (bgrayson@netbsd.org)
 //
@@ -14,14 +14,24 @@
 //
 
 #include <stdlib.h>  //  for getloadavg()
+#include <sys/types.h>
+#include <sys/sysctl.h>
 #include "loadmeter.h"
+#include "coretemp.h"
 #include "xosview.h"
 
 LoadMeter::LoadMeter( XOSView *parent )
-  : FieldMeterGraph( parent, 2, "LOAD", "PROCS per MIN/IDLE", 1, 1, 0 ){
+  : FieldMeterGraph( parent, 3, "LOAD", "PROCS/IDLE", 1, 1, 0 ){
 }
 
 LoadMeter::~LoadMeter( void ){
+}
+
+/* Overload to prevent the empty speed field from drawing occasionally. */
+void LoadMeter::drawfields( int manditory ){
+  numfields_ = 2;
+  FieldMeterGraph::drawfields(manditory);
+  numfields_ = 3;
 }
 
 void LoadMeter::checkResources( void ){
@@ -33,6 +43,7 @@ void LoadMeter::checkResources( void ){
 
   setfieldcolor( 0, procloadcol_ );
   setfieldcolor( 1, parent_->getResource( "loadIdleColor" ) );
+  setfieldcolor( 2, parent_->getResource( "loadCpuColor" ) );
 
   priority_ = atoi (parent_->getResource("loadPriority"));
   dodecay_ = parent_->isResourceTrue("loadDecay");
@@ -40,6 +51,7 @@ void LoadMeter::checkResources( void ){
   SetUsedFormat (parent_->getResource("loadUsedFormat"));
   warnThreshold = atoi (parent_->getResource("loadWarnThreshold"));
   critThreshold = atoi (parent_->getResource("loadCritThreshold"));
+  do_cpu_speed_ = parent_->isResourceTrue( "loadCpuSpeed" );
 
   alarmstate = lastalarmstate = 0;
 
@@ -59,6 +71,25 @@ void LoadMeter::checkResources( void ){
 
 void LoadMeter::checkevent( void ){
   getloadinfo();
+
+  if ( do_cpu_speed_ ) {
+    int speed = 0, cpus = CoreTemp::countCpus();
+    char name[25];
+    old_cpu_speed_ = cur_cpu_speed_;
+    cur_cpu_speed_ = 0;
+    size_t size = sizeof(speed);
+    for (uint i=0; i<cpus; i++) {
+      snprintf(name, 25, "dev.cpu.%d.freq", i);
+      sysctlbyname(name, &speed, &size, NULL, 0);
+      cur_cpu_speed_ += speed;
+    }
+    cur_cpu_speed_ /= cpus;
+    if ( old_cpu_speed_ != cur_cpu_speed_ ) {
+      snprintf(name, 25, "PROCS/IDLE/%d MHz", cur_cpu_speed_);
+      legend(name);
+      drawlegend();
+    }
+  }
   drawfields();
 }
 
@@ -83,7 +114,7 @@ void LoadMeter::getloadinfo( void ){
     drawlegend();
     lastalarmstate = alarmstate;
   }
-    
+
 
   //  This method of auto-adjust is better than the old way.
   //  If fields[0] is less than 20% of display, shrink display to be
@@ -94,10 +125,10 @@ void LoadMeter::getloadinfo( void ){
   //  If fields[0] is larger, then set it to be 1/5th of full.
   if ( fields_[0]>total_ )
     total_ = fields_[0]*5.0;
-      
+
   if ( total_ < 1.0)
     total_ = 1.0;
-    
+
   fields_[1] = (float) (total_ - fields_[0]);
 
   /*  I don't see why anyone would want to use any format besides

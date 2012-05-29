@@ -1,4 +1,4 @@
-//  
+//
 //  Copyright (c) 1994, 1995 by Mike Romberg ( romberg@fsl.noaa.gov )
 //  Copyright (c) 1995, 1996, 1997-2002 by Brian Grayson (bgrayson@netbsd.org)
 //
@@ -24,7 +24,9 @@ public:
   LoadMeter( XOSView *parent );
   ~LoadMeter( void );
 
-  const char *name( void ) const { return "LoadMeter"; }  
+  virtual void drawfields( int manditory = 0 );
+
+  const char *name( void ) const { return "LoadMeter"; }
   void checkevent( void );
 
   void checkResources( void );
@@ -34,6 +36,8 @@ protected:
   unsigned long procloadcol_, warnloadcol_, critloadcol_;
 private:
   int warnThreshold, critThreshold, alarmstate, lastalarmstate;
+  int old_cpu_speed_, cur_cpu_speed_;
+  bool do_cpu_speed_;
 };
 
 
