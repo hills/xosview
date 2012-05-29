@@ -1,4 +1,4 @@
-//  
+//
 //  Copyright (c) 1995, 1996, 1997-2002 by Brian Grayson (bgrayson@netbsd.org)
 //
 //  This file was written by Brian Grayson for the NetBSD and xosview
@@ -16,7 +16,11 @@
 #include "kernel.h"     //  For NetBSD-specific icky (but handy) kvm_ code.  BCG
 
 DiskMeter::DiskMeter( XOSView *parent, float max )
+#if __FreeBSD_version >= 500000
+: FieldMeterGraph( parent, 3, "DISK", "READ/WRITE/IDLE" ){
+#else
 : FieldMeterGraph( parent, 2, "DISK", "XFER/IDLE" ){
+#endif
   //  The setting of the priority will be done in checkResources().  BCG
   dodecay_ = 0;
 
@@ -44,7 +48,9 @@ DiskMeter::DiskMeter( XOSView *parent, float max )
   warnx("!!! The DiskMeter has been disabled.");
     disableMeter ();
   }
+#if __FreeBSD_version < 500000
   prevBytes = 0;
+#endif
   maxBandwidth_ = max;
   total_ = max;
   getstats();
@@ -61,7 +67,11 @@ DiskMeter::DiskMeter( XOSView *parent, float max )
   if (total_ < 1.0)
   {
     total_ = (float)1.0;
+#if __FreeBSD_version >= 500000
+    fields_[2] = total_;
+#else
     fields_[1] = total_;
+#endif
   }
 }
 
@@ -72,8 +82,14 @@ void DiskMeter::checkResources( void ){
   FieldMeterGraph::checkResources();
 
   if (kernelHasStats_) {
+#if __FreeBSD_version >= 500000
+    setfieldcolor( 0, parent_->getResource("diskReadColor") );
+    setfieldcolor( 1, parent_->getResource("diskWriteColor") );
+    setfieldcolor( 2, parent_->getResource("diskIdleColor") );
+#else
     setfieldcolor( 0, parent_->getResource("diskUsedColor") );
     setfieldcolor( 1, parent_->getResource("diskIdleColor") );
+#endif
     priority_ = atoi (parent_->getResource("diskPriority"));
     dodecay_ = parent_->isResourceTrue("diskDecay");
     useGraph_ = parent_->isResourceTrue("diskGraph");
@@ -81,6 +97,9 @@ void DiskMeter::checkResources( void ){
   }
   fields_[0] = 0.0;
   fields_[1] = 0.0;
+#if __FreeBSD_version >= 500000
+  fields_[2] = 0.0;
+#endif
 }
 
 void DiskMeter::checkevent( void ){
@@ -90,22 +109,57 @@ void DiskMeter::checkevent( void ){
 
 void DiskMeter::getstats( void ){
   IntervalTimerStop();
+#if __FreeBSD_version >= 500000
+  u_int64_t reads = 0, writes = 0;
+#else
   unsigned long long currBytes = 0;
+#endif
 //  Reset to desired full-scale settings.
   total_ = maxBandwidth_;
 
   if (kernelHasStats_) {
+#if __FreeBSD_version >= 500000
+    BSDGetDiskXFerBytes (&reads, &writes);
+#else
     BSDGetDiskXFerBytes (&currBytes);
+#endif
 #if DEBUG
     printf ("currBytes is %#x %#0x\n", (int) (currBytes >> 32), (int)
 	    (currBytes & 0xffffffff));
 #endif
   }
   /*  Adjust this to bytes/second.  */
+#if __FreeBSD_version >= 500000
+  fields_[0] = reads / IntervalTimeInSecs();
+  fields_[1] = writes / IntervalTimeInSecs();
+#else
   fields_[0] = (currBytes-prevBytes)/IntervalTimeInSecs();
+#endif
   /*  Adjust in case of first call.  */
-  if (fields_[0] < 0) fields_[0] = 0.0;
+#if __FreeBSD_version >= 500000
+  if (fields_[0] < 0)
+    fields_[0] = 0.0;
+  if (fields_[1] < 0)
+    fields_[1] = 0.0;
+#else
+  if (fields_[0] < 0)
+    fields_[0] = 0.0;
+#endif
 //  Adjust total_ if needed.
+#if __FreeBSD_version >= 500000
+  if (fields_[0] + fields_[1] > total_)
+    total_ = fields_[0] + fields_[1];
+
+  fields_[2] = total_ - ( fields_[0] + fields_[1] );
+  if (fields_[0] < 0.0)
+    fprintf (stderr, "diskmeter: fields[0] of %f is < 0!\n", fields_[0]);
+  if (fields_[1] < 0.0)
+    fprintf (stderr, "diskmeter: fields[1] of %f is < 0!\n", fields_[1]);
+  if (fields_[2] < 0.0)
+    fprintf (stderr, "diskmeter: fields[2] of %f is < 0!\n", fields_[2]);
+
+  setUsed (fields_[0] + fields_[1], total_);
+#else
   if (fields_[0] > total_)
     total_ = fields_[0];
 
@@ -114,12 +168,16 @@ void DiskMeter::getstats( void ){
     fprintf (stderr, "diskmeter: fields[0] of %f is < 0!\n", fields_[0]);
   if (fields_[1] < 0.0)
     fprintf (stderr, "diskmeter: fields[1] of %f is < 0!\n", fields_[1]);
-    
+
   setUsed ( fields_[0], total_);
+#endif
+
 #ifdef HAVE_DEVSTAT
   /*  The devstat library provides a differential value already,
    *  so we should compare against 0 each time.  */
-  prevBytes = currBytes = 0;
+#if __FreeBSD_version < 500000
+  prevBytes = 0;
+#endif
 #else
   prevBytes = currBytes;
 #endif

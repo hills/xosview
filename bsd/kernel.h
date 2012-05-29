@@ -62,7 +62,11 @@ int
 BSDDiskInit();
 
 void
+#if __FreeBSD_version >= 500000
+BSDGetDiskXFerBytes (u_int64_t *read_bytes, u_int64_t *write_bytes);
+#else
 BSDGetDiskXFerBytes (unsigned long long * bytes);
+#endif
 
 #ifdef XOSVIEW_FREEBSD
 void

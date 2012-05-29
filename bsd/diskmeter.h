@@ -1,5 +1,5 @@
-//  
-//  NetBSD port:  
+//
+//  NetBSD port:
 //  Copyright (c) 1995,1996,1997 Brian Grayson(bgrayson@netbsd.org)
 //
 //  This file was written by Brian Grayson for the NetBSD and xosview
@@ -16,6 +16,7 @@
 
 #include "fieldmetergraph.h"
 #include <sys/types.h>		//  For u_int64_t
+#include <sys/param.h>
 
 class DiskMeter : public FieldMeterGraph {
 public:
@@ -29,7 +30,9 @@ public:
 protected:
   void getstats( void );
 private:
+#if __FreeBSD_version < 500000
   u_int64_t prevBytes;
+#endif
   int kernelHasStats_;
   float	maxBandwidth_;
 };

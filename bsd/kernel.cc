@@ -649,21 +649,23 @@ DevStat_Init(void) {
 	 * devstat version.
 	 */
 #if __FreeBSD_version >= 500000
-	if (devstat_checkversion(kd) < 0) {
+	if (devstat_checkversion(NULL) < 0) {
 #else
 	if (checkversion() < 0) {
 #endif
 		nodisk++;
+		warnx("%s\n", devstat_errbuf);
 		return;
 	}
 
 	/* find out how many devices we have */
 #if __FreeBSD_version >= 500000
-	if ((num_devices = devstat_getnumdevs(kd)) < 0) {
+	if ((num_devices = devstat_getnumdevs(NULL)) < 0) {
 #else
 	if ((num_devices = getnumdevs()) < 0) {
 #endif
 		nodisk++;
+		warnx("%s\n", devstat_errbuf);
 		return;
 	}
 
@@ -678,11 +680,12 @@ DevStat_Init(void) {
 	 * errors.
 	 */
 #if __FreeBSD_version >= 500000
-	if (devstat_getdevs(kd,&cur) == -1) {
+	if (devstat_getdevs(NULL,&cur) == -1) {
 #else
 	if (getdevs(&cur) == -1) {
 #endif
 		nodisk++;
+		warnx("%s\n", devstat_errbuf);
 		return;
 	}
 
@@ -700,6 +703,7 @@ DevStat_Init(void) {
 	if (buildmatch(da, &matches, &num_matches) != 0) {
 #endif
 		nodisk++;
+		warnx("%s\n", devstat_errbuf);
 		return;
 	}
 
@@ -722,12 +726,18 @@ DevStat_Init(void) {
 		       generation, cur.dinfo->devices, num_devices,
 		       matches, num_matches,
 		       NULL, 0,
-		       select_mode, 10, 0) == -1)
+		       select_mode, 10, 0) == -1) {
 		nodisk++;
+		warnx("%s\n", devstat_errbuf);
+	}
 }
 
 int
+#if __FreeBSD_version >= 500000
+DevStat_Get(u_int64_t *read_bytes, u_int64_t *write_bytes) {
+#else
 DevStat_Get(void) {
+#endif
 	register int dn;
 	long double busy_seconds;
 	u_int64_t total_transfers;
@@ -745,7 +755,7 @@ DevStat_Get(void) {
 		 * were previously displaying has gone away.
 		 */
 #if __FreeBSD_version >= 500000
-		switch (devstat_getdevs(kd,&cur)) {
+		switch (devstat_getdevs(NULL, &cur)) {
 #else
 		switch (getdevs(&cur)) {
 #endif
@@ -816,18 +826,22 @@ DevStat_Get(void) {
 #if __FreeBSD_version >= 500000
 			if (devstat_compute_statistics(&cur.dinfo->devices[di],
 				&last.dinfo->devices[di], busy_seconds,
+				DSM_TOTAL_BYTES_READ, read_bytes,
+				DSM_TOTAL_BYTES_WRITE, write_bytes,
 				DSM_TOTAL_BYTES, &total_bytes,
 				DSM_TOTAL_TRANSFERS, &total_transfers,
-				DSM_NONE) != 0)
+				DSM_NONE) != 0) {
 #else
 			if (compute_stats(&cur.dinfo->devices[di],
 				  &last.dinfo->devices[di], busy_seconds,
 				  &total_bytes, &total_transfers,
 				  NULL, NULL,
 				  NULL, NULL,
-				  NULL, NULL)!= 0)
+				  NULL, NULL)!= 0) {
 #endif
-				  break;
+				warnx("%s\n", devstat_errbuf);
+				break;
+			}
 			total_xfers += (int)total_transfers;
 			total_xbytes += (int)total_bytes;
 		}
@@ -841,7 +855,6 @@ DevStat_Get(void) {
 #else
  		last.busy_time = cur.busy_time;
 #endif
-
 	} else {
 		/* no disks found ? */
 		total_xfers = 0;
@@ -887,10 +900,18 @@ BSDDiskInit() {
 }
 
 void
+#if __FreeBSD_version >= 500000
+BSDGetDiskXFerBytes (u_int64_t *read_bytes, u_int64_t *write_bytes) {
+#else
 BSDGetDiskXFerBytes (unsigned long long *bytesXferred) {
+#endif
 #ifdef XOSVIEW_FREEBSD
 #ifdef HAVE_DEVSTAT
+#if __FreeBSD_version >= 500000
+  DevStat_Get(read_bytes, write_bytes);
+#else
   *bytesXferred = DevStat_Get();
+#endif
 #else
   /* FreeBSD still has the old-style disk statistics in global arrays
      indexed by the disk number (defs are in <sys/dkstat.h> */
