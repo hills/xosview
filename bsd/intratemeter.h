@@ -1,4 +1,4 @@
-//  
+//
 //  Copyright (c) 1999 by Brian Grayson (bgrayson@netbsd.org)
 //
 //  This file may be distributed under terms of the GPL or of the BSD
@@ -19,13 +19,13 @@ public:
   IrqRateMeter( XOSView *parent );
   ~IrqRateMeter( void );
 
-  const char *name( void ) const { return "IrqRateMeter"; }  
+  const char *name( void ) const { return "IrqRateMeter"; }
   void checkevent( void );
 
   void checkResources( void );
 protected:
-  unsigned long irqs_[NUM_INTR], lastirqs_[NUM_INTR];
-  unsigned long delta;
+  unsigned long *irqs_, *lastirqs_;
+  unsigned int irqcount_;
 
   void getinfo( void );
   unsigned long oncol_, idlecol_;

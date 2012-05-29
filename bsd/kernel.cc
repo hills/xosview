@@ -1077,7 +1077,7 @@ BSDNumInts() {
 }
 
 void
-BSDGetIntrStats (unsigned long *intrCount) {
+BSDGetIntrStats (unsigned long *intrCount, unsigned int *intrNbrs) {
 #if defined(XOSVIEW_FREEBSD) && ( defined(__i386__) || defined(__x86_64__) )
 # if __FreeBSD_version < 500000
     /* FreeBSD has an array of interrupt counts, indexed by device number.
@@ -1098,8 +1098,11 @@ BSDGetIntrStats (unsigned long *intrCount) {
   int i;
   while (--nintr >= 0) {
     if (intrnames[0] != '\0') {
-      sscanf(intrnames, "irq%d", &i);
-      intrCount[i] = *intrcnt;
+      if (sscanf(intrnames, "irq%d", &i) == 1) {
+        intrCount[i] = *intrcnt;
+        if (intrNbrs)
+            intrNbrs[i] = i;
+      }
     }
     intrcnt++;
     intrnames += strlen(intrnames) + 1;
@@ -1140,8 +1143,11 @@ BSDGetIntrStats (unsigned long *intrCount) {
     for (i=0; i < nintr; i++) {
 	  if (kvm_intrname[0] != '\0') {
 	  /* Figure out which irq we have here */
-		if (sscanf(kvm_intrname, "irq%d", &d) == 1)
+		if (sscanf(kvm_intrname, "irq%d", &d) == 1) {
 		  intrCount[d] = *kvm_intrcnt;
+          if (intrNbrs)
+            intrNbrs[d] = d;
+        }
 	  }
 	  kvm_intrcnt++;
 	  kvm_intrname += strlen(kvm_intrname) + 1;

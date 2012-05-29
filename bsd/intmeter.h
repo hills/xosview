@@ -1,4 +1,4 @@
-//  
+//
 //  Copyright (c) 1994, 1995 by Mike Romberg ( romberg@fsl.noaa.gov )
 //
 //  This file may be distributed under terms of the GPL
@@ -10,6 +10,8 @@
 #include "bitmeter.h"
 #include "kernel.h"
 
+#include <map>
+
 class IntMeter : public BitMeter {
 public:
   IntMeter( XOSView *parent,
@@ -20,10 +22,14 @@ public:
   void checkevent( void );
 
   void checkResources( void );
+private:
+  unsigned long *irqs_, *lastirqs_;
+  unsigned int *inbrs_;
+  unsigned int irqcount_;
+  std::map<int,int> realintnum;
 protected:
-  unsigned long irqs_[NUM_INTR], lastirqs_[NUM_INTR];
-
   void getirqs( void );
+  void updateirqcount( bool init = false );
 };
 
 #endif

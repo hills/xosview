@@ -1,4 +1,4 @@
-//  
+//
 //  Copyright (c) 1999 by Brian Grayson (bgrayson@netbsd.org)
 //
 //  This file may be distributed under terms of the GPL or of the BSD
@@ -15,8 +15,11 @@
 
 IrqRateMeter::IrqRateMeter( XOSView *parent )
   : FieldMeterGraph( parent, 2, "IRQs", "IRQs per sec/IDLE", 1, 1, 0 ){
-  kernelHasStats_ = BSDIntrInit();
+  irqcount_ = BSDNumInts();
+  irqs_ = new unsigned long[irqcount_];
+  lastirqs_ = new unsigned long[irqcount_];
 
+  kernelHasStats_ = BSDIntrInit();
   if (!kernelHasStats_) {
   warnx(
   "!!! The kernel does not seem to have the symbols needed for the IrqRateMeter.");
@@ -28,6 +31,8 @@ IrqRateMeter::IrqRateMeter( XOSView *parent )
 }
 
 IrqRateMeter::~IrqRateMeter( void ){
+  delete[] irqs_;
+  delete[] lastirqs_;
 }
 
 void IrqRateMeter::checkResources( void ){
@@ -45,10 +50,7 @@ void IrqRateMeter::checkResources( void ){
   SetUsedFormat (parent_->getResource("irqrateUsedFormat"));
   total_ = 2000;
 
-  //  Now, grab a sample.  I don't know if this is needed here.  BCG
-  BSDGetIntrStats (lastirqs_);
-  BSDGetIntrStats (irqs_);
-  getinfo();
+  BSDGetIntrStats (lastirqs_, NULL);
 }
 
 void IrqRateMeter::checkevent( void ){
@@ -57,18 +59,16 @@ void IrqRateMeter::checkevent( void ){
 }
 
 void IrqRateMeter::getinfo( void ){
-  int i;
-
   IntervalTimerStop();
-  BSDGetIntrStats (irqs_);
-  delta = 0;
-  for (i=0;i<NUM_INTR;i++) {
+  BSDGetIntrStats (irqs_, NULL);
+  int delta = 0;
+  for (uint i=0;i<irqcount_;i++) {
     delta += irqs_[i]-lastirqs_[i];
     lastirqs_[i] = irqs_[i];
   }
   /*  Scale delta by the priority.  */
   fields_[0] = delta / IntervalTimeInSecs();
-  
+
   //  Bump total_, if needed.
   if (fields_[0] > total_) total_ = fields_[0];
 

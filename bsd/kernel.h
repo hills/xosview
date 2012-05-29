@@ -86,6 +86,6 @@ int
 BSDNumInts();
 
 void
-BSDGetIntrStats (unsigned long *intrCount);
+BSDGetIntrStats (unsigned long *intrCount, unsigned int *intrNbrs);
 
 #endif
