@@ -165,7 +165,7 @@ xosview*intPriority:	    1
 ! Interrupt Rate Meter Resources
 xosview*irqrate:	True
 xosview*irqrateUsedColor:	red
-xosview*irqrateIdleColor:	black
+xosview*irqrateIdleColor:	aquamarine
 xosview*irqratePriority:	1
 xosview*irqrateUsedFormat:  autoscale
 xosview*irqrateDecay:	True

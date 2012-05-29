@@ -198,7 +198,7 @@ BSDInitSwapInfo()
 #ifdef USE_KVM_GETSWAPINFO
 	char msgbuf[BUFSIZ];
 	struct kvm_swap dummy;
- 
+
 	if (kvm_getswapinfo(kd, &dummy, 1, 0) < 0) {
 		snprintf(msgbuf, sizeof(msgbuf),
 		    "xosview: swap: kvm_getswapinfo failed");
@@ -239,7 +239,7 @@ BSDInitSwapInfo()
 #ifdef XOSVIEW_FREEBSD
         if ((sw = (struct swdevt*) malloc(nswdev * sizeof(*sw))) == NULL ||
             (perdev = (long*) malloc(nswdev * sizeof(*perdev))) == NULL) {
-                printf("xosview: swap: malloc returned NULL.\n"  
+                printf("xosview: swap: malloc returned NULL.\n"
 		  "Number of Swap devices (nswdef) looked like %d\n", nswdev);
                 return (0);
         }
@@ -262,7 +262,7 @@ BSDInitSwapInfo()
             (perdev = (long*) malloc(nswdev * sizeof(*perdev))) == NULL ||
             (mp = (struct mapent*) malloc(nswapmap * sizeof(*mp))) == NULL) {
 #endif
-                printf("xosview: swap: malloc returned NULL.\n"  
+                printf("xosview: swap: malloc returned NULL.\n"
 		  "Number of Swap devices (nswdef) looked like %d\n", nswdev);
                 return (0);
         }
@@ -457,16 +457,17 @@ fetchswap()
 #endif /* XOSVIEW_FREEBSD */
 
 void
-BSDGetSwapInfo(int* total, int* free)
+BSDGetSwapInfo(int64_t* total, int64_t* free)
 {
-        int i, avail, npfree, used=0, xsize, xfree;
+	int i, npfree, xsize, xfree;
+	int64_t avail, used=0;
 
 	fetchswap();
 #ifdef USE_KVM_GETSWAPINFO
 	avail = used = 0;
 	if (kvnsw == 0) {
-		avail += pagesize * kvmsw[0].ksw_total;
-		used += pagesize * kvmsw[0].ksw_used;
+		avail += pagesize * (int64_t)kvmsw[0].ksw_total;
+		used += pagesize * (int64_t)kvmsw[0].ksw_used;
 	}
 	*total = avail;
 	*free = avail - used;

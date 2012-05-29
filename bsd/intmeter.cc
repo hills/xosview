@@ -1,4 +1,4 @@
-//  
+//
 //  Copyright (c) 1994, 1995 by Mike Romberg ( romberg@fsl.noaa.gov )
 //
 //  This file may be distributed under terms of the GPL
@@ -20,9 +20,9 @@ IntMeter::IntMeter( XOSView *parent,
   //  out the door.
   //  Same goes for platforms (like Alpha) with more than 16
   //  interrupts.
-  : BitMeter( parent, "INTS", "IRQs", 16 /*BSDNumInts()*/, 
+  : BitMeter( parent, "INTS", "IRQs", BSDNumInts(),
               dolegends, dousedlegends ) {
-  for ( int i = 0 ; i < 16 ; i++ )
+  for ( int i = 0 ; i < BSDNumInts() ; i++ )
     irqs_[i] = lastirqs_[i] = 0;
   if (!BSDIntrInit()) {
     disableMeter();
@@ -35,7 +35,7 @@ IntMeter::~IntMeter( void ){
 void IntMeter::checkevent( void ){
   getirqs();
 
-  for ( int i = 0 ; i < 16 ; i++ ){
+  for ( int i = 0 ; i < BSDNumInts() ; i++ ){
     bits_[i] = ((irqs_[i] - lastirqs_[i]) != 0);
     lastirqs_[i] = irqs_[i];
   }
@@ -52,7 +52,7 @@ void IntMeter::checkResources( void ){
   }
 }
 
-void 
+void
 IntMeter::getirqs( void )
 {
     BSDGetIntrStats (irqs_);

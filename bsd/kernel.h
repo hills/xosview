@@ -2,7 +2,7 @@
 #define __kernel_h__
 
 //
-//  NetBSD port:  
+//  NetBSD port:
 //  Copyright (c) 1995, 1996, 1997-2002 by Brian Grayson (bgrayson@netbsd.org)
 //
 //  This file was written by Brian Grayson for the NetBSD and xosview
@@ -67,8 +67,11 @@ void
 FreeBSDGetBufspace(int* bfsp);
 #endif
 
-
-#define NUM_INTR	16
+#if defined(XOSVIEW_FREEBSD) && defined(__alpha__)
+# define NUM_INTR	256
+#else
+# define NUM_INTR	16
+#endif
 
 int
 BSDIntrInit();

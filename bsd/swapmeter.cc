@@ -1,7 +1,7 @@
-//  
+//
 //  Copyright (c) 1994, 1995 by Mike Romberg ( romberg@fsl.noaa.gov )
 //
-//  NetBSD port:  
+//  NetBSD port:
 //  Copyright (c) 1995, 1996, 1997-2002 by Brian Grayson (bgrayson@netbsd.org)
 //
 //  This file was written by Brian Grayson for the NetBSD and xosview
@@ -71,7 +71,7 @@ void SwapMeter::checkevent( void ){
 }
 
 void SwapMeter::getswapinfo( void ){
-  unsigned long long total_int, free_int;
+  int64_t total_int, free_int;
 
   if (doSwap) {
 #ifdef HAVE_SWAPCTL
