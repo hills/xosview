@@ -19,14 +19,10 @@ static const char *VERSIONFILE = "/proc/version";
 std::map<int,int> realintnum;
 
 IntMeter::IntMeter( XOSView *parent, int cpu)
-  : BitMeter( parent, "INTS", "", 1,
-              0, 0 ), _cpu(cpu), _old(true) {
- if (getLinuxVersion() <= 2.0)
- 	_old = true;
- else
- 	_old = false;
- irqs_=lastirqs_=0;
- initirqcount();
+  : BitMeter( parent, "INTS", "", 1, 0, 0 ), _cpu(cpu), _old((getLinuxVersion() <= 2.0) ? true : false) {
+  irqs_ = lastirqs_ = NULL;
+  initirqcount();
+  printf("%d\n", cpu);
 }
 
 IntMeter::~IntMeter( void ){
@@ -52,6 +48,7 @@ void IntMeter::checkResources( void ){
   onColor_  = parent_->allocColor( parent_->getResource( "intOnColor" ) );
   offColor_ = parent_->allocColor( parent_->getResource( "intOffColor" ) );
   priority_ = atoi(parent_->getResource("intPriority"));
+  separate_ = parent_->isResourceTrue("intSeparate");
 }
 
 float IntMeter::getLinuxVersion(void) {
@@ -75,8 +72,7 @@ int IntMeter::countCPUs(void) {
 
 void IntMeter::getirqs( void ){
   std::ifstream intfile( INTFILE );
-  int intno, count;
-  int	idx;
+  int intno, count, tmp, idx;
 
   if ( !intfile ){
     std::cerr <<"Can not open file : " <<INTFILE << std::endl;
@@ -87,6 +83,7 @@ void IntMeter::getirqs( void ){
       intfile.ignore(1024, '\n');
 
   while ( !intfile.eof() ){
+    count = tmp = 0;
     intfile >> idx;
     intno = realintnum[idx];
     if(intno>=numBits())
@@ -94,11 +91,13 @@ void IntMeter::getirqs( void ){
     if (!intfile) break;
     intfile.ignore(1);
     if ( !intfile.eof() ){
-      for (int i = 0 ; i <= _cpu ; i++)
-          intfile >>count;
+      for (int i = 0; i <= _cpu; i++) {
+        intfile >> tmp;
+        count += tmp;
+      }
       intfile.ignore(1024, '\n');
 
-      irqs_[intno] = count;
+      irqs_[intno] = ( separate_ ? tmp : count );
     }
   }
 }

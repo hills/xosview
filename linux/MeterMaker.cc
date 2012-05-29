@@ -136,8 +136,12 @@ if ( stats ) {
   if (_xos->isResourceTrue("interrupts")) {
     int cpuCount = IntMeter::countCPUs();
     cpuCount = cpuCount == 0 ? 1 : cpuCount;
-    for (int i = 0 ; i < cpuCount ; i++)
-      push(new IntMeter(_xos, i));
+    if (_xos->isResourceTrue("intSeparate")) {
+      for (int i = 0 ; i < cpuCount ; i++)
+        push(new IntMeter(_xos, i));
+    }
+    else
+      push(new IntMeter(_xos, cpuCount-1));
   }
 
   // check for the battery meter

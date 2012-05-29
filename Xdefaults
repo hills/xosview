@@ -157,6 +157,7 @@ xosview*serialPriority:     1
 ! Interrupt Meter Resources
 
 xosview*interrupts:         False
+xosview*intSeparate:        False
 xosview*intOnColor:         red
 xosview*intOffColor:        aquamarine
 xosview*intPriority:	    1
