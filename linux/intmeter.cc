@@ -22,7 +22,6 @@ IntMeter::IntMeter( XOSView *parent, int cpu)
   : BitMeter( parent, "INTS", "", 1, 0, 0 ), _cpu(cpu), _old((getLinuxVersion() <= 2.0) ? true : false) {
   irqs_ = lastirqs_ = NULL;
   initirqcount();
-  printf("%d\n", cpu);
 }
 
 IntMeter::~IntMeter( void ){
