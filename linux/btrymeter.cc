@@ -113,23 +113,35 @@ bool BtryMeter::has_syspower( void ){
   bool found;
   DIR *dir;
   struct dirent *dp;
+  struct stat buf;
+  char dirname[80], f[80];
+  std::ifstream type;
+  std::string t;
 
   dir = opendir(SYSPOWERDIR);
   if (dir == NULL)
       return false;
 
   found = false;
-  while (!found) {
-      dp = readdir(dir);
-      if (dp == NULL)
-          break;
-
-      if (strncmp(dp->d_name, "BAT", 3) == 0) {
+  while (!found && (dp = readdir(dir))) {
+    if (!strncmp(dp->d_name, ".", 1))
+      continue;
+    if (!strncmp(dp->d_name, "..", 2))
+      continue;
+    snprintf(dirname, 80, "%s/%s", SYSPOWERDIR, dp->d_name);
+    if (stat(dirname, &buf) == 0 && S_ISDIR(buf.st_mode)) {
+      snprintf(f, 80, "%s/%s", dirname, "/type");
+      type.open(f);
+      if (type.good()) {
+        type >> t;
+        if (strncmp(t.c_str(), "Battery", 7) == 0) {
           found = true;
           break;
+        }
       }
+      type.close();
+    }
   }
-
   if (closedir(dir) != 0)
       abort();
 
@@ -339,7 +351,7 @@ bool BtryMeter::getapminfo( void ){
   // If the battery status is reported as a negative number, it means we are
   // running on AC power and no battery status is available - Report it as
   // completely empty (0). (Refer to Debian bug report #281565)
-  if (fields_[0] < 0) 
+  if (fields_[0] < 0)
     fields_[0] = 0;
 
   total_ = 100;
