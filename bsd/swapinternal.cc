@@ -192,104 +192,98 @@ int
 BSDInitSwapInfo()
 {
 #ifdef XOSVIEW_BSDI
-        struct swdevt *swseq;
-        int i;
+	struct swdevt *swseq;
+	int i;
 #endif
-        static int once = 0;
 #ifdef USE_KVM_GETSWAPINFO
 	char msgbuf[BUFSIZ];
 	struct kvm_swap dummy;
 
-	if (kvm_getswapinfo(kd, &dummy, 1, 0) < 0) {
-		snprintf(msgbuf, sizeof(msgbuf),
-		    "xosview: swap: kvm_getswapinfo failed");
-	}
+	if (kvm_getswapinfo(kd, &dummy, 1, 0) < 0)
+		snprintf(msgbuf, sizeof(msgbuf), "xosview: swap: kvm_getswapinfo failed");
 	pagesize = getpagesize();
+	return (1);
 #else /* USE_KVM_GETSWAPINFO */
-        u_long ptr;
+	static int once = 0;
+	u_long ptr;
 
-	(void) ptr;	//  Avoid gcc warnings.
-        if (once)
-                return (1);
-        if (kvm_nlist(swap_kd, syms)) {
-#ifndef HAVE_SWAPCTL
+	if (once)
+		return (1);
+	if (kvm_nlist(swap_kd, syms)) {
+# ifndef HAVE_SWAPCTL
 		int i;
 		char msgbuf[BUFSIZ];
 
-                strncpy(msgbuf, "xosview: swap: cannot find", BUFSIZ);
-                for (i = 0; syms[i].n_name != NULL; i++) {
-                        if (syms[i].n_value == 0) {
-			  	strncat(msgbuf, " ", BUFSIZ-strlen(msgbuf));
-			  	strncat(msgbuf, syms[i].n_name,
-				    BUFSIZ-strlen(msgbuf));
-                        }
-                }
-                printf("%s\n", msgbuf);
-#endif
-                return (0);
-        }
-#ifdef HAVE_SWAPCTL
+		strncpy(msgbuf, "xosview: swap: cannot find", BUFSIZ);
+		for (i = 0; syms[i].n_name != NULL; i++) {
+			if (syms[i].n_value == 0) {
+				strncat(msgbuf, " ", BUFSIZ-strlen(msgbuf));
+				strncat(msgbuf, syms[i].n_name, BUFSIZ-strlen(msgbuf));
+			}
+		}
+		printf("%s\n", msgbuf);
+# endif
+		return (0);
+	}
+# ifdef HAVE_SWAPCTL
 	return 0;
-#else
-#ifdef XOSVIEW_BSDI
-        KGET(VM_SWAPSTATS, swapstats);
-#endif
-        KGET(VM_NSWAP, nswap);
-        KGET(VM_NSWDEV, nswdev);
-        KGET(VM_DMMAX, dmmax);
-#ifdef XOSVIEW_FREEBSD
-        if ((sw = (struct swdevt*) malloc(nswdev * sizeof(*sw))) == NULL ||
-            (perdev = (long*) malloc(nswdev * sizeof(*perdev))) == NULL) {
-                printf("xosview: swap: malloc returned NULL.\n"
-		  "Number of Swap devices (nswdef) looked like %d\n", nswdev);
-                return (0);
-        }
+# else
+#  ifdef XOSVIEW_BSDI
+	KGET(VM_SWAPSTATS, swapstats);
+#  endif
+	KGET(VM_NSWAP, nswap);
+	KGET(VM_NSWDEV, nswdev);
+	KGET(VM_DMMAX, dmmax);
+#  ifdef XOSVIEW_FREEBSD
+	if ((sw = (struct swdevt*) malloc(nswdev * sizeof(*sw))) == NULL ||
+	    (perdev = (long*) malloc(nswdev * sizeof(*perdev))) == NULL) {
+		printf("xosview: swap: malloc returned NULL.\n");
+		printf("Number of Swap devices (nswdef) looked like %d\n", nswdev);
+		return (0);
+	}
 	KGET1(VM_SWDEVT, &ptr, sizeof ptr, "swdevt");
 	KGET2(ptr, sw, (signed) (nswdev * sizeof(*sw)), "*swdevt");
-#else /* XOSVIEW_FREEBSD */
-#ifndef XOSVIEW_BSDI
-        KGET(VM_NSWAPMAP, nswapmap);
-#endif
-        KGET(VM_SWAPMAP, kswapmap);     /* kernel `swapmap' is a pointer */
-#ifdef XOSVIEW_BSDI
-        if ((sw = (struct swdevt*) malloc(swapstats.swap_nswdev * sizeof(*sw)))
-	    == NULL ||
-            (perdev = (long*) malloc(swapstats.swap_nswdev * sizeof(*perdev)))
-	    == NULL ||
-            (mp =(struct mapent*) malloc(swapstats.swap_mapsize * sizeof(*mp)))
-	    == NULL) {
-#else
-        if ((sw = (struct swdevt*) malloc(nswdev * sizeof(*sw))) == NULL ||
-            (perdev = (long*) malloc(nswdev * sizeof(*perdev))) == NULL ||
-            (mp = (struct mapent*) malloc(nswapmap * sizeof(*mp))) == NULL) {
-#endif
-                printf("xosview: swap: malloc returned NULL.\n"
-		  "Number of Swap devices (nswdef) looked like %d\n", nswdev);
-                return (0);
-        }
-        KGET1(VM_SWDEVT, sw, (signed) (nswdev * sizeof(*sw)), "swdevt");
-#ifdef XOSVIEW_BSDI
-        if (swapstats.swap_nswdev > nswdev) {
-                /* The rest were allocated individually. */
-                KGET(VM_SWSEQ, swseq);
-                for (i = nswdev; i < swapstats.swap_nswdev; i++) {
-                        KGET2((u_long)swseq, &sw[i], sizeof(sw[i]), "swseq");
-                        swseq = sw[i].sw_next;
-                }
-        }
-#endif
-#endif /* XOSVIEW_FREEBSD */
-#endif /* USE_KVM_GETSWAPINFO */
-        once = 1;
-        return (1);
+#  else /* XOSVIEW_FREEBSD */
+#   ifndef XOSVIEW_BSDI
+	KGET(VM_NSWAPMAP, nswapmap);
+#   endif
+	KGET(VM_SWAPMAP, kswapmap);     /* kernel `swapmap' is a pointer */
+#   ifdef XOSVIEW_BSDI
+	if ((sw = (struct swdevt*) malloc(swapstats.swap_nswdev * sizeof(*sw))) == NULL ||
+	    (perdev = (long*) malloc(swapstats.swap_nswdev * sizeof(*perdev))) == NULL ||
+	    (mp =(struct mapent*) malloc(swapstats.swap_mapsize * sizeof(*mp))) == NULL) {
+#   else
+	if ((sw = (struct swdevt*) malloc(nswdev * sizeof(*sw))) == NULL ||
+	    (perdev = (long*) malloc(nswdev * sizeof(*perdev))) == NULL ||
+	    (mp = (struct mapent*) malloc(nswapmap * sizeof(*mp))) == NULL) {
+#   endif
+		printf("xosview: swap: malloc returned NULL.\n");
+		printf("Number of Swap devices (nswdef) looked like %d\n", nswdev);
+		return (0);
+	}
+	KGET1(VM_SWDEVT, sw, (signed) (nswdev * sizeof(*sw)), "swdevt");
+#   ifdef XOSVIEW_BSDI
+	if (swapstats.swap_nswdev > nswdev) {
+		/* The rest were allocated individually. */
+		KGET(VM_SWSEQ, swseq);
+		for (i = nswdev; i < swapstats.swap_nswdev; i++) {
+			KGET2((u_long)swseq, &sw[i], sizeof(sw[i]), "swseq");
+			swseq = sw[i].sw_next;
+		}
+	}
+#   endif
+#  endif /* XOSVIEW_FREEBSD */
+# endif /* USE_KVM_GETSWAPINFO */
+	once = 1;
+	return (1);
 #endif
 }
 
-#ifdef XOSVIEW_FREEBSD
-/* Taken verbatim from /usr/src/usr.bin/systat/swap.c (pavel 24-Jan-1998) */
 int
 fetchswap()
 {
+#ifdef XOSVIEW_FREEBSD
+	/* Taken verbatim from /usr/src/usr.bin/systat/swap.c (pavel 24-Jan-1998) */
 #ifndef USE_KVM_GETSWAPINFO
 	struct rlist head;
 	struct rlist *swapptr;
@@ -302,8 +296,7 @@ fetchswap()
 	while (swapptr) {
 		int	top, bottom, next_block;
 
-		KGET2((unsigned long)swapptr, &head,
-		      sizeof(struct rlist), "swapptr");
+		KGET2((unsigned long)swapptr, &head, sizeof(struct rlist), "swapptr");
 
 		top = head.rl_end;
 		bottom = head.rl_start;
@@ -324,12 +317,10 @@ fetchswap()
 		 */
 		while (top / dmmax != bottom / dmmax) {
 			next_block = ((bottom + dmmax) / dmmax);
-			perdev[(bottom / dmmax) % nswdev] +=
-				next_block * dmmax - bottom;
+			perdev[(bottom / dmmax) % nswdev] += next_block * dmmax - bottom;
 			bottom = next_block * dmmax;
 		}
-		perdev[(bottom / dmmax) % nswdev] +=
-			top - bottom + 1;
+		perdev[(bottom / dmmax) % nswdev] += top - bottom + 1;
 
 		swapptr = head.rl_next;
 	}
@@ -337,130 +328,120 @@ fetchswap()
 	kvnsw = kvm_getswapinfo(kd, kvmsw, 1, 0);
 #endif /* USE_KVM_GETSWAPINFO */
 	return 0;
-
-}
 #else /* XOSVIEW_FREEBSD */
-void
-fetchswap()
-{
 #ifndef HAVE_SWAPCTL
-        int s, e, i=0;
-        int elast;
+	int s, e, i = 0;
+	int elast;
 	struct mapent* localmp;
 #ifdef XOSVIEW_BSDI
 	long  siz;
-        struct swdevt *sp;
+	struct swdevt *sp;
 #endif
-
 	localmp = mp;
 #ifdef XOSVIEW_BSDI
-        s= swapstats.swap_mapsize * sizeof(*mp);
+	s = swapstats.swap_mapsize * sizeof(*mp);
 #else
-        s = nswapmap * sizeof(*localmp);
+	s = nswapmap * sizeof(*localmp);
 #endif
-        if (kvm_read(swap_kd, (long)kswapmap, localmp, s) != s)
-                printf("cannot read swapmap: %s", kvm_geterr(swap_kd));
+	if (kvm_read(swap_kd, (long)kswapmap, localmp, s) != s)
+		printf("cannot read swapmap: %s", kvm_geterr(swap_kd));
 
-        /* first entry in map is `struct map'; rest are mapent's */
-        swapmap = (struct map *)localmp;
-	if (!swapmap)
-	{
-	  fprintf(stderr, "Error:  swapmap appears to be %p.  Did you\n"
+	/* first entry in map is `struct map'; rest are mapent's */
+	swapmap = (struct map *)localmp;
+	if (!swapmap) {
 #ifdef XOSVIEW_BSDI
-                  "specify the correct kernel via -N, if not running /bsd?\n",
+		fprintf(stderr, "Error:  swapmap appears to be %p.  Did you\n"
+		        "specify the correct kernel via -N, if not running /bsd?\n",
 #else
-	    "specify the correct kernel via -N, if not running /netbsd?\n",
+		fprintf(stderr, "Error:  swapmap appears to be %p.  Did you\n"
+		        "specify the correct kernel via -N, if not running /netbsd?\n",
 #endif
-	    swapmap);
-	  exit(1);
+		        swapmap);
+		exit(1);
 	}
 #ifdef XOSVIEW_BSDI
-        if (swapstats.swap_mapsize !=
-            (unsigned)(swapmap->m_limit + 1 - (struct mapent *)kswapmap))
-                err(-1,"panic: swap: swapstats.swap_mapsize goof");
+	if (swapstats.swap_mapsize != (unsigned)(swapmap->m_limit + 1 - (struct mapent *)kswapmap))
+		err(-1,"panic: swap: swapstats.swap_mapsize goof");
 #else
-        if (nswapmap != swapmap->m_limit - (struct mapent *)kswapmap)
-                printf("panic: swap: nswapmap goof");
+	if (nswapmap != swapmap->m_limit - (struct mapent *)kswapmap)
+		printf("panic: swap: nswapmap goof");
 #endif
-
-        /*
-         * Count up swap space.
-         */
-        nfree = 0;
-        elast = 0;
+	/*
+	 * Count up swap space.
+	 */
+	nfree = 0;
+	elast = 0;
 #ifdef XOSVIEW_BSDI
-        bzero(perdev, swapstats.swap_nswdev * sizeof(*perdev));
+	bzero(perdev, swapstats.swap_nswdev * sizeof(*perdev));
 #else
-        bzero(perdev, nswdev * sizeof(*perdev));
+	bzero(perdev, nswdev * sizeof(*perdev));
 #endif
 #ifdef XOSVIEW_BSDI
-        for (localmp++; (unsigned)(siz = localmp->m_size) != 0xffffffff; localmp++) {
+	for (localmp++; (unsigned)(siz = localmp->m_size) != 0xffffffff; localmp++) {
 #else
-        for (localmp++; localmp->m_addr != 0; localmp++) {
+	for (localmp++; localmp->m_addr != 0; localmp++) {
 #endif
-                s = localmp->m_addr;                 /* start of swap region */
-                e = localmp->m_addr + localmp->m_size;    /* end of region */
-                elast = e;
-                nfree += localmp->m_size;
-
+		s = localmp->m_addr;                      /* start of swap region */
+		e = localmp->m_addr + localmp->m_size;    /* end of region */
+		elast = e;
+		nfree += localmp->m_size;
 #ifdef XOSVIEW_BSDI
-/* This code mimics swstrategy(). */
-                if (swapstats.swap_nswdev > 1) {
-                        if (s < nswap) {
-                                if (nswdev > 1)
-                                        i = (s / dmmax / 2) % nswdev;
-                                else
-                                        i = 0;
-                                if (sw[i].sw_flags & SW_SEQUENTIAL)
-                                        err(-1,"panic: swap: interlv/seq 1");
-                        } else {
-                                s -= nswap;
-                                for (sp = &sw[i = nswdev];
-                                     i < swapstats.swap_nswdev; sp++, i++) {
-                                        if (s <= sp->sw_nblks)
-                                                break;
-                                        s -= sp->sw_nblks;
-                                }
-                                if ((sw[i].sw_flags & SW_SEQUENTIAL) == 0)
-                                        err(-1,"panic: swap: interlv/seq 2");
-                        }
-                } else
-                        i = 0;
+		/* This code mimics swstrategy(). */
+		if (swapstats.swap_nswdev > 1) {
+			if (s < nswap) {
+				if (nswdev > 1)
+					i = (s / dmmax / 2) % nswdev;
+				else
+					i = 0;
+				if (sw[i].sw_flags & SW_SEQUENTIAL)
+					err(-1,"panic: swap: interlv/seq 1");
+			}
+			else {
+				s -= nswap;
+				for (sp = &sw[i = nswdev]; i < swapstats.swap_nswdev; sp++, i++) {
+					if (s <= sp->sw_nblks)
+						break;
+					s -= sp->sw_nblks;
+				}
+				if ((sw[i].sw_flags & SW_SEQUENTIAL) == 0)
+					err(-1,"panic: swap: interlv/seq 2");
+			}
+		}
+		else
+			i = 0;
 
-                perdev[i] += siz;
+		perdev[i] += siz;
 #else
-                /*
-                 * Swap space is split up among the configured disks.
-                 * The first dmmax blocks of swap space some from the
-                 * first disk, the next dmmax blocks from the next,
-                 * and so on.  The list of free space joins adjacent
-                 * free blocks, ignoring device boundries.  If we want
-                 * to keep track of this information per device, we'll
-                 * just have to extract it ourselves.
-                 */
+		/*
+		 * Swap space is split up among the configured disks.
+		 * The first dmmax blocks of swap space some from the
+		 * first disk, the next dmmax blocks from the next,
+		 * and so on.  The list of free space joins adjacent
+		 * free blocks, ignoring device boundries.  If we want
+		 * to keep track of this information per device, we'll
+		 * just have to extract it ourselves.
+		 */
 
-                /* calculate first device on which this falls */
-                i = (s / dmmax) % nswdev;
-                while (s < e) {         /* XXX this is inefficient */
-                        int bound = roundup(s + 1, dmmax);
-
-                        if (bound > e)
-                                bound = e;
-                        perdev[i] += bound - s;
-                        if (++i >= nswdev)
-                                i = 0;
-                        s = bound;
-                }
+		/* calculate first device on which this falls */
+		i = (s / dmmax) % nswdev;
+		while (s < e) {         /* XXX this is inefficient */
+			int bound = roundup(s + 1, dmmax);
+			if (bound > e)
+				bound = e;
+			perdev[i] += bound - s;
+			if (++i >= nswdev)
+				i = 0;
+			s = bound;
+		}
 #endif
-        }
+	}
 #endif
-}
 #endif /* XOSVIEW_FREEBSD */
+}
 
 void
 BSDGetSwapInfo(int64_t* total, int64_t* free)
 {
-	int npfree, xsize, xfree;
 	int64_t avail, used=0;
 
 	fetchswap();
@@ -473,52 +454,51 @@ BSDGetSwapInfo(int64_t* total, int64_t* free)
 	*total = avail;
 	*free = avail - used;
 #else /* USE_KVM_GETSWAPINFO */
-        avail = npfree = 0;
+	int npfree, xsize, xfree;
+	avail = npfree = 0;
 #ifdef XOSVIEW_BSDI
-        for (int i = 0; i < swapstats.swap_nswdev; i++) {
+	for (int i = 0; i < swapstats.swap_nswdev; i++) {
 #else
-        for (int i = 0; i < nswdev; i++) {
+	for (int i = 0; i < nswdev; i++) {
 #endif
-                /*
-                 * Don't report statistics for partitions which have not
-                 * yet been activated via swapon(8).
-                 */
-                if (!sw[i].sw_freed) {
+		/*
+		 * Don't report statistics for partitions which have not
+		 * yet been activated via swapon(8).
+		 */
+		if (!sw[i].sw_freed)
 			/* -----  Originally, this printed a
 			 * warning.  However, for xosview, we
 			 * don't want the warning printed.
 			 * bgrayson  */
-                        continue;
-                }
+			continue;
 #ifdef XOSVIEW_FREEBSD
-                /*
-                 * The first dmmax is never allocated to avoid trashing of
-                 * disklabels
-                 */
-                /*xsize = sw[i].sw_nblks - dmmax;*/
+		/*
+		 * The first dmmax is never allocated to avoid trashing of
+		 * disklabels
+		 */
+		/*xsize = sw[i].sw_nblks - dmmax;*/
 		/*  Actually, count those dmmax blocks -- pstat,
 		 *  top, etc. do.  It is swap space that is not
 		 *  free for use.  bgrayson, on suggestion from
 		 *  Andrew Sharp.  */
-                xsize = sw[i].sw_nblks;
+		xsize = sw[i].sw_nblks;
 #else
-                xsize = sw[i].sw_nblks;
+		xsize = sw[i].sw_nblks;
 #endif /* XOSVIEW_FREEBSD */
 		xfree = perdev[i];
-                used = xsize - xfree;
-                npfree++;
-                avail += xsize;
-        }
-        /*
-         * If only one partition has been set up via swapon(8), we don't
-         * need to bother with totals.
-         */
-        if (npfree > 1) {
-                used = avail - nfree;
-        }
-	  /*  Convert from 512-byte blocks to bytes.  */
-        *total = 512*avail;
-        *free = 512*(avail-used);
+		used = xsize - xfree;
+		npfree++;
+		avail += xsize;
+	}
+	/*
+	 * If only one partition has been set up via swapon(8), we don't
+	 * need to bother with totals.
+	 */
+	if (npfree > 1)
+		used = avail - nfree;
+	/*  Convert from 512-byte blocks to bytes.  */
+	*total = 512*avail;
+	*free = 512*(avail-used);
 #endif /* USE_KVM_GETSWAPINFO */
 }
 

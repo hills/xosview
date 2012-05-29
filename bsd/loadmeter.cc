@@ -78,7 +78,7 @@ void LoadMeter::checkevent( void ){
     old_cpu_speed_ = cur_cpu_speed_;
     cur_cpu_speed_ = 0;
     size_t size = sizeof(speed);
-    for (uint i=0; i<cpus; i++) {
+    for (int i=0; i<cpus; i++) {
       snprintf(name, 25, "dev.cpu.%d.freq", i);
       sysctlbyname(name, &speed, &size, NULL, 0);
       cur_cpu_speed_ += speed;

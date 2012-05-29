@@ -627,13 +627,13 @@ BSDGetSwapCtlInfo(int64_t *totalp, int64_t *freep) {
   long generation;
   devstat_select_mode select_mode;
   struct devstat_match *matches;
-  int num_matches;
+  int num_matches = 0;
   int num_selected, num_selections;
   long select_generation;
   static struct statinfo cur, last;
   int num_devices;
   struct device_selection *dev_select;
-  char nodisk;
+  int nodisk = 0;
 
 void
 DevStat_Init(void) {
@@ -1073,8 +1073,8 @@ void
 BSDGetIntrStats (unsigned long *intrCount, unsigned int *intrNbrs) {
 #if defined(XOSVIEW_FREEBSD) && ( defined(__i386__) || defined(__x86_64__) )
 # if __FreeBSD_version < 500000
-    /* FreeBSD has an array of interrupt counts, indexed by device number.
-       These are also indirected by IRQ num with intr_countp: */
+  /* FreeBSD has an array of interrupt counts, indexed by device number.
+     These are also indirected by IRQ num with intr_countp: */
   unsigned long *intrcnt, *intrcnt2;
   char *intrnames, *intrnames2;
   int nintr = nlst[EINTRCNT_SYM_INDEX].n_value - nlst[INTRCNT_SYM_INDEX].n_value;
@@ -1094,7 +1094,7 @@ BSDGetIntrStats (unsigned long *intrCount, unsigned int *intrNbrs) {
       if (sscanf(intrnames, "irq%d", &i) == 1) {
         intrCount[i] = *intrcnt;
         if (intrNbrs)
-            intrNbrs[i] = i;
+          intrNbrs[i] = i;
       }
     }
     intrcnt++;
@@ -1103,84 +1103,78 @@ BSDGetIntrStats (unsigned long *intrCount, unsigned int *intrNbrs) {
   free(intrcnt2);
   free(intrnames2);
 # else /* FreeBSD >= 5.x */
-      /* This code is stolen from vmstat */
-    unsigned long *kvm_intrcnt, *base_intrcnt;
-    char *kvm_intrname, *base_intrname;
-    size_t inamlen, intrcntlen;
-    unsigned int i, nintr;
-    int d;
+       /* This code is stolen from vmstat */
+  unsigned long *kvm_intrcnt, *base_intrcnt;
+  char *kvm_intrname, *base_intrname;
+  size_t inamlen, intrcntlen;
+  unsigned int i, nintr;
+  int d;
 
 #  if __FreeBSD_version > 900039
-    safe_kvm_read (nlst[EINTRCNT_SYM_INDEX].n_value, &intrcntlen, sizeof(intrcntlen));
-    safe_kvm_read (nlst[EINTRNAMES_SYM_INDEX].n_value, &inamlen, sizeof(inamlen));
+  safe_kvm_read (nlst[EINTRCNT_SYM_INDEX].n_value, &intrcntlen, sizeof(intrcntlen));
+  safe_kvm_read (nlst[EINTRNAMES_SYM_INDEX].n_value, &inamlen, sizeof(inamlen));
 #  else
-    intrcntlen = nlst[EINTRCNT_SYM_INDEX].n_value - nlst[INTRCNT_SYM_INDEX].n_value;
-    inamlen = nlst[EINTRNAMES_SYM_INDEX].n_value - nlst[INTRNAMES_SYM_INDEX].n_value;
+  intrcntlen = nlst[EINTRCNT_SYM_INDEX].n_value - nlst[INTRCNT_SYM_INDEX].n_value;
+  inamlen = nlst[EINTRNAMES_SYM_INDEX].n_value - nlst[INTRNAMES_SYM_INDEX].n_value;
 #  endif
-    nintr = intrcntlen / sizeof(unsigned long);
+  nintr = intrcntlen / sizeof(unsigned long);
 
-    if (((kvm_intrcnt = (unsigned long *)malloc(intrcntlen)) == NULL) ||
-	((kvm_intrname = (char *)malloc(inamlen)) == NULL))
-      err(1, "malloc()");
+  if (((kvm_intrcnt = (unsigned long *)malloc(intrcntlen)) == NULL) ||
+      ((kvm_intrname = (char *)malloc(inamlen)) == NULL))
+    err(1, "malloc()");
 
-    // keep track of the mem we're given:
-    base_intrcnt = kvm_intrcnt;
-    base_intrname = kvm_intrname;
+  // keep track of the mem we're given:
+  base_intrcnt = kvm_intrcnt;
+  base_intrname = kvm_intrname;
 
-    safe_kvm_read (nlst[INTRCNT_SYM_INDEX].n_value, kvm_intrcnt, intrcntlen);
-    safe_kvm_read (nlst[INTRNAMES_SYM_INDEX].n_value, kvm_intrname, inamlen);
+  safe_kvm_read (nlst[INTRCNT_SYM_INDEX].n_value, kvm_intrcnt, intrcntlen);
+  safe_kvm_read (nlst[INTRNAMES_SYM_INDEX].n_value, kvm_intrname, inamlen);
 
-    /* kvm_intrname has the ASCII names of the IRQs, every null-terminated
-     * string corresponds to a value in the kvm_intrcnt array
-     * e.g. irq1: atkbd0   */
-    for (i=0; i < nintr; i++) {
-	  if (kvm_intrname[0] != '\0') {
-	  /* Figure out which irq we have here */
-		if (sscanf(kvm_intrname, "irq%d", &d) == 1) {
-		  intrCount[d] = *kvm_intrcnt;
-          if (intrNbrs)
-            intrNbrs[d] = d;
-        }
-	  }
-	  kvm_intrcnt++;
-	  kvm_intrname += strlen(kvm_intrname) + 1;
+  /* kvm_intrname has the ASCII names of the IRQs, every null-terminated
+   * string corresponds to a value in the kvm_intrcnt array
+   * e.g. irq1: atkbd0   */
+  for (i=0; i < nintr; i++) {
+    if (kvm_intrname[0] != '\0') {
+      /* Figure out which irq we have here */
+      if (sscanf(kvm_intrname, "irq%d", &d) == 1) {
+        intrCount[d] = *kvm_intrcnt;
+        if (intrNbrs)
+          intrNbrs[d] = d;
+      }
     }
+    kvm_intrcnt++;
+    kvm_intrname += strlen(kvm_intrname) + 1;
+  }
 
-    // Doh! somebody needs to free this stuff too... (pavel 20-Jan-2006)
-    free(base_intrcnt);
-    free(base_intrname);
+  // Doh! somebody needs to free this stuff too... (pavel 20-Jan-2006)
+  free(base_intrcnt);
+  free(base_intrname);
 #endif
 #elif defined (XOSVIEW_BSDI)
-    int nintr = 16;
+  int nintr = 16;
 #if _BSDI_VERSION >= 199802 /* BSD/OS 4.x */
-    safe_kvm_read(nlst[ININ_SYM_INDEX].n_value,intrs,
-                  NISRC*sizeof(intr_info_t));
-    for (int i=0;i<NISRC;i++)
-            if ((intrs[i].ii_irq >= 0) && (intrs[i].ii_irq < nintr))
-                    intrCount[intrs[i].ii_irq] = intrs[i].ii_cnt;
+  safe_kvm_read(nlst[ININ_SYM_INDEX].n_value,intrs, NISRC*sizeof(intr_info_t));
+  for (int i=0;i<NISRC;i++)
+    if ((intrs[i].ii_irq >= 0) && (intrs[i].ii_irq < nintr))
+      intrCount[intrs[i].ii_irq] = intrs[i].ii_cnt;
 #else /* BSD/OS 3.x */
-    safe_kvm_read(nlst[ISAINTR_SYM_INDEX].n_value,kvm_intrptrs ,
-                  sizeof(long)*nintr);
-    for (int i=0;i<nintr;i++)
-      intrCount[i] = kvm_intrptrs[i];
+  safe_kvm_read(nlst[ISAINTR_SYM_INDEX].n_value,kvm_intrptrs, sizeof(long)*nintr);
+  for (int i=0;i<nintr;i++)
+    intrCount[i] = kvm_intrptrs[i];
 #endif /* _BSDI_VERSION */
-
 #else /* XOSVIEW_FREEBSD */
   //  NetBSD/OpenBSD version, based on vmstat.c.  Note that the pc532
   //  platform does support intrcnt and eintrcnt, but vmstat uses
   //  the more advanced event counters to provide software
   //  counts.  We'll just use the intrcnt array here.  If anyone
   //  has problems, please mail me.  bgrayson
-  {
 #if defined(XOSVIEW_OPENBSD) && (defined(__pc532__) || defined(__i386__))
 # ifdef __i386__
   struct intrhand *intrhand[16], *ihp, ih;
   int intrstray[16];
 
-  safe_kvm_read(nlst[INTRHAND_SYM_INDEX].n_value, intrhand,
-    sizeof(intrhand));
-  safe_kvm_read(nlst[INTRSTRAY_SYM_INDEX].n_value, intrstray,
-    sizeof(intrstray));
+  safe_kvm_read(nlst[INTRHAND_SYM_INDEX].n_value, intrhand, sizeof(intrhand));
+  safe_kvm_read(nlst[INTRSTRAY_SYM_INDEX].n_value, intrstray, sizeof(intrstray));
 
   for (int i=0;i<16;i++) {
     ihp = intrhand[i];
@@ -1207,59 +1201,55 @@ BSDGetIntrStats (unsigned long *intrCount, unsigned int *intrNbrs) {
   }
 # endif /* pc532 */
 #else /* XOSVIEW_OPENBSD && (__pc532__ || __i386__) */
-// Now let's do the modern NetBSD way...
+  // Now let's do the modern NetBSD way...
 #if defined(NETBSD_1_6A)
-    // Shamelessly lifted from vmstat.c v1.119, with additional error
-    // checking and ignoring of soft interrupts, etc.
+  // Shamelessly lifted from vmstat.c v1.119, with additional error
+  // checking and ignoring of soft interrupts, etc.
 
-    struct evcntlist allevents;
-    struct evcnt evcnt, *evptr;
-    char evname[EVCNT_STRING_MAX];
+  struct evcntlist allevents;
+  struct evcnt evcnt, *evptr;
+  char evname[EVCNT_STRING_MAX];
 
-    safe_kvm_read(nlst[ALLEVENTS_SYM_INDEX].n_value, &allevents, sizeof(allevents));
-    evptr = allevents.tqh_first;
-    int i = 0;
+  safe_kvm_read(nlst[ALLEVENTS_SYM_INDEX].n_value, &allevents, sizeof(allevents));
+  evptr = allevents.tqh_first;
+  int i = 0;
 
-    while (evptr && i < NUM_INTR) {
+  while (evptr && i < NUM_INTR) {
+    safe_kvm_read((unsigned int)evptr, &evcnt, sizeof(evcnt));
+    evptr = evcnt.ev_list.tqe_next;
 
-      safe_kvm_read((unsigned int)evptr, &evcnt, sizeof(evcnt));
+    // Skip non-interrupt event counts.
+    if (evcnt.ev_type != EVCNT_TYPE_INTR)
+      continue;
 
-      evptr = evcnt.ev_list.tqe_next;
+    safe_kvm_read((unsigned int)evcnt.ev_name, evname, evcnt.ev_namelen);
+    // If it's a soft interrupt (has a name that starts with "soft"), skip it.
+    if (!strncmp(evname, "soft", 4))
+      continue;
 
-      // Skip non-interrupt event counts.
-      if (evcnt.ev_type != EVCNT_TYPE_INTR)
-	continue;
-
-      safe_kvm_read((unsigned int)evcnt.ev_name, evname, evcnt.ev_namelen);
-      // If it's a soft interrupt (has a name that starts with "soft"), skip it.
-      if (!strncmp(evname, "soft", 4))
-	continue;
-
-      // If we see counts that we can hold, record them...
-      if (i < NUM_INTR) {
-	intrCount[i] = evcnt.ev_count;
-      } else {
-	// ... otherwise accumulate them all into last bucket.
-	static bool firstTime = true;
-	intrCount[NUM_INTR-1] += evcnt.ev_count;
-	if (firstTime) {
-	  warnx("!!! Saw more than %d interrupts on event chain.", NUM_INTR);
-	  warnx("!!! Lumping remainder into last bucket.");
-	  firstTime = false;
-	}
+    // If we see counts that we can hold, record them...
+    if (i < NUM_INTR) {
+      intrCount[i] = evcnt.ev_count;
+    }
+    else {
+      // ... otherwise accumulate them all into last bucket.
+      static bool firstTime = true;
+      intrCount[NUM_INTR-1] += evcnt.ev_count;
+      if (firstTime) {
+        warnx("!!! Saw more than %d interrupts on event chain.", NUM_INTR);
+        warnx("!!! Lumping remainder into last bucket.");
+        firstTime = false;
       }
-      i++;
     }
+    i++;
+  }
 #else
-    int nintr = BSDNumInts();
-    safe_kvm_read(nlst[INTRCNT_SYM_INDEX].n_value, kvm_intrcnt,
-      sizeof(long)*nintr);
-    for (int i=0;i<nintr;i++) {
-      intrCount[i] = kvm_intrcnt[i];
-    }
+  int nintr = BSDNumInts();
+  safe_kvm_read(nlst[INTRCNT_SYM_INDEX].n_value, kvm_intrcnt, sizeof(long)*nintr);
+  for (int i = 0; i < nintr; i++)
+    intrCount[i] = kvm_intrcnt[i];
 #endif
 #endif /* XOSVIEW_OPENBSD && (pc532 || i386) */
-  }
   return;
 #endif
 }
