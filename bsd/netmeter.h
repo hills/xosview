@@ -1,7 +1,7 @@
-//  
+//
 //  Copyright (c) 1994, 1995 by Mike Romberg ( romberg@fsl.noaa.gov )
 //
-//  NetBSD port:  
+//  NetBSD port:
 //  Copyright (c) 1995, 1996, 1997-2002 by Brian Grayson (bgrayson@netbsd.org)
 //
 //  This file was written by Brian Grayson for the NetBSD and xosview
@@ -26,25 +26,26 @@ public:
   NetMeter(XOSView *parent, float max);
   ~NetMeter( void );
 
-  const char *name( void ) const { return "NetMeter"; }  
+  const char *name( void ) const { return "NetMeter"; }
   void checkevent( void );
 
   void checkResources( void );
 
-  void BSDGetNetInOut (long long * inbytes, long long * outbytes);
+  void BSDGetNetInOut (unsigned long long *inbytes, unsigned long long *outbytes);
 protected:
   float netBandwidth_;
   std::string netIface_;
+  bool ignored_;
 
+  void getstats(void);
 private:
   //  NetBSD:  Use long long, so we won't run into problems after 4 GB
   //  has been transferred over the net!
-  long long _lastBytesIn, _lastBytesOut;
+  unsigned long long _lastBytesIn, _lastBytesOut;
 
   //  Did the meter initialize properly?
   bool kernelHasStats_;
 
-  void adjust(void);
 };
 
 #endif

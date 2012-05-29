@@ -1,7 +1,7 @@
-//  
+//
 //  Copyright (c) 1994, 1995 by Mike Romberg ( romberg@fsl.noaa.gov )
 //
-//  NetBSD port:  
+//  NetBSD port:
 //  Copyright (c) 1995, 1996, 1997-2002 by Brian Grayson (bgrayson@netbsd.org)
 //
 //  This file was written by Brian Grayson for the NetBSD and xosview
@@ -22,17 +22,18 @@ NetMeter::NetMeter( XOSView *parent, float max )
   : FieldMeterGraph( parent, 3, "NET", "IN/OUT/IDLE" ){
   kernelHasStats_ = BSDNetInit();
   if (!kernelHasStats_) {
-    warnx(
-  "!!! The kernel does not seem to have the symbols needed for the NetMeter.");
-  warnx( "!!! The NetMeter has been disabled.");
+    warnx("!!! The kernel does not seem to have the symbols needed for the NetMeter.");
+    warnx( "!!! The NetMeter has been disabled.");
     disableMeter ();
-  } else {
-    IntervalTimerStart();
+  }
+  else {
     netBandwidth_ = max;
     total_ = netBandwidth_;
     _lastBytesIn = _lastBytesOut = 0;
     netIface_ = "False";
+    ignored_ = false;
     BSDGetNetInOut (&_lastBytesIn, &_lastBytesOut);
+    IntervalTimerStart();
   }
 }
 
@@ -51,11 +52,21 @@ void NetMeter::checkResources( void ){
     useGraph_ = parent_->isResourceTrue("netGraph");
     SetUsedFormat (parent_->getResource("netUsedFormat"));
     netIface_ = parent_->getResource( "netIface" );
+    if (netIface_[0] == '-') {
+      ignored_ = true;
+      netIface_.erase(0, netIface_.find_first_not_of("- "));
+    }
   }
 }
 
 void NetMeter::checkevent( void ){
   if (kernelHasStats_) {
+    getstats();
+  }
+  drawfields();
+}
+
+void NetMeter::getstats(void) {
     IntervalTimerStop();
 
     //  Reset total_ to expected maximum.  If it is too low, it
@@ -65,19 +76,11 @@ void NetMeter::checkevent( void ){
     fields_[0] = fields_[1] = 0;
 
     //  Begin NetBSD-specific code.  BCG
-    long long nowBytesIn, nowBytesOut;
+    unsigned long long nowBytesIn, nowBytesOut;
 
     //  The BSDGetNetInOut() function is in kernel.cc    BCG
     BSDGetNetInOut (&nowBytesIn, &nowBytesOut);
-    long long correction = 0x10000000;
-    correction *= 0x10;
-    /*  Deal with 32-bit wrap by making last value 2^32 less.  Yes,
-     *  this is a better idea than adding to nowBytesIn -- the
-     *  latter would only work for the first wrap (1+2^32 vs. 1)
-     *  but not for the second (1+2*2^32 vs. 1) -- 1+2^32 -
-     *  (1+2^32) is still too big.  */
-    if (nowBytesIn < _lastBytesIn) _lastBytesIn -= correction;
-    if (nowBytesOut < _lastBytesOut) _lastBytesOut -= correction;
+
     float t = (1.0) / IntervalTimeInSecs();
     fields_[0] = (float)(nowBytesIn - _lastBytesIn) * t;
     _lastBytesIn = nowBytesIn;
@@ -85,17 +88,11 @@ void NetMeter::checkevent( void ){
     _lastBytesOut = nowBytesOut;
     //  End BSD-specific code.  BCG
 
-    adjust();
+    if (total_ < (fields_[0] + fields_[1]))
+      total_ = fields_[0] + fields_[1];
     fields_[2] = total_ - fields_[0] - fields_[1];
     /*  The fields_ values have already been scaled into bytes/sec by
      *  the manipulations (* t) above.  */
     setUsed (fields_[0]+fields_[1], total_);
     IntervalTimerStart();
-  }
-  drawfields();
-}
-
-void NetMeter::adjust(void){
-  if (total_ < (fields_[0] + fields_[1]))
-    total_ = fields_[0] + fields_[1];
 }

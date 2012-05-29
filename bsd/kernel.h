@@ -47,9 +47,6 @@ BSDGetCPUTimes(long* timesArray);
 int
 BSDNetInit();
 
-void
-BSDGetNetInOut (long long * inbytes, long long * outbytes);
-
 int
 BSDSwapInit();
 

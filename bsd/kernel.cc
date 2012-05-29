@@ -485,57 +485,51 @@ BSDNetInit() {
 #endif
 }
 
-void NetMeter::BSDGetNetInOut (long long * inbytes, long long * outbytes) {
-
-
+void NetMeter::BSDGetNetInOut (unsigned long long *inbytes, unsigned long long *outbytes) {
   struct ifnet * ifnetp;
   struct ifnet ifnet;
+  bool skipif = false;
 
 #if (__FreeBSD_version < 300000) //werner May/29/98 quick hack for current
-
   //  The "ifnet" symbol in the kernel points to a 'struct ifnet' pointer.
   safe_kvm_read (nlst[IFNET_SYM_INDEX].n_value, &ifnetp, sizeof(ifnetp));
-
 #else // FreeBSD > 3.0
-
   struct ifnethead ifnethd;
   safe_kvm_read (nlst[IFNET_SYM_INDEX].n_value, &ifnethd, sizeof(ifnethd));
   ifnetp = ifnethd.tqh_first;
-
 #endif
-
   *inbytes = 0;
   *outbytes = 0;
 
   while (ifnetp) {
     //  Now, dereference the pointer to get the ifnet struct.
     safe_kvm_read ((u_long) ifnetp, &ifnet, sizeof(ifnet));
-#ifdef XOSVIEW_NETBSD
+    if (!(ifnet.if_flags & IFF_UP))
+      continue;
+#if defined XOSVIEW_NETBSD || ( defined XOSVIEW_FREEBSD && __FreeBSD_version >= 501113 )
     if (netIface_ != "False" ) {
-    char ifname[256];
+      char ifname[256];
 #ifdef NETBSD_OLD_IFACE
-    //  In pre-1.2A, getting the interface name was more complicated.
-    safe_kvm_read ((u_long) ifnet.if_name, ifname, 256);
-    snprintf (ifname, 256, "%s%d", ifname, ifnet.if_unit);
+      //  In pre-1.2A, getting the interface name was more complicated.
+      safe_kvm_read ((u_long) ifnet.if_name, ifname, 256);
+      snprintf (ifname, 256, "%s%d", ifname, ifnet.if_unit);
 #else
-    safe_kvm_read ((u_long) (((char*)ifnetp) + (&ifnet.if_xname[0] - (char*)&ifnet)), ifname, 256);
-    snprintf (ifname, 256, "%s", ifname);
+      safe_kvm_read ((u_long) (((char*)ifnetp) + (&ifnet.if_xname[0] - (char*)&ifnet)), ifname, 256);
+      snprintf (ifname, 256, "%s", ifname);
 #endif
 #ifdef NET_DEBUG
-    printf ("Interface name is %s\n", ifname);
-    printf ("Ibytes: %8llu Obytes %8llu\n",
-	(unsigned long long) ifnet.if_ibytes,
-	(unsigned long long) ifnet.if_obytes);
-    printf ("Ipackets:  %8llu\n", (unsigned long long) ifnet.if_ipackets);
+      printf ("Interface name is %s\n", ifname);
+      printf ("Ibytes: %8llu Obytes %8llu\n", (unsigned long long) ifnet.if_ibytes, (unsigned long long) ifnet.if_obytes);
+      printf ("Ipackets:  %8llu\n", (unsigned long long) ifnet.if_ipackets);
 #endif /* NET_DEBUG */
-      if (ifname != netIface_)
-	goto skipif;
+      if ( (!ignored_ && ifname != netIface_) || (ignored_ && ifname == netIface_) )
+        skipif = true;
     }
 #endif /* XOSVIEW_NETBSD */
-    *inbytes  += ifnet.if_ibytes;
-    *outbytes += ifnet.if_obytes;
-
-skipif:
+    if (!skipif) {
+      *inbytes  += ifnet.if_ibytes;
+      *outbytes += ifnet.if_obytes;
+    }
     //  Linked-list step taken from if.c in netstat source, line 120.
 #ifdef XOSVIEW_FREEBSD
 #if (__FreeBSD_version >= 300000)
@@ -549,7 +543,6 @@ skipif:
     ifnetp = (struct ifnet*) ifnet.if_list.tqe_next;
 #endif
   }
-
 }
 
 
