@@ -272,12 +272,11 @@ void FieldMeter::drawfields( int manditory ){
       parent_->setStippleN(0);	/*  Restore all-bits stipple.  */
       lastvals_[i] = twidth;
       lastx_[i] = x;
-
-      if ( dousedlegends_ )
-	drawused( manditory );
     }
     x += twidth;
   }
+  if ( dousedlegends_ )
+    drawused( manditory );
 
   //parent_->flush();
 }
