@@ -31,8 +31,8 @@ public:
 protected:
   int dodecay_;
   int firsttime_;  //  Used to set up decaying fields right the first time.
-  float *decay_;
-  float *lastDecayval_;
+  double *decay_;
+  double *lastDecayval_;
 private:
 };
 

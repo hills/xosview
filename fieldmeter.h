@@ -28,7 +28,7 @@ public:
   void used_obsolete( int val ) { print_ = PERCENT; used_ = val; }
   void absolute_obsolete( float val ) { print_ = FLOAT; used_ = val; }
 
-  void setUsed (float val, float total);
+  void setUsed (double val, double total);
   void draw( void );
   void checkevent( void );
   void disableMeter ( void );

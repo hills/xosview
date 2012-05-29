@@ -29,7 +29,7 @@ public:
   void dousedlegends( int val ) { dousedlegends_ = val; }
   void reset( void );
 
-  void setUsed (float val, float total);
+  void setUsed (double val, double total);
   void setBits(int startbit, unsigned char values);
 
   void draw( void );
@@ -42,8 +42,8 @@ protected:
   enum UsedType { INVALID_0, FLOAT, PERCENT, AUTOSCALE, INVALID_TAIL };
 
   int numfields_;
-  float *fields_;
-  float total_, used_, lastused_;
+  double *fields_;
+  double total_, used_, lastused_;
   int *lastvals_, *lastx_;
   unsigned long *colors_;
   unsigned long usedcolor_;

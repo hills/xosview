@@ -36,7 +36,7 @@ protected:
   /*  There's some sort of corruption going on -- we can't have
    *  variables after the heightfield_ below, otherwise they get
    *  corrupted???  */
-  float *heightfield_;
+  double *heightfield_;
 private:
   void drawBar( int i );
 };

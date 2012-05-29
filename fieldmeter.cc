@@ -70,7 +70,7 @@ void FieldMeter::SetUsedFormat ( const char * const fmt ) {
   }
 }
 
-void FieldMeter::setUsed (float val, float total)
+void FieldMeter::setUsed (double val, double total)
 {
   if (print_ == FLOAT)
     used_ = val;
@@ -180,7 +180,7 @@ void FieldMeter::drawused( int manditory ){
   }
   else if (print_ == AUTOSCALE){
     char scale;
-    float scaled_used;
+    double scaled_used;
       /*  Unfortunately, we have to do our comparisons by 1000s (otherwise
        *  a value of 1020, which is smaller than 1K, could end up
        *  being printed as 1020, which is wider than what can fit)  */
@@ -260,7 +260,7 @@ void FieldMeter::drawfields( int manditory ){
 	  "will not be displayed.\n", name());
     }
 
-    twidth = (int) ((width_ * (float) fields_[i]) / total_);
+    twidth = (int) ((width_ * (double) fields_[i]) / total_);
 //    twidth = (int)((fields_[i] * width_) / total_);
     if ( (i == numfields_ - 1) && ((x + twidth) != (x_ + width_)) )
       twidth = width_ + x_ - x;

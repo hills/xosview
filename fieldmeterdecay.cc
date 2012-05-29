@@ -38,8 +38,8 @@ FieldMeterDecay::FieldMeterDecay( XOSView *parent,
 : FieldMeter (parent, numfields, title, legend, docaptions, dolegends,
               dousedlegends)
 {
-  decay_ = new float[numfields];
-  lastDecayval_ = new float[numfields];
+  decay_ = new double[numfields];
+  lastDecayval_ = new double[numfields];
   for (int decayCtr = 0; decayCtr < numfields; decayCtr++) {
     decay_[decayCtr] = 0.0;
     lastDecayval_[decayCtr] = 0.0;
@@ -108,7 +108,7 @@ void FieldMeterDecay::drawfields( int manditory ){
     decay_[i] = ALPHA*decay_[i] + (1-ALPHA)*(fields_[i]*1.0/total_);
 
     //  We want to round the widths, rather than truncate.
-    twidth = (int) (0.5 + (width_ * (float) fields_[i]) / total_);
+    twidth = (int) (0.5 + (width_ * (double) fields_[i]) / total_);
     decaytwidth = (int) (0.5 + width_ * decay_[i]);
     if (decaytwidth < 0.0) {
         std::cerr << "Error:  FieldMeterDecay " << name() << ":  decaytwidth of ";

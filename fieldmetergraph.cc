@@ -73,7 +73,7 @@ void FieldMeterGraph::drawfields( int manditory )
 	{
 		if( numfields_ > 0 && graphNumCols_ > 0 )
 		{
-			heightfield_ = new float [numfields_*graphNumCols_];
+			heightfield_ = new double [numfields_*graphNumCols_];
 
 			for( i = 0; i < graphNumCols_; i++ )
 			{
@@ -104,7 +104,7 @@ void FieldMeterGraph::drawfields( int manditory )
 	// get current values to be plotted
 	for( i = 0; i < numfields_; i++ )
 	{
-		float a = fields_[i] / total_;
+		double a = fields_[i] / total_;
 		if( a <= 0.0 )
 			a = 0.0;
 		if( a >= 1.0 )

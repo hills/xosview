@@ -40,7 +40,7 @@ void RAIDMeter::checkevent( void ){
     bits_[i] = (working_map[i]=='+');
   }
   fields_[0]=100.0;
-  sscanf(resync_state, "resync=%f", &fields_[0] );
+  sscanf(resync_state, "resync=%lf", &fields_[0] );
   fields_[1] = total_ - fields_[1];
   if(fields_[0]<100.0){
     setfieldcolor(0,doneColor_);

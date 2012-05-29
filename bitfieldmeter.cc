@@ -91,7 +91,7 @@ void BitFieldMeter::SetUsedFormat ( const char * const fmt ) {
   }
 }
 
-void BitFieldMeter::setUsed (float val, float total)
+void BitFieldMeter::setUsed (double val, double total)
 {
   if (print_ == FLOAT)
     used_ = val;
@@ -206,7 +206,7 @@ void BitFieldMeter::drawused( int manditory ){
   }
   else if (print_ == AUTOSCALE){
     char scale;
-    float scaled_used;
+    double scaled_used;
       /*  Unfortunately, we have to do our comparisons by 1000s (otherwise
        *  a value of 1020, which is smaller than 1K, could end up
        *  being printed as 1020, which is wider than what can fit)  */
@@ -301,7 +301,7 @@ void BitFieldMeter::drawfields( int manditory ){
 	  "will not be displayed.\n", name());
     }
 
-    twidth = (int) (((width_/2 - 3) * (float) fields_[i]) / total_);
+    twidth = (int) (((width_/2 - 3) * (double) fields_[i]) / total_);
 //    twidth = (int)((fields_[i] * width_) / total_);
     if ( (i == numfields_ - 1) && ((x + twidth) != (x_ + width_)) )
       twidth = width_ + x_ - x;
@@ -342,7 +342,7 @@ void BitFieldMeter::setNumFields(int n){
   delete[] colors_;
   delete[] lastvals_;
   delete[] lastx_;
-  fields_ = new float[numfields_];
+  fields_ = new double[numfields_];
   colors_ = new unsigned long[numfields_];
   lastvals_ = new int[numfields_];
   lastx_ = new int[numfields_];
