@@ -119,6 +119,9 @@ abbreviation for all three of the free BSD operating systems (NetBSD,
 FreeBSD, OpenBSD).
 
 \fBLoad\fP: Kernel reported load average
+   all platforms  :  load
+   Linux          :  load | CPU frequency
+   FreeBSD        :  load | CPU frequency
 
 \fBCPU Usage\fP
    Linux  : user | nice | system | soft-interrupt | interrupt | io-wait | guest | stolen | idle
@@ -446,16 +449,27 @@ graph columns. This is only used by meters which have graph mode enabled.
 .\"  Do the load: True resource.
 .xt load
 
+xosview*loadCritColor: \fIcolor\fP
+.RS
+This is the color that the load meter will use once the load average is
+above critical load threshold.
+.RE
+
 xosview*loadWarnColor: \fIcolor\fP
 .RS
 This is the color that the load meter will use once the load average is
-greater than 1.
+above the warning threshold.
 .RE
 
 xosview*loadProcColor: \fIcolor\fP
 .RS
 This is the color that the load meter will use to display the load average
-when it is less than or equal to 1.
+when it is below the warning threshold.
+.RE
+
+xosview*loadCpuColor: \fIcolor\fP
+.RS
+This is the color that the load meter will use to display the CPU speed.
 .RE
 
 .\"  loadIdleColor
@@ -464,10 +478,17 @@ when it is less than or equal to 1.
 .\"  Do the priority resource
 .pp load
 
+xosview*loadCritThreshold: \fIint\fP
+.RS
+This number (which must be an integer >= 1) sets the value at which
+the loadmeter changes its status and color from "warning" to "critical".
+The default value is 5.
+.RE
+
 xosview*loadWarnThreshold: \fIint\fP
 .RS
 This number (which must be an integer >= 1) sets the value at which
-the loadmeter changes its status and color from "normal" to "alarm".
+the loadmeter changes its status and color from "normal" to "warning".
 The default value is 2.
 .RE
 
