@@ -8,9 +8,7 @@ PLATFORM ?= linux
 PREFIX ?= /usr/local
 
 BINDIR ?= $(PREFIX)/bin
-EXECDIR ?= $(PREFIX)/libexec
 MANDIR ?= $(PREFIX)/share/man
-DOCDIR ?= $(PREFIX)/share/doc
 
 # Optional build arguments; user may wish to override
 
