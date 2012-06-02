@@ -10,16 +10,6 @@
 #include <sstream>
 #include <stdlib.h>
 
-#ifdef USESYSCALLS
-#if defined(GNULIBC) || defined(__GLIBC__)
-#include <sys/sysinfo.h>
-#else
-#include <syscall.h>
-#include <linux/kernel.h>
-#endif
-#endif
-
-
 static const char MEMFILENAME[] = "/proc/meminfo";
 
 
@@ -49,31 +39,6 @@ void SwapMeter::checkevent( void ){
 
 
 void SwapMeter::getswapinfo( void ){
-#ifdef USESYSCALLS
-  struct sysinfo sinfo;
-  unsigned long unit;
-
-#if defined(GNULIBC) || defined(__GLIBC__)
-  sysinfo(&sinfo);
-#else
-  syscall( SYS_sysinfo, &sinfo );
-#endif
-
-  unit = (sinfo.mem_unit ? sinfo.mem_unit : 1);
-
-  total_ = (double)sinfo.totalswap * unit;
-  fields_[0] = (double)(sinfo.totalswap - sinfo.freeswap) * unit;
-  fields_[1] = (double)sinfo.freeswap * unit;
-
-  if ( total_ == 0 ){
-    total_ = 1;
-    fields_[0] = 0;
-    fields_[1] = 1;
-  }
-
-  if (total_)
-    setUsed (fields_[0], total_);
-#else
   std::ifstream meminfo( MEMFILENAME );
   if ( !meminfo ){
     std::cerr <<"Cannot open file : " <<MEMFILENAME << std::endl;
@@ -120,5 +85,4 @@ void SwapMeter::getswapinfo( void ){
 
   if (total_)
     setUsed (fields_[0], total_);
-#endif
 }
