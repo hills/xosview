@@ -1,3 +1,5 @@
+For changes since xosview-1.9.1, see the source code history in Git.
+
 Changes since xosview-1.9.0
 
   - Fix a bug where battery meter was not redrawn
