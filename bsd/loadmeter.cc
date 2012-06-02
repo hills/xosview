@@ -21,7 +21,7 @@
 #include "xosview.h"
 
 LoadMeter::LoadMeter( XOSView *parent )
-  : FieldMeterGraph( parent, 3, "LOAD", "PROCS/IDLE", 1, 1, 0 ){
+  : FieldMeterGraph( parent, 3, "LOAD", "PROCS/MIN", 1, 1, 0 ){
 }
 
 LoadMeter::~LoadMeter( void ){
@@ -43,7 +43,6 @@ void LoadMeter::checkResources( void ){
 
   setfieldcolor( 0, procloadcol_ );
   setfieldcolor( 1, parent_->getResource( "loadIdleColor" ) );
-  setfieldcolor( 2, parent_->getResource( "loadCpuColor" ) );
 
   priority_ = atoi (parent_->getResource("loadPriority"));
   dodecay_ = parent_->isResourceTrue("loadDecay");
@@ -85,7 +84,7 @@ void LoadMeter::checkevent( void ){
     }
     cur_cpu_speed_ /= cpus;
     if ( old_cpu_speed_ != cur_cpu_speed_ ) {
-      snprintf(name, 25, "PROCS/IDLE/%d MHz", cur_cpu_speed_);
+      snprintf(name, 25, "PROCS/MIN %d MHz", cur_cpu_speed_);
       legend(name);
       drawlegend();
     }
