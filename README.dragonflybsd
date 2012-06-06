@@ -1,0 +1,16 @@
+  Support for DragonflyBSD added by Tomi Tapper (tomi.o.tapper@jyu.fi). Tested
+on DragonflyBSD version 3.0, but may work on other versions (earlier or later)
+as well. Please test and report if possible.
+
+For building xosview by hand, add these lines into .config.
+
+CPPFLAGS += -I/usr/pkg/include
+LDLIBS += -lkvm -lkinfo -ldevstat -L/usr/pkg/lib
+
+
+*****************************************************************************
+  Note:  xosview needs to run 'setgid kmem' in order to access some of the
+    kernel information (at least until some more statistics are added to
+    the /kern or /proc file systems).  If you do not have root or kmem
+    permission on the machine, xosview will not run.
+*****************************************************************************
