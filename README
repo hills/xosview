@@ -30,6 +30,9 @@ The Makefile picks up additional variables from a .config file in the
 source code directory.  You may prefer to use this if you are doing
 several builds for testing and debugging.
 
+Some platform variants require specific build flags; see the 'targets'
+directory for preset .config files.
+
 See the man page for information on the xosview display and how to
 customize it.
 

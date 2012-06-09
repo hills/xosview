@@ -2,11 +2,10 @@
 on DragonflyBSD version 3.0, but may work on other versions (earlier or later)
 as well. Please test and report if possible.
 
-For building xosview by hand, add these lines into .config.
+For building xosview by hand, custom build flags should be copied into the
+.config file from:
 
-CPPFLAGS += -I/usr/pkg/include
-LDLIBS += -lkvm -lkinfo -ldevstat -L/usr/pkg/lib
-
+  targets/dragonflybsd-3.0
 
 *****************************************************************************
   Note:  xosview needs to run 'setgid kmem' in order to access some of the
