@@ -1,7 +1,7 @@
-//  
+//
 //  Copyright (c) 1994, 1995 by Mike Romberg ( romberg@fsl.noaa.gov )
 //
-//  NetBSD port:  
+//  NetBSD port:
 //  Copyright (c) 1995, 1996, 1997-2002 by Brian Grayson (bgrayson@netbsd.org)
 //
 //  This file was written by Brian Grayson for the NetBSD and xosview
@@ -18,19 +18,21 @@
 
 #include "fieldmetergraph.h"
 
+
 class MemMeter : public FieldMeterGraph {
 public:
-  MemMeter( XOSView *parent );
-  ~MemMeter( void );
+	MemMeter( XOSView *parent );
+	~MemMeter( void );
 
-  const char *name( void ) const { return "MemMeter"; }  
-  void checkevent( void );
+	const char *name( void ) const { return "MemMeter"; }
+	void checkevent( void );
+	void checkResources( void );
 
-  void checkResources( void );
 protected:
+	void getmeminfo( void );
 
-  void getmeminfo( void );
 private:
+	unsigned long meminfo_[5];
 };
 
 

@@ -1,7 +1,7 @@
-//  
+//
 //  Copyright (c) 1994, 1995 by Mike Romberg ( romberg@fsl.noaa.gov )
 //
-//  NetBSD port:  
+//  NetBSD port:
 //  Copyright (c) 1995, 1996, 1997-2002 by Brian Grayson (bgrayson@netbsd.org)
 //
 //  This file was written by Brian Grayson for the NetBSD and xosview
@@ -18,21 +18,29 @@
 
 #include "fieldmetergraph.h"
 
+#if defined(XOSVIEW_DFBSD)
+#define CPUSTATES 5
+#else
+#include <sys/dkstat.h>
+#endif
+
+
 class CPUMeter : public FieldMeterGraph {
 public:
-  CPUMeter( XOSView *parent );
-  ~CPUMeter( void );
+	CPUMeter( XOSView *parent );
+	~CPUMeter( void );
 
-  const char *name( void ) const { return "CPUMeter"; }
-  void checkevent( void );
+	const char *name( void ) const { return "CPUMeter"; }
+	void checkevent( void );
+	void checkResources( void );
 
-  void checkResources( void );
 protected:
-  long cputime_[2][5];
-  int cpuindex_;
+	void getcputime( void );
 
-  void getcputime( void );
 private:
+	long cputime_[2][CPUSTATES];
+	int cpuindex_;
 };
+
 
 #endif

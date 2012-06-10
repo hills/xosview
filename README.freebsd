@@ -2,10 +2,18 @@
 Pavel.  From within the ports system, xosview ought to build out
 of the box --- if not, it's a bug.
 
-  For building xosview by hand, see README.netbsd, as there are
-no FreeBSD-specific things at this time.
+  This version of xosview no longer supports FreeBSD versions below 7.0. Users
+of older versions need xosview version below 1.9.
 
-  Feel free to contact me with any *BSD concerns, or Mike and/or me
-for any general xosview problems or suggestions.
+For building xosview by hand, add these lines into .config.
 
-  Brian Grayson, Feb 98	bgrayson@netbsd.org
+CPPFLAGS += -I/usr/local/include
+LDLIBS += -lkvm -ldevstat -L/usr/local/lib
+
+
+*****************************************************************************
+  Note:  xosview needs to run 'setgid kmem' in order to access some of the
+    kernel information (at least until some more statistics are added to
+    the /kern or /proc file systems).  If you do not have root or kmem
+    permission on the machine, xosview will not run.
+*****************************************************************************

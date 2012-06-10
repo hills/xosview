@@ -13,91 +13,46 @@
 //    authors for a copy.
 //
 
-#include "kernel.h"		/*  For BSDSwapInit().  */
-#include <stdlib.h>		//  For atoi().  BCG
-#ifndef HAVE_SWAPCTL
-# include <err.h>		//  For warnx().
-#endif
+#include <stdlib.h>
+#include <sys/types.h>
+#include "kernel.h"
 #include "swapmeter.h"
-#include "swapinternal.h"	/*  For *SwapInfo() functions.  */
 
-static int doSwap = 1;
 
 SwapMeter::SwapMeter( XOSView *parent )
-: FieldMeterGraph( parent, 2, "SWAP", "USED/FREE" ){
-#ifdef HAVE_SWAPCTL
-  useSwapCtl = 0;
-#endif
-  BSDSwapInit();	//  In kernel.cc
-#if !(defined(XOSVIEW_OPENBSD) || defined(HAVE_SWAPCTL))
-  if (!BSDInitSwapInfo())
-#endif
-  {
-#ifdef HAVE_SWAPCTL
-    //  Set up to use new swap code instead.
-    useSwapCtl = 1;
-#else
-  warnx("The kernel does not seem to have the symbols needed for the\n"
-  "SwapMeter.  If your kernel is newer than 1.2F, but xosview was\n"
-  "compiled on an older system, then recompile xosview on a 1.2G or later\n"
-  "system and it will automatically adjust to using swapctl() when needed.\n"
-  "\nIf this is not the case (kernel before version 1.2G), make sure the\n"
-  "running kernel is /netbsd, or use the -N flag for xosview to specify\n"
-  "an alternate kernel file.\n"
-  "\nThe SwapMeter has been disabled.\n");
-  doSwap = 0;
-  disableMeter();
-#endif
-  }
+	: FieldMeterGraph( parent, 2, "SWAP", "USED/FREE" ) {
+	BSDSwapInit();
 }
 
-SwapMeter::~SwapMeter( void ){
+SwapMeter::~SwapMeter( void ) {
 }
 
-void SwapMeter::checkResources( void ){
-  FieldMeterGraph::checkResources();
+void SwapMeter::checkResources( void ) {
+	FieldMeterGraph::checkResources();
 
-  setfieldcolor( 0, parent_->getResource("swapUsedColor") );
-  setfieldcolor( 1, parent_->getResource("swapFreeColor") );
-  priority_ = atoi (parent_->getResource("swapPriority"));
-  dodecay_ = parent_->isResourceTrue("swapDecay");
-  useGraph_ = parent_->isResourceTrue("swapGraph");
-  SetUsedFormat (parent_->getResource("swapUsedFormat"));
+	setfieldcolor( 0, parent_->getResource("swapUsedColor") );
+	setfieldcolor( 1, parent_->getResource("swapFreeColor") );
+	priority_ = atoi( parent_->getResource("swapPriority") );
+	dodecay_ = parent_->isResourceTrue("swapDecay");
+	useGraph_ = parent_->isResourceTrue("swapGraph");
+	SetUsedFormat( parent_->getResource("swapUsedFormat") );
 }
 
-void SwapMeter::checkevent( void ){
-  getswapinfo();
-  drawfields();
+void SwapMeter::checkevent( void ) {
+	getswapinfo();
+	drawfields();
 }
 
-void SwapMeter::getswapinfo( void ){
-  int64_t total_int, free_int;
+void SwapMeter::getswapinfo( void ) {
+	u_int64_t total = 0, used = 0;
 
-  if (doSwap) {
-#ifdef HAVE_SWAPCTL
-    // Allow the option to use either swapctl() or other method.
-    if (useSwapCtl)
-      BSDGetSwapCtlInfo(&total_int, &free_int);
-    else
-#endif
-#if defined(XOSVIEW_OPENBSD) || defined(HAVE_SWAPCTL)
-      // For OpenBSD or HAVE_SWAPCTL systems, _never_ use the older
-      // method if HAVE_SWAPCTL is set.
-      ;
-#else
-      BSDGetSwapInfo (&total_int, &free_int);
-#endif
-  }
-  else {
-    total_int = 1;	/*  So the meter looks blank.  */
-    free_int = 1;
-  }
+	BSDGetSwapInfo(&total, &used);
 
-  total_ = total_int;
-  if ( total_ == 0 )
-    total_ = 1;	/*  We don't want any division by zero, now, do we?  :)  */
-  fields_[1] = free_int;
-  fields_[0] = total_ - fields_[1];
+	total_ = (double)total;
+	if ( total_ == 0.0 )
+		total_ = 1.0;  /* We don't want any division by zero, now, do we?  :) */
+	fields_[0] = (double)used;
+	fields_[1] = total_;
 
-  setUsed (fields_[0], total_);
+	setUsed(fields_[0], total_);
 }

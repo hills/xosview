@@ -15,26 +15,27 @@
 #define _DISKMETER_H_
 
 #include "fieldmetergraph.h"
-#include <sys/types.h>		//  For u_int64_t
-#include <sys/param.h>
+#include "defines.h"
+
 
 class DiskMeter : public FieldMeterGraph {
 public:
-  DiskMeter( XOSView *parent, float max );
-  ~DiskMeter( void );
+	DiskMeter( XOSView *parent, double max );
+	~DiskMeter( void );
 
-  const char *name( void ) const { return "DiskMeter"; }
-  void checkevent( void );
+	const char *name( void ) const { return "DiskMeter"; }
+	void checkevent( void );
+	void checkResources( void );
 
-  void checkResources( void );
 protected:
-  void getstats( void );
+	void getstats( void );
+
 private:
-#if __FreeBSD_version < 500000
-  u_int64_t prevBytes;
+#ifndef HAVE_DEVSTAT
+	u_int64_t prevreads_, prevwrites_;
 #endif
-  int kernelHasStats_;
-  float	maxBandwidth_;
+	double maxBandwidth_;
 };
+
 
 #endif

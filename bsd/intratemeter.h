@@ -12,23 +12,24 @@
 #define _IRQRATEMETER_H_
 
 #include "fieldmetergraph.h"
-#include "kernel.h"
+
 
 class IrqRateMeter : public FieldMeterGraph {
 public:
-  IrqRateMeter( XOSView *parent );
-  ~IrqRateMeter( void );
+	IrqRateMeter( XOSView *parent );
+	~IrqRateMeter( void );
 
-  const char *name( void ) const { return "IrqRateMeter"; }
-  void checkevent( void );
+	const char *name( void ) const { return "IrqRateMeter"; }
+	void checkevent( void );
+	void checkResources( void );
 
-  void checkResources( void );
+private:
+	unsigned long *irqs_, *lastirqs_;
+	unsigned int irqcount_;
+
 protected:
-  unsigned long *irqs_, *lastirqs_;
-  unsigned int irqcount_;
-
-  void getinfo( void );
-  unsigned long oncol_, idlecol_;
-  bool kernelHasStats_;
+	void getinfo( void );
 };
+
+
 #endif

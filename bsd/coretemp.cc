@@ -11,131 +11,94 @@
 //
 //
 //
-#include "coretemp.h"
-#include "xosview.h"
-#include <sys/types.h>
-#include <sys/sysctl.h>
-#include <sys/param.h>
+
 #include <stdlib.h>
+#include <stdio.h>
+#include "kernel.h"
+#include "coretemp.h"
+
 
 CoreTemp::CoreTemp( XOSView *parent, const char *label, const char *caption, int cpu)
-  : FieldMeter( parent, 2, label, caption, 1, 1, 1 ) {
-  _cpu = cpu;
-  checkResources();
+	: FieldMeter( parent, 2, label, caption, 1, 1, 1 ) {
+	cpu_ = cpu;
+	checkResources();
 }
 
 CoreTemp::~CoreTemp( void ) {
-
 }
 
 void CoreTemp::checkResources( void ) {
-  FieldMeter::checkResources();
+	FieldMeter::checkResources();
 
-  setfieldcolor( 0, parent_->getResource( "coretempActColor" ) );
-  setfieldcolor( 1, parent_->getResource( "coretempIdleColor") );
+	setfieldcolor( 0, parent_->getResource( "coretempActColor" ) );
+	setfieldcolor( 1, parent_->getResource( "coretempIdleColor") );
 
-  priority_ = atoi( parent_->getResource( "coretempPriority" ) );
-  _oldtotal = total_ = atoi( parent_->getResourceOrUseDefault( "coretempHighest", "100" ) );
-  SetUsedFormat( parent_->getResource( "coretempUsedFormat" ) );
+	priority_ = atoi( parent_->getResource( "coretempPriority" ) );
+	oldtotal_ = total_ = atoi( parent_->getResourceOrUseDefault( "coretempHighest", "100" ) );
+	SetUsedFormat( parent_->getResource( "coretempUsedFormat" ) );
 }
 
 void CoreTemp::checkevent( void ) {
-  getcoretemp();
-  drawfields();
+	getcoretemp();
+	drawfields();
 }
 
-// Temperatures can be read with sysctl dev.cpu.%d.temperature.
-// Values are in degrees Celsius (FreeBSD < 7.2) or in
-// 10*degrees Kelvin (FreeBSD >= 7.3).
 void CoreTemp::getcoretemp( void ) {
-  int val = 0, high = 0;
-  size_t size = sizeof(val);
-  char name[25];
+	int cpus = BSDCountCpus();
+	float *temps = (float *)calloc(cpus, sizeof(float));
+	float *tjmax = (float *)calloc(cpus, sizeof(float));
 
-  fields_[0] = 0.0;
-  if ( _cpu >= 0 ) {    // one core
-    snprintf(name, 25, "dev.cpu.%d.temperature", _cpu);
-    sysctlbyname(name, &val, &size, NULL, 0);
-    snprintf(name, 25, "dev.cpu.%d.coretemp.tjmax", _cpu);
-    sysctlbyname(name, &high, &size, NULL, 0);
-#if __FreeBSD_version < 702106
-    fields_[0] = (float)val;
-    total_ = (float)high;
-#else
-    fields_[0] = ((float)val - 2732.0) / 10.0;
-    total_ = ((float)high - 2732.0) / 10.0;
-#endif
-  }
-  else if ( _cpu == -1 ) {  // average
-    int cpus = countCpus();
-    float tempval = 0.0, temphigh = 0.0;
-    for (int i=0; i<cpus; i++) {
-      snprintf(name, 25, "dev.cpu.%d.temperature", i);
-      sysctlbyname(name, &val, &size, NULL, 0);
-      snprintf(name, 25, "dev.cpu.%d.coretemp.tjmax", i);
-      sysctlbyname(name, &high, &size, NULL, 0);
-      tempval += (float)val;
-      temphigh += (float)val;
-    }
-#if __FreeBSD_version < 702106
-    fields_[0] = tempval;
-    total_ = temphigh;
-#else
-    fields_[0] = ((float)val - 2732.0) / 10.0;
-    total_ = ((float)high - 2732.0) / 10.0;
-#endif
-    fields_[0] /= (float)cpus;
-    total_ /= (float)cpus;
-  }
-  else if ( _cpu == -2 ) {  // maximum
-    int cpus = countCpus();
-    float tempval = -2732.0, temphigh = -2732.0;
-    for (int i=0; i<cpus; i++) {
-      snprintf(name, 25, "dev.cpu.%d.temperature", i);
-      sysctlbyname(name, &val, &size, NULL, 0);
-      snprintf(name, 25, "dev.cpu.%d.coretemp.tjmax", i);
-      sysctlbyname(name, &high, &size, NULL, 0);
-      if (val > tempval)
-        tempval = (float)val;
-      if (high > temphigh)
-        temphigh = (float)high;
-    }
-#if __FreeBSD_version < 702106
-    fields_[0] = tempval;
-    total_ = highval;
-#else
-    fields_[0] = ((float)tempval - 2732.0) / 10.0;
-    total_ = ((float)high - 2732.0) / 10.0;
-#endif
-  }
-  else {    // should not happen
-    std::cerr << "Unknown CPU core number in coretemp." << std::endl;
-    parent_->done(1);
-    return;
-  }
+	BSDGetCPUTemperature(temps, tjmax);
 
-  fields_[1] = total_ - fields_[0];
-  if (fields_[1] <= 0) {   // alarm
-    fields_[1] = 0;
-    setfieldcolor( 0, parent_->getResource( "coretempHighColor" ) );
-  }
-  else
-    setfieldcolor( 0, parent_->getResource( "coretempActColor" ) );
+	fields_[0] = 0.0;
+	if ( cpu_ >= 0 && cpu_ < cpus ) {  // one core
+		fields_[0] = temps[cpu_];
+		total_ = ( tjmax[cpu_] > 0.0 ? tjmax[cpu_] : oldtotal_ );
+	}
+	else if ( cpu_ == -1 ) {  // average
+		float tempval = 0.0, temphigh = 0.0;
+		for (int i = 0; i < cpus; i++) {
+			tempval += temps[i];
+			temphigh += ( tjmax[i] > 0.0 ? tjmax[i] : oldtotal_ );
+		}
+		fields_[0] = tempval / (float)cpus;
+		total_ = temphigh / (float)cpus;
+	}
+	else if ( cpu_ == -2 ) {  // maximum
+		float tempval = -300.0, temphigh = -300.0;
+		for (int i = 0; i < cpus; i++) {
+			if (temps[i] > tempval)
+				tempval = temps[i];
+			if (tjmax[i] > temphigh)
+				temphigh = ( tjmax[i] > 0.0 ? tjmax[i] : oldtotal_ );
+		}
+		fields_[0] = tempval;
+		total_ = temphigh;
+	}
+	else {    // should not happen
+		std::cerr << "Unknown CPU core number in coretemp." << std::endl;
+		parent_->done(1);
+		return;
+	}
 
-  setUsed(fields_[0], total_);
+	free(temps);
+	free(tjmax);
 
-  if (total_ != _oldtotal) {
-    char l[25];
-    snprintf(l, 25, "TEMPERATURE (C)/%d", (int)total_);
-    legend(l);
-    drawlegend();
-    _oldtotal = total_;
-  }
-}
+	fields_[1] = total_ - fields_[0];
+	if (fields_[1] < 0.0) {   // alarm
+		fields_[1] = 0.0;
+		setfieldcolor( 0, parent_->getResource( "coretempHighColor" ) );
+	}
+	else
+		setfieldcolor( 0, parent_->getResource( "coretempActColor" ) );
 
-int CoreTemp::countCpus( void ) {
-  int cpus = 0;
-  size_t size = sizeof(cpus);
-  sysctlbyname("kern.smp.cpus", &cpus, &size, NULL, 0);
-  return cpus;
+	setUsed(fields_[0], total_);
+
+	if (total_ != oldtotal_) {
+		char l[25];
+		snprintf(l, 25, "TEMPERATURE (C)/%d", (int)total_);
+		legend(l);
+		drawlegend();
+		oldtotal_ = total_;
+	}
 }

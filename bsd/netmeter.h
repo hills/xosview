@@ -17,35 +17,27 @@
 #define _NETMETER_H_
 
 #include "fieldmetergraph.h"
-#include "timer.h"
+#include <string>
 
-class Host;
 
 class NetMeter : public FieldMeterGraph {
 public:
-  NetMeter(XOSView *parent, float max);
-  ~NetMeter( void );
+	NetMeter( XOSView *parent, float max );
+	~NetMeter( void );
 
-  const char *name( void ) const { return "NetMeter"; }
-  void checkevent( void );
+	const char *name( void ) const { return "NetMeter"; }
+	void checkevent( void );
+	void checkResources( void );
 
-  void checkResources( void );
-
-  void BSDGetNetInOut (unsigned long long *inbytes, unsigned long long *outbytes);
 protected:
-  float netBandwidth_;
-  std::string netIface_;
-  bool ignored_;
+	void getstats(void);
 
-  void getstats(void);
 private:
-  //  NetBSD:  Use long long, so we won't run into problems after 4 GB
-  //  has been transferred over the net!
-  unsigned long long _lastBytesIn, _lastBytesOut;
-
-  //  Did the meter initialize properly?
-  bool kernelHasStats_;
-
+	unsigned long long lastBytesIn_, lastBytesOut_;
+	float netBandwidth_;
+	std::string netIface_;
+	bool ignored_;
 };
+
 
 #endif

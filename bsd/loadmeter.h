@@ -21,23 +21,21 @@
 
 class LoadMeter : public FieldMeterGraph {
 public:
-  LoadMeter( XOSView *parent );
-  ~LoadMeter( void );
+	LoadMeter( XOSView *parent );
+	~LoadMeter( void );
 
-  virtual void drawfields( int manditory = 0 );
+	const char *name( void ) const { return "LoadMeter"; }
+	void checkevent( void );
+	void checkResources( void );
 
-  const char *name( void ) const { return "LoadMeter"; }
-  void checkevent( void );
-
-  void checkResources( void );
 protected:
+	void getloadinfo( void );
 
-  void getloadinfo( void );
-  unsigned long procloadcol_, warnloadcol_, critloadcol_;
 private:
-  int warnThreshold, critThreshold, alarmstate, lastalarmstate;
-  int old_cpu_speed_, cur_cpu_speed_;
-  bool do_cpu_speed_;
+	unsigned long procloadcol_, warnloadcol_, critloadcol_;
+	int warnThreshold_, critThreshold_, alarmstate_, lastalarmstate_;
+	int old_cpu_speed_, cur_cpu_speed_;
+	bool do_cpu_speed_;
 };
 
 

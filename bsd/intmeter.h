@@ -8,28 +8,29 @@
 #define _INTMETER_H_
 
 #include "bitmeter.h"
-#include "kernel.h"
-
 #include <map>
+
 
 class IntMeter : public BitMeter {
 public:
-  IntMeter( XOSView *parent,
-	    const char *title = "", const char *legend ="",
-	    int dolegends = 0, int dousedlegends = 0 );
-  ~IntMeter( void );
+	IntMeter( XOSView *parent, const char *title = "", const char *legend = "",
+	          int dolegends = 0, int dousedlegends = 0 );
+	~IntMeter( void );
 
-  void checkevent( void );
+	const char *name( void ) const { return "IntMeter"; }
+	void checkevent( void );
+	void checkResources( void );
 
-  void checkResources( void );
 private:
-  unsigned long *irqs_, *lastirqs_;
-  unsigned int *inbrs_;
-  unsigned int irqcount_;
-  std::map<int,int> realintnum;
+	unsigned long *irqs_, *lastirqs_;
+	unsigned int *inbrs_;
+	unsigned int irqcount_;
+	std::map<int,int> realintnum_;
+
 protected:
-  void getirqs( void );
-  void updateirqcount( bool init = false );
+	void getirqs( void );
+	void updateirqcount( bool init = false );
 };
+
 
 #endif

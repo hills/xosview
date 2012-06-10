@@ -68,9 +68,9 @@ OBJS += bsd/MeterMaker.o \
         bsd/memmeter.o \
         bsd/netmeter.o \
         bsd/pagemeter.o \
-        bsd/swapinternal.o \
         bsd/swapmeter.o \
-        bsd/coretemp.o
+        bsd/coretemp.o \
+        bsd/sensor.o
 CPPFLAGS += -Ibsd/
 endif
 

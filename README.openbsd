@@ -1,14 +1,18 @@
-  The OpenBSD version has been verified to work on version 2.3.
-If you find that it works on other versions (earlier or later),
-please inform me (bgrayson@netbsd.org).  I do not currently
-run OpenBSD, and am thus unable to test xosview out.
+  OpenBSD version originally written and maintained by Brian Grayson
+(bgrayson@netbsd.org). Brought up-to-date with OpenBSD 5 by Tomi Tapper
+(tomi.o.tapper@jyu.fi). This version has been made on OpenBSD version 5.1.
+It may work on other versions (earlier or later) as well. Please test and
+report if possible.
 
-  There are no OpenBSD-specific instructions.  Some meters may
-not work, depending on how divergent the NetBSD and OpenBSD
-trees have become.  If you find any things that don't work,
-please let me know.  If you know a fix, it would be greatly
-appreciated!
+For building xosview by hand, add these lines into .config.
 
-  See README.netbsd for generic *BSD info.
+CPPFLAGS += -I/usr/X11R6/include
+LDLIBS += -lkvm -L/usr/X11R6/lib
 
-  Brian Grayson (bgrayson@netbsd.org)      May 1998
+
+*****************************************************************************
+  Note:  xosview needs to run 'setgid kmem' in order to access some of the
+    kernel information (at least until some more statistics are added to
+    the /kern or /proc file systems).  If you do not have root or kmem
+    permission on the machine, xosview will not run.
+*****************************************************************************

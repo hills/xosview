@@ -268,13 +268,27 @@ xosview*acpitempIdleColor:        aquamarine
 xosview*acpitemp1:                CPU
 xosview*acpitemp2:                MB
 xosview*acpitempPriority:         20
-xosview*acpitempUsedFormat:       autoscale
+xosview*acpitempUsedFormat:       float
 
 xosview*coretemp:                 False
 xosview*coretempActColor:         blue
 xosview*coretempHighColor:        red
 xosview*coretempIdleColor:        aquamarine
 xosview*coretempPriority:         20
-xosview*coretempUsedFormat:       autoscale
+xosview*coretempUsedFormat:       float
 xosview*coretempDisplayType:      separate    ! separate, maximum or average
 ! xosview*coretemp1Package:         0
+
+xosview*bsdsensor:               False
+xosview*bsdsensorActColor:       blue
+xosview*bsdsensorHighColor:      red
+xosview*bsdsensorIdleColor:      aquamarine
+xosview*bsdsensorPriority:       20
+xosview*bsdsensorUsedFormat:     float
+! NetBSD example
+! xosview*bsdsensor1:              coretemp0.cur-value
+! OpenBSD example
+! xosview*bsdsensor1:              it0.temp1
+! xosview*bsdsensorLabel1:         CPU0
+! xosview*bsdsensorHigh1:          100
+

@@ -17,21 +17,19 @@
 
 class CoreTemp : public FieldMeter {
 public:
-  CoreTemp( XOSView *parent, const char *label, const char *caption, int cpu);
-  ~CoreTemp( void );
+	CoreTemp( XOSView *parent, const char *label, const char *caption, int cpu);
+	~CoreTemp( void );
 
-  const char *name( void ) const { return "CoreTemp"; }
-  void checkevent( void );
+	const char *name( void ) const { return "CoreTemp"; }
+	void checkevent( void );
+	void checkResources( void );
 
-  void checkResources( void );
-  static int countCpus( void );
 protected:
-  void getcoretemp( void );
+	void getcoretemp( void );
 
 private:
-  int   _cpu;
-  bool  _separate;
-  float _oldtotal;
+	int   cpu_;
+	float oldtotal_;
 };
 
 

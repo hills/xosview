@@ -1,7 +1,7 @@
-//  
+//
 //  Copyright (c) 1994, 1995 by Mike Romberg ( romberg@fsl.noaa.gov )
 //
-//  NetBSD port:  
+//  NetBSD port:
 //  Copyright (c) 1995, 1996, 1997-2002 by Brian Grayson (bgrayson@netbsd.org)
 //
 //  This file was originally written by Brian Grayson for the NetBSD and
@@ -14,94 +14,50 @@
 //    authors for a copy.
 //
 
-#include <stdlib.h>		//  For atoi().  BCG
+#include <stdlib.h>
+#include "kernel.h"
 #include "pagemeter.h"
-#include "kernel.h"		//  For NetBSD Page functions.
 
-#if defined(UVM) && defined (VM_UVMEXP2)
-#include <sys/sysctl.h>         /*  Needed for uvmexp_sysctl.  */
-#endif
 
 PageMeter::PageMeter( XOSView *parent, double total )
-: FieldMeterGraph( parent, 3, "PAGE", "IN/OUT/IDLE" ){
-  total_ = total;
-  BSDPageInit();
-#ifdef UVM
-# ifdef VM_UVMEXP2
-  int params[] = {CTL_VM, VM_UVMEXP2};
-  size_t prev_size = sizeof (prev_);
-  sysctl (params, 2, &prev_, &prev_size, NULL, 0);
-# else
-  BSDGetUVMPageStats(&prev_);
-# endif
-#else
-  BSDGetPageStats(&prev_);
-#endif
+	: FieldMeterGraph( parent, 3, "PAGE", "IN/OUT/IDLE" ) {
+	total_ = total;
+	BSDPageInit();
+	BSDGetPageStats(NULL, previnfo_);
 }
 
-PageMeter::~PageMeter( void ){ }
-
-void PageMeter::checkResources( void ){
-  FieldMeterGraph::checkResources();
-
-  //  The Active and Inactive colors are new.
-  setfieldcolor( 0, parent_->getResource("pageInColor") );
-  setfieldcolor( 1, parent_->getResource("pageOutColor") );
-  setfieldcolor( 2, parent_->getResource("pageIdleColor") );
-  priority_ = atoi (parent_->getResource("pagePriority"));
-  dodecay_ = parent_->isResourceTrue("pageDecay");
-  useGraph_ = parent_->isResourceTrue("pageGraph");
-  SetUsedFormat (parent_->getResource("pageUsedFormat"));
+PageMeter::~PageMeter( void ) {
 }
 
-void PageMeter::checkevent( void ){
-  getpageinfo();
-  drawfields();
+void PageMeter::checkResources( void ) {
+	FieldMeterGraph::checkResources();
+
+	setfieldcolor( 0, parent_->getResource("pageInColor") );
+	setfieldcolor( 1, parent_->getResource("pageOutColor") );
+	setfieldcolor( 2, parent_->getResource("pageIdleColor") );
+	priority_ = atoi( parent_->getResource("pagePriority") );
+	dodecay_ = parent_->isResourceTrue("pageDecay");
+	useGraph_ = parent_->isResourceTrue("pageGraph");
+	SetUsedFormat( parent_->getResource("pageUsedFormat") );
 }
 
-void PageMeter::getpageinfo (void) {
-//  Begin NetBSD-specific code...
-#if defined(UVM)
-# ifdef VM_UVMEXP2
-  int params[] = {CTL_VM, VM_UVMEXP2};
-  struct uvmexp_sysctl uvm;
-  size_t uvm_size = sizeof (uvm);
-  sysctl (params, 2, &uvm, &uvm_size, NULL, 0);
-# else
-  struct uvmexp uvm;
-  BSDGetUVMPageStats(&uvm);
-# endif
-#else
-  struct vmmeter vm;
-  BSDGetPageStats(&vm);
-#endif
-#ifdef XOSVIEW_FREEBSD
-  /* It depends, of course on what you want to measure.  I think, howver,
-     that you want the sum of pages paged to swap (i.e. dirty pages) and
-     pages paged to vnodes (i.e. mmap-ed files). (pavel 21-Jan-1998) */
-  fields_[0] = vm.v_vnodepgsin - prev_.v_vnodepgsin +
-      				vm.v_swappgsin - prev_.v_swappgsin;
-  fields_[1] = vm.v_vnodepgsout - prev_.v_vnodepgsout +
-      				vm.v_swappgsout - prev_.v_swappgsout;
-  prev_ = vm;
-#else
-# if defined(UVM)
-  fields_[0] = uvm.pageins - prev_.pageins;
-  fields_[1] = uvm.pgswapout - prev_.pgswapout;
-  prev_ = uvm;
-# else
-  fields_[0] = vm.v_pgpgin - prev_.v_pgpgin;
-  fields_[1] = vm.v_pgpgout - prev_.v_pgpgout;
-  prev_ = vm;
-# endif
-#endif
-  /*  NOTE:  This results in a meter display of pages, not pages
-   *  per second.  Divide by IntervalTimeInSecs() to convert to
-   *  pages/second.  */
-//  End NetBSD-specific code...
-  if (total_ < fields_[0] + fields_[1])
-    total_ = fields_[0] + fields_[1];
+void PageMeter::checkevent( void ) {
+	getpageinfo();
+	drawfields();
+}
 
-  fields_[2] = total_ - fields_[0] - fields_[1];
-  setUsed (total_ - fields_[2], total_);
+void PageMeter::getpageinfo( void ) {
+	unsigned long info[2];
+	BSDGetPageStats(NULL, info);
+
+	fields_[0] = info[0] - previnfo_[0];
+	fields_[1] = info[1] - previnfo_[1];
+	previnfo_[0] = info[0];
+	previnfo_[1] = info[1];
+
+	if (total_ < fields_[0] + fields_[1])
+		total_ = fields_[0] + fields_[1];
+
+	fields_[2] = total_ - fields_[0] - fields_[1];
+	setUsed(total_ - fields_[2], total_);
 }

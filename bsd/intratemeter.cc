@@ -8,72 +8,67 @@
 //    authors for a copy.
 //
 
-#include <err.h>		//  For warnx.
-#include <stdlib.h>	//  For atoi.
+#include <stdlib.h>
+#include <strings.h>
+#include <err.h>
+#include "kernel.h"
 #include "intratemeter.h"
-#include "xosview.h"
+
 
 IrqRateMeter::IrqRateMeter( XOSView *parent )
-  : FieldMeterGraph( parent, 2, "IRQs", "IRQs per sec/IDLE", 1, 1, 0 ){
-  irqcount_ = BSDNumInts();
-  irqs_ = new unsigned long[irqcount_];
-  lastirqs_ = new unsigned long[irqcount_];
-
-  kernelHasStats_ = BSDIntrInit();
-  if (!kernelHasStats_) {
-  warnx(
-  "!!! The kernel does not seem to have the symbols needed for the IrqRateMeter.");
-  warnx(
-  "!!! The IrqRateMeter has been disabled.");
-
-    disableMeter();
-  }
+	: FieldMeterGraph( parent, 2, "IRQs", "IRQs per sec/IDLE", 1, 1, 0 ) {
+	if (!BSDIntrInit()) {
+		warnx("The kernel does not seem to have the symbols needed for the IrqRateMeter.");
+		warnx("The IrqRateMeter has been disabled.");
+		disableMeter();
+	}
+	irqcount_ = BSDNumInts();
+	irqs_ = (unsigned long *)calloc(irqcount_ + 1, sizeof(long));
+	lastirqs_ = (unsigned long *)calloc(irqcount_ + 1, sizeof(long));
 }
 
-IrqRateMeter::~IrqRateMeter( void ){
-  delete[] irqs_;
-  delete[] lastirqs_;
+IrqRateMeter::~IrqRateMeter( void ) {
+	free(irqs_);
+	free(lastirqs_);
 }
 
-void IrqRateMeter::checkResources( void ){
-  FieldMeterGraph::checkResources();
-  if (kernelHasStats_) {
-    oncol_ = parent_->allocColor(parent_->getResource("irqrateUsedColor"));
-    idlecol_ = parent_->allocColor(parent_->getResource("irqrateIdleColor"));
-    setfieldcolor( 0, oncol_ );
-    setfieldcolor( 1, idlecol_);
-  }
+void IrqRateMeter::checkResources( void ) {
+	FieldMeterGraph::checkResources();
+	setfieldcolor( 0, parent_->getResource("irqrateUsedColor") );
+	setfieldcolor( 1, parent_->getResource("irqrateIdleColor") );
+	priority_ = atoi( parent_->getResource("irqratePriority") );
+	dodecay_ = parent_->isResourceTrue("irqrateDecay");
+	useGraph_ = parent_->isResourceTrue("irqrateGraph");
+	SetUsedFormat( parent_->getResource("irqrateUsedFormat") );
+	total_ = 2000;
 
-  priority_ = atoi (parent_->getResource("irqratePriority"));
-  dodecay_ = parent_->isResourceTrue("irqrateDecay");
-  useGraph_ = parent_->isResourceTrue("irqrateGraph");
-  SetUsedFormat (parent_->getResource("irqrateUsedFormat"));
-  total_ = 2000;
-
-  BSDGetIntrStats (lastirqs_, NULL);
+	BSDGetIntrStats(lastirqs_, NULL);
 }
 
-void IrqRateMeter::checkevent( void ){
-  getinfo();
-  drawfields();
+void IrqRateMeter::checkevent( void ) {
+	getinfo();
+	drawfields();
 }
 
-void IrqRateMeter::getinfo( void ){
-  IntervalTimerStop();
-  BSDGetIntrStats (irqs_, NULL);
-  int delta = 0;
-  for (uint i=0;i<irqcount_;i++) {
-    delta += irqs_[i]-lastirqs_[i];
-    lastirqs_[i] = irqs_[i];
-  }
-  /*  Scale delta by the priority.  */
-  fields_[0] = delta / IntervalTimeInSecs();
+void IrqRateMeter::getinfo( void ) {
+	int delta = 0;
 
-  //  Bump total_, if needed.
-  if (fields_[0] > total_) total_ = fields_[0];
+	IntervalTimerStop();
+	BSDGetIntrStats(irqs_, NULL);
 
-  /*  I don't see why anyone would want to use any format besides
-   *  float, but just in case.... */
-  setUsed (fields_[0], total_);
-  IntervalTimerStart();
+	for (uint i = 0; i <= irqcount_; i++) {
+		delta += irqs_[i] - lastirqs_[i];
+		lastirqs_[i] = irqs_[i];
+	}
+	bzero(irqs_, (irqcount_ + 1) * sizeof(irqs_[0]));
+
+	/*  Scale delta by the priority.  */
+	fields_[0] = delta / IntervalTimeInSecs();
+
+	//  Bump total_, if needed.
+	if (fields_[0] > total_)
+		total_ = fields_[0];
+
+	setUsed(fields_[0], total_);
+	IntervalTimerStart();
 }

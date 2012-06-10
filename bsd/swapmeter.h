@@ -1,4 +1,4 @@
-//  
+//
 //  Copyright (c) 1995, 1996, 1997-2002 by Brian Grayson (bgrayson@netbsd.org)
 //
 //  This file was written by Brian Grayson for the NetBSD and xosview
@@ -18,20 +18,15 @@
 
 class SwapMeter : public FieldMeterGraph {
 public:
-  SwapMeter( XOSView *parent );
-  ~SwapMeter( void );
+	SwapMeter( XOSView *parent );
+	~SwapMeter( void );
 
-  const char *name( void ) const { return "SwapMeter"; }  
-  void checkevent( void );
+	const char *name( void ) const { return "SwapMeter"; }
+	void checkevent( void );
+	void checkResources( void );
 
-  void checkResources( void );
 protected:
-
-  void getswapinfo( void );
-private:
-#ifdef HAVE_SWAPCTL
-  int useSwapCtl;
-#endif
+	void getswapinfo( void );
 };
 
 

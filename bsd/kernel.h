@@ -14,67 +14,51 @@
 //    authors for a copy.
 //
 
+#include <sys/types.h>
 #include "defines.h"
 
 void
 BSDInit();
 
 void
-SetKernelName(const char* const kernelName);
+SetKernelName(const char* kernelName);
+
+int
+BSDGetCPUSpeed();
 
 void
 BSDPageInit();
 
-#if defined(UVM)
 void
-BSDGetUVMPageStats(struct uvmexp* uvmp);
-#else
-void
-BSDGetPageStats(struct vmmeter* vmp);
-#endif
+BSDGetPageStats(unsigned long *meminfo, unsigned long *pageinfo);
 
 void
 BSDCPUInit();
 
-#if defined(XOSVIEW_NETBSD) && (__NetBSD_Version__ >= 104260000)
 void
-BSDGetCPUTimes(u_int64_t* timesArray);
+#if defined(XOSVIEW_NETBSD) || defined(XOSVIEW_DFBSD)
+BSDGetCPUTimes(u_int64_t *timesArray);
 #else
-void
-BSDGetCPUTimes(long* timesArray);
+BSDGetCPUTimes(long *timesArray);
 #endif
 
 int
 BSDNetInit();
 
+void
+BSDGetNetInOut(unsigned long long *inbytes, unsigned long long *outbytes, const char *netIface, bool ignored);
+
 int
 BSDSwapInit();
 
-#ifdef HAVE_SWAPCTL
 void
-BSDGetSwapCtlInfo(unsigned long long* total, unsigned long long* free);
-#endif
+BSDGetSwapInfo(u_int64_t* total, u_int64_t* free);
 
 int
 BSDDiskInit();
 
-void
-#if __FreeBSD_version >= 500000
-BSDGetDiskXFerBytes (u_int64_t *read_bytes, u_int64_t *write_bytes);
-#else
-BSDGetDiskXFerBytes (unsigned long long * bytes);
-#endif
-
-#ifdef XOSVIEW_FREEBSD
-void
-FreeBSDGetBufspace(int* bfsp);
-#endif
-
-#if defined(XOSVIEW_FREEBSD) && defined(__alpha__)
-# define NUM_INTR	256
-#else
-# define NUM_INTR	16
-#endif
+u_int64_t
+BSDGetDiskXFerBytes(u_int64_t *read_bytes, u_int64_t *write_bytes);
 
 int
 BSDIntrInit();
@@ -83,6 +67,16 @@ int
 BSDNumInts();
 
 void
-BSDGetIntrStats (unsigned long *intrCount, unsigned int *intrNbrs);
+BSDGetIntrStats(unsigned long *intrCount, unsigned int *intrNbrs);
+
+int
+BSDCountCpus(void);
+
+void
+BSDGetCPUTemperature(float *temps, float *tjmax);
+
+void
+BSDGetSensor(const char *name, const char *valname, float *value);
+
 
 #endif

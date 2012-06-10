@@ -121,7 +121,7 @@ FreeBSD, OpenBSD).
 \fBLoad\fP: Kernel reported load average
    all platforms  :  load
    Linux          :  load | CPU frequency
-   FreeBSD        :  load | CPU frequency
+   *BSD           :  load | CPU frequency
 
 \fBCPU Usage\fP
    Linux  : user | nice | system | soft-interrupt | interrupt | io-wait | guest | stolen | idle
@@ -131,8 +131,7 @@ FreeBSD, OpenBSD).
 
 \fBMemory Usage\fP
    Linux  : used | buffers | slab | map | cache | free
-   NetBSD : active | inactive | wired | free
-   FreeBSD: active | inactive | wired | buffer | free
+   *BSD   : active | inactive | wired | buffer | free
    OpenBSD: active | inactive | wired | free
    IRIX   : kernel | fs | user | free
    HPUX   : text | used | other | free
@@ -146,7 +145,7 @@ FreeBSD, OpenBSD).
 
 \fBDisk Usage\fP: Throughput to/from local disk, per second
    Linux  : in | out | idle
-   *BSD   : transferred | idle
+   *BSD   : in | out | idle
 
 \fBPage Swapping\fP: Pages to/from swap, per second
    Linux  : in | out | idle
@@ -171,10 +170,8 @@ FreeBSD, OpenBSD).
 \fBSerial Port Status\fP: "leds" which show the serial port parameters
    Linux  : LSR and MSR
 
-\fBBattery Level\fP
+\fBBattery Level\fP: charge and status of batteries
    Linux  : available | used
-   NetBSD : available | used
-   OpenBSD: available | used
 
 \fBRAID\fP: State of disks in a software RAID array
    Linux  : disk0 disk1 disk2 ... diskN | rebuild
@@ -184,8 +181,8 @@ FreeBSD, OpenBSD).
 
 \fBTemperature sensors\fP
    Shows readings from temperature sensors.
-   Linux  : ACPI or i2c/hwmon or Intel Core sensor
-   FreeBSD: Intel Core sensor
+   Linux  : ACPI or i2c/hwmon or Intel Core/AMD K8+ sensors
+   *BSD   : i2c or Intel Core/AMD K8+ sensors
 
 Typing a 'q' in the window will terminate xosview.
 
@@ -354,7 +351,6 @@ a given platform.
 
 \fBGeneral Resources\fP
 
-
 xosview*title: \fIname\fP
 .RS
 The string that xosview will use for the X window title.  Normally xosview
@@ -445,7 +441,6 @@ graph columns. This is only used by meters which have graph mode enabled.
 
 \fBLoad Meter Resources\fP
 
-
 .\"  Do the load: True resource.
 .xt load
 
@@ -458,18 +453,13 @@ above critical load threshold.
 xosview*loadWarnColor: \fIcolor\fP
 .RS
 This is the color that the load meter will use once the load average is
-above the warning threshold.
+above the warning but below the critical load threshold.
 .RE
 
 xosview*loadProcColor: \fIcolor\fP
 .RS
 This is the color that the load meter will use to display the load average
 when it is below the warning threshold.
-.RE
-
-xosview*loadCpuColor: \fIcolor\fP
-.RS
-This is the color that the load meter will use to display the CPU speed.
 .RE
 
 .\"  loadIdleColor
@@ -508,8 +498,8 @@ xosview*loadCpuSpeed: (True or False)
 Display the current CPU speed in the load meter.
 .RE
 
-\fBCPU Meter Resources\fP
 
+\fBCPU Meter Resources\fP
 
 xosview*cpu: (True or False)
 .RS
@@ -549,9 +539,7 @@ choice based on the number of CPUs found.
 .RE
 
 
-
 \fBMemory Meter Resources\fP
-
 
 .\"  Do the mem: True resource.
 .xt mem
@@ -573,9 +561,9 @@ choice based on the number of CPUs found.
 
 .cc mem Other "HP ``other'' memory"
 
-.cc mem Active "NetBSD active memory"
+.cc mem Active "*BSD active memory"
 
-.cc mem Inactive "NetBSD inactive memory"
+.cc mem Inactive "*BSD inactive memory"
 
 .\"  Priority, decay, usedFormat resources:
 .pp mem
@@ -639,7 +627,6 @@ percentage of page swapping (25% in, 75% out).
 
 \fBGfx Meter Resources\fP
 
-
 xosview*gfx:	(True or False)
 .RS
 If True xosview will display the GfxMeter. The value is sampled once per
@@ -697,7 +684,6 @@ does not work in decay mode.
 
 \fBNetwork Meter Resources\fP
 
-
 xosview*net: (True or False)
 .RS
 If True xosview will display the NetMeter.  Linux users will have to configure
@@ -723,6 +709,7 @@ prepended with '-' sign, the data in that interface is ignored.
 
 .\"  net{In,Out}Color:
 .cc net In incoming
+
 .cc net Out outgoing
 .\"  FIXME XXX  Change the netBackground resource to be netIdleColor.
 
@@ -740,8 +727,8 @@ This is the color that the network meter will use for the "idle" field.
 
 .uf net
 
-\fBNFSStats (Client) Resources\fP
 
+\fBNFSStats (Client) Resources\fP
 
 xosview*NFSStats: (True or False)
 .RS
@@ -801,6 +788,7 @@ xosview*NFSDStatIdleColor: \fIcolor\fP
 The color to be used for idle stats.
 .RE
 
+
 \fBSerial Meter Resources\fP
 
 xosview*serial(0-9): (True, False, or portBase)
@@ -829,6 +817,7 @@ This is the color the serial meter will use for bits that are not set.
 .\"  Do the priority resource
 .pp serial
 
+
 \fBInterrupt Meter Resources\fP
 
 xosview*interrupts: (True or False)
@@ -854,6 +843,7 @@ This is the color that will be used to show "inactive" interrupts.
 
 .\"  Do the priority resource
 .pp int
+
 
 \fBLm Sensors Temperature Resources\fP
 
@@ -885,12 +875,11 @@ Name of temperature file from /proc/sys/dev/sensors/*/* or
 /sys/class/hwmon/*/*, N=1... Also absolute path is accepted.
 .br
 Note if more files with same name exists, only the first is found unless
-absolute path is used.
+absolute path is used, e.g.
 .br
-eg.
+xosview*lmstemp1: temp
 .br
-xosview*lmstemp1:	temp
-xosview*lmstemp2:	remote_temp
+xosview*lmstemp2: remote_temp
 .RE
 
 xosview*lmstempLabel\fIN\fP:	\fILabelstring\fP
@@ -901,6 +890,7 @@ N-th label for above temperatures, default is TMP.
 .pp lmstemp
 
 .uf lmstemp
+
 
 \fBACPI Temperature Resources\fP
 
@@ -948,16 +938,18 @@ N-th label for above temperatures, default is TMP.
 .RE
 
 .pp acpitemp
+
 .uf acpitemp
 
-\fBIntel Core Temperature Sensor Resources\fP
+
+\fBIntel Core / AMD K8+ Temperature Sensor Resources\fP
 
 .xt coretemp
 
 xosview*coretempHighest: 100
 .RS
-Highest temp value displayed, default 100. On Linux, the value is read from
-sysfs if none is given.
+Highest temp value displayed, default 100. If none is given, TjMax value is
+used, if available.
 .RE
 
 xosview*coretempActColor:  \fIcolor\fP
@@ -977,8 +969,8 @@ Color between actual and alarm temperatures.
 
 xosview*coretemp\fIN\fPPackage:   0
 .RS
-The number of physical CPU for meter N. Currently only one physical CPU can
-be shown per meter.
+The number of physical CPU for meter N on Linux. Currently only one physical
+CPU can be shown per meter.
 .RE
 
 xosview*coretemp\fIN\fPDisplayType: (separate, average or maximum)
@@ -1001,7 +993,68 @@ Display the highest core temperature of a multi-core CPU.
 .RE
 
 .pp coretemp
+
 .uf coretemp
+
+
+\fB*BSD Sensor Resources\fP
+
+.xt bsdsensor
+
+xosview*bsdsensorActColor: \fIcolor\fP
+.RS
+Color of actual value.
+.RE
+
+xosview*bsdsensorHighColor: \fIcolor\fP
+.RS
+Color above alarm value, also used to indicate alarm.
+.RE
+
+xosview*bsdsensorIdleColor: \fIcolor\fP
+.RS
+Color between actual and alarm values.
+.RE
+
+xosview*bsdsensor\fIN\fP:     \fIname.type\fP
+.br
+xosview*bsdsensorHigh\fIN\fP: \fIname.type\fP
+.RS
+Here, the name is the sensor driver, and type is the wanted value. Also
+absolute value is accepted for bsdsensorHigh\fIN\fP. You can find the correct
+pair for OpenBSD and DragonflyBSD with systat command, e.g.
+.br
+xosview*bsdsensor1:     it0.temp1
+.br
+xosview*bsdsensorHigh1: 100
+.RE
+
+.RS
+On NetBSD, you can find the driver name with envstat command. Value name for
+the actual reading is typically 'cur-value' and for alarm level 'max-critical',
+e.g.
+.br
+xosview*bsdsensor2:     coretemp0.cur-value
+.br
+xosview*bsdsensorHigh2: coretemp0.max-critical
+.RE
+
+.RS
+For all possible NetBSD value names, refer to envstat source code.
+.RE
+.RS
+FreeBSD has no usable sensor drivers as of version 9.0.
+.RE
+
+xosview*bsdsensorLabel\fIN\fP:	\fILabelstring\fP
+.RS
+N-th label for above meters, default is SEN\fIN\fP.
+.RE
+
+.pp bsdsensor
+
+.uf bsdsensor
+
 
 \fBBattery Meter Resources\fP
 
@@ -1054,14 +1107,13 @@ xosview*batteryNoneColor: \fIcolor\fP
 If no battery is present - or all batteries get removed (while on AC).
 .RE
 
-
 .\"  Do the priority resource
 .pp battery
 
 .uf battery
 
-\fBWireless Meter Resources\fP
 
+\fBWireless Meter Resources\fP
 
 xosview*wireless: (True or False)
 .RS
@@ -1105,7 +1157,9 @@ This is the background color.
 .xt disk
 
 .\"  disk colors
-.cc disk Used "bytes transferred (in or out)"
+.cc disk In reads
+
+.cc disk Out writes
 
 .cc disk Idle idle
 
@@ -1133,6 +1187,7 @@ This color will be used for the linux meter to show reads.
 .dg disk
 
 .uf disk
+
 
 \fBRAID Meter Resources\fP
 
