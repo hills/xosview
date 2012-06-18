@@ -14,10 +14,11 @@
 #include "sensor.h"
 
 
-BSDSensor::BSDSensor( XOSView *parent, const char *name, const char *high, const char *label, const char *caption )
+BSDSensor::BSDSensor( XOSView *parent, const char *name, const char *high, const char *label, const char *caption, int nbr )
 	: FieldMeter( parent, 3, label, caption, 1, 1, 1 ) {
 	name_ = name;
 	high_ = high;
+	nbr_ = nbr;
 }
 
 BSDSensor::~BSDSensor( void ) {
@@ -37,7 +38,11 @@ void BSDSensor::checkResources( void ) {
 	}
 	else
 		total_ = 100;  // guess something and adjust later
-	SetUsedFormat( parent_->getResource( "bsdsensorUsedFormat" ) );
+
+	char s[30];
+	snprintf(s, 30, "bsdsensorUsedFormat%d", nbr_);
+	const char *f = parent_->getResourceOrUseDefault(s, NULL);
+	SetUsedFormat( f ? f : parent_->getResource( "bsdsensorUsedFormat" ) );
 }
 
 void BSDSensor::checkevent( void ) {

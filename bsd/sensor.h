@@ -18,7 +18,7 @@
 
 class BSDSensor : public FieldMeter {
 public:
-	BSDSensor( XOSView *parent, const char *name, const char *high, const char *label, const char *caption);
+	BSDSensor( XOSView *parent, const char *name, const char *high, const char *label, const char *caption, int nbr);
 	~BSDSensor( void );
 
 	const char *name( void ) const { return "BSDSensor"; }
@@ -30,6 +30,7 @@ protected:
 
 private:
 	std::string name_, high_;
+	int nbr_;
 };
 
 

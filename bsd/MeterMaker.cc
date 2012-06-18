@@ -104,7 +104,7 @@ void MeterMaker::makeMeters(void) {
 			snprintf(s, 20, "bsdsensorLabel%d", i);
 			snprintf(label, 5, "SEN%d", i);
 			const char *lab = _xos->getResourceOrUseDefault(s, label);
-			push(new BSDSensor(_xos, res, high, lab, caption));
+			push(new BSDSensor(_xos, res, high, lab, caption, i));
 		}
 	}
 
