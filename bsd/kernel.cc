@@ -52,11 +52,13 @@ static int mib_dsk[3] = { CTL_HW, HW_IOSTATS, sizeof(struct io_sysctl) };
 #if defined(XOSVIEW_OPENBSD)
 #include <sys/sched.h>
 #include <sys/disk.h>
+#include <sys/mount.h>
 #include <net/route.h>
 #include <net/if_dl.h>
 static int mib_spd[2] = { CTL_HW, HW_CPUSPEED };
 static int mib_cpt[2] = { CTL_KERN, KERN_CPTIME };
 static int mib_ifl[6] = { CTL_NET, AF_ROUTE, 0, 0, NET_RT_IFLIST, 0 };
+static int mib_bcs[3] = { CTL_VFS, VFS_GENERIC, VFS_BCACHESTAT };
 #endif
 
 #if defined(XOSVIEW_DFBSD)
@@ -307,19 +309,27 @@ BSDGetPageStats(unsigned long *meminfo, unsigned long *pageinfo) {
 		err(EX_OSERR, "sysctl vm.uvmexp failed");
 
 	if (meminfo) {
-		meminfo[0] = (long)uvm.active * uvm.pagesize;
-		meminfo[1] = (long)uvm.inactive * uvm.pagesize;
-		meminfo[2] = (long)uvm.wired * uvm.pagesize;
+		meminfo[0] = (unsigned long)uvm.active * uvm.pagesize;
+		meminfo[1] = (unsigned long)uvm.inactive * uvm.pagesize;
+		meminfo[2] = (unsigned long)uvm.wired * uvm.pagesize;
 #if defined(XOSVIEW_OPENBSD)
-		meminfo[3] = 0;  // OpenBSD has no cache info
+		struct bcachestats bcs;
+		size = sizeof(bcs);
+		if ( sysctl(mib_bcs, 3, &bcs, &size, NULL, 0) < 0 )
+			err(EX_OSERR, "sysctl vfs.generic.bcachestats failed");
+
+		meminfo[3] = (unsigned long)bcs.numbufpages * uvm.pagesize;
+		// used + free != total --> add the unknown part to inactive,
+		// as active, cache and free are the same as in top
+		meminfo[1] = (unsigned long)(uvm.npages - uvm.active - uvm.wired - bcs.numbufpages - uvm.free) * uvm.pagesize;
 #else
-		meminfo[3] = (long)(uvm.filepages + uvm.execpages) * uvm.pagesize;
+		meminfo[3] = (unsigned long)(uvm.filepages + uvm.execpages) * uvm.pagesize;
 #endif
-		meminfo[4] = (long)uvm.free * uvm.pagesize;
+		meminfo[4] = (unsigned long)uvm.free * uvm.pagesize;
 	}
 	if (pageinfo) {
-		pageinfo[0] = (long)uvm.pgswapin;
-		pageinfo[1] = (long)uvm.pgswapout;
+		pageinfo[0] = (unsigned long)uvm.pgswapin;
+		pageinfo[1] = (unsigned long)uvm.pgswapout;
 	}
 #else  /* HAVE_UVM */
 	struct vmmeter vm;
