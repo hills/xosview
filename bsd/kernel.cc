@@ -1140,6 +1140,9 @@ BSDGetCPUTemperature(float *temps, float *tjmax) {
 	}
 	if (prop_dictionary_recv_ioctl(fd, ENVSYS_GETDICTIONARY, &pdict))
 		err(EX_OSERR, "Could not get sensor dictionary");
+	if (close(fd) == -1)
+		err(EX_OSERR, "Could not close %s", _PATH_SYSMON);
+
 	if (prop_dictionary_count(pdict) == 0) {
 		warn("No sensors found");
 		return;
@@ -1264,6 +1267,9 @@ BSDGetSensor(const char *name, const char *valname, float *value) {
 	}
 	if (prop_dictionary_recv_ioctl(fd, ENVSYS_GETDICTIONARY, &pdict))
 		err(EX_OSERR, "Could not get sensor dictionary");
+	if (close(fd) == -1)
+		err(EX_OSERR, "Could not close %s", _PATH_SYSMON);
+
 	if (prop_dictionary_count(pdict) == 0) {
 		warn("No sensors found");
 		return;
