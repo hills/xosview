@@ -13,7 +13,9 @@
 
 #include "cpumeter.h"
 #include "fieldmeter.h"
+#include <string>
 #include <vector>
+
 
 class CoreTemp : public FieldMeter {
 public:
@@ -30,10 +32,12 @@ protected:
   void getcoretemp( void );
 
 private:
-  int   _pkg;
-  int   _cpu;
-  int   _high;
-  std::vector<int> _cpus;   // sysfs indices (tempn_input) for max and avg
+  int _type;                // 0: Intel / 1: AMD
+  int _pkg;
+  int _cpu;
+  int _high;
+  std::string _node;        // hwmon node (hwmonN) for k8temp/k10temp
+  std::vector<int> _cpus;   // sysfs indices (tempN_input) for max and avg
 };
 
 
