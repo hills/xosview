@@ -428,7 +428,6 @@ BSDNetInit() {
 void
 BSDGetNetInOut(unsigned long long *inbytes, unsigned long long *outbytes, const char *netIface, bool ignored) {
 	char ifname[IFNAMSIZ];
-	bool skipif = false;
 	*inbytes = 0;
 	*outbytes = 0;
 #if defined(XOSVIEW_OPENBSD)
@@ -446,6 +445,7 @@ BSDGetNetInOut(unsigned long long *inbytes, unsigned long long *outbytes, const 
 		err(EX_OSERR, "BSDGetNetInOut(): sysctl 2 failed");
 
 	for (next = buf; next < buf + size; next += ifm->ifm_msglen) {
+		bool skipif = false;
 		ifm = (struct if_msghdr *)next;
 		if (ifm->ifm_type != RTM_IFINFO || ifm->ifm_addrs & RTAX_IFP == 0)
 			continue;
@@ -477,6 +477,7 @@ BSDGetNetInOut(unsigned long long *inbytes, unsigned long long *outbytes, const 
 	ifnetp = TAILQ_FIRST(&ifnethd);
 
 	while (ifnetp) {
+		bool skipif = false;
 		//  Now, dereference the pointer to get the ifnet struct.
 		safe_kvm_read((u_long)ifnetp, &ifnet, sizeof(ifnet));
 		strlcpy(ifname, ifnet.if_xname, sizeof(ifname));
