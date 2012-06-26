@@ -313,9 +313,11 @@ BSDGetPageStats(unsigned long *meminfo, unsigned long *pageinfo) {
 		err(EX_OSERR, "sysctl vm.uvmexp failed");
 
 	if (meminfo) {
-		meminfo[0] = (unsigned long)uvm.active * uvm.pagesize;
+		// UVM excludes kernel memory -> assume it is active mem
+		meminfo[0] = (unsigned long)(uvm.npages - uvm.inactive - uvm.wired - uvm.free) * uvm.pagesize;
 		meminfo[1] = (unsigned long)uvm.inactive * uvm.pagesize;
 		meminfo[2] = (unsigned long)uvm.wired * uvm.pagesize;
+#if 0
 #if defined(XOSVIEW_OPENBSD)
 		struct bcachestats bcs;
 		size = sizeof(bcs);
@@ -323,14 +325,15 @@ BSDGetPageStats(unsigned long *meminfo, unsigned long *pageinfo) {
 			err(EX_OSERR, "sysctl vfs.generic.bcachestats failed");
 
 		meminfo[3] = (unsigned long)bcs.numbufpages * uvm.pagesize;
-		// used + free != total --> add the unknown part to inactive,
-		// as active, cache and free are the same as in top
-		meminfo[1] = (unsigned long)(uvm.npages - uvm.active - uvm.wired - bcs.numbufpages - uvm.free) * uvm.pagesize;
 #else
 		unsigned long bm = 0;
 		safe_kvm_read_symbol(BUFMEM_SYM_INDEX, &bm, sizeof(bm));
 		meminfo[3] = bm + (unsigned long)(uvm.filepages + uvm.execpages) * uvm.pagesize;
 #endif
+#endif
+		// cache is already included in active and inactive memory and
+		// there's no way to know how much is in which -> disable cache
+		meminfo[3] = 0;
 		meminfo[4] = (unsigned long)uvm.free * uvm.pagesize;
 	}
 	if (pageinfo) {
