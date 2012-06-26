@@ -1171,7 +1171,9 @@ BSDGetCPUTemperature(float *temps, float *tjmax) {
 			if ( (pobj2 = prop_dictionary_get((prop_dictionary_t)pobj, "critical-max")) && tjmax )
 				tjmax[i] = (prop_number_integer_value((prop_number_t)pobj2) / 1000000.0) - 273.15;
 		}
+		prop_object_iterator_release(piter2);
 	}
+	prop_object_iterator_release(piter);
 	prop_object_release(pdict);
 #else  /* XOSVIEW_NETBSD */
 	int val = 0;
@@ -1305,6 +1307,7 @@ BSDGetSensor(const char *name, const char *valname, float *value) {
 		          strncmp(type, "Ohms", 4) == 0 )
 			*value = (float)val / 1000000.0;      // electrical units are in micro{V,A,W,Ohm}
 	}
+	prop_object_iterator_release(piter);
 	prop_object_release(pdict);
 #else  /* XOSVIEW_NETBSD */
 #if defined(XOSVIEW_OPENBSD) || defined(XOSVIEW_DFBSD)
