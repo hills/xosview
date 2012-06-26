@@ -85,6 +85,7 @@ xosview*memTextColor:       blue
 xosview*memOtherColor:      orange
 xosview*memActiveColor:	    blue
 xosview*memInactiveColor:   lightblue
+xosview*memWiredColor:      orange
 xosview*memPriority:        10
 xosview*memDecay:           False
 xosview*memGraph:           False

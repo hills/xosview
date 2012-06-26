@@ -35,8 +35,8 @@ void MemMeter::checkResources( void ) {
 
 	setfieldcolor( 0, parent_->getResource("memActiveColor") );
 	setfieldcolor( 1, parent_->getResource("memInactiveColor") );
-	setfieldcolor( 2, parent_->getResource("memCacheColor") );
-	setfieldcolor( 3, parent_->getResource("memBufferColor") );
+	setfieldcolor( 2, parent_->getResource("memWiredColor") );
+	setfieldcolor( 3, parent_->getResource("memCacheColor") );
 	setfieldcolor( 4, parent_->getResource("memFreeColor") );
 	priority_ = atoi( parent_->getResource("memPriority") );
 	dodecay_ = parent_->isResourceTrue("memDecay");
