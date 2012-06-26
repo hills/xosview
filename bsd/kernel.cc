@@ -137,27 +137,31 @@ static struct nlist nlst[] =
 #if defined(XOSVIEW_NETBSD)
 { "_allevents" },
 #define ALLEVENTS_SYM_INDEX  3
+{ "_bufmem" },
+#define BUFMEM_SYM_INDEX     4
 #else
 { DUMMY_SYM },
 #define DUMMY_3
+{ DUMMY_SYM },
+#define DUMMY_4
 #endif
 #if defined(XOSVIEW_FREEBSD)
 { "_intrnames" },
-#define INTRNAMES_SYM_INDEX  4
+#define INTRNAMES_SYM_INDEX  5
 # if __FreeBSD_version >= 900040
 { "_sintrnames" },
 # else
 { "_eintrnames" },
 # endif
-#define EINTRNAMES_SYM_INDEX 5
+#define EINTRNAMES_SYM_INDEX 6
 { "_intrcnt" },
-#define INTRCNT_SYM_INDEX    6
+#define INTRCNT_SYM_INDEX    7
 # if __FreeBSD_version >= 900040
 { "_sintrcnt" },
 # else
 { "_eintrcnt" },
 # endif
-#define EINTRCNT_SYM_INDEX   7
+#define EINTRCNT_SYM_INDEX   8
 #endif
 { NULL }
 };
@@ -323,7 +327,9 @@ BSDGetPageStats(unsigned long *meminfo, unsigned long *pageinfo) {
 		// as active, cache and free are the same as in top
 		meminfo[1] = (unsigned long)(uvm.npages - uvm.active - uvm.wired - bcs.numbufpages - uvm.free) * uvm.pagesize;
 #else
-		meminfo[3] = (unsigned long)(uvm.filepages + uvm.execpages) * uvm.pagesize;
+		unsigned long bm = 0;
+		safe_kvm_read_symbol(BUFMEM_SYM_INDEX, &bm, sizeof(bm));
+		meminfo[3] = bm + (unsigned long)(uvm.filepages + uvm.execpages) * uvm.pagesize;
 #endif
 		meminfo[4] = (unsigned long)uvm.free * uvm.pagesize;
 	}
