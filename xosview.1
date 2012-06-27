@@ -131,8 +131,9 @@ FreeBSD, OpenBSD).
 
 \fBMemory Usage\fP
    Linux  : used | buffers | slab | map | cache | free
-   *BSD   : active | inactive | wired | buffer | free
+   *BSD   : active | inactive | wired | cache | free
    OpenBSD: active | inactive | wired | free
+   NetBSD : active | inactive | wired | free
    IRIX   : kernel | fs | user | free
    HPUX   : text | used | other | free
    GNU    : active | inactive | wired | free
@@ -209,7 +210,6 @@ documented in README.netbsd):
   xosview \-name xosvstipple &
   xosview \-name xosvstipplebw &
 .RE
-
 .RE
 
 \-display \fIdisplay\fP
@@ -247,7 +247,6 @@ xosview*geometry resource.
 This option overrides the xosview*usedlabels resource.  It is equivalent to
 setting xosview*usedlabels to "False".
 .RE
-
 +usedlabels
 .RS
 This option overrides the xosview*usedlabels resource.  It is equivalent to
@@ -321,6 +320,15 @@ Equivalent to \-irqrate and +irqrate.
 
 .\"  Handle -/+lmstemp
 .pm lmstemp
+
+.\"  Handle -/+coretemp
+.pm coretemp
+
+.\"  Handle -/+acpitemp
+.pm acpitemp
+
+.\"  Handle -/+bsdsensor
+.pm bsdsensor
 .RE
 
 \-xrm \fIresource_string\fP
@@ -444,10 +452,10 @@ graph columns. This is only used by meters which have graph mode enabled.
 .\"  Do the load: True resource.
 .xt load
 
-xosview*loadCritColor: \fIcolor\fP
+xosview*loadProcColor: \fIcolor\fP
 .RS
-This is the color that the load meter will use once the load average is
-above critical load threshold.
+This is the color that the load meter will use to display the load average
+when it is below the warning threshold.
 .RE
 
 xosview*loadWarnColor: \fIcolor\fP
@@ -456,10 +464,10 @@ This is the color that the load meter will use once the load average is
 above the warning but below the critical load threshold.
 .RE
 
-xosview*loadProcColor: \fIcolor\fP
+xosview*loadCritColor: \fIcolor\fP
 .RS
-This is the color that the load meter will use to display the load average
-when it is below the warning threshold.
+This is the color that the load meter will use once the load average is
+above critical load threshold.
 .RE
 
 .\"  loadIdleColor
@@ -468,18 +476,18 @@ when it is below the warning threshold.
 .\"  Do the priority resource
 .pp load
 
-xosview*loadCritThreshold: \fIint\fP
-.RS
-This number (which must be an integer >= 1) sets the value at which
-the loadmeter changes its status and color from "warning" to "critical".
-The default value is 5.
-.RE
-
 xosview*loadWarnThreshold: \fIint\fP
 .RS
 This number (which must be an integer >= 1) sets the value at which
 the loadmeter changes its status and color from "normal" to "warning".
-The default value is 2.
+The default value is the number of processors.
+.RE
+
+xosview*loadCritThreshold: \fIint\fP
+.RS
+This number (which must be an integer >= 1) sets the value at which
+the loadmeter changes its status and color from "warning" to "critical".
+The default value is four times the warning threshold.
 .RE
 
 xosview*loadDecay: (True or False)
@@ -564,6 +572,8 @@ choice based on the number of CPUs found.
 .cc mem Active "*BSD active memory"
 
 .cc mem Inactive "*BSD inactive memory"
+
+.cc mem Wired "*BSD wired memory"
 
 .\"  Priority, decay, usedFormat resources:
 .pp mem
@@ -1042,6 +1052,7 @@ xosview*bsdsensorHigh2: coretemp0.max-critical
 .RS
 For all possible NetBSD value names, refer to envstat source code.
 .RE
+
 .RS
 FreeBSD has no usable sensor drivers as of version 9.0.
 .RE
