@@ -89,6 +89,9 @@ void CPUMeter::getcputime( void ){
   }
 
   // Guest time already included in user time
+  // Sometimes guest > user though
+  if (fields_[6] > fields_[0])
+    fields_[6] = fields_[0];
   fields_[0] -= fields_[6];
   total_ -= fields_[6];
 
