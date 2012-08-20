@@ -18,10 +18,10 @@ static const char STATFILENAME[] = "/proc/stat";
 #define MAX_PROCSTAT_LENGTH 4096
 
 CPUMeter::CPUMeter(XOSView *parent, const char *cpuID)
-: FieldMeterGraph( parent, 9, toUpper(cpuID), "USR/NICE/SYS/SI/HI/WIO/GST/ST/IDLE" ) {
+: FieldMeterGraph( parent, 10, toUpper(cpuID), "USR/NIC/SYS/SI/HI/WIO/GST/NGS/ST/IDLE" ) {
   _lineNum = findLine(cpuID);
   for ( int i = 0 ; i < 2 ; i++ )
-    for ( int j = 0 ; j < 9 ; j++ )
+    for ( int j = 0 ; j < 10 ; j++ )
       cputime_[i][j] = 0;
   cpuindex_ = 0;
 
@@ -40,8 +40,9 @@ void CPUMeter::checkResources( void ){
   setfieldcolor( 4, parent_->getResource( "cpuInterruptColor" ) );
   setfieldcolor( 5, parent_->getResource( "cpuWaitColor" ) );
   setfieldcolor( 6, parent_->getResource( "cpuGuestColor" ) );
-  setfieldcolor( 7, parent_->getResource( "cpuStolenColor" ) );
-  setfieldcolor( 8, parent_->getResource( "cpuFreeColor" ) );
+  setfieldcolor( 7, parent_->getResource( "cpuNiceGuestColor" ) );
+  setfieldcolor( 8, parent_->getResource( "cpuStolenColor" ) );
+  setfieldcolor( 9, parent_->getResource( "cpuFreeColor" ) );
   priority_ = atoi (parent_->getResource( "cpuPriority" ) );
   dodecay_ = parent_->isResourceTrue( "cpuDecay" );
   useGraph_ = parent_->isResourceTrue( "cpuGraph" );
@@ -78,11 +79,12 @@ void CPUMeter::getcputime( void ){
 	      >>cputime_[cpuindex_][5]
 	      >>cputime_[cpuindex_][6]
 	      >>cputime_[cpuindex_][7]
-	      >>cputime_[cpuindex_][8];
+	      >>cputime_[cpuindex_][8]
+	      >>cputime_[cpuindex_][9];
 
   int oldindex = (cpuindex_+1)%2;
-  for ( int i = 0 ; i < 9 ; i++ ){
-    static int cputime_to_field[9] = { 0, 1, 2, 8, 5, 4, 3, 7, 6 };
+  static int cputime_to_field[10] = { 0, 1, 2, 9, 5, 4, 3, 6, 8, 7 };
+  for ( int i = 0 ; i < 10 ; i++ ){
     int field = cputime_to_field[i];
     fields_[field] = cputime_[cpuindex_][i] - cputime_[oldindex][i];
     total_ += fields_[field];
@@ -94,9 +96,14 @@ void CPUMeter::getcputime( void ){
     fields_[6] = fields_[0];
   fields_[0] -= fields_[6];
   total_ -= fields_[6];
+  // Same applies to niced guest times
+  if (fields_[7] > fields_[1])
+    fields_[7] = fields_[1];
+  fields_[1] -= fields_[7];
+  total_ -= fields_[7];
 
   if (total_){
-    setUsed (total_ - fields_[8], total_); // any non-idle time
+    setUsed (total_ - fields_[9], total_); // any non-idle time
     cpuindex_ = (cpuindex_ + 1) % 2;
   }
 }

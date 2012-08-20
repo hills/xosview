@@ -124,7 +124,7 @@ FreeBSD, OpenBSD).
    *BSD           :  load | CPU frequency
 
 \fBCPU Usage\fP
-   Linux  : user | nice | system | soft-interrupt | interrupt | io-wait | guest | stolen | idle
+   Linux  : user | nice | system | soft-interrupt | interrupt | io-wait | guest | niced guest | stolen | idle
    *BSD   : user | nice | system | interrupt | idle
    IRIX   : user | system | interrupt | wait | idle
    HPUX   : user | nice | system | interrupt | idle
@@ -525,7 +525,17 @@ created for multiple CPUs.
 
 .cc cpu System "cpu system time"
 
-.cc cpu Interrupt "cpu interrupt time"
+.cc cpu Interrupt "cpu hard interrupt time"
+
+.cc cpu SInterrupt "cpu soft interrupt time"
+
+.cc cpu Wait "cpu IO waiting time"
+
+.cc cpu Guest "cpu virtualization guest time"
+
+.cc cpu NiceGuest "cpu niced virtualization guest time"
+
+.cc cpu Stolen "cpu involuntary wait time"
 
 .cc cpu Free "cpu idle time"
 
