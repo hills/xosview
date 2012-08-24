@@ -258,19 +258,32 @@ unsigned int CoreTemp::countCpus(int pkg)
   glob_t gbuf;
   char s[80];
   struct stat sbuf;
+  int count = 0;
+  std::string dummy;
+  std::ifstream file;
 
   snprintf(s, 80, "%s.%d", SYS_CORETEMP, pkg);
-  if (stat(s, &sbuf) == 0)
-    strncat(s, "/temp*_input", 80);
+  if (stat(s, &sbuf) == 0) {
+    strncat(s, "/temp*_label", 80);
+    glob(s, 0, NULL, &gbuf);
+    // loop through paths in gbuf and check if it is a core or package
+    for (uint i = 0; i < gbuf.gl_pathc; i++) {
+      file.open(gbuf.gl_pathv[i]);
+      file >> dummy;
+      file.close();
+      if (strncmp(dummy.c_str(), "Core", 4) == 0)
+        count++;
+    }
+    globfree(&gbuf);
+  }
   else {
-    std::string dummy;
-    std::ifstream file;
     DIR *dir;
     struct dirent *dent;
     dir = opendir(SYS_HWMON);
     if (!dir)
       return 0;
 
+    // loop through hwmon devices and if AMD sensor if found, count its inputs
     while ( (dent = readdir(dir)) ) {
       if (!strncmp(dent->d_name, ".", 1))
         continue;
@@ -287,9 +300,10 @@ unsigned int CoreTemp::countCpus(int pkg)
       }
     }
     closedir(dir);
+
+    glob(s, 0, NULL, &gbuf);
+    count = gbuf.gl_pathc;
+    globfree(&gbuf);
   }
-  glob(s, 0, NULL, &gbuf);
-  int count = gbuf.gl_pathc;
-  globfree(&gbuf);
   return count;
 }
