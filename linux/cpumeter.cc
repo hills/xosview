@@ -86,7 +86,8 @@ void CPUMeter::getcputime( void ){
   static int cputime_to_field[10] = { 0, 1, 2, 9, 5, 4, 3, 6, 8, 7 };
   for ( int i = 0 ; i < 10 ; i++ ){
     int field = cputime_to_field[i];
-    fields_[field] = cputime_[cpuindex_][i] - cputime_[oldindex][i];
+    // counters in /proc/stat do sometimes go backwards
+    fields_[field] = ( cputime_[cpuindex_][i] > cputime_[oldindex][i] ? cputime_[cpuindex_][i] - cputime_[oldindex][i] : 0 );
     total_ += fields_[field];
   }
 
