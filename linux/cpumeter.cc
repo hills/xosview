@@ -15,6 +15,9 @@
 #include <ctype.h>
 
 static const char STATFILENAME[] = "/proc/stat";
+static const char VERSIONFILENAME[] = "/proc/version";
+static int cputime_to_field[10] = { 0, 1, 2, 9, 5, 4, 3, 6, 8, 7 };
+
 #define MAX_PROCSTAT_LENGTH 4096
 
 CPUMeter::CPUMeter(XOSView *parent, const char *cpuID)
@@ -24,7 +27,27 @@ CPUMeter::CPUMeter(XOSView *parent, const char *cpuID)
     for ( int j = 0 ; j < 10 ; j++ )
       cputime_[i][j] = 0;
   cpuindex_ = 0;
-
+  kernel_ = getkernelversion();
+  if (kernel_ < 2006000) {  // 2.4 kernels had four stats
+    legend("USR/NIC/SYS/IDLE");
+    setNumFields(4);
+    cputime_to_field[3] = 3;
+  }
+  else if (kernel_ < 2006011) {  // steal time appeared on 2.6.11
+    legend("USR/NIC/SYS/SI/HI/WIO/IDLE");
+    setNumFields(7);
+    cputime_to_field[3] = 6;
+  }
+  else if (kernel_ < 2006024) {  // guest time appeared on 2.6.24
+    legend("USR/NIC/SYS/SI/HI/WIO/ST/IDLE");
+    setNumFields(8);
+    cputime_to_field[3] = 7;
+  }
+  else if (kernel_ < 2006032) {  // niced guest time appeared on 2.6.32
+    legend("USR/NIC/SYS/SI/HI/WIO/GST/ST/IDLE");
+    setNumFields(9);
+    cputime_to_field[3] = 8;
+  }
 }
 
 CPUMeter::~CPUMeter( void ){
@@ -36,13 +59,18 @@ void CPUMeter::checkResources( void ){
   setfieldcolor( 0, parent_->getResource( "cpuUserColor" ) );
   setfieldcolor( 1, parent_->getResource( "cpuNiceColor" ) );
   setfieldcolor( 2, parent_->getResource( "cpuSystemColor" ) );
-  setfieldcolor( 3, parent_->getResource( "cpuSInterruptColor" ) );
-  setfieldcolor( 4, parent_->getResource( "cpuInterruptColor" ) );
-  setfieldcolor( 5, parent_->getResource( "cpuWaitColor" ) );
-  setfieldcolor( 6, parent_->getResource( "cpuGuestColor" ) );
-  setfieldcolor( 7, parent_->getResource( "cpuNiceGuestColor" ) );
-  setfieldcolor( 8, parent_->getResource( "cpuStolenColor" ) );
-  setfieldcolor( 9, parent_->getResource( "cpuFreeColor" ) );
+  if (kernel_ >= 2006000) {
+    setfieldcolor( 3, parent_->getResource( "cpuSInterruptColor" ) );
+    setfieldcolor( 4, parent_->getResource( "cpuInterruptColor" ) );
+    setfieldcolor( 5, parent_->getResource( "cpuWaitColor" ) );
+  }
+  if (kernel_ >= 2006024)
+    setfieldcolor( 6, parent_->getResource( "cpuGuestColor" ) );
+  if (kernel_ >= 2006032)
+    setfieldcolor( 7, parent_->getResource( "cpuNiceGuestColor" ) );
+  if (kernel_ >= 2006011)
+    setfieldcolor( numfields_-2, parent_->getResource( "cpuStolenColor" ) );
+  setfieldcolor( numfields_-1, parent_->getResource( "cpuFreeColor" ) );
   priority_ = atoi (parent_->getResource( "cpuPriority" ) );
   dodecay_ = parent_->isResourceTrue( "cpuDecay" );
   useGraph_ = parent_->isResourceTrue( "cpuGraph" );
@@ -83,8 +111,7 @@ void CPUMeter::getcputime( void ){
 	      >>cputime_[cpuindex_][9];
 
   int oldindex = (cpuindex_+1)%2;
-  static int cputime_to_field[10] = { 0, 1, 2, 9, 5, 4, 3, 6, 8, 7 };
-  for ( int i = 0 ; i < 10 ; i++ ){
+  for ( int i = 0 ; i < numfields_ ; i++ ){
     int field = cputime_to_field[i];
     // counters in /proc/stat do sometimes go backwards
     fields_[field] = ( cputime_[cpuindex_][i] > cputime_[oldindex][i] ? cputime_[cpuindex_][i] - cputime_[oldindex][i] : 0 );
@@ -171,4 +198,20 @@ const char *CPUMeter::toUpper(const char *str){
     *tmp = toupper(*tmp);
 
   return buffer;
+}
+
+int CPUMeter::getkernelversion(void){
+  std::ifstream f(VERSIONFILENAME);
+  if (!f) {
+    std::cerr << "Can not get kernel version from " << VERSIONFILENAME << "." << std::endl;
+    exit(1);
+  }
+  
+  std::string tmp, version;
+  int major = 0, minor = 0, micro = 0;
+  
+  f >> tmp >> tmp >> version;
+  sscanf(version.c_str(), "%d.%d.%d", &major, &minor, &micro);
+  
+  return ( major*1000000 + minor*1000 + micro);
 }
