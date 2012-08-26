@@ -512,10 +512,9 @@ Display the current CPU speed in the load meter.
 xosview*cpu: (True or False)
 .RS
 If True then xosview will display a cpu meter.  On linux SMP machines this
-will cause a separate meter to be displayed for each cpu if Jerome Forissier's
-kernel patch has been applied.  See the 'README.linux' file for more
-details. On IRIX 6.5, the resource cpuFormat decides which meters are
-created for multiple CPUs.
+will cause a separate meter to be displayed for each cpu.  See the
+'README.linux' file for more details. On IRIX 6.5, the resource cpuFormat
+decides which meters are created for multiple CPUs.
 .RE
 
 .\"  cpuUserColor, cpuNiceColor, cpuSystemColor, cpuInterruptColor, cpuFreeColor
@@ -584,6 +583,10 @@ choice based on the number of CPUs found.
 .cc mem Inactive "*BSD inactive memory"
 
 .cc mem Wired "*BSD wired memory"
+
+.cc mem Slab "Linux in-kernel data structures"
+
+.cc mem Map "Linux memory mapped files"
 
 .\"  Priority, decay, usedFormat resources:
 .pp mem
@@ -949,7 +952,7 @@ Absolute path can also be used.
 xosview*acpihigh\fIN\fP:    \fIfilename\fP
 .RS
 Name of high value/trip point file from /proc/acpi/thermal_zone or
-/sys/devices/virtual/thermal
+/sys/devices/virtual/thermal, or an absolute path to one.
 .RE
 
 xosview*acpitempLabel\fIN\fP:  \fILabelstring\fP
