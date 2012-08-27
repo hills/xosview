@@ -24,6 +24,7 @@
 
 
 #include "netmeter.h"
+#include "cpumeter.h"
 #include "xosview.h"
 
 #include <unistd.h>
@@ -60,22 +61,7 @@ NetMeter::~NetMeter( void ){
 
 void NetMeter::checkOSVersion(void)
     {
-    std::ifstream ifs("/proc/sys/kernel/osrelease");
-    if (!ifs)
-        {
-        std::cerr <<"Can not open file : " << "/proc/sys/kernel/osrelease"
-          << std::endl;
-        exit(1);
-        }
-
-    int major, minor;
-    _bytesInDev = 0;
-    ifs >> major;
-    ifs.ignore(1);
-    ifs >> minor;
-    ifs.ignore(1);
-
-    if (major > 2 || (major == 2 && minor >= 1))
+    if (CPUMeter::getkernelversion() >= 2100000)
         {
 	// check presence of iacct and oacct chains
         std::ifstream chains("/proc/net/ip_fwchains");
