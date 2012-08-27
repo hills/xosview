@@ -22,8 +22,6 @@ protected:
 
   void getmeminfo( void );
 private:
-  int _shAdj;
-
   class LineInfo {
   public:
     LineInfo(const char *id, double *val)
@@ -46,9 +44,6 @@ private:
 
   LineInfo *_MIlineInfos;
   int _numMIlineInfos;
-
-  LineInfo *_MSlineInfos;
-  int _numMSlineInfos;
 
   void initLineInfo(void);
   LineInfo *findLines(LineInfo *tmplate, int len, const char *fname);

@@ -11,41 +11,26 @@
 #include <stdlib.h>
 
 static const char MEMFILENAME[] = "/proc/meminfo";
-static const char MEMSTATFNAME[] = "/proc/memstat";
 
 MemMeter::MemMeter( XOSView *parent )
 : FieldMeterGraph( parent, 6, "MEM", "USED/BUFF/SLAB/MAP/CACHE/FREE" ){
-  _shAdj = -1;
-
-  // Check and see if the memstat module has been loaded
-  std::ifstream test(MEMSTATFNAME);
-  if (test){
-    setNumFields(5);
-    legend("USED/SHAR/BUFF/CACHE/FREE");
-    _shAdj = 0;
-  }
-
-  _MSlineInfos = NULL;
   _MIlineInfos = NULL;
   initLineInfo();
 }
 
 MemMeter::~MemMeter( void ){
   delete[] _MIlineInfos;
-  delete[] _MSlineInfos;
 }
 
 void MemMeter::checkResources( void ){
   FieldMeterGraph::checkResources();
 
   setfieldcolor( 0, parent_->getResource( "memUsedColor" ) );
-  if (_shAdj == 0)
-    setfieldcolor( 1, parent_->getResource( "memSharedColor" ) );
-  setfieldcolor( 2 + _shAdj, parent_->getResource( "memBufferColor" ) );
-  setfieldcolor( 3 + _shAdj, parent_->getResource( "memSlabColor" ) );
-  setfieldcolor( 4 + _shAdj, parent_->getResource( "memMapColor" ) );
-  setfieldcolor( 5 + _shAdj, parent_->getResource( "memCacheColor" ) );
-  setfieldcolor( 6 + _shAdj, parent_->getResource( "memFreeColor" ) );
+  setfieldcolor( 1, parent_->getResource( "memBufferColor" ) );
+  setfieldcolor( 2, parent_->getResource( "memSlabColor" ) );
+  setfieldcolor( 3, parent_->getResource( "memMapColor" ) );
+  setfieldcolor( 4, parent_->getResource( "memCacheColor" ) );
+  setfieldcolor( 5, parent_->getResource( "memFreeColor" ) );
   priority_ = atoi (parent_->getResource( "memPriority" ) );
   dodecay_ = parent_->isResourceTrue( "memDecay" );
   useGraph_ = parent_->isResourceTrue( "memGraph" );
@@ -69,20 +54,11 @@ void MemMeter::checkevent( void ){
 
 void MemMeter::getmeminfo( void ){
   getmemstat(MEMFILENAME, _MIlineInfos, _numMIlineInfos);
-  if (_shAdj == 0)
-    getmemstat(MEMSTATFNAME, _MSlineInfos, _numMSlineInfos);
-
-  if (_shAdj == 0){
-    fields_[3] -= fields_[1]; // cache size seems to contain shared size !?
-                              // without this fix "used" sometimes gets < 0 !
-    fields_[0] = total_ - fields_[4] - fields_[3] - fields_[2] - fields_[1];
-  }else{
-    fields_[4] -= fields_[3]; // mapped comes from cache
-    fields_[0] = total_ - fields_[5] - fields_[4] - fields_[3] - fields_[2] - fields_[1];
-  }
+  fields_[4] -= fields_[3]; // mapped comes from cache
+  fields_[0] = total_ - fields_[5] - fields_[4] - fields_[3] - fields_[2] - fields_[1];
 
   if (total_)
-    FieldMeterDecay::setUsed (total_ - fields_[6 + _shAdj], total_);
+    setUsed (total_ - fields_[5], total_);
 }
 
 MemMeter::LineInfo *MemMeter::findLines(LineInfo *tmplate, int len,
@@ -118,23 +94,15 @@ MemMeter::LineInfo *MemMeter::findLines(LineInfo *tmplate, int len,
 void MemMeter::initLineInfo(void){
   static LineInfo infos[] = {
     LineInfo("MemTotal", &total_),
-    LineInfo("MemFree", &fields_[6 + _shAdj]),
-    LineInfo("Buffers", &fields_[2 + _shAdj]),
-    LineInfo("Slab", &fields_[3 + _shAdj]),
-    LineInfo("Mapped", &fields_[4 + _shAdj]),
-    LineInfo("Cached", &fields_[5 + _shAdj])
+    LineInfo("MemFree", &fields_[5]),
+    LineInfo("Buffers", &fields_[1]),
+    LineInfo("Slab", &fields_[2]),
+    LineInfo("Mapped", &fields_[3]),
+    LineInfo("Cached", &fields_[4])
   };
   _numMIlineInfos = sizeof(infos) / sizeof(LineInfo);
 
   _MIlineInfos = findLines(infos, _numMIlineInfos, MEMFILENAME);
-
-  static LineInfo msinfos[] = {
-    LineInfo("Shared", &fields_[1])
-  };
-  _numMSlineInfos = sizeof(msinfos) / sizeof(LineInfo);
-
-  if (_shAdj == 0)
-    _MSlineInfos = findLines(msinfos, _numMSlineInfos, MEMSTATFNAME);
 }
 
 void MemMeter::getmemstat(const char *fname, LineInfo *infos, int ninfos){
