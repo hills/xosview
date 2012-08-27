@@ -1067,7 +1067,17 @@ For all possible NetBSD value names, refer to envstat source code.
 .RE
 
 .RS
-FreeBSD has no usable sensor drivers as of version 9.0.
+FreeBSD has no sensor drivers as of version 9.0. However, ACPI thermal zones
+can be used by defining the sysctl node below hw.acpi.thermal, e.g.
+.br
+xosview*bsdsensor1:     tz0.temperature
+.br
+xosview*bsdsensorHigh1: tz0._CRT
+.br
+.RE
+
+.RS
+ACPI thermal zones work similarly on DragonflyBSD as well.
 .RE
 
 xosview*bsdsensorLabel\fIN\fP:	\fILabelstring\fP

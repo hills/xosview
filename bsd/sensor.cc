@@ -52,11 +52,19 @@ void BSDSensor::checkevent( void ) {
 
 void BSDSensor::getsensor( void ) {
 	float value;
-	BSDGetSensor(name_.substr(0, name_.find_first_of('.')).c_str(), name_.substr(name_.find_first_of('.') + 1).c_str(), &value);
+	BSDGetSensor( name_.substr(0, name_.find_first_of('.')).c_str(),
+	              name_.substr(name_.find_first_of('.') + 1).c_str(), &value );
 	if ( !high_.empty() ) {
 		float high;
-		BSDGetSensor(high_.substr(0, high_.find_first_of('.')).c_str(), high_.substr(high_.find_first_of('.') + 1).c_str(), &high);
-		total_ = high;
+		BSDGetSensor( high_.substr(0, high_.find_first_of('.')).c_str(),
+		              high_.substr(high_.find_first_of('.') + 1).c_str(), &high );
+		if (high != total_) {
+			char l[20];
+			snprintf(l, 20, "ACT/HIGH/%d", (int)high);
+			legend(l);
+			drawlegend();
+			total_ = high;
+		}
 	}
 	fields_[0] = (double)value;
 	fields_[1] = total_ - fields_[0];

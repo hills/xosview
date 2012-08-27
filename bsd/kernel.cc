@@ -1319,15 +1319,30 @@ BSDGetSensor(const char *name, const char *valname, float *value) {
 	prop_object_iterator_release(piter);
 	prop_object_release(pdict);
 #else  /* XOSVIEW_NETBSD */
+	size_t size;
+	char dummy[50];
+#if defined(XOSVIEW_FREEBSD) || defined(XOSVIEW_DFBSD)
+	// FreeBSD has no sensor framework, but ACPI thermal zones might work.
+	// They are readable through sysctl (also works in Dragonfly).
+	// Values are in 10 * degrees Kelvin.
+	if ( strncmp(name, "tz", 2) == 0 ) {
+		int val = 0;
+		size = sizeof(val);
+		snprintf(dummy, 50, "hw.acpi.thermal.%s.%s", name, valname);
+		if ( sysctlbyname(dummy, &val, &size, NULL, 0) < 0 )
+			err(EX_OSERR, "sysctl %s failed", dummy);
+		*value = ((float)val - 2732.0) / 10.0;
+		return;
+	}
+	// If Dragonfly and tzN specified, return. Otherwise, fall through.
+#endif
 #if defined(XOSVIEW_OPENBSD) || defined(XOSVIEW_DFBSD)
 	/* Adapted from systat. */
 	// All kinds of sensors are read with sysctl. We have to go through them
 	// to find the required device and value. Parameter 'name' is the device
 	// name and 'valname' consists of type and sensor index (e.g. it0.temp1).
 	//  Values are transformed to suitable units.
-	int val = 0, index = -1;
-	char dummy[20];
-	size_t size = sizeof(val);
+	int index = -1;
 	struct sensordev sd;
 	struct sensor s;
 
@@ -1398,8 +1413,6 @@ BSDGetSensor(const char *name, const char *valname, float *value) {
 			}
 		}
 	}
-#else  /* XOSVIEW_FREEBSD */
-	warnx("FreeBSD has no sensor framework yet.");
 #endif
 #endif
 }
