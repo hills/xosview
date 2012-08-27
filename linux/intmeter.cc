@@ -6,7 +6,6 @@
 
 #include "intmeter.h"
 #include "xosview.h"
-#include "cpumeter.h"
 #include <fstream>
 #include <sstream>
 #include <map>
@@ -14,12 +13,12 @@
 
 
 static const char *INTFILE     = "/proc/interrupts";
-static const char *VERSIONFILE = "/proc/version";
 
 std::map<int,int> realintnum;
 
 IntMeter::IntMeter( XOSView *parent, int cpu)
-  : BitMeter( parent, "INTS", "", 1, 0, 0 ), _cpu(cpu), _old((getLinuxVersion() <= 2.0) ? true : false) {
+  : BitMeter( parent, "INTS", "", 1, 0, 0 ), _cpu(cpu) {
+  _old = ( CPUMeter::getkernelversion() <= 2000000 ? true : false );
   irqs_ = lastirqs_ = NULL;
   initirqcount();
 }
@@ -48,25 +47,6 @@ void IntMeter::checkResources( void ){
   offColor_ = parent_->allocColor( parent_->getResource( "intOffColor" ) );
   priority_ = atoi(parent_->getResource("intPriority"));
   separate_ = parent_->isResourceTrue("intSeparate");
-}
-
-float IntMeter::getLinuxVersion(void) {
-    std::ifstream vfile(VERSIONFILE);
-    if (!vfile) {
-      std::cerr << "Can not open file : " << VERSIONFILE << std::endl;
-      exit(1);
-    }
-
-    std::string dump;
-    float rval;
-    vfile >> dump >> dump; // Drop the first two words
-    vfile >> rval; // Drops everything but #.# (float regex)
-
-    return rval;
-}
-
-int IntMeter::countCPUs(void) {
- return CPUMeter::countCPUs();
 }
 
 void IntMeter::getirqs( void ){
