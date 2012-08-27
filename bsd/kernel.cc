@@ -301,7 +301,7 @@ BSDPageInit() {
 /* meminfo[5]  = { active, inactive, wired, cached, free } */
 /* pageinfo[2] = { pages_in, pages_out }                   */
 void
-BSDGetPageStats(unsigned long *meminfo, unsigned long *pageinfo) {
+BSDGetPageStats(u_int64_t *meminfo, u_int64_t *pageinfo) {
 #if defined(HAVE_UVM)
 #ifdef VM_UVMEXP2
 	struct uvmexp_sysctl uvm;
@@ -314,9 +314,9 @@ BSDGetPageStats(unsigned long *meminfo, unsigned long *pageinfo) {
 
 	if (meminfo) {
 		// UVM excludes kernel memory -> assume it is active mem
-		meminfo[0] = (unsigned long)(uvm.npages - uvm.inactive - uvm.wired - uvm.free) * uvm.pagesize;
-		meminfo[1] = (unsigned long)uvm.inactive * uvm.pagesize;
-		meminfo[2] = (unsigned long)uvm.wired * uvm.pagesize;
+		meminfo[0] = (u_int64_t)(uvm.npages - uvm.inactive - uvm.wired - uvm.free) * uvm.pagesize;
+		meminfo[1] = (u_int64_t)uvm.inactive * uvm.pagesize;
+		meminfo[2] = (u_int64_t)uvm.wired * uvm.pagesize;
 #if 0
 #if defined(XOSVIEW_OPENBSD)
 		struct bcachestats bcs;
@@ -324,21 +324,21 @@ BSDGetPageStats(unsigned long *meminfo, unsigned long *pageinfo) {
 		if ( sysctl(mib_bcs, 3, &bcs, &size, NULL, 0) < 0 )
 			err(EX_OSERR, "sysctl vfs.generic.bcachestats failed");
 
-		meminfo[3] = (unsigned long)bcs.numbufpages * uvm.pagesize;
+		meminfo[3] = (u_int64_t)bcs.numbufpages * uvm.pagesize;
 #else
 		unsigned long bm = 0;
 		safe_kvm_read_symbol(BUFMEM_SYM_INDEX, &bm, sizeof(bm));
-		meminfo[3] = bm + (unsigned long)(uvm.filepages + uvm.execpages) * uvm.pagesize;
+		meminfo[3] = bm + (u_int64_t)(uvm.filepages + uvm.execpages) * uvm.pagesize;
 #endif
 #endif
 		// cache is already included in active and inactive memory and
 		// there's no way to know how much is in which -> disable cache
 		meminfo[3] = 0;
-		meminfo[4] = (unsigned long)uvm.free * uvm.pagesize;
+		meminfo[4] = (u_int64_t)uvm.free * uvm.pagesize;
 	}
 	if (pageinfo) {
-		pageinfo[0] = (unsigned long)uvm.pgswapin;
-		pageinfo[1] = (unsigned long)uvm.pgswapout;
+		pageinfo[0] = (u_int64_t)uvm.pgswapin;
+		pageinfo[1] = (u_int64_t)uvm.pgswapout;
 	}
 #else  /* HAVE_UVM */
 	struct vmmeter vm;
@@ -355,22 +355,22 @@ BSDGetPageStats(unsigned long *meminfo, unsigned long *pageinfo) {
 #endif
 	if (meminfo) {
 #if defined(XOSVIEW_FREEBSD)
-		meminfo[0] = vm.v_active_count * vm.v_page_size;
-		meminfo[1] = vm.v_inactive_count * vm.v_page_size;
-		meminfo[2] = vm.v_wire_count * vm.v_page_size;
-		meminfo[3] = vm.v_cache_count * vm.v_page_size;
-		meminfo[4] = vm.v_free_count * vm.v_page_size;
+		meminfo[0] = (u_int64_t)vm.v_active_count * vm.v_page_size;
+		meminfo[1] = (u_int64_t)vm.v_inactive_count * vm.v_page_size;
+		meminfo[2] = (u_int64_t)vm.v_wire_count * vm.v_page_size;
+		meminfo[3] = (u_int64_t)vm.v_cache_count * vm.v_page_size;
+		meminfo[4] = (u_int64_t)vm.v_free_count * vm.v_page_size;
 #else  /* XOSVIEW_DFBSD */
-		meminfo[0] = vms.v_active_count * vms.v_page_size;
-		meminfo[1] = vms.v_inactive_count * vms.v_page_size;
-		meminfo[2] = vms.v_wire_count * vms.v_page_size;
-		meminfo[3] = vms.v_cache_count * vms.v_page_size;
-		meminfo[4] = vms.v_free_count * vms.v_page_size;
+		meminfo[0] = (u_int64_t)vms.v_active_count * vms.v_page_size;
+		meminfo[1] = (u_int64_t)vms.v_inactive_count * vms.v_page_size;
+		meminfo[2] = (u_int64_t)vms.v_wire_count * vms.v_page_size;
+		meminfo[3] = (u_int64_t)vms.v_cache_count * vms.v_page_size;
+		meminfo[4] = (u_int64_t)vms.v_free_count * vms.v_page_size;
 #endif
 	}
 	if (pageinfo) {
-		pageinfo[0] = vm.v_vnodepgsin + vm.v_swappgsin;
-		pageinfo[1] = vm.v_vnodepgsout + vm.v_swappgsout;
+		pageinfo[0] = (u_int64_t)vm.v_vnodepgsin + (u_int64_t)vm.v_swappgsin;
+		pageinfo[1] = (u_int64_t)vm.v_vnodepgsout + (u_int64_t)vm.v_swappgsout;
 	}
 #endif
 }

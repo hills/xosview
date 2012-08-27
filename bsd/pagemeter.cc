@@ -47,7 +47,7 @@ void PageMeter::checkevent( void ) {
 }
 
 void PageMeter::getpageinfo( void ) {
-	unsigned long info[2];
+	u_int64_t info[2];
 	BSDGetPageStats(NULL, info);
 
 	fields_[0] = info[0] - previnfo_[0];

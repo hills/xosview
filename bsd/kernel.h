@@ -30,7 +30,7 @@ void
 BSDPageInit();
 
 void
-BSDGetPageStats(unsigned long *meminfo, unsigned long *pageinfo);
+BSDGetPageStats(u_int64_t *meminfo, u_int64_t *pageinfo);
 
 void
 BSDCPUInit();

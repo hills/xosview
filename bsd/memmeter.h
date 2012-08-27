@@ -32,7 +32,7 @@ protected:
 	void getmeminfo( void );
 
 private:
-	unsigned long meminfo_[5];
+	u_int64_t meminfo_[5];
 };
 
 
