@@ -6,11 +6,7 @@
 #ifdef HAVE_XPM
 #include <X11/xpm.h>
 #endif
-#ifdef HAVE_IOSTREAM
 #include <iostream>
-#else
-#include <iostream>
-#endif
 #include <string.h>
 
 class XWin;

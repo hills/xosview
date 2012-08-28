@@ -53,7 +53,8 @@ OBJS += linux/MeterMaker.o \
 	linux/wirelessmeter.o \
 	linux/acpitemp.o \
 	linux/coretemp.o
-CPPFLAGS += -Ilinux/
+CPPFLAGS += -Ilinux/ -DHAVE_XPM -DHAVE_USLEEP
+LDLIBS += -lXpm
 endif
 
 ifeq ($(PLATFORM), bsd)
@@ -71,7 +72,8 @@ OBJS += bsd/MeterMaker.o \
         bsd/swapmeter.o \
         bsd/coretemp.o \
         bsd/sensor.o
-CPPFLAGS += -Ibsd/
+CPPFLAGS += -Ibsd/ -DHAVE_XPM -DHAVE_USLEEP
+LDLIBS += -lXpm
 endif
 
 ifeq ($(PLATFORM), irix65)

@@ -10,8 +10,9 @@
 #include "xosview.h"
 #include "meter.h"
 #include "MeterMaker.h"
-#if (defined(XOSVIEW_NETBSD) || defined(XOSVIEW_FREEBSD) || defined(XOSVIEW_OPENBSD))
-#include "kernel.h"
+#if ( defined(XOSVIEW_NETBSD) || defined(XOSVIEW_FREEBSD) || \
+      defined(XOSVIEW_OPENBSD) || defined(XOSVIEW_DFBSD) )
+# include "kernel.h"
 #endif
 
 static const char * const versionString = "xosview version: Git";
@@ -82,7 +83,8 @@ XOSView::XOSView( const char * instName, int argc, char *argv[] ) : XWin(),
     sleeptime_ = usleeptime_ / 1000000;
     usleeptime_ = usleeptime_ % 1000000;
   } else { sleeptime_ = 0; }
-#if (defined(XOSVIEW_NETBSD) || defined(XOSVIEW_FREEBSD) || defined(XOSVIEW_OPENBSD))
+#if ( defined(XOSVIEW_NETBSD) || defined(XOSVIEW_FREEBSD) || \
+      defined(XOSVIEW_OPENBSD) || defined(XOSVIEW_DFBSD) )
   BSDInit();	/*  Needs to be done before processing of -N option.  */
 #endif
 
@@ -406,7 +408,8 @@ void XOSView::checkArgs (int argc, char** argv) const
 		  argc--;
 		}
 		break;
-#if (defined(XOSVIEW_NETBSD) || defined(XOSVIEW_FREEBSD) || defined(XOSVIEW_OPENBSD))
+#if ( defined(XOSVIEW_NETBSD) || defined(XOSVIEW_FREEBSD) || \
+      defined(XOSVIEW_OPENBSD) || defined(XOSVIEW_DFBSD) )
       case 'N': if (strlen(argv[0]) > 2)
       		  SetKernelName(argv[0]+2);
 		else
