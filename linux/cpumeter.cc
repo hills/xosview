@@ -16,7 +16,7 @@
 
 static const char STATFILENAME[] = "/proc/stat";
 static const char VERSIONFILENAME[] = "/proc/version";
-static int cputime_to_field[10] = { 0, 1, 2, 9, 5, 4, 3, 6, 8, 7 };
+static int cputime_to_field[10] = { 0, 1, 2, 9, 5, 4, 3, 8, 6, 7 };
 
 #define MAX_PROCSTAT_LENGTH 4096
 
@@ -120,18 +120,22 @@ void CPUMeter::getcputime( void ){
 
   // Guest time already included in user time
   // Sometimes guest > user though
-  if (fields_[6] > fields_[0])
-    fields_[6] = fields_[0];
-  fields_[0] -= fields_[6];
-  total_ -= fields_[6];
+  if (kernel_ >= 2006024) {
+    if (fields_[6] > fields_[0])
+      fields_[6] = fields_[0];
+    fields_[0] -= fields_[6];
+    total_ -= fields_[6];
+  }
   // Same applies to niced guest times
-  if (fields_[7] > fields_[1])
-    fields_[7] = fields_[1];
-  fields_[1] -= fields_[7];
-  total_ -= fields_[7];
+  if (kernel_ >= 2006032) {
+    if (fields_[7] > fields_[1])
+      fields_[7] = fields_[1];
+    fields_[1] -= fields_[7];
+    total_ -= fields_[7];
+  }
 
   if (total_){
-    setUsed (total_ - fields_[9], total_); // any non-idle time
+    setUsed (total_ - fields_[numfields_ - 1], total_); // any non-idle time
     cpuindex_ = (cpuindex_ + 1) % 2;
   }
 }
@@ -206,12 +210,12 @@ int CPUMeter::getkernelversion(void){
     std::cerr << "Can not get kernel version from " << VERSIONFILENAME << "." << std::endl;
     exit(1);
   }
-  
+
   std::string tmp, version;
   int major = 0, minor = 0, micro = 0;
-  
+
   f >> tmp >> tmp >> version;
   sscanf(version.c_str(), "%d.%d.%d", &major, &minor, &micro);
-  
+
   return ( major*1000000 + minor*1000 + micro);
 }
