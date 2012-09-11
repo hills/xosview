@@ -110,28 +110,17 @@ void CPUMeter::getcputime( void ){
 	      >>cputime_[cpuindex_][8]
 	      >>cputime_[cpuindex_][9];
 
+  // Guest time already included in user time.
+  cputime_[cpuindex_][0] -= cputime_[cpuindex_][8];
+  // Same applies to niced guest time.
+  cputime_[cpuindex_][1] -= cputime_[cpuindex_][9];
+
   int oldindex = (cpuindex_+1)%2;
   for ( int i = 0 ; i < numfields_ ; i++ ){
     int field = cputime_to_field[i];
     // counters in /proc/stat do sometimes go backwards
     fields_[field] = ( cputime_[cpuindex_][i] > cputime_[oldindex][i] ? cputime_[cpuindex_][i] - cputime_[oldindex][i] : 0 );
     total_ += fields_[field];
-  }
-
-  // Guest time already included in user time
-  // Sometimes guest > user though
-  if (kernel_ >= 2006024) {
-    if (fields_[6] > fields_[0])
-      fields_[6] = fields_[0];
-    fields_[0] -= fields_[6];
-    total_ -= fields_[6];
-  }
-  // Same applies to niced guest times
-  if (kernel_ >= 2006032) {
-    if (fields_[7] > fields_[1])
-      fields_[7] = fields_[1];
-    fields_[1] -= fields_[7];
-    total_ -= fields_[7];
   }
 
   if (total_){
