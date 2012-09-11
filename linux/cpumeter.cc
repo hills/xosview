@@ -116,11 +116,14 @@ void CPUMeter::getcputime( void ){
   cputime_[cpuindex_][1] -= cputime_[cpuindex_][9];
 
   int oldindex = (cpuindex_+1)%2;
-  for ( int i = 0 ; i < numfields_ ; i++ ){
+  // zero all the fields
+  memset(fields_, 0, numfields_*sizeof(fields_[0]));
+  for ( int i = 0 ; i < 10 ; i++ ){
     int field = cputime_to_field[i];
     // counters in /proc/stat do sometimes go backwards
-    fields_[field] = ( cputime_[cpuindex_][i] > cputime_[oldindex][i] ? cputime_[cpuindex_][i] - cputime_[oldindex][i] : 0 );
-    total_ += fields_[field];
+    int time = ( cputime_[cpuindex_][i] > cputime_[oldindex][i] ? cputime_[cpuindex_][i] - cputime_[oldindex][i] : 0 );
+    fields_[field] += time;
+    total_ += time;
   }
 
   if (total_){
