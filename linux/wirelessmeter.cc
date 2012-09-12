@@ -65,27 +65,29 @@ void WirelessMeter::getpwrinfo( void ){
 
   int linkq = 0;
 
-if (strncmp(devname, "0", 1)) {
-
-  while (!loadinfo.eof()){
-    loadinfo.getline(buff, 256);
-    if (!loadinfo.eof()){
+  if (strncmp(devname, "0", 1)) {
+    while (!loadinfo.eof()){
+      loadinfo.getline(buff, 256);
+      if (!loadinfo.eof()){
         loadinfo >> buff;
-      if (!strncmp(buff, devname, strlen(devname))) {
-	loadinfo >> buff >> linkq; }
+        if (!strncmp(buff, devname, strlen(devname)))
+          loadinfo >> buff >> linkq;
+      }
+    }
+  }
 
-} } }
-
-if (!strncmp(devname, "0", 1)) {
-
-  for (int i = 0 ; i < _number; ) {
-    loadinfo.getline(buff, 256);
-	loadinfo >> devname >> buff >> linkq;
-	if (!loadinfo.eof()){
-          if ( linkq != 0 ) i++; }
-		if ( loadinfo.eof() ) break; }
-
-}
+  if (!strncmp(devname, "0", 1)) {
+    for (int i = 0 ; i < _number; ) {
+      loadinfo.getline(buff, 256);
+      loadinfo >> devname >> buff >> linkq;
+      if (!loadinfo.eof()){
+        if ( linkq != 0 )
+          i++;
+      }
+      if ( loadinfo.eof() )
+        break;
+    }
+  }
 
   fields_[0] = linkq;
 
@@ -116,20 +118,21 @@ int WirelessMeter::countdevices(void){
     exit( 1 );
   }
 
-char buf[1024];
+  char buf[1024];
 
-for (int i = 1 ; i < 2 ; i++)
+  for (int i = 1 ; i < 2 ; i++)
     stats.getline(buf, 1024);
 
   int wirelessCount = 0;
   int linkq = 0;
   while (!stats.eof()){
     stats.getline(buf, 1024);
-	stats >> buf >> buf >> linkq;
-if (!stats.eof()){
-	  if ( linkq != 0 )
+    stats >> buf >> buf >> linkq;
+    if (!stats.eof()){
+      if ( linkq != 0 )
           wirelessCount++;
-  }}
+    }
+  }
 
   return wirelessCount;
 }
