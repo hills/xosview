@@ -919,7 +919,6 @@ BSDNumInts() {
 	}
 #elif defined(XOSVIEW_OPENBSD)
 	int nintr = 0;
-	char name[128];
 	int mib_int[4] = { CTL_KERN, KERN_INTRCNT, KERN_INTRCNT_NUM };
 	size_t size = sizeof(nintr);
 	if ( sysctl(mib_int, 3, &nintr, &size, NULL, 0) < 0 ) {
@@ -929,7 +928,7 @@ BSDNumInts() {
 	for (int i = 0; i < nintr; i++) {
 		mib_int[2] = KERN_INTRCNT_VECTOR;
 		mib_int[3] = i;
-		size = sizeof(name);
+		size = sizeof(nbr);
 		if ( sysctl(mib_int, 4, &nbr, &size, NULL, 0) < 0 )
 			warn("Could not get name of interrupt %d", i);
 		else
