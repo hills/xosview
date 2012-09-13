@@ -105,18 +105,18 @@ The \\$1 meter will use this color to display the \\$3 field.
 .\"  ================  End of Macros  =============================
 .SH DESCRIPTION
 \fIxosview\fP is a monitor which displays the status of several system
-based parameters.  These include CPU usage, load average, memory, swap
+parameters.  These include CPU usage, load average, memory, swap
 space, network usage and more.  Each resource is displayed as a
 horizontal bar which is separated into color coded regions showing how
-much of the resource which is being put to a particular use.
+much of the resource is being put to a particular use.
 
 \fIxosview\fP runs on several platforms (Linux, NetBSD, FreeBSD,
-OpenBSD, some Solaris systems, IRIX 6.5, HPUX and GNU).  Not all of
-the meters described below are supported on all platforms.  Some of
-the meters may appear different depending upon the platform
+OpenBSD, DragonflyBSD, some Solaris systems, IRIX 6.5, HPUX and GNU).
+Not all of the meters described below are supported on all platforms.
+Some of the meters may appear different depending upon the platform
 \fIxosview\fP is running on.  Note that *BSD is used as an
-abbreviation for all three of the free BSD operating systems (NetBSD,
-FreeBSD, OpenBSD).
+abbreviation for all the supported BSD operating systems (NetBSD,
+FreeBSD, OpenBSD, DragonflyBSD).
 
 \fBLoad\fP: Kernel reported load average
    all platforms  :  load
@@ -124,14 +124,16 @@ FreeBSD, OpenBSD).
    *BSD           :  load | CPU frequency
 
 \fBCPU Usage\fP
-   Linux  : user | nice | system | soft-interrupt | interrupt | io-wait | guest | niced guest | stolen | idle
+   Linux  : user | nice | system | soft-interrupt | interrupt | io-wait |
+            guest | niced guest | stolen | idle
    *BSD   : user | nice | system | interrupt | idle
    IRIX   : user | system | interrupt | wait | idle
    HPUX   : user | nice | system | interrupt | idle
 
 \fBMemory Usage\fP
    Linux  : used | buffers | slab | map | cache | free
-   *BSD   : active | inactive | wired | cache | free
+   FreeBSD: active | inactive | wired | cache | free
+   DFBSD  : active | inactive | wired | cache | free
    OpenBSD: active | inactive | wired | free
    NetBSD : active | inactive | wired | free
    IRIX   : kernel | fs | user | free
@@ -190,7 +192,7 @@ Typing a 'q' in the window will terminate xosview.
 .SH OPTIONS
 
 Most of these command line options are just a convenient way to set one or
-more of xosview's resources.  Please see the \fBRESOURCES\fP section for
+more of \fIxosview\fP's resources.  Please see the \fBRESOURCES\fP section for
 more details on what the resource is for.
 
 \-v
@@ -511,10 +513,9 @@ Display the current CPU speed in the load meter.
 
 xosview*cpu: (True or False)
 .RS
-If True then xosview will display a cpu meter.  On linux SMP machines this
-will cause a separate meter to be displayed for each cpu.  See the
-'README.linux' file for more details. On IRIX 6.5, the resource cpuFormat
-decides which meters are created for multiple CPUs.
+If True then xosview will display a cpu meter.  On Linux and IRIX SMP
+machines, the resource cpuFormat defines how meters are created for
+multiple CPUs.
 .RE
 
 .\"  cpuUserColor, cpuNiceColor, cpuSystemColor, cpuInterruptColor, cpuFreeColor
@@ -896,9 +897,8 @@ xosview*lmstemp\fIN\fP:	\fIfilename\fP
 .RS
 Name of temperature file from /proc/sys/dev/sensors/*/* or
 /sys/class/hwmon/*/*, N=1... Also absolute path is accepted.
-.br
-Note if more files with same name exists, only the first is found unless
-absolute path is used, e.g.
+Note that if more files with same name exists, only the first is found unless
+absolute path is used. For example,
 .br
 xosview*lmstemp1: temp
 .br
@@ -943,10 +943,8 @@ Color between actual and alarm temperatures.
 xosview*acpitemp\fIN\fP: \fIfilename\fP
 .RS
 Name of temperature file from /proc/acpi/thermal_zone or
-/sys/devices/virtual/thermal
-.br
-Note that the last directory part must be given, e.g. TZ0/temperature.
-Absolute path can also be used.
+/sys/devices/virtual/thermal. Note that the last directory part must be
+given, e.g. TZ0/temperature. Absolute path can also be used.
 .RE
 
 xosview*acpihigh\fIN\fP:    \fIfilename\fP
@@ -1043,9 +1041,11 @@ xosview*bsdsensor\fIN\fP:     \fIname.type\fP
 .br
 xosview*bsdsensorHigh\fIN\fP: \fIname.type\fP
 .RS
-Here, the name is the sensor driver, and type is the wanted value. Also
-absolute value is accepted for bsdsensorHigh\fIN\fP. You can find the correct
-pair for OpenBSD and DragonflyBSD with systat command, e.g.
+Here, the name is the sensor driver, and type is the wanted value. Also static
+numerical value is accepted for bsdsensorHigh\fIN\fP.
+.br
+You can find the correct pair for OpenBSD and DragonflyBSD with systat
+command, e.g.
 .br
 xosview*bsdsensor1:     it0.temp1
 .br
@@ -1096,7 +1096,7 @@ xosview*battery: (True or False)
 .RS
 If True then xosview will display a battery meter.  Linux users will need
 to have APM or ACPI support in their kernels for this to work.
-For both, APM and ACPI xosview shows the status/sum of all batteries.
+For both APM and ACPI, xosview shows the status/sum of all batteries.
 Additionally - the legend text gets changed/adjusted to reflect the
 current state (charging/low/critical/etc.) of the battery/batteries.
 .RE
@@ -1131,7 +1131,6 @@ Depends on the machine - e.g. below 25% remaining capacity.
 xosview*batteryCritColor: \fIcolor\fP
 .RS
 APM case: the 'left' color if APM indicates 'critical' state. (less than 5%)
-
 ACPI case: the 'left' color if the remaining capacity is below the alarm value.
 (which can be set by the user in /proc/acpi/battery/BAT[01]/alarm )
 .RE
@@ -1151,25 +1150,25 @@ If no battery is present - or all batteries get removed (while on AC).
 
 xosview*wireless: (True or False)
 .RS
-If True then xosview will display the link-Quality of wireless connections.
-Note that the graph will *never* schow up, if you don't have any wireless
-Devices, or no wireless extensions in Kernel (/proc/net/wireless).
+If True then xosview will display the link quality of each wireless connection.
+Note that the graph will *never* show up, if you don't have any wireless
+devices, or no wireless extensions in the kernel (/proc/net/wireless).
 Default is true.
 .RE
 
 xosview*PoorQualityColor: \fIcolor\fP
 .RS
-This is the color for the Link-Graph with Quality between 0 and 6.
+This is the color for the quality field when between 0 and 6.
 .RE
 
 xosview*FairQualityColor: \fIcolor\fP
 .RS
-This is the color for the Link-Graph with Quality between 7 and 14.
+This is the color for the quality field when between 7 and 14.
 .RE
 
 xosview*GoodQualityColor: \fIcolor\fP
 .RS
-This is the color for the Link-Graph with Quality higher than 14.
+This is the color for the quality field when higher than 14.
 .RE
 
 xosview*wirelessUsedColor: \fIcolor\fP
