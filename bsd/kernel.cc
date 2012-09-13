@@ -264,14 +264,18 @@ BSDGetCPUSpeed() {
 
 #if defined(XOSVIEW_FREEBSD)
 	char name[25];
-	int speed = 0, cpus = BSDCountCpus();
+	int speed = 0, cpus = BSDCountCpus(), avail_cpus = 0;
 	size = sizeof(speed);
 	for (int i = 0; i < cpus; i++) {
 		snprintf(name, 25, "dev.cpu.%d.freq", i);
-		sysctlbyname(name, &speed, &size, NULL, 0);
-		cpu_speed += speed;
+		if ( sysctlbyname(name, &speed, &size, NULL, 0) == 0 ) {
+			// count only cpus with individual freq available
+			cpu_speed += speed;
+			avail_cpus++;
+		}
 	}
-	cpu_speed /= cpus;
+	if (avail_cpus > 1)
+		cpu_speed /= avail_cpus;
 #elif defined(XOSVIEW_OPENBSD)
 	size = sizeof(cpu_speed);
 	if ( sysctl(mib_spd, 2, &cpu_speed, &size, NULL, 0) < 0 )
