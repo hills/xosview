@@ -27,6 +27,7 @@ protected:
   long long cputime_[2][10];
   int cpuindex_;
   int kernel_;
+  int statfields_;
 
   void getcputime(void);
   int findLine(const char *cpuID);

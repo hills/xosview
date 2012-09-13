@@ -556,6 +556,76 @@ creates one cumulative meter and one for each CPU. `auto' makes a
 choice based on the number of CPUs found.
 .RE
 
+xosview*cpuFields: USED/USR/NIC/SYS/INT/SI/HI/WIO/GST/NGS/STL/IDLE
+.RS
+The set of fields to show in Linux CPU meter instead the default of all
+available fields. Possible fields are:
+
+\fBUSED\fP:
+.RS
+Combine all used CPU time into one field. This is the sum of user, nice,
+system, soft and hard interrupts, guest, niced guest and stolen times.
+None of these, except stolen, may be defined together with `USED'.
+.RE
+\fBIDLE\fP:
+.RS
+Time spent doing nothing. Includes I/O wait if it is not defined separately.
+.RE
+\fBUSR\fP:
+.RS
+Time spent in user mode processes. Includes nice, guest and niced guest if
+those are not defined separately.
+.RE
+\fBNIC\fP:
+.RS
+Time spent in niced user mode processes. Includes niced guest if neither it
+nor guest is not defined separately.
+.RE
+\fBSYS\fP:
+.RS
+Time spent in kernel code. Includes soft and hard interrupt as well as stolen
+time if those are not defined separately.
+.RE
+\fBINT\fP:
+.RS
+Combines soft and hard interrupt handling times into one field.
+.RE
+\fBSI\fP:
+.RS
+Time the kernel used to handle soft interrupts. Available on Linux kernel
+2.6.0 and higher.
+.RE
+\fBHI\fP:
+.RS
+Time the kernel used to handle hard interrupts. Available on Linux kernel
+2.6.0 and higher.
+.RE
+\fBWIO\fP:
+.RS
+Time spent waiting for I/O to complete. Available on Linux kernel
+2.6.0 and higher.
+.RE
+\fBGST\fP:
+.RS
+Time spent running guest OS in virtual machine. Includes niced guest if
+it is not defined separately. Available on Linux kernel 2.6.24 and higher.
+.RE
+\fBNGS\fP:
+.RS
+Time spent running niced guest OS in virtual machine. Available on Linux kernel
+2.6.32 and higher.
+.RE
+\fBSTL\fP:
+.RS
+Involuntary wait time when running as guest in virtual machine. Available
+on Linux kernel 2.6.11 and higher.
+.RE
+
+Most combinations are possible (see above for restrictions), but at least
+`USED' or `USR' and `SYS' need to be defined. `IDLE' field is added
+automatically.
+.RE
+
 
 \fBMemory Meter Resources\fP
 

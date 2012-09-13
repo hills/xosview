@@ -21,33 +21,23 @@ static int cputime_to_field[10] = { 0, 1, 2, 9, 5, 4, 3, 8, 6, 7 };
 #define MAX_PROCSTAT_LENGTH 4096
 
 CPUMeter::CPUMeter(XOSView *parent, const char *cpuID)
-: FieldMeterGraph( parent, 10, toUpper(cpuID), "USR/NIC/SYS/SI/HI/WIO/GST/NGS/ST/IDLE" ) {
+: FieldMeterGraph( parent, 10, toUpper(cpuID), "USR/NIC/SYS/SI/HI/WIO/GST/NGS/STL/IDLE" ) {
   _lineNum = findLine(cpuID);
   for ( int i = 0 ; i < 2 ; i++ )
     for ( int j = 0 ; j < 10 ; j++ )
       cputime_[i][j] = 0;
   cpuindex_ = 0;
   kernel_ = getkernelversion();
-  if (kernel_ < 2006000) {  // 2.4 kernels had four stats
-    legend("USR/NIC/SYS/IDLE");
-    setNumFields(4);
-    cputime_to_field[3] = 3;
-  }
-  else if (kernel_ < 2006011) {  // steal time appeared on 2.6.11
-    legend("USR/NIC/SYS/SI/HI/WIO/IDLE");
-    setNumFields(7);
-    cputime_to_field[3] = 6;
-  }
-  else if (kernel_ < 2006024) {  // guest time appeared on 2.6.24
-    legend("USR/NIC/SYS/SI/HI/WIO/ST/IDLE");
-    setNumFields(8);
-    cputime_to_field[3] = 7;
-  }
-  else if (kernel_ < 2006032) {  // niced guest time appeared on 2.6.32
-    legend("USR/NIC/SYS/SI/HI/WIO/GST/ST/IDLE");
-    setNumFields(9);
-    cputime_to_field[3] = 8;
-  }
+  if (kernel_ < 2006000)
+    statfields_ = 4;
+  else if (kernel_ < 2006011)
+    statfields_ = 7;
+  else if (kernel_ < 2006024)
+    statfields_ = 8;
+  else if (kernel_ < 2006032)
+    statfields_ = 9;
+  else
+    statfields_ = 10;
 }
 
 CPUMeter::~CPUMeter( void ){
@@ -56,25 +46,211 @@ CPUMeter::~CPUMeter( void ){
 void CPUMeter::checkResources( void ){
   FieldMeterGraph::checkResources();
 
-  setfieldcolor( 0, parent_->getResource( "cpuUserColor" ) );
-  setfieldcolor( 1, parent_->getResource( "cpuNiceColor" ) );
-  setfieldcolor( 2, parent_->getResource( "cpuSystemColor" ) );
-  if (kernel_ >= 2006000) {
-    setfieldcolor( 3, parent_->getResource( "cpuSInterruptColor" ) );
-    setfieldcolor( 4, parent_->getResource( "cpuInterruptColor" ) );
-    setfieldcolor( 5, parent_->getResource( "cpuWaitColor" ) );
-  }
-  if (kernel_ >= 2006024)
-    setfieldcolor( 6, parent_->getResource( "cpuGuestColor" ) );
-  if (kernel_ >= 2006032)
-    setfieldcolor( 7, parent_->getResource( "cpuNiceGuestColor" ) );
-  if (kernel_ >= 2006011)
-    setfieldcolor( numfields_-2, parent_->getResource( "cpuStolenColor" ) );
-  setfieldcolor( numfields_-1, parent_->getResource( "cpuFreeColor" ) );
-  priority_ = atoi (parent_->getResource( "cpuPriority" ) );
+  unsigned long usercolor = parent_->allocColor(parent_->getResource( "cpuUserColor" ) );
+  unsigned long nicecolor = parent_->allocColor(parent_->getResource( "cpuNiceColor" ) );
+  unsigned long syscolor  = parent_->allocColor(parent_->getResource( "cpuSystemColor" ) );
+  unsigned long sintcolor = parent_->allocColor(parent_->getResource( "cpuSInterruptColor" ) );
+  unsigned long intcolor  = parent_->allocColor(parent_->getResource( "cpuInterruptColor" ) );
+  unsigned long waitcolor = parent_->allocColor(parent_->getResource( "cpuWaitColor" ) );
+  unsigned long gstcolor  = parent_->allocColor(parent_->getResource( "cpuGuestColor" ) );
+  unsigned long ngstcolor = parent_->allocColor(parent_->getResource( "cpuNiceGuestColor" ) );
+  unsigned long stealcolor= parent_->allocColor(parent_->getResource( "cpuStolenColor" ) );
+  unsigned long idlecolor = parent_->allocColor(parent_->getResource( "cpuFreeColor" ) );
+
+  priority_ = atoi(parent_->getResource( "cpuPriority" ) );
   dodecay_ = parent_->isResourceTrue( "cpuDecay" );
   useGraph_ = parent_->isResourceTrue( "cpuGraph" );
-  SetUsedFormat (parent_->getResource("cpuUsedFormat"));
+  SetUsedFormat(parent_->getResource("cpuUsedFormat") );
+
+  const char *f = parent_->getResourceOrUseDefault( "cpuFields", NULL );
+  if (f == NULL) {
+    /* Use default fields. */
+    if (kernel_ < 2006000)  // 2.4 kernels had four stats
+      legend("USR/NIC/SYS/IDLE");
+    else if (kernel_ < 2006011)  // steal time appeared on 2.6.11
+      legend("USR/NIC/SYS/SI/HI/WIO/IDLE");
+    else if (kernel_ < 2006024)  // guest time appeared on 2.6.24
+      legend("USR/NIC/SYS/SI/HI/WIO/STL/IDLE");
+    else if (kernel_ < 2006032)  // niced guest time appeared on 2.6.32
+      legend("USR/NIC/SYS/SI/HI/WIO/GST/STL/IDLE");
+    setNumFields(statfields_);
+    // idle is always the last field
+    cputime_to_field[3] = numfields_ - 1;
+
+    setfieldcolor(0, usercolor);
+    setfieldcolor(1, nicecolor);
+    setfieldcolor(2, syscolor);
+    setfieldcolor(numfields_-1, idlecolor);
+    if (kernel_ >= 2006000) {
+      setfieldcolor(3, sintcolor);
+      setfieldcolor(4, intcolor);
+      setfieldcolor(5, waitcolor);
+    }
+    if (kernel_ >= 2006011)
+      setfieldcolor(numfields_-2, stealcolor);
+    if (kernel_ >= 2006024)
+      setfieldcolor(6, gstcolor);
+    if (kernel_ >= 2006032)
+      setfieldcolor(7, ngstcolor);
+
+    return;
+  }
+
+  /* Use user-defined fields.
+   * Fields         Including if not its own field
+   * --------------|------------------------------
+   *   USED         all used time, including user and system times
+   *     USR        user time, including nice and guest times
+   *       NIC      niced time, including niced guest unless guest is present
+   *       GST      guest time, including niced guest time
+   *         NGS    niced guest time
+   *     SYS        system time, including interrupt and stolen times
+   *       INT      interrupt time, including soft and hard interrupt times
+   *         HI     hard interrupt time
+   *         SI     soft interrupt time
+   *       STL      stolen time
+   *   IDLE         idle time, including io wait time
+   *     WIO        io wait time
+   *
+   * Stolen time is a class of its own in kernel scheduler, in cpufreq it is
+   * considered used time. Here it is part of used and system time, but can be
+   * separate field as well.
+   * Idle field is always present.
+   * Either USED or at least USR+SYS must be included.
+   */
+
+  std::string lgnd, fields(f);
+  int field = 0;
+
+  /* Check for possible fields and define field mapping. Assign colors and
+   * build legend on the way.
+   */
+  if (fields.find("USED") != fields.npos) { // USED = USR+NIC+SYS+SI+HI+GST+NGS(+STL)
+    if (fields.find("USR") != fields.npos || fields.find("NIC") != fields.npos ||
+        fields.find("SYS") != fields.npos || fields.find("INT") != fields.npos ||
+        fields.find("HI")  != fields.npos || fields.find("SI")  != fields.npos ||
+        fields.find("GST") != fields.npos || fields.find("NGS") != fields.npos) {
+      std::cerr << "'USED' cannot be in cpuFields together with either 'USR', "
+                << "'NIC', 'SYS', 'INT', 'HI', 'SI', 'GST' or 'NGS'." << std::endl;
+      exit(1);
+    }
+    setfieldcolor(field, usercolor);
+    if (kernel_ >= 2006000) // SI and HI
+      cputime_to_field[5] = cputime_to_field[6] = field;
+    if (kernel_ >= 2006024) // GST
+      cputime_to_field[8] = field;
+    if (kernel_ >= 2006032) // NGS
+      cputime_to_field[9] = field;
+    if (kernel_ >= 2006011 && fields.find("STL") == fields.npos)
+      cputime_to_field[7] = field; // STL can be separate as well
+    // USR, NIC and SYS
+    cputime_to_field[0] = cputime_to_field[1] = cputime_to_field[2] = field++;
+    lgnd = "USED";
+  }
+  if (fields.find("USR") != fields.npos) {
+    setfieldcolor(field, usercolor);
+    // add NIC if not on its own
+    if (fields.find("NIC") == fields.npos)
+      cputime_to_field[1] = field;
+    // add GST if not on its own
+    if (kernel_ >= 2006024 && fields.find("GST") == fields.npos)
+      cputime_to_field[8] = field;
+    // add NGS if not on its own and neither NIC or GST is present
+    if (kernel_ >= 2006032 && fields.find("NGS") == fields.npos &&
+        fields.find("NIC") == fields.npos && fields.find("GST") == fields.npos)
+      cputime_to_field[9] = field;
+    cputime_to_field[0] = field++;
+    lgnd = "USR";
+  }
+  else {
+    if (fields.find("USED") == fields.npos) {
+      std::cerr << "Either 'USED' or 'USR' is mandatory in cpuFields." << std::endl;
+      exit(1);
+    }
+  }
+  if (fields.find("NIC") != fields.npos) {
+    setfieldcolor(field, nicecolor);
+    // add NGS if not on its own and GST is not present
+    if (kernel_ >= 2006032 && fields.find("NGS") == fields.npos &&
+        fields.find("GST") == fields.npos)
+      cputime_to_field[9] = field;
+    cputime_to_field[1] = field++;
+    lgnd += "/NIC";
+  }
+  if (fields.find("SYS") != fields.npos) {
+    setfieldcolor(field, syscolor);
+    // add SI if not on its own and INT is not present
+    if (kernel_ >= 2006000 && fields.find("SI") == fields.npos &&
+        fields.find("INT") == fields.npos)
+      cputime_to_field[6] = field;
+    // add HI if not on its own and INT is not present
+    if (kernel_ >= 2006000 && fields.find("HI") == fields.npos &&
+        fields.find("INT") == fields.npos)
+      cputime_to_field[5] = field;
+    // add STL if not on its own
+    if (kernel_ >= 2006011 && fields.find("STL") == fields.npos)
+      cputime_to_field[7] = field;
+    cputime_to_field[2] = field++;
+    lgnd += "/SYS";
+  }
+  else {
+    if (fields.find("USED") == fields.npos) {
+      std::cerr << "Either 'USED' or 'SYS' is mandatory in cpuFields." << std::endl;
+      exit(1);
+    }
+  }
+  if (kernel_ >= 2006000) {
+    if (fields.find("INT") != fields.npos) { // combine soft and hard interrupt times
+      setfieldcolor(field, intcolor);
+      cputime_to_field[5] = cputime_to_field[6] = field++;
+      lgnd += "/INT";
+    } // Maybe should warn if both INT and HI/SI are requested ???
+    else { // separate soft and hard interrupt times
+      if (fields.find("SI") != fields.npos) {
+        setfieldcolor(field, sintcolor);
+        cputime_to_field[5] = field++;
+        lgnd += "/SI";
+      }
+      if (fields.find("HI") != fields.npos) {
+        setfieldcolor(field, intcolor);
+        cputime_to_field[6] = field++;
+        lgnd += "/HI";
+      }
+    }
+    if (fields.find("WIO") != fields.npos) {
+      setfieldcolor(field, waitcolor);
+      cputime_to_field[4] = field++;
+      lgnd += "/WIO";
+    }
+    if (kernel_ >= 2006024 && fields.find("GST") != fields.npos) {
+      setfieldcolor(field, gstcolor);
+      // add NGS if not on its own
+      if (kernel_ >= 2006032 && fields.find("NGS") == fields.npos)
+        cputime_to_field[9] = field;
+      cputime_to_field[8] = field++;
+      lgnd += "/GST";
+    }
+    if (kernel_ >= 2006032 && fields.find("NGS") != fields.npos) {
+      setfieldcolor(field, ngstcolor);
+      cputime_to_field[9] = field++;
+      lgnd += "/NGS";
+    }
+    if (kernel_ >= 2006011 && fields.find("STL") != fields.npos) {
+      setfieldcolor(field, stealcolor);
+      cputime_to_field[7] = field++;
+      lgnd += "/STL";
+    }
+  }
+  // always add IDLE field
+  setfieldcolor(field, idlecolor);
+  // add WIO if not on its own
+  if (kernel_ >= 2006000 && fields.find("WIO") == fields.npos)
+    cputime_to_field[4] = field;
+  cputime_to_field[3] = field++;
+  lgnd += "/IDLE";
+
+  legend(lgnd.c_str());
+  numfields_ = field; // can't use setNumFields as it destroys the color mapping
 }
 
 void CPUMeter::checkevent( void ){
@@ -118,12 +294,12 @@ void CPUMeter::getcputime( void ){
   int oldindex = (cpuindex_+1)%2;
   // zero all the fields
   memset(fields_, 0, numfields_*sizeof(fields_[0]));
-  for ( int i = 0 ; i < 10 ; i++ ){
-    int field = cputime_to_field[i];
+  for ( int i = 0 ; i < statfields_ ; i++ ){
     // counters in /proc/stat do sometimes go backwards
     int time = ( cputime_[cpuindex_][i] > cputime_[oldindex][i] ? cputime_[cpuindex_][i] - cputime_[oldindex][i] : 0 );
-    fields_[field] += time;
+    fields_[cputime_to_field[i]] += time;
     total_ += time;
+//     XOSDEBUG("cputime_[%d] = %2d  fields_[%d] = %d\n", i, time, cputime_to_field[i], (int)fields_[cputime_to_field[i]]);
   }
 
   if (total_){
@@ -154,10 +330,7 @@ int CPUMeter::findLine(const char *cpuID){
   return -1;
 }
 
-// Checks for the SMP kernel patch by forissier@isia.cma.fr.
-// http://www-isia.cma.fr/~forissie/smp_kernel_patch/
-// If it finds that this patch has been applied to the current kernel
-// then returns the number of cpus that are on this machine.
+// Returns the number of cpus that are on this machine.
 int CPUMeter::countCPUs(void){
   std::ifstream stats( STATFILENAME );
 
