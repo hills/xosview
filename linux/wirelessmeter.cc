@@ -11,8 +11,6 @@
 #include <fstream>
 #include <stdlib.h>
 #include <string.h>
-//#include <strstream>
-#include <sstream>
 #include <ctype.h>
 
 using namespace std;
@@ -138,16 +136,11 @@ int WirelessMeter::countdevices(void){
 }
 
 const char *WirelessMeter::wirelessStr(int num){
-  static char buffer[32];
-  std::ostringstream str;
-  
-  str << "WLAN";
+  static char buffer[8] = "WLAN";
+
   if (num != 1)
-    str << (num);
-  str << std::ends;
+    snprintf(buffer + 4, 3, "%d", num);
 
-  strncpy(buffer, str.str().c_str(), 32);
-  buffer[31] = '\0';
-
+  buffer[7] = '\0';
   return buffer;
 }
