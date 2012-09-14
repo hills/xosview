@@ -16,7 +16,7 @@ OPTFLAGS ?= -Wall -O3
 
 # Required build arguments
 
-CPPFLAGS += $(OPTFLAGS) -I.
+CPPFLAGS += $(OPTFLAGS) -I. -MMD
 LDLIBS += -lX11
 
 OBJS = Host.o \
