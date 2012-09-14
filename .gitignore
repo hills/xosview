@@ -1,7 +1,7 @@
+.config
 xosview
 *.d
 *.o
-ii_files
 dist
 
 ##  Auto-generated stuff:
