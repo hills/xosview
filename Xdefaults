@@ -53,6 +53,7 @@ xosview*gfxUsedFormat:	   autoscale
 ! CPU Meter Resources
 
 xosview*cpu:                True
+xosview*cpuFields:          USR SYS WIO IDLE
 xosview*cpuUserColor:       seagreen
 xosview*cpuNiceColor:       yellow
 xosview*cpuSystemColor:     orange

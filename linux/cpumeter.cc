@@ -62,40 +62,6 @@ void CPUMeter::checkResources( void ){
   useGraph_ = parent_->isResourceTrue( "cpuGraph" );
   SetUsedFormat(parent_->getResource("cpuUsedFormat") );
 
-  const char *f = parent_->getResourceOrUseDefault( "cpuFields", NULL );
-  if (f == NULL) {
-    /* Use default fields. */
-    if (kernel_ < 2006000)  // 2.4 kernels had four stats
-      legend("USR/NIC/SYS/IDLE");
-    else if (kernel_ < 2006011)  // steal time appeared on 2.6.11
-      legend("USR/NIC/SYS/SI/HI/WIO/IDLE");
-    else if (kernel_ < 2006024)  // guest time appeared on 2.6.24
-      legend("USR/NIC/SYS/SI/HI/WIO/STL/IDLE");
-    else if (kernel_ < 2006032)  // niced guest time appeared on 2.6.32
-      legend("USR/NIC/SYS/SI/HI/WIO/GST/STL/IDLE");
-    setNumFields(statfields_);
-    // idle is always the last field
-    cputime_to_field[3] = numfields_ - 1;
-
-    setfieldcolor(0, usercolor);
-    setfieldcolor(1, nicecolor);
-    setfieldcolor(2, syscolor);
-    setfieldcolor(numfields_-1, idlecolor);
-    if (kernel_ >= 2006000) {
-      setfieldcolor(3, sintcolor);
-      setfieldcolor(4, intcolor);
-      setfieldcolor(5, waitcolor);
-    }
-    if (kernel_ >= 2006011)
-      setfieldcolor(numfields_-2, stealcolor);
-    if (kernel_ >= 2006024)
-      setfieldcolor(6, gstcolor);
-    if (kernel_ >= 2006032)
-      setfieldcolor(7, ngstcolor);
-
-    return;
-  }
-
   /* Use user-defined fields.
    * Fields         Including if not its own field
    * --------------|------------------------------
@@ -119,6 +85,7 @@ void CPUMeter::checkResources( void ){
    * Either USED or at least USR+SYS must be included.
    */
 
+  const char *f = parent_->getResource( "cpuFields" );
   std::string lgnd, fields(f);
   int field = 0;
 
