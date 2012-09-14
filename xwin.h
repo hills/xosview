@@ -3,9 +3,6 @@
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
-#ifdef HAVE_XPM
-#include <X11/xpm.h>
-#endif
 #include <iostream>
 #include <string.h>
 

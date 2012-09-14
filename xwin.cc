@@ -1,4 +1,7 @@
 #include <X11/Xatom.h>
+#ifdef HAVE_XPM
+#include <X11/xpm.h>
+#endif
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
