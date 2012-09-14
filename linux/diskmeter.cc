@@ -296,7 +296,7 @@ void DiskMeter::getsysfsdiskinfo( void )
        // is a dir, locate 'stat' file in it
        disk = disk + "/stat";
        if (stat(disk.c_str(), &buf) == 0 && buf.st_mode & S_IFREG) {
-                //XOSDEBUG("disk stat: %s\n",disk.c_str() );
+                XOSDEBUG("disk stat: %s\n",disk.c_str() );
                 diskstat.open(disk.c_str());
                 if ( diskstat.good() ) {
                    sec_read=sec_written=0L;
@@ -309,7 +309,7 @@ void DiskMeter::getsysfsdiskinfo( void )
                    all_bytes_read    += (unsigned long long) sec_read * (unsigned long long) sect_size;
                    all_bytes_written += (unsigned long long) sec_written * (unsigned long long) sect_size;
 
-                   //XOSDEBUG("disk stat: %s | read: %ld, written: %ld\n",disk.c_str(),sec_read,sec_written );
+                   XOSDEBUG("disk stat: %s | read: %ld, written: %ld\n",disk.c_str(),sec_read,sec_written );
                    diskstat.close(); diskstat.clear();
                 } else {
                   XOSDEBUG("disk stat open: %s - errno=%d\n",disk.c_str(),errno );
@@ -322,6 +322,6 @@ void DiskMeter::getsysfsdiskinfo( void )
     }
   } // for
   closedir(dir);
-  //XOSDEBUG("disk: read: %ld, written: %ld\n",all_sec_read, all_sec_written );
+  XOSDEBUG("disk: read: %lld, written: %lld\n",all_bytes_read, all_bytes_written );
   update_info(all_bytes_read, all_bytes_written);
 }

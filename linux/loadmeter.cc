@@ -158,7 +158,7 @@ void LoadMeter::getspeedinfo( void ){
         // XOSDEBUG("speed: a=\"%s\" v=\"%s\"\n",argname.c_str(),argval.c_str() );
 
     if ( argname.substr(0,7) == "cpu MHz" ) {
-        //XOSDEBUG("SPEED: %s\n",argval.c_str() );
+        XOSDEBUG("SPEED: %s\n",argval.c_str() );
         total_cpu += atoi(argval.c_str());
 	ncpus++;
     }

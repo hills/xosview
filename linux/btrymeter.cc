@@ -484,7 +484,7 @@ bool BtryMeter::acpi_battery_present(const std::string& filename)
 	argname.clear(); argval.clear();
 	loadinfo >> argname >> argval;
 
-	//XOSDEBUG("batt ?: a=\"%s\" v=\"%s\"\n",argname.c_str(),argval.c_str() );
+	XOSDEBUG("batt ?: a=\"%s\" v=\"%s\"\n",argname.c_str(),argval.c_str() );
 	if ( argname == "present:" )
            if ( argval == "yes" )
 		return true;
@@ -513,7 +513,7 @@ bool BtryMeter::acpi_parse_battery(const std::string& dirname)
 	inp_strm.str(inp_line.c_str() );
 	argname.clear(); argval.clear();
 	inp_strm >> argname >> argval;
-	//XOSDEBUG("alarm: a=\"%s\" v=\"%s\"\n",argname.c_str(),argval.c_str() );
+	XOSDEBUG("alarm: a=\"%s\" v=\"%s\"\n",argname.c_str(),argval.c_str() );
 
 	if ( argname == "alarm:" ) {
 		battery.alarm = atoi(argval.c_str());
@@ -532,7 +532,7 @@ bool BtryMeter::acpi_parse_battery(const std::string& dirname)
 	argval.clear();
 	std::getline(loadinfo,argval);
 
-	//XOSDEBUG("info: a=\"%s\" v=\"%s\"\n",argname.c_str(),argval.c_str() );
+	XOSDEBUG("info: a=\"%s\" v=\"%s\"\n",argname.c_str(),argval.c_str() );
 
 	if ( argname == "design capacity" ) {
 		battery.design_capacity=atoi(argval.c_str() );
@@ -564,7 +564,7 @@ bool BtryMeter::acpi_parse_battery(const std::string& dirname)
 	argval.clear();
 	inp_strm >> argval; // this ignores leading spaces
 
-	//XOSDEBUG("state: a=\"%s\" v=\"%s\"\n",argname.c_str(),argval.c_str() );
+	XOSDEBUG("state: a=\"%s\" v=\"%s\"\n",argname.c_str(),argval.c_str() );
 
 	if ( argname == "charging state" ) {
 		if ( argval == "charged" )
@@ -621,7 +621,7 @@ bool BtryMeter::sys_parse_battery(const std::string& dirname)
   while ( loadinfo.good() ) {
 	value.clear();
 	loadinfo >> value;
-	//XOSDEBUG("alarm (%s): v=\"%s\"\n", filename.c_str(), value.c_str() );
+	XOSDEBUG("alarm (%s): v=\"%s\"\n", filename.c_str(), value.c_str() );
     battery.alarm = atoi(value.c_str());
     break;
   }
@@ -635,7 +635,7 @@ bool BtryMeter::sys_parse_battery(const std::string& dirname)
   while ( loadinfo.good() ) {
 	value.clear();
 	loadinfo >> value;
-	//XOSDEBUG("design_capacity (%s): v=\"%s\"\n", filename.c_str(), value.c_str() );
+	XOSDEBUG("design_capacity (%s): v=\"%s\"\n", filename.c_str(), value.c_str() );
     battery.design_capacity = atoi(value.c_str());
     break;
   }
@@ -656,7 +656,7 @@ bool BtryMeter::sys_parse_battery(const std::string& dirname)
   while ( loadinfo.good() ) {
 	value.clear();
 	loadinfo >> value;
-	//XOSDEBUG("last_full_capacity (%s): v=\"%s\"\n", filename.c_str(), value.c_str() );
+	XOSDEBUG("last_full_capacity (%s): v=\"%s\"\n", filename.c_str(), value.c_str() );
     battery.last_full_capacity = atoi(value.c_str());
     break;
   }
@@ -670,7 +670,7 @@ bool BtryMeter::sys_parse_battery(const std::string& dirname)
   while ( loadinfo.good() ) {
 	value.clear();
 	loadinfo >> value;
-	//XOSDEBUG("remaining_capacity (%s): v=\"%s\"\n", filename.c_str(), value.c_str() );
+	XOSDEBUG("remaining_capacity (%s): v=\"%s\"\n", filename.c_str(), value.c_str() );
     battery.remaining_capacity = atoi(value.c_str());
     break;
   }
@@ -682,7 +682,7 @@ bool BtryMeter::sys_parse_battery(const std::string& dirname)
   while ( loadinfo.good() ) {
 	value.clear();
 	loadinfo >> value;
-	//XOSDEBUG("status (%s): v=\"%s\"\n", filename.c_str(), value.c_str() );
+	XOSDEBUG("status (%s): v=\"%s\"\n", filename.c_str(), value.c_str() );
 
     if ( value == "Full" )
         battery.charging_state=0;
