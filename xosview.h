@@ -80,8 +80,13 @@ private:
   bool _ispartiallyvisible;
 };
 
-/*  Make XOSDEBUG("This is a format string.  %d %d\n", a, b); look
- *  like if (0) printf("This ..."...);.  Change the 0 to a 1, to
- *  enable these debugging outputs.  */
-#define XOSDEBUG	if (0) printf
+#ifdef DEBUG
+#define XOSDEBUG(...) { \
+  fprintf(stderr, "%s:%d: ", __func__, __LINE__); \
+  fprintf(stderr, __VA_ARGS__); \
+}
+#else
+#define XOSDEBUG(...)
+#endif
+
 #endif
