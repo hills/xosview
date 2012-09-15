@@ -21,10 +21,13 @@ public:
 
   static int countCPUs(void);
   static const char *cpuStr(int num);
+  static int getkernelversion(void);
 protected:
   int _lineNum;
-  long long cputime_[2][9];
+  long long cputime_[2][10];
   int cpuindex_;
+  int kernel_;
+  int statfields_;
 
   void getcputime(void);
   int findLine(const char *cpuID);

@@ -8,6 +8,7 @@
 #define _INTMETER_H_
 
 #include "bitmeter.h"
+#include "cpumeter.h"
 
 class IntMeter : public BitMeter {
 public:
@@ -18,8 +19,7 @@ public:
 
   void checkResources( void );
 
-  static float getLinuxVersion(void);
-  static int countCPUs(void);
+  static int countCPUs(void) { return CPUMeter::countCPUs(); }
 
 protected:
   unsigned long *irqs_, *lastirqs_;

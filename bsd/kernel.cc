@@ -137,27 +137,31 @@ static struct nlist nlst[] =
 #if defined(XOSVIEW_NETBSD)
 { "_allevents" },
 #define ALLEVENTS_SYM_INDEX  3
+{ "_bufmem" },
+#define BUFMEM_SYM_INDEX     4
 #else
 { DUMMY_SYM },
 #define DUMMY_3
+{ DUMMY_SYM },
+#define DUMMY_4
 #endif
 #if defined(XOSVIEW_FREEBSD)
 { "_intrnames" },
-#define INTRNAMES_SYM_INDEX  4
+#define INTRNAMES_SYM_INDEX  5
 # if __FreeBSD_version >= 900040
 { "_sintrnames" },
 # else
 { "_eintrnames" },
 # endif
-#define EINTRNAMES_SYM_INDEX 5
+#define EINTRNAMES_SYM_INDEX 6
 { "_intrcnt" },
-#define INTRCNT_SYM_INDEX    6
+#define INTRCNT_SYM_INDEX    7
 # if __FreeBSD_version >= 900040
 { "_sintrcnt" },
 # else
 { "_eintrcnt" },
 # endif
-#define EINTRCNT_SYM_INDEX   7
+#define EINTRCNT_SYM_INDEX   8
 #endif
 { NULL }
 };
@@ -260,14 +264,18 @@ BSDGetCPUSpeed() {
 
 #if defined(XOSVIEW_FREEBSD)
 	char name[25];
-	int speed = 0, cpus = BSDCountCpus();
+	int speed = 0, cpus = BSDCountCpus(), avail_cpus = 0;
 	size = sizeof(speed);
 	for (int i = 0; i < cpus; i++) {
 		snprintf(name, 25, "dev.cpu.%d.freq", i);
-		sysctlbyname(name, &speed, &size, NULL, 0);
-		cpu_speed += speed;
+		if ( sysctlbyname(name, &speed, &size, NULL, 0) == 0 ) {
+			// count only cpus with individual freq available
+			cpu_speed += speed;
+			avail_cpus++;
+		}
 	}
-	cpu_speed /= cpus;
+	if (avail_cpus > 1)
+		cpu_speed /= avail_cpus;
 #elif defined(XOSVIEW_OPENBSD)
 	size = sizeof(cpu_speed);
 	if ( sysctl(mib_spd, 2, &cpu_speed, &size, NULL, 0) < 0 )
@@ -297,7 +305,7 @@ BSDPageInit() {
 /* meminfo[5]  = { active, inactive, wired, cached, free } */
 /* pageinfo[2] = { pages_in, pages_out }                   */
 void
-BSDGetPageStats(unsigned long *meminfo, unsigned long *pageinfo) {
+BSDGetPageStats(u_int64_t *meminfo, u_int64_t *pageinfo) {
 #if defined(HAVE_UVM)
 #ifdef VM_UVMEXP2
 	struct uvmexp_sysctl uvm;
@@ -309,27 +317,32 @@ BSDGetPageStats(unsigned long *meminfo, unsigned long *pageinfo) {
 		err(EX_OSERR, "sysctl vm.uvmexp failed");
 
 	if (meminfo) {
-		meminfo[0] = (unsigned long)uvm.active * uvm.pagesize;
-		meminfo[1] = (unsigned long)uvm.inactive * uvm.pagesize;
-		meminfo[2] = (unsigned long)uvm.wired * uvm.pagesize;
+		// UVM excludes kernel memory -> assume it is active mem
+		meminfo[0] = (u_int64_t)(uvm.npages - uvm.inactive - uvm.wired - uvm.free) * uvm.pagesize;
+		meminfo[1] = (u_int64_t)uvm.inactive * uvm.pagesize;
+		meminfo[2] = (u_int64_t)uvm.wired * uvm.pagesize;
+#if 0
 #if defined(XOSVIEW_OPENBSD)
 		struct bcachestats bcs;
 		size = sizeof(bcs);
 		if ( sysctl(mib_bcs, 3, &bcs, &size, NULL, 0) < 0 )
 			err(EX_OSERR, "sysctl vfs.generic.bcachestats failed");
 
-		meminfo[3] = (unsigned long)bcs.numbufpages * uvm.pagesize;
-		// used + free != total --> add the unknown part to inactive,
-		// as active, cache and free are the same as in top
-		meminfo[1] = (unsigned long)(uvm.npages - uvm.active - uvm.wired - bcs.numbufpages - uvm.free) * uvm.pagesize;
+		meminfo[3] = (u_int64_t)bcs.numbufpages * uvm.pagesize;
 #else
-		meminfo[3] = (unsigned long)(uvm.filepages + uvm.execpages) * uvm.pagesize;
+		unsigned long bm = 0;
+		safe_kvm_read_symbol(BUFMEM_SYM_INDEX, &bm, sizeof(bm));
+		meminfo[3] = bm + (u_int64_t)(uvm.filepages + uvm.execpages) * uvm.pagesize;
 #endif
-		meminfo[4] = (unsigned long)uvm.free * uvm.pagesize;
+#endif
+		// cache is already included in active and inactive memory and
+		// there's no way to know how much is in which -> disable cache
+		meminfo[3] = 0;
+		meminfo[4] = (u_int64_t)uvm.free * uvm.pagesize;
 	}
 	if (pageinfo) {
-		pageinfo[0] = (unsigned long)uvm.pgswapin;
-		pageinfo[1] = (unsigned long)uvm.pgswapout;
+		pageinfo[0] = (u_int64_t)uvm.pgswapin;
+		pageinfo[1] = (u_int64_t)uvm.pgswapout;
 	}
 #else  /* HAVE_UVM */
 	struct vmmeter vm;
@@ -346,22 +359,22 @@ BSDGetPageStats(unsigned long *meminfo, unsigned long *pageinfo) {
 #endif
 	if (meminfo) {
 #if defined(XOSVIEW_FREEBSD)
-		meminfo[0] = vm.v_active_count * vm.v_page_size;
-		meminfo[1] = vm.v_inactive_count * vm.v_page_size;
-		meminfo[2] = vm.v_wire_count * vm.v_page_size;
-		meminfo[3] = vm.v_cache_count * vm.v_page_size;
-		meminfo[4] = vm.v_free_count * vm.v_page_size;
+		meminfo[0] = (u_int64_t)vm.v_active_count * vm.v_page_size;
+		meminfo[1] = (u_int64_t)vm.v_inactive_count * vm.v_page_size;
+		meminfo[2] = (u_int64_t)vm.v_wire_count * vm.v_page_size;
+		meminfo[3] = (u_int64_t)vm.v_cache_count * vm.v_page_size;
+		meminfo[4] = (u_int64_t)vm.v_free_count * vm.v_page_size;
 #else  /* XOSVIEW_DFBSD */
-		meminfo[0] = vms.v_active_count * vms.v_page_size;
-		meminfo[1] = vms.v_inactive_count * vms.v_page_size;
-		meminfo[2] = vms.v_wire_count * vms.v_page_size;
-		meminfo[3] = vms.v_cache_count * vms.v_page_size;
-		meminfo[4] = vms.v_free_count * vms.v_page_size;
+		meminfo[0] = (u_int64_t)vms.v_active_count * vms.v_page_size;
+		meminfo[1] = (u_int64_t)vms.v_inactive_count * vms.v_page_size;
+		meminfo[2] = (u_int64_t)vms.v_wire_count * vms.v_page_size;
+		meminfo[3] = (u_int64_t)vms.v_cache_count * vms.v_page_size;
+		meminfo[4] = (u_int64_t)vms.v_free_count * vms.v_page_size;
 #endif
 	}
 	if (pageinfo) {
-		pageinfo[0] = vm.v_vnodepgsin + vm.v_swappgsin;
-		pageinfo[1] = vm.v_vnodepgsout + vm.v_swappgsout;
+		pageinfo[0] = (u_int64_t)vm.v_vnodepgsin + (u_int64_t)vm.v_swappgsin;
+		pageinfo[1] = (u_int64_t)vm.v_vnodepgsout + (u_int64_t)vm.v_swappgsout;
 	}
 #endif
 }
@@ -428,7 +441,6 @@ BSDNetInit() {
 void
 BSDGetNetInOut(unsigned long long *inbytes, unsigned long long *outbytes, const char *netIface, bool ignored) {
 	char ifname[IFNAMSIZ];
-	bool skipif = false;
 	*inbytes = 0;
 	*outbytes = 0;
 #if defined(XOSVIEW_OPENBSD)
@@ -446,6 +458,7 @@ BSDGetNetInOut(unsigned long long *inbytes, unsigned long long *outbytes, const 
 		err(EX_OSERR, "BSDGetNetInOut(): sysctl 2 failed");
 
 	for (next = buf; next < buf + size; next += ifm->ifm_msglen) {
+		bool skipif = false;
 		ifm = (struct if_msghdr *)next;
 		if (ifm->ifm_type != RTM_IFINFO || ifm->ifm_addrs & RTAX_IFP == 0)
 			continue;
@@ -477,6 +490,7 @@ BSDGetNetInOut(unsigned long long *inbytes, unsigned long long *outbytes, const 
 	ifnetp = TAILQ_FIRST(&ifnethd);
 
 	while (ifnetp) {
+		bool skipif = false;
 		//  Now, dereference the pointer to get the ifnet struct.
 		safe_kvm_read((u_long)ifnetp, &ifnet, sizeof(ifnet));
 		strlcpy(ifname, ifnet.if_xname, sizeof(ifname));
@@ -905,7 +919,6 @@ BSDNumInts() {
 	}
 #elif defined(XOSVIEW_OPENBSD)
 	int nintr = 0;
-	char name[128];
 	int mib_int[4] = { CTL_KERN, KERN_INTRCNT, KERN_INTRCNT_NUM };
 	size_t size = sizeof(nintr);
 	if ( sysctl(mib_int, 3, &nintr, &size, NULL, 0) < 0 ) {
@@ -915,7 +928,7 @@ BSDNumInts() {
 	for (int i = 0; i < nintr; i++) {
 		mib_int[2] = KERN_INTRCNT_VECTOR;
 		mib_int[3] = i;
-		size = sizeof(name);
+		size = sizeof(nbr);
 		if ( sysctl(mib_int, 4, &nbr, &size, NULL, 0) < 0 )
 			warn("Could not get name of interrupt %d", i);
 		else
@@ -1170,7 +1183,9 @@ BSDGetCPUTemperature(float *temps, float *tjmax) {
 			if ( (pobj2 = prop_dictionary_get((prop_dictionary_t)pobj, "critical-max")) && tjmax )
 				tjmax[i] = (prop_number_integer_value((prop_number_t)pobj2) / 1000000.0) - 273.15;
 		}
+		prop_object_iterator_release(piter2);
 	}
+	prop_object_iterator_release(piter);
 	prop_object_release(pdict);
 #else  /* XOSVIEW_NETBSD */
 	int val = 0;
@@ -1304,17 +1319,33 @@ BSDGetSensor(const char *name, const char *valname, float *value) {
 		          strncmp(type, "Ohms", 4) == 0 )
 			*value = (float)val / 1000000.0;      // electrical units are in micro{V,A,W,Ohm}
 	}
+	prop_object_iterator_release(piter);
 	prop_object_release(pdict);
 #else  /* XOSVIEW_NETBSD */
+	size_t size;
+	char dummy[50];
+#if defined(XOSVIEW_FREEBSD) || defined(XOSVIEW_DFBSD)
+	// FreeBSD has no sensor framework, but ACPI thermal zones might work.
+	// They are readable through sysctl (also works in Dragonfly).
+	// Values are in 10 * degrees Kelvin.
+	if ( strncmp(name, "tz", 2) == 0 ) {
+		int val = 0;
+		size = sizeof(val);
+		snprintf(dummy, 50, "hw.acpi.thermal.%s.%s", name, valname);
+		if ( sysctlbyname(dummy, &val, &size, NULL, 0) < 0 )
+			err(EX_OSERR, "sysctl %s failed", dummy);
+		*value = ((float)val - 2732.0) / 10.0;
+		return;
+	}
+	// If Dragonfly and tzN specified, return. Otherwise, fall through.
+#endif
 #if defined(XOSVIEW_OPENBSD) || defined(XOSVIEW_DFBSD)
 	/* Adapted from systat. */
 	// All kinds of sensors are read with sysctl. We have to go through them
 	// to find the required device and value. Parameter 'name' is the device
 	// name and 'valname' consists of type and sensor index (e.g. it0.temp1).
 	//  Values are transformed to suitable units.
-	int val = 0, index = -1;
-	char dummy[20];
-	size_t size = sizeof(val);
+	int index = -1;
 	struct sensordev sd;
 	struct sensor s;
 
@@ -1385,8 +1416,6 @@ BSDGetSensor(const char *name, const char *valname, float *value) {
 			}
 		}
 	}
-#else  /* XOSVIEW_FREEBSD */
-	warnx("FreeBSD has no sensor framework yet.");
 #endif
 #endif
 }

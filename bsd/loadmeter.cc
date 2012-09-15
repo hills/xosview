@@ -39,9 +39,19 @@ void LoadMeter::checkResources( void ) {
 	dodecay_ = parent_->isResourceTrue("loadDecay");
 	useGraph_ = parent_->isResourceTrue("loadGraph");
 	SetUsedFormat( parent_->getResource("loadUsedFormat") );
-	warnThreshold_ = atoi( parent_->getResource("loadWarnThreshold") );
-	critThreshold_ = atoi( parent_->getResource("loadCritThreshold") );
 	do_cpu_speed_ = parent_->isResourceTrue("loadCpuSpeed");
+
+	const char *warn = parent_->getResource("loadWarnThreshold");
+	if (strncmp(warn, "auto", 2) == 0)
+		warnThreshold_ = BSDCountCpus();
+	else
+		warnThreshold_ = atoi(warn);
+
+	const char *crit = parent_->getResource("loadCritThreshold");
+	if (strncmp(crit, "auto", 2) == 0)
+		critThreshold_ = warnThreshold_ * 4;
+	else
+		critThreshold_ = atoi(crit);
 
 	alarmstate_ = lastalarmstate_ = 0;
 

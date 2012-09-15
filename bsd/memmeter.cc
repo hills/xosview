@@ -22,7 +22,11 @@
 
 
 MemMeter::MemMeter( XOSView *parent )
+#if defined(HAVE_UVM)
+	: FieldMeterGraph( parent, 4, "MEM", "ACT/INACT/WRD/FREE" ) {
+#else
 	: FieldMeterGraph( parent, 5, "MEM", "ACT/INACT/WRD/CA/FRE" ) {
+#endif
 	BSDPageInit();
 }
 
@@ -35,9 +39,13 @@ void MemMeter::checkResources( void ) {
 
 	setfieldcolor( 0, parent_->getResource("memActiveColor") );
 	setfieldcolor( 1, parent_->getResource("memInactiveColor") );
-	setfieldcolor( 2, parent_->getResource("memCacheColor") );
-	setfieldcolor( 3, parent_->getResource("memBufferColor") );
+	setfieldcolor( 2, parent_->getResource("memWiredColor") );
+#if defined(HAVE_UVM)
+	setfieldcolor( 3, parent_->getResource("memFreeColor") );
+#else
+	setfieldcolor( 3, parent_->getResource("memCacheColor") );
 	setfieldcolor( 4, parent_->getResource("memFreeColor") );
+#endif
 	priority_ = atoi( parent_->getResource("memPriority") );
 	dodecay_ = parent_->isResourceTrue("memDecay");
 	useGraph_ = parent_->isResourceTrue("memGraph");
@@ -51,9 +59,15 @@ void MemMeter::checkevent( void ) {
 
 void MemMeter::getmeminfo( void ) {
 	BSDGetPageStats(meminfo_, NULL);
-	for (int i = 0; i < 5; i++)
-		fields_[i] = (double)meminfo_[i];
-
+	fields_[0] = (double)meminfo_[0];
+	fields_[1] = (double)meminfo_[1];
+	fields_[2] = (double)meminfo_[2];
+#if defined(HAVE_UVM)
+	fields_[3] = (double)meminfo_[4];
+#else
+	fields_[3] = (double)meminfo_[3];
+	fields_[4] = (double)meminfo_[4];
+#endif
 	total_ = fields_[0] + fields_[1] + fields_[2] + fields_[3] + fields_[4];
-	setUsed(total_ - fields_[4], total_);
+	setUsed(total_ - (double)meminfo_[4], total_);
 }
