@@ -10,9 +10,6 @@
 #include "memmeter.h"
 #include "gfxmeter.h"
 #include "diskmeter.h"
-#if 0
-#include "pagemeter.h"
-#endif
 
 #include <stdlib.h>
 
@@ -68,11 +65,6 @@ void MeterMaker::makeMeters(void)
 
     if( _xos->isResourceTrue("gfx") && GfxMeter::nPipes() > 0 )
         push(new GfxMeter( _xos, atoi( _xos->getResource( "gfxWarnThreshold" ))));
-
-#if 0 // eile: not yet working 
-    if (_xos->isResourceTrue("disk"))
-        push(new DiskMeter(_xos, atof(_xos->getResource("diskBandwidth"))));
-#endif
 
     if (_xos->isResourceTrue("mem"))
         push(new MemMeter(_xos));

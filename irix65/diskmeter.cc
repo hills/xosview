@@ -46,14 +46,6 @@ void DiskMeter::getdiskinfo( void )
     // new data
     total_ = maxspeed_;
 
-#if 0
-    // fix overflow (conversion bug?)
-    if (fields_[0] < 0.0)
-        fields_[0] = 0.0;
-    if (fields_[1] < 0.0)
-        fields_[1] = 0.0;
-#endif
-    
     if (fields_[0] + fields_[1] > total_)
        	total_ = fields_[0] + fields_[1];
 

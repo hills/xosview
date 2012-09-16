@@ -217,33 +217,3 @@ void NFSStats::checkevent(void)
 	_lastretrns = retrns;
 	_lastauthrefresh = authrefresh;
 }
-#if 0
-NFSV3::NFSV3( XOSView *parent)
-	: BitMeter( parent, "NFSv3", "", 1, 0, 0 ) {
-
-	setNumBits(23);
-	legend("Version 3");
-
-	for ( int i = 0 ; i < numBits() ; i++ )
-		procs[i] = lastprocs[i] = 0;
-}
-NFSV3::~NFSV3( void ) {
-}
-
-void NFSV3::checkResources( void ){
-  BitMeter::checkResources();
-  onColor_  = parent_->allocColor( parent_->getResource( "NFSv3OnColor" ) );
-  offColor_ = parent_->allocColor( parent_->getResource( "NFSv3OffColor" ) );
-}
-
-void NFSV3::checkevent( void ){
-  getirqs();
-
-  for ( int i = 0 ; i < numBits() ; i++ ){
-    bits_[i] = ((irqs_[i] - lastirqs_[i]) != 0);
-    lastirqs_[i] = irqs_[i];
-  }
-
-  BitMeter::checkevent();
-}
-#endif

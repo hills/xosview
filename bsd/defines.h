@@ -45,10 +45,4 @@
 #define USE_KVM_GETSWAPINFO 1
 #endif
 
-/* Our battery meter does not work on recent BSDs. */
-#if 0
-#define HAVE_BATTERY_METER 1
-#endif
-
-
 #endif

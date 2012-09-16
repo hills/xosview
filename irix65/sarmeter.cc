@@ -126,24 +126,6 @@ void SarMeter::parseBuffer( void )
             {
                 memcpy( &_di.current[i], ptr, sizeof( diskinfo ));
                 ptr += sizeof( diskinfo );
-
-#if 0
-                fprintf( stderr, "diskinfo {\n  %s\n", _di.current[i].name );
-                fprintf( stderr, "  stat {\n" );
-                fprintf( stderr, "    ios {\n" );
-                fprintf( stderr, "      %d, %d, %d, %d\n",
-                    _di.current[i].stat.ios.io_ops,
-                    _di.current[i].stat.ios.io_misc,
-                    _di.current[i].stat.ios.io_qcnt,
-                    _di.current[i].stat.ios.io_unlog );
-                fprintf( stderr, "    }\n" );
-                fprintf( stderr, "    %d %d %d %d %d\n", 
-                    _di.current[i].stat.io_bcnt,
-                    _di.current[i].stat.io_resp,
-                    _di.current[i].stat.io_act,
-                    _di.current[i].stat.io_wops,
-                    _di.current[i].stat.io_wbcnt );
-#endif
             }
             
             forwardBufferTo( ptr );

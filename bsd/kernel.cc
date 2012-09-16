@@ -321,20 +321,7 @@ BSDGetPageStats(u_int64_t *meminfo, u_int64_t *pageinfo) {
 		meminfo[0] = (u_int64_t)(uvm.npages - uvm.inactive - uvm.wired - uvm.free) * uvm.pagesize;
 		meminfo[1] = (u_int64_t)uvm.inactive * uvm.pagesize;
 		meminfo[2] = (u_int64_t)uvm.wired * uvm.pagesize;
-#if 0
-#if defined(XOSVIEW_OPENBSD)
-		struct bcachestats bcs;
-		size = sizeof(bcs);
-		if ( sysctl(mib_bcs, 3, &bcs, &size, NULL, 0) < 0 )
-			err(EX_OSERR, "sysctl vfs.generic.bcachestats failed");
 
-		meminfo[3] = (u_int64_t)bcs.numbufpages * uvm.pagesize;
-#else
-		unsigned long bm = 0;
-		safe_kvm_read_symbol(BUFMEM_SYM_INDEX, &bm, sizeof(bm));
-		meminfo[3] = bm + (u_int64_t)(uvm.filepages + uvm.execpages) * uvm.pagesize;
-#endif
-#endif
 		// cache is already included in active and inactive memory and
 		// there's no way to know how much is in which -> disable cache
 		meminfo[3] = 0;
