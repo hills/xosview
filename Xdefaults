@@ -57,9 +57,9 @@ xosview*cpuFields:          USR SYS WIO IDLE
 xosview*cpuUserColor:       seagreen
 xosview*cpuNiceColor:       yellow
 xosview*cpuSystemColor:     orange
-xosview*cpuInterruptColor:  red
+xosview*cpuInterruptColor:  lightblue
 xosview*cpuSInterruptColor: orange red
-xosview*cpuWaitColor:       lightblue
+xosview*cpuWaitColor:       red
 xosview*cpuFreeColor:       aquamarine
 xosview*cpuGuestColor:      blue
 xosview*cpuNiceGuestColor:  gold
@@ -77,10 +77,10 @@ xosview*mem:                True
 xosview*memKernelColor:     yellow
 xosview*memUsedColor:       seagreen
 xosview*memSharedColor:     SkyBlue
-xosview*memBufferColor:     orange
+xosview*memBufferColor:     red
 xosview*memSlabColor:	    blue
 xosview*memMapColor:	    SlateBlue1
-xosview*memCacheColor:      red
+xosview*memCacheColor:      orange
 xosview*memFreeColor:       aquamarine
 xosview*memTextColor:       blue
 xosview*memOtherColor:      orange
