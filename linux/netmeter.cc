@@ -61,7 +61,7 @@ NetMeter::~NetMeter( void ){
 
 void NetMeter::checkOSVersion(void)
     {
-    if (CPUMeter::getkernelversion() >= 2100000)
+    if (CPUMeter::getkernelversion() >= 2001000)
         {
 	// check presence of iacct and oacct chains
         std::ifstream chains("/proc/net/ip_fwchains");
