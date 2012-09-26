@@ -15,7 +15,7 @@
 #include <ctype.h>
 
 static const char STATFILENAME[] = "/proc/stat";
-static const char VERSIONFILENAME[] = "/proc/version";
+static const char VERSIONFILENAME[] = "/proc/sys/kernel/osrelease";
 static int cputime_to_field[10] = { 0, 1, 2, 9, 5, 4, 3, 8, 6, 7 };
 
 #define MAX_PROCSTAT_LENGTH 4096
@@ -343,10 +343,10 @@ int CPUMeter::getkernelversion(void){
     exit(1);
   }
 
-  std::string tmp, version;
+  std::string version;
   int major = 0, minor = 0, micro = 0;
 
-  f >> tmp >> tmp >> version;
+  f >> version;
   sscanf(version.c_str(), "%d.%d.%d", &major, &minor, &micro);
 
   return ( major*1000000 + minor*1000 + micro);
