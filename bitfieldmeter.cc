@@ -319,8 +319,6 @@ void BitFieldMeter::drawfields( int manditory ){
     }
     x += twidth;
   }
-
-  //parent_->flush();
 }
 
 void BitFieldMeter::checkevent( void ){

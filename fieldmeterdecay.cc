@@ -160,6 +160,4 @@ void FieldMeterDecay::drawfields( int manditory ){
     decayx += decaytwidth;
 
   }
-
-  //parent_->flush();
 }

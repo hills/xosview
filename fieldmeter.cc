@@ -277,8 +277,6 @@ void FieldMeter::drawfields( int manditory ){
   }
   if ( dousedlegends_ )
     drawused( manditory );
-
-  //parent_->flush();
 }
 
 void FieldMeter::checkevent( void ){
