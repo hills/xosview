@@ -103,6 +103,7 @@ XOSView::XOSView( const char * instName, int argc, char *argv[] ) : XWin(),
   name_ = const_cast<char *>("xosview");
   _isvisible = false;
   _ispartiallyvisible = false;
+  _defer_resize = true;
   exposed_once_flag_ = 0;
 
   expose_flag_ = 1;
@@ -145,7 +146,6 @@ XOSView::XOSView( const char * instName, int argc, char *argv[] ) : XWin(),
   title( winname() );
   iconname( winname() );
   dolegends();
-  resize();
 }
 
 void XOSView::checkVersion(int argc, char *argv[]) const
@@ -338,8 +338,16 @@ void XOSView::run( void ){
           tmp->meter_->checkevent();
         tmp = tmp->next_;
       }
+    }
 
-      flush();
+    /* To avoid long streams of redraw, we defer this until
+     * all events are exhausted, before sleeping */
+
+    if (_defer_resize) {
+      resize();
+      expose_flag_ = 1;
+      draw();
+      _defer_resize = false;
     }
 
     /*  First, sleep for the proper integral number of seconds --
@@ -430,9 +438,8 @@ void XOSView::resizeEvent( XConfigureEvent &event ) {
 
   width(event.width);
   height(event.height);
-  resize();
-  expose_flag_ = 1;
-  draw();
+
+  _defer_resize = true;
 }
 
 

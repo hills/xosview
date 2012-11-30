@@ -77,6 +77,7 @@ private:
 
   bool _isvisible;
   bool _ispartiallyvisible;
+  bool _defer_resize;
 };
 
 #ifdef DEBUG
