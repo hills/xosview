@@ -339,8 +339,6 @@ void XOSView::keyrelease( char *ch ){
 }
 
 void XOSView::run( void ){
-  int counter = 0;
-
   while( !done_ ){
     checkevent();
 
@@ -359,8 +357,6 @@ void XOSView::run( void ){
      *  usleep only deals with times less than 1 sec.  */
     if (sleeptime_) sleep((unsigned int)sleeptime_);
     if (usleeptime_) usleep( (unsigned int)usleeptime_);
-
-    counter = (counter + 1) % 5;
   }
 }
 
