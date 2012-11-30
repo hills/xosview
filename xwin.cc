@@ -46,7 +46,6 @@ void XWin::XWinInit (int argc, char** argv, char* geometry, Xrm* xrm) {
 
   // Set up the default Events
   events_ = NULL;
-  addEvent( new Event( this, ConfigureNotify, &XWin::configureEvent ) );
   addEvent( new Event( this, ClientMessage, &XWin::deleteEvent ) );
   addEvent( new Event( this, MappingNotify, &XWin::mappingNotify ) );
 
@@ -352,12 +351,6 @@ unsigned long XWin::allocColor( const char *name ){
     std::cerr <<"XWin::allocColor() : failed to alloc : " <<name <<std::endl;
 
   return exact.pixel;
-}
-//-----------------------------------------------------------------------------
-
-void XWin::configureEvent( XEvent &event ){
-  width( event.xconfigure.width );
-  height( event.xconfigure.height );
 }
 //-----------------------------------------------------------------------------
 

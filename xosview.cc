@@ -415,8 +415,21 @@ void XOSView::exposeEvent( XExposeEvent &event ) {
   if (!exposed_once_flag_) { exposed_once_flag_ = 1; draw(); }
 }
 
-void XOSView::resizeEvent( XEvent & ) {
-  XOSDEBUG("Got resize event.\n");
+/*
+ * All window changes come in via XConfigureEvent (not
+ * XResizeRequestEvent)
+ */
+
+void XOSView::resizeEvent( XConfigureEvent &event ) {
+  XOSDEBUG("Got configure event.\n");
+
+  if (event.width == width_ && event.height == height_)
+    return;
+
+  XOSDEBUG("Window has resized\n");
+
+  width(event.width);
+  height(event.height);
   resize();
   expose_flag_ = 1;
   draw();

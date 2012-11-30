@@ -66,7 +66,7 @@ protected:
   void dolegends( void );
 
   void checkOverallResources();
-  void resizeEvent( XEvent & );
+  void resizeEvent( XConfigureEvent &event );
   void exposeEvent( XExposeEvent &event );
   void keyPressEvent( XKeyEvent &event );
   void visibilityEvent( XVisibilityEvent &event );
