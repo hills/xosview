@@ -310,7 +310,6 @@ void XOSView::reallydraw( void ){
     tmp->meter_->draw();
     tmp = tmp->next_;
   }
-  flush();
 
   expose_flag_ = 0;
 }
@@ -349,6 +348,8 @@ void XOSView::run( void ){
       draw();
       _defer_resize = false;
     }
+
+    flush();
 
     /*  First, sleep for the proper integral number of seconds --
      *  usleep only deals with times less than 1 sec.  */
