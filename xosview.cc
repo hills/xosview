@@ -326,10 +326,6 @@ void XOSView::draw ( void ) {
     }
   }
 }
-void XOSView::keyrelease( char *ch ){
-/*  WARNING:  This code is not called by anything.  */
-(void) ch;  /*  To avoid gcc warnings.  */
-}
 
 void XOSView::run( void ){
   while( !done_ ){
