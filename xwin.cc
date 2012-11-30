@@ -356,8 +356,6 @@ unsigned long XWin::allocColor( const char *name ){
 //-----------------------------------------------------------------------------
 
 void XWin::configureEvent( XEvent &event ){
-  x( event.xconfigure.x );
-  y( event.xconfigure.y );
   width( event.xconfigure.width );
   height( event.xconfigure.height );
 }

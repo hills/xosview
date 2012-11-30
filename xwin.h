@@ -20,10 +20,6 @@ public:
   virtual ~XWin( void );
   void XWinInit ( int argc, char* argv[], char* geometry, Xrm* xrmp );
 
-  int x( void ) { return x_; }
-  void x( int val ) { x_ = val; }
-  int y( void ) { return y_; }
-  void y( int val ) { y_ = val; }
   int width( void ) { return width_; }
   void width( int val ) { width_ = val; }
   int height( void ) { return height_; }
