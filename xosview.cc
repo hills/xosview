@@ -344,9 +344,14 @@ void XOSView::run( void ){
 
     if (_defer_resize) {
       resize();
-      expose_flag_ = 1;
-      draw();
       _defer_resize = false;
+      expose_flag_ = 1;
+      _defer_draw = true;
+    }
+
+    if (_defer_draw) {
+      draw();
+      _defer_draw = false;
     }
 
     flush();
@@ -418,10 +423,13 @@ void XOSView::exposeEvent( XExposeEvent &event ) {
   if ( event.count == 0 )
   {
     expose_flag_ = 1;
-    draw();
+    _defer_draw = true;
   }
   XOSDEBUG("Got expose event.\n");
-  if (!exposed_once_flag_) { exposed_once_flag_ = 1; draw(); }
+  if (!exposed_once_flag_) {
+    exposed_once_flag_ = 1;
+    _defer_draw = true;
+  }
 }
 
 /*
