@@ -423,7 +423,7 @@ void XOSView::exposeEvent( XExposeEvent &event ) {
   _isvisible = true;
   if ( event.count == 0 )
   {
-    expose_flag_++;
+    expose_flag_ = 1;
     draw();
   }
   XOSDEBUG("Got expose event.\n");
@@ -432,7 +432,7 @@ void XOSView::exposeEvent( XExposeEvent &event ) {
 
 void XOSView::resizeEvent( XEvent & ) {
   resize();
-  expose_flag_++;
+  expose_flag_ = 1;
   draw();
 }
 
