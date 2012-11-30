@@ -427,6 +427,7 @@ void XOSView::exposeEvent( XExposeEvent &event ) {
 }
 
 void XOSView::resizeEvent( XEvent & ) {
+  XOSDEBUG("Got resize event.\n");
   resize();
   expose_flag_ = 1;
   draw();
