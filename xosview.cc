@@ -270,10 +270,7 @@ void  XOSView::resize( void ){
   int topmargin = vmargin_;
   int rightmargin = hmargin_;
   int newwidth = width_ - xoff_ - rightmargin;
-/*
-  int newheight = (height_ - (10 + 5 * (nummeters_ - 1) +
-                              nummeters_ * yoff_)) / nummeters_;
-*/
+
   int newheight =
         (height_ -
          (topmargin + topmargin + (nummeters_-1)*spacing + nummeters_*yoff_)
@@ -284,10 +281,6 @@ void  XOSView::resize( void ){
   int counter = 1;
   MeterNode *tmp = meters_;
   while ( tmp != NULL ) {
-/*
-    tmp->meter_->resize( xoff_, 5 * counter + counter * yoff_ +
-                         (counter - 1) * newheight, newwidth, newheight );
-*/
     tmp->meter_->resize( xoff_,
                          topmargin + counter*yoff_ + (counter-1)*(newheight+spacing),
                         newwidth, newheight );
