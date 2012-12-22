@@ -228,18 +228,17 @@ xosview*lmstemp:	False
 xosview*lmstempActColor:	blue
 xosview*lmstempHighColor:	red
 xosview*lmstempIdleColor:      aquamarine
-! xosview*lmstempHighest:	100
-! default 100
-xosview*lmstemp1:	temp
-xosview*lmstemp2:	remote_temp
-! for more sensors just add entries here
-! note, there is currently no way to configure sensors with same
-! name in different subdirs
-! xosview*lmstempLabel1:	TMP
-! labels for avove sensors (default = TMP)
-xosview*lmstempLabel2:	RTMP
 xosview*lmstempPriority: 20
 xosview*lmstempUsedFormat: autoscale
+xosview*lmstempHighest:	100
+! xosview*lmstemp1:	temp
+! xosview*lmstemp2:	remote_temp
+! for more sensors just add entries here
+! note, to configure sensors with same name in different subdirs,
+! use absolute paths
+! labels for above sensors (default = TMP)
+! xosview*lmstempLabel1:    TMP
+! xosview*lmstempLabel2:	RTMP
 
 xosview*NFSDStats:       False
 xosview*NFSDStatCallsColor:     green
@@ -264,11 +263,11 @@ xosview*acpitemp:                 False
 xosview*acpitempActColor:         blue
 xosview*acpitempHighColor:        red
 xosview*acpitempIdleColor:        aquamarine
-! xosview*acpitempHighest:         100
-xosview*acpitemp1:                CPU
-xosview*acpitemp2:                MB
 xosview*acpitempPriority:         20
 xosview*acpitempUsedFormat:       float
+xosview*acpitempHighest:          100
+! xosview*acpitemp1:                CPU
+! xosview*acpitemp2:                MB
 
 xosview*coretemp:                 False
 xosview*coretempActColor:         blue
