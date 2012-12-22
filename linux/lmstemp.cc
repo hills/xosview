@@ -29,19 +29,27 @@ LmsTemp::LmsTemp( XOSView *parent, const char *tempfile, const char *highfile, c
   _tempfile = new char[PATH_MAX];
   if (!checksensors(1, PROC_SENSORS_24, tempfile, highfile)) {
     if (!checksensors(0, PROC_SENSORS_26, tempfile, highfile)) {
-      std::cerr << label << " Can not find file : ";
+      std::cerr << label << " : Can not find file ";
       if (tempfile[0] == '/') {
-        std::cerr << tempfile << " or " << highfile;
-        if (highfile[0] != '/')
-          std::cerr << " under " << PROC_SENSORS_24 << " or " << PROC_SENSORS_26;
+        std::cerr << tempfile;
+        if (highfile) {
+          if (highfile[0] == '/')
+            std::cerr << " or " << highfile;
+          else
+            std::cerr << ", or " << highfile << " under " << PROC_SENSORS_24 << " or " << PROC_SENSORS_26;
+        }
       }
       else {
-        if (highfile[0] == '/')
-          std::cerr << tempfile << " under " << PROC_SENSORS_24 << " or " << PROC_SENSORS_26 << " or " << highfile;
+        if (highfile) {
+          if (highfile[0] == '/')
+            std::cerr << tempfile << " under " << PROC_SENSORS_24 << " or " << PROC_SENSORS_26 << ", or " << highfile;
+          else
+            std::cerr << tempfile << " or " << highfile << " under " << PROC_SENSORS_24 << " or " << PROC_SENSORS_26;
+        }
         else
-          std::cerr << tempfile << " or " << highfile << " under " << PROC_SENSORS_24 << " or " << PROC_SENSORS_26;
+          std::cerr << tempfile << " under " << PROC_SENSORS_24 << " or " << PROC_SENSORS_26;
       }
-      std::cerr << std::endl;
+      std::cerr << "." << std::endl;
       parent_->done(1);
     }
   }
