@@ -39,9 +39,11 @@ CoreTemp::~CoreTemp( void ) {
 void CoreTemp::checkResources( void ) {
   FieldMeter::checkResources();
 
-  setfieldcolor( 0, parent_->getResource( "coretempActColor" ) );
+  _actcolor  = parent_->allocColor( parent_->getResource( "coretempActColor" ) );
+  _highcolor = parent_->allocColor( parent_->getResource( "coretempHighColor") );
+  setfieldcolor( 0, _actcolor );
   setfieldcolor( 1, parent_->getResource( "coretempIdleColor") );
-  setfieldcolor( 2, parent_->getResource( "coretempHighColor") );
+  setfieldcolor( 2, _highcolor );
   priority_ = atoi( parent_->getResource( "coretempPriority" ) );
   SetUsedFormat( parent_->getResource( "coretempUsedFormat" ) );
 
@@ -226,21 +228,25 @@ void CoreTemp::getcoretemp( void ) {
 
   fields_[0] /= 1000.0;
   high /= 1000.0;
+
   fields_[1] = high - fields_[0];
   if (fields_[1] < 0) { // alarm: T > high
     fields_[1] = 0;
-    setfieldcolor( 0, parent_->getResource( "coretempHighColor" ) );
+    if (colors_[0] != _highcolor) {
+      setfieldcolor( 0, _highcolor );
+      drawlegend();
+    }
   }
-  else
-    setfieldcolor( 0, parent_->getResource( "coretempActColor" ) );
+  else {
+    if (colors_[0] != _actcolor) {
+      setfieldcolor( 0, _actcolor );
+      drawlegend();
+    }
+  }
 
   fields_[2] = total_ - fields_[1] - fields_[0];
-  if (fields_[2] < 0) { // alarm: T > TjMax
+  if (fields_[2] < 0)
     fields_[2] = 0;
-    setfieldcolor( 0, parent_->getResource( "coretempHighColor" ) );
-  }
-  else
-    setfieldcolor( 0, parent_->getResource( "coretempActColor" ) );
 
   setUsed( fields_[0], total_ );
 

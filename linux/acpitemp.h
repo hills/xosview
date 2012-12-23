@@ -33,6 +33,7 @@ private:
   char _highfile[80];
   int  _high;
   bool _usesysfs;
+  unsigned long _actcolor, _highcolor;
 };
 
 

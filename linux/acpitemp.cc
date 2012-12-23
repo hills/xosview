@@ -90,10 +90,11 @@ int ACPITemp::checkacpi( const char *tempfile, const char *highfile ) {
 void ACPITemp::checkResources( void ) {
   FieldMeter::checkResources();
 
-  setfieldcolor( 0, parent_->getResource( "acpitempActColor" ) );
+  _actcolor  = parent_->allocColor( parent_->getResource( "acpitempActColor" ) );
+  _highcolor = parent_->allocColor( parent_->getResource( "acpitempHighColor" ) );
+  setfieldcolor( 0, _actcolor );
   setfieldcolor( 1, parent_->getResource( "acpitempIdleColor") );
-  setfieldcolor( 2, parent_->getResource( "acpitempHighColor" ) );
-
+  setfieldcolor( 2, _highcolor );
   priority_ = atoi( parent_->getResource( "acpitempPriority" ) );
   SetUsedFormat( parent_->getResource( "acpitempUsedFormat" ) );
 }
@@ -145,12 +146,22 @@ void ACPITemp::getacpitemp( void ) {
   fields_[1] = high - fields_[0];
   if (fields_[1] < 0) { // alarm: T > high
     fields_[1] = 0;
-    setfieldcolor( 0, parent_->getResource( "acpitempHighColor" ) );
+    if (colors_[0] != _highcolor) {
+      setfieldcolor( 0, _highcolor );
+      drawlegend();
+    }
   }
-  else
-    setfieldcolor( 0, parent_->getResource( "acpitempActColor" ) );
+  else {
+    if (colors_[0] != _actcolor) {
+      setfieldcolor( 0, _actcolor );
+      drawlegend();
+    }
+  }
 
   fields_[2] = total_ - fields_[1] - fields_[0];
+  if (fields_[2] < 0)
+    fields_[2] = 0;
+
   setUsed( fields_[0], total_ );
 
   if (high != _high) {

@@ -38,6 +38,7 @@ private:
   int _high;
   std::string _node;        // hwmon node (hwmonN) for k8temp/k10temp
   std::vector<int> _cpus;   // sysfs indices (tempN_input) for max and avg
+  unsigned long _actcolor, _highcolor;
 };
 
 

@@ -176,10 +176,11 @@ bool LmsTemp::checksensors(int isproc, const char *dir, const char* tempfile, co
 void LmsTemp::checkResources( void ){
   FieldMeter::checkResources();
 
-  setfieldcolor( 0, parent_->getResource( "lmstempActColor" ) );
+  _actcolor  = parent_->allocColor( parent_->getResource( "lmstempActColor" ) );
+  _highcolor = parent_->allocColor( parent_->getResource( "lmstempHighColor" ) );
+  setfieldcolor( 0, _actcolor );
   setfieldcolor( 1, parent_->getResource( "lmstempIdleColor") );
-  setfieldcolor( 2, parent_->getResource( "lmstempHighColor" ) );
-
+  setfieldcolor( 2, _highcolor );
   priority_ = atoi (parent_->getResource( "lmstempPriority" ) );
   SetUsedFormat(parent_->getResource( "lmstempUsedFormat" ) );
 }
@@ -218,7 +219,7 @@ void LmsTemp::getlmstemp( void ){
   // dummy, high changed from integer to double to allow it to display
   // the full value, unfit for an int. (See Debian bug #183695)
   double dummy, high;
-  char l[20];
+  bool do_legend = false;
 
   std::ifstream tempfile( _tempfile );
   if (!tempfile) {
@@ -247,31 +248,40 @@ void LmsTemp::getlmstemp( void ){
       high = total_;
       }
 
-  if ( high > total_ ) {
-    total_ = 10 * ceil((high * 1.25) / 10);
-    snprintf(l, 20, "ACT/%d/%d", (int)high, (int)total_);
+  if ( high > total_ || high != _high ) {
+    char l[16];
+    if ( high > total_ )
+      total_ = 10 * (int)((high * 1.25) / 10);
+    _high = high;
+    if ( _highfile )
+      snprintf(l, 16, "ACT/%d/%d", (int)high, (int)total_);
+    else
+      snprintf(l, 16, "ACT/HIGH/%d", (int)total_);
     legend(l);
-    drawlegend();
+    do_legend = true;
   }
 
   fields_[1] = high - fields_[0];
   if(fields_[1] < 0) { // alarm: T > max
     fields_[1] = 0;
-    setfieldcolor( 0, parent_->getResource( "lmstempHighColor" ) );
+    if (colors_[0] != _highcolor) {
+      setfieldcolor( 0, _highcolor );
+      do_legend = true;
+    }
   }
-  else
-    setfieldcolor( 0, parent_->getResource( "lmstempActColor" ) );
+  else {
+    if (colors_[0] != _actcolor) {
+      setfieldcolor( 0, _actcolor );
+      do_legend = true;
+    }
+  }
 
   fields_[2] = total_ - fields_[1] - fields_[0];
-  setUsed (fields_[0], total_);
+  if (fields_[2] < 0)
+    fields_[2] = 0;
 
-  if (high != _high) {
-    _high = high;
-    if (_highfile)
-      snprintf(l, 20, "ACT/%d/%d", (int)high, (int)total_);
-    else
-      snprintf(l, 20, "ACT/HIGH/%d", (int)total_);
-    legend(l);
+  setUsed(fields_[0], total_);
+
+  if (do_legend)
     drawlegend();
-  }
 }

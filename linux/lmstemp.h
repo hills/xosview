@@ -32,6 +32,7 @@ private:
   char *_tempfile, *_highfile;
   int _high;
   int _isproc;
+  unsigned long _actcolor, _highcolor;
 };
 
 
