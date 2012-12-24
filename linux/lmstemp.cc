@@ -23,6 +23,7 @@
 static const char PROC_SENSORS_24[] = "/proc/sys/dev/sensors";
 static const char PROC_SENSORS_26[] = "/sys/class/hwmon";
 
+
 LmsTemp::LmsTemp( XOSView *parent, const char *tempfile, const char *highfile, const char *label, const char *caption)
   : FieldMeter( parent, 3, label, caption, 1, 1, 0 ){
   _highfile = new char[PATH_MAX];
@@ -103,72 +104,68 @@ bool LmsTemp::checksensors(int isproc, const char *dir, const char* tempfile, co
     return true;
   }
 
-  d1=opendir(dir);
-  if(!d1)
+  d1 = opendir(dir);
+  if (!d1)
     return false;
-  else
-    {
-      char dirname[64];
+  else {
+    char dirname[64];
 
     while (!temp_found && !high_found && (ent1 = readdir(d1))) {
-	  if(!strncmp(ent1->d_name,".", 1))
-	    continue;
-	  if(!strncmp(ent1->d_name,"..", 2))
-	    continue;
+      if (!strncmp(ent1->d_name, ".", 1))
+        continue;
+      if (!strncmp(ent1->d_name, "..", 2))
+        continue;
 
-	  snprintf(dirname, 64, "%s/%s",dir ,ent1->d_name);
+      snprintf(dirname, 64, "%s/%s", dir, ent1->d_name);
       for (int i = 0; i < j; i++) {
-        if (stat(dirname, &buf) == 0 && S_ISDIR(buf.st_mode)) {
-	      d2=opendir(dirname);
-	      if(!d2)
-		std::cerr << "The directory " <<dirname
-                  <<"exists but cannot be read.\n";
-	      else
-		{
-		  while((ent2=readdir(d2)))
-		    {
-
-		      char f[80];
-		      snprintf(f, 80, "%s/%s",dirname,ent2->d_name);
-		      if(stat(f,&buf)!=0 || !S_ISREG(buf.st_mode))
-			continue;
+        if ( stat(dirname, &buf) == 0 && S_ISDIR(buf.st_mode) ) {
+          d2 = opendir(dirname);
+          if (!d2)
+            std::cerr << "The directory " << dirname
+                      << "exists but cannot be read.\n";
+          else {
+            while ((ent2 = readdir(d2))) {
+              char f[80];
+              snprintf(f, 80, "%s/%s", dirname, ent2->d_name);
+              if ( stat(f, &buf) != 0 || !S_ISREG(buf.st_mode) )
+                continue;
 
               if (isproc) {
-                if (!strncmp(ent2->d_name, tempfile, strlen(tempfile))) {
+                if ( !strncmp(ent2->d_name, tempfile, strlen(tempfile)) ) {
                   temp_found = true;
                   high_found = true;
                   strcpy(_tempfile, f);
                 }
               }
               else {
-                if (!strncmp(ent2->d_name, tempfile, strlen(tempfile)) &&
-                    !strncmp(ent2->d_name + strlen(tempfile), "_input", 6)) {
+                if ( !strncmp(ent2->d_name, tempfile, strlen(tempfile)) &&
+                     !strncmp(ent2->d_name + strlen(tempfile), "_input", 6) ) {
                   strcpy(_tempfile, f);
                   temp_found = true;
                 }
-                if (!high_found && (!strncmp(ent2->d_name, highfile, strlen(highfile)) &&
-                    !strncmp(ent2->d_name + strlen(highfile), "_max", 4))) {
+                if ( !high_found && (!strncmp(ent2->d_name, highfile, strlen(highfile)) &&
+                     !strncmp(ent2->d_name + strlen(highfile), "_max", 4)) ) {
                   strcpy(_highfile, f);
                   high_found = true;
                 }
               }
               if (temp_found && high_found) {
-			  _isproc = isproc;
+                _isproc = isproc;
                 closedir(d2);
                 closedir(d1);
                 return true;
-			}
-		    }
-		  closedir(d2);
-		}
-	    }
+              }
+            }
+            closedir(d2);
+          }
+        }
 
         // Some /sys sensors have the readings in subdirectory /device
         if (!isproc)
           strncat(dirname, "/device", sizeof(dirname) - strlen(dirname) - 1);
       }
-	}
     }
+  }
   closedir(d1);
   return (temp_found && high_found);
 }
@@ -224,9 +221,9 @@ void LmsTemp::getlmstemp( void ){
   std::ifstream tempfile( _tempfile );
   if (!tempfile) {
     std::cerr << "Can not open file : " << _tempfile << std::endl;
-	parent_->done(1);
-	return;
-    }
+    parent_->done(1);
+    return;
+  }
 
   if (_isproc) {
     tempfile >> high >> dummy >> fields_[0];
@@ -238,15 +235,15 @@ void LmsTemp::getlmstemp( void ){
       std::ifstream highfile( _highfile );
       if (!highfile) {
         std::cerr << "Can not open file : " << _highfile << std::endl;
-	  parent_->done(1);
-	  return;
+        parent_->done(1);
+        return;
       }
       highfile >> high;
       high /= 1000;
     }
     else
       high = total_;
-      }
+  }
 
   if ( high > total_ || high != _high ) {
     char l[16];
@@ -262,7 +259,7 @@ void LmsTemp::getlmstemp( void ){
   }
 
   fields_[1] = high - fields_[0];
-  if(fields_[1] < 0) { // alarm: T > max
+  if (fields_[1] < 0) { // alarm: T > max
     fields_[1] = 0;
     if (colors_[0] != _highcolor) {
       setfieldcolor( 0, _highcolor );
