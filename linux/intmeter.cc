@@ -102,8 +102,11 @@ void IntMeter::updateirqcount( int n, bool init ){
       if ( &*it == &*realintnum.rbegin() ) { // last element
         if ( it->first == prev + 1 )
           os << "-" ;
-        else
+        else {
+          if ( prev == prev2 + 1 )
+            os << "-" << prev;
           os << "," ;
+        }
         os << it->first;
       }
       else {
