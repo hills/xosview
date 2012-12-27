@@ -25,7 +25,16 @@ static const char SYS_ACPI_TZ[]  = "/sys/devices/virtual/thermal";
 ACPITemp::ACPITemp( XOSView *parent, const char *tempfile, const char *highfile, const char *label, const char *caption )
 : FieldMeter( parent, 3, label, caption, 1, 1, 0 ) {
   if (!checkacpi(tempfile, highfile)) {
-    std::cerr << "Can not find " << tempfile << " or " << highfile << " in " << PROC_ACPI_TZ << " or " << SYS_ACPI_TZ << std::endl;
+    std::cerr << "Can not find file : ";
+    if (tempfile[0] == '/' && highfile[0] == '/')
+      std::cerr << tempfile << " or " << highfile;
+    else if (tempfile[0] == '/')
+      std::cerr << tempfile << ", or " << highfile << " under " << PROC_ACPI_TZ << " or " << SYS_ACPI_TZ;
+    else if (highfile[0] == '/')
+      std::cerr << tempfile << " under " << PROC_ACPI_TZ << " or " << SYS_ACPI_TZ << ", or " << highfile;
+    else
+      std::cerr << tempfile << " or " << highfile << " under " << PROC_ACPI_TZ << " or " << SYS_ACPI_TZ;
+    std::cerr << "." << std::endl;
     parent_->done(1);
   }
   _high = 0;
