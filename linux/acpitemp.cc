@@ -51,49 +51,50 @@ ACPITemp::~ACPITemp( void ) {
 
 int ACPITemp::checkacpi( const char *tempfile, const char *highfile ) {
   struct stat buf;
-  char temp[80], high[80];
+  char temp[PATH_SIZE], high[PATH_SIZE];
   bool temp_found = false, high_found = false;
 
   if (tempfile[0] == '/') {
-    if (stat(tempfile, &buf) == 0)
+    if ( stat(tempfile, &buf) == 0 && S_ISREG(buf.st_mode) )
       temp_found = true;
     else
       return false;
   }
   if (highfile[0] == '/') {
-    if (stat(highfile, &buf) == 0)
+    if ( stat(highfile, &buf) == 0 && S_ISREG(buf.st_mode) )
       high_found = true;
     else
       return false;
   }
 
   if (temp_found && high_found) {
-    strcpy(_tempfile, tempfile);
-    strcpy(_highfile, highfile);
+    strncpy(_tempfile, tempfile, PATH_SIZE);
+    strncpy(_highfile, highfile, PATH_SIZE);
     return true;
   }
 
-  snprintf(temp, 80, "%s/%s", SYS_ACPI_TZ, tempfile);
-  snprintf(high, 80, "%s/%s", SYS_ACPI_TZ, highfile);
+  snprintf(temp, PATH_SIZE, "%s/%s", SYS_ACPI_TZ, tempfile);
+  snprintf(high, PATH_SIZE, "%s/%s", SYS_ACPI_TZ, highfile);
 
-  if ( (stat(temp, &buf) != 0 || !S_ISREG(buf.st_mode)) || (stat(high, &buf) != 0 || !S_ISREG(buf.st_mode)) )
-    _usesysfs = false;
-  else {
-    strcpy(_tempfile, temp);
-    strcpy(_highfile, high);
+  if ( (stat(temp, &buf) == 0 && S_ISREG(buf.st_mode)) &&
+       (stat(high, &buf) == 0 && S_ISREG(buf.st_mode)) ) {
+    strncpy(_tempfile, temp, PATH_SIZE);
+    strncpy(_highfile, high, PATH_SIZE);
     _usesysfs = true;
     return true;
   }
 
-  snprintf(temp, 80, "%s/%s", PROC_ACPI_TZ, tempfile);
-  snprintf(high, 80, "%s/%s", PROC_ACPI_TZ, highfile);
+  _usesysfs = false;
+  snprintf(temp, PATH_SIZE, "%s/%s", PROC_ACPI_TZ, tempfile);
+  snprintf(high, PATH_SIZE, "%s/%s", PROC_ACPI_TZ, highfile);
 
-  if ( (stat(temp, &buf) != 0 || !S_ISREG(buf.st_mode)) || (stat(high, &buf) != 0 || !S_ISREG(buf.st_mode)) )
-    return false;
-
-  strcpy(_tempfile, temp);
-  strcpy(_highfile, high);
-  return true;
+  if ( (stat(temp, &buf) == 0 && S_ISREG(buf.st_mode)) &&
+       (stat(high, &buf) == 0 && S_ISREG(buf.st_mode)) ) {
+    strncpy(_tempfile, temp, PATH_SIZE);
+    strncpy(_highfile, high, PATH_SIZE);
+    return true;
+  }
+  return false;
 }
 
 void ACPITemp::checkResources( void ) {

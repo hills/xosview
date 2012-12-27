@@ -14,6 +14,8 @@
 
 #include "fieldmeter.h"
 
+#define PATH_SIZE 128
+
 
 class ACPITemp : public FieldMeter {
 public:
@@ -29,8 +31,8 @@ protected:
   void getacpitemp( void );
   int  checkacpi(const char* tempfile, const char* highfile);
 private:
-  char _tempfile[80];
-  char _highfile[80];
+  char _tempfile[PATH_SIZE];
+  char _highfile[PATH_SIZE];
   int  _high;
   bool _usesysfs;
   unsigned long _actcolor, _highcolor;
