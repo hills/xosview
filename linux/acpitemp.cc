@@ -12,11 +12,9 @@
 #include "acpitemp.h"
 #include "xosview.h"
 #include <fstream>
-#include <math.h>
 #include <stdlib.h>
 #include <dirent.h>
 #include <sys/stat.h>
-
 
 static const char PROC_ACPI_TZ[] = "/proc/acpi/thermal_zone";
 static const char SYS_ACPI_TZ[]  = "/sys/devices/virtual/thermal";
@@ -38,11 +36,6 @@ ACPITemp::ACPITemp( XOSView *parent, const char *tempfile, const char *highfile,
     parent_->done(1);
   }
   _high = 0;
-  const char *p;
-  if ((p = strrchr(caption, '/')) != 0)
-    total_ = atoi(p+1);
-  else
-    total_ = 100;
 }
 
 ACPITemp::~ACPITemp( void ) {
@@ -103,8 +96,9 @@ void ACPITemp::checkResources( void ) {
   _actcolor  = parent_->allocColor( parent_->getResource( "acpitempActColor" ) );
   _highcolor = parent_->allocColor( parent_->getResource( "acpitempHighColor" ) );
   setfieldcolor( 0, _actcolor );
-  setfieldcolor( 1, parent_->getResource( "acpitempIdleColor") );
+  setfieldcolor( 1, parent_->getResource( "acpitempIdleColor" ) );
   setfieldcolor( 2, _highcolor );
+  total_ = atoi( parent_->getResourceOrUseDefault( "acpitempHighest", "100" ) );
   priority_ = atoi( parent_->getResource( "acpitempPriority" ) );
   SetUsedFormat( parent_->getResource( "acpitempUsedFormat" ) );
 }
@@ -129,28 +123,29 @@ void ACPITemp::getacpitemp( void ) {
     return;
   }
 
-  double high;
-  char l[20];
-  std::string s1, s2, s3;
+  float high;
+  std::string dummy;
+  bool do_legend = false;
 
   if (_usesysfs) {
-    high_file >> s1;
-    high = atof(s1.c_str()) / 1000.0;
-    temp_file >> s1;
-    fields_[0] = atof(s1.c_str()) / 1000.0;
+    high_file >> high;
+    high /= 1000.0;
+    temp_file >> fields_[0];
+    fields_[0] /= 1000.0;
   }
   else {
-    high_file >> s1 >> s2 >> s3;
-    high = atof(s3.c_str());
-    temp_file >> s1 >> s2;
-    fields_[0] = atof(s2.c_str());
+    high_file >> dummy >> dummy >> high;
+    temp_file >> dummy >> fields_[0];
   }
 
-  if (high >= total_) {
-    total_ = 10 * ceil((high * 1.25) / 10);
-    snprintf(l, 20, "ACT/%d/%d", (int)high, (int)total_);
+  if (high > total_ || high != _high) {
+    char l[16];
+    if (high > total_)
+      total_ = 10 * (int)((high * 1.25) / 10);
+    _high = high;
+    snprintf(l, 16, "ACT/%d/%d", (int)high, (int)total_);
     legend(l);
-    drawlegend();
+    do_legend = true;
   }
 
   fields_[1] = high - fields_[0];
@@ -158,13 +153,13 @@ void ACPITemp::getacpitemp( void ) {
     fields_[1] = 0;
     if (colors_[0] != _highcolor) {
       setfieldcolor( 0, _highcolor );
-      drawlegend();
+      do_legend = true;
     }
   }
   else {
     if (colors_[0] != _actcolor) {
       setfieldcolor( 0, _actcolor );
-      drawlegend();
+      do_legend = true;
     }
   }
 
@@ -174,10 +169,6 @@ void ACPITemp::getacpitemp( void ) {
 
   setUsed( fields_[0], total_ );
 
-  if (high != _high) {
-    _high = high;
-    snprintf(l, 20, "ACT/%d/%d", (int)high, (int)total_);
-    legend(l);
+  if (do_legend)
     drawlegend();
-  }
 }
