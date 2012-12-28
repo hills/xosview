@@ -212,7 +212,7 @@ void DiskMeter::update_info(unsigned long long rsum, unsigned long long wsum)
     // avoid strange values at first call
     // (by this - the first value displayed becomes zero)
     if(sysfs_read_prev_ == 0L)
-    { 
+    {
         sysfs_read_prev_  = rsum;
         sysfs_write_prev_ = wsum;
         itim = 1; 	// itim is garbage here too. Valgrind complains.
@@ -242,14 +242,9 @@ void DiskMeter::update_info(unsigned long long rsum, unsigned long long wsum)
     IntervalTimerStart();
 }
 
-
-
 // XXX: sysfs - read Documentation/iostats.txt !!!
 // extract stats from /sys/block/*/stat
 // each disk reports a 32bit u_int, which can WRAP around
-// XXX: currently sector-size is fixed 512bytes
-//      (would need a sysfs-val for sect-size)
-
 void DiskMeter::getsysfsdiskinfo( void )
 {
         // field-3: sects read since boot (but can wrap!)
@@ -260,68 +255,64 @@ void DiskMeter::getsysfsdiskinfo( void )
   std::string disk;
   struct stat buf;
   std::ifstream diskstat;
+  char line[128];
+  unsigned long vals[7];
 
   // the sum of all disks:
-  unsigned long long all_bytes_read,all_bytes_written;
-
-  // ... while this is only one disk's value:
-  unsigned long sec_read,sec_written;
-  unsigned long sect_size;
-
-  unsigned long dummy;
+  unsigned long long all_bytes_read = 0, all_bytes_written = 0;
+  unsigned int sect_size = 512; // disk stats in /sys are always in 512 byte units
 
   IntervalTimerStop();
   total_ = maxspeed_;
+  sysfs_dir += '/';
 
   DIR *dir = opendir(_statFileName);
-  if (dir==NULL) {
+  if (dir == NULL) {
     XOSDEBUG("sysfs: Cannot open directory : %s\n", _statFileName);
     return;
   }
 
-  // reset all sums
-  all_bytes_read=all_bytes_written=0L;
-  sect_size=0L;
-
   // visit every /sys/block/*/stat and sum up the values:
-
   for (struct dirent *dirent; (dirent = readdir(dir)) != NULL; ) {
-    if (strncmp(dirent->d_name, ".", 1) == 0
-        || strncmp(dirent->d_name, "..", 2) == 0)
+    if (strncmp(dirent->d_name, ".", 1) == 0 ||
+        strncmp(dirent->d_name, "..", 2) == 0)
       continue;
 
-    disk = sysfs_dir + "/" + dirent->d_name;
-
+    disk = sysfs_dir + dirent->d_name;
     if (stat(disk.c_str(), &buf) == 0 && buf.st_mode & S_IFDIR) {
-       // is a dir, locate 'stat' file in it
-       disk = disk + "/stat";
-       if (stat(disk.c_str(), &buf) == 0 && buf.st_mode & S_IFREG) {
-                XOSDEBUG("disk stat: %s\n",disk.c_str() );
-                diskstat.open(disk.c_str());
-                if ( diskstat.good() ) {
-                   sec_read=sec_written=0L;
-                   diskstat >> dummy >> dummy >> sec_read >> dummy >> dummy >> dummy >> sec_written;
+      // is a dir, locate 'stat' file in it
+      disk += "/stat";
+      if (stat(disk.c_str(), &buf) == 0 && buf.st_mode & S_IFREG) {
+        XOSDEBUG("disk stat: %s\n", disk.c_str());
+        diskstat.open(disk.c_str());
+        if (diskstat.good()) {
+          diskstat.getline(line, 128);
+          char *cur = line, *end = NULL;
+          for (int i = 0; i < 7; i++) {
+            vals[i] = strtoul(cur, &end, 10);
+            cur = end;
+          }
+          // XXX: ignoring wrap around case for each disk
+          // (would require saving old vals for each disk etc..)
+          all_bytes_read    += vals[2];
+          all_bytes_written += vals[6];
 
-                   sect_size = 512; // XXX: not always true
-
-                   // XXX: ignoring wrap around case for each disk
-                   // (would require saving old vals for each disk etc..)
-                   all_bytes_read    += (unsigned long long) sec_read * (unsigned long long) sect_size;
-                   all_bytes_written += (unsigned long long) sec_written * (unsigned long long) sect_size;
-
-                   XOSDEBUG("disk stat: %s | read: %ld, written: %ld\n",disk.c_str(),sec_read,sec_written );
-                   diskstat.close(); diskstat.clear();
-                } else {
-                  XOSDEBUG("disk stat open: %s - errno=%d\n",disk.c_str(),errno );
-                }
-       } else {
-        XOSDEBUG("disk stat is not file: %s - errno=%d\n",disk.c_str(),errno );
-       }
-    } else {
-        XOSDEBUG("disk is not dir: %s - errno=%d\n",disk.c_str(),errno );
+          XOSDEBUG("disk stat: %s | read: %lu, written: %lu\n", disk.c_str(), vals[2], vals[6]);
+          diskstat.close();
+          diskstat.clear();
+        }
+        else
+          XOSDEBUG("disk stat open: %s - errno=%d\n", disk.c_str(), errno);
+      }
+      else
+        XOSDEBUG("disk stat is not file: %s - errno=%d\n", disk.c_str(), errno);
     }
+    else
+      XOSDEBUG("disk is not dir: %s - errno=%d\n", disk.c_str(), errno);
   } // for
   closedir(dir);
-  XOSDEBUG("disk: read: %lld, written: %lld\n",all_bytes_read, all_bytes_written );
+  all_bytes_read *= sect_size;
+  all_bytes_written *= sect_size;
+  XOSDEBUG("disk: read: %llu, written: %llu\n", all_bytes_read, all_bytes_written);
   update_info(all_bytes_read, all_bytes_written);
 }
