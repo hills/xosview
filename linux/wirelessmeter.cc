@@ -1,4 +1,4 @@
-//  
+//
 //  Copyright (c) 2001 by Tim Ehlers ( tehlers@gwdg.de )
 //
 //  This file may be distributed under terms of the GPL
@@ -11,16 +11,13 @@
 #include <fstream>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
+#include <stdio.h>
 
-using namespace std;
-
-static const char WLFILENAME[] = "/proc/net/wireless";
 
 WirelessMeter::WirelessMeter( XOSView *parent, int ID, const char *wlID)
-	: FieldMeterGraph ( parent, 2, wlID, "LINK/LEVEL", 1, 1, 0 ), _number(ID) {
-  lastqualitystate = -1;
-  strcpy(devname, "0");
+  : FieldMeterGraph ( parent, 2, wlID, "LINK/LEVEL", 1, 1, 0 ), _number(ID) {
+  _lastquality = -1;
+  total_ = 0;
 }
 
 WirelessMeter::~WirelessMeter( void ){
@@ -29,13 +26,12 @@ WirelessMeter::~WirelessMeter( void ){
 void WirelessMeter::checkResources( void ){
   FieldMeterGraph::checkResources();
 
-  poorqualcol_ = parent_->allocColor(parent_->getResource( "PoorQualityColor" ));
-  fairqualcol_ = parent_->allocColor(parent_->getResource( "FairQualityColor" ));
-  goodqualcol_ = parent_->allocColor(parent_->getResource( "GoodQualityColor" ));
-
+  _poorqualcol = parent_->allocColor(parent_->getResource( "PoorQualityColor" ));
+  _fairqualcol = parent_->allocColor(parent_->getResource( "FairQualityColor" ));
+  _goodqualcol = parent_->allocColor(parent_->getResource( "GoodQualityColor" ));
   setfieldcolor( 1, parent_->getResource( "wirelessUsedColor" ) );
 
-  priority_ = atoi (parent_->getResource( "wirelessPriority" ) );
+  priority_ = atoi(parent_->getResource( "wirelessPriority" ) );
   dodecay_ = parent_->isResourceTrue( "wirelessDecay" );
   SetUsedFormat(parent_->getResource( "wirelessUsedFormat" ) );
 }
@@ -46,101 +42,93 @@ void WirelessMeter::checkevent( void ){
   drawfields();
 }
 
-
 void WirelessMeter::getpwrinfo( void ){
-  ifstream loadinfo( WLFILENAME );
-
+  std::ifstream loadinfo( WLFILENAME );
   if ( !loadinfo ){
-    cerr <<"Can not open file : " <<WLFILENAME <<endl;
+    std::cerr << "Can not open file : " << WLFILENAME << std::endl;
     parent_->done(1);
     return;
   }
 
-  char buff[256];
+  char buff[16];
+  int linkq = 0, quality = 0;
 
-  for (int i = 1 ; i < 2 ; i++)
-    loadinfo.getline(buff, 256);
+  // skip the two header rows
+  loadinfo.ignore(1024, '\n');
+  loadinfo.ignore(1024, '\n');
 
-  int linkq = 0;
-
-  if (strncmp(devname, "0", 1)) {
-    while (!loadinfo.eof()){
-      loadinfo.getline(buff, 256);
-      if (!loadinfo.eof()){
-        loadinfo >> buff;
-        if (!strncmp(buff, devname, strlen(devname)))
-          loadinfo >> buff >> linkq;
-      }
-    }
+  if ( _devname.empty() ) {  // find devname on first run
+    for (int i = 0; i < _number; i++)
+      loadinfo.ignore(1024, '\n');
+    if ( loadinfo.good() )
+      loadinfo >> _devname >> buff >> linkq;
   }
-
-  if (!strncmp(devname, "0", 1)) {
-    for (int i = 0 ; i < _number; ) {
-      loadinfo.getline(buff, 256);
-      loadinfo >> devname >> buff >> linkq;
-      if (!loadinfo.eof()){
-        if ( linkq != 0 )
-          i++;
-      }
-      if ( loadinfo.eof() )
+  else {
+    while ( !loadinfo.eof() ) {
+      loadinfo >> buff;
+      if ( _devname == buff ) {
+        loadinfo >> buff >> linkq;
         break;
+      }
+      loadinfo.ignore(1024, '\n');
     }
   }
+
+  if ( linkq >= 250 )
+    linkq = 0;
 
   fields_[0] = linkq;
+  if ( fields_[0] >= 15 )
+    quality = 2;
+  else if ( fields_[0] >= 7 )
+    quality = 1;
+  else
+    quality = 0;
 
-  if ( fields_[0] <  7 ) qualitystate = 0;
-  if ( fields_[0] >= 7 ) qualitystate = 1;
-  if ( fields_[0] >= 15 ) qualitystate = 2;
-  
-  if ( qualitystate != lastqualitystate ){
-    if ( qualitystate == 0 ) setfieldcolor( 0, poorqualcol_ );
-    if ( qualitystate == 1 ) setfieldcolor( 0, fairqualcol_ );
-    if ( qualitystate == 2 ) setfieldcolor( 0, goodqualcol_ );
+  if ( quality != _lastquality ){
+    if ( quality == 0 )
+      setfieldcolor( 0, _poorqualcol );
+    else if ( quality == 1 )
+      setfieldcolor( 0, _fairqualcol );
+    else
+      setfieldcolor( 0, _goodqualcol );
+
     drawlegend();
-    lastqualitystate = qualitystate;
+    _lastquality = quality;
   }
 
-  if ( fields_[0] >= 250 ) { fields_[0] = 0; qualitystate = 0; }
-
-  total_ = 30 * (int)(fields_[0] / 30 + 1);
-  fields_[1] = fields_[0];
-  setUsed (fields_[0], total_);
+  if (fields_[0] >= total_)
+    total_ = 30 * (int)(fields_[0] / 30 + 1);
+  fields_[1] = total_ - fields_[0];
+  setUsed(fields_[0], total_);
 }
 
 int WirelessMeter::countdevices(void){
-  ifstream stats( WLFILENAME );
-
+  std::ifstream stats( WLFILENAME );
   if ( !stats ){
-    cerr <<"Can not open file : " <<WLFILENAME <<endl;
+    std::cerr << "Can not open file : " << WLFILENAME << std::endl;
     exit( 1 );
   }
 
-  char buf[1024];
+  char devname[16];
+  int count = 0;
 
-  for (int i = 1 ; i < 2 ; i++)
-    stats.getline(buf, 1024);
+  stats.ignore(1024, '\n');
+  stats.ignore(1024, '\n');
 
-  int wirelessCount = 0;
-  int linkq = 0;
-  while (!stats.eof()){
-    stats.getline(buf, 1024);
-    stats >> buf >> buf >> linkq;
-    if (!stats.eof()){
-      if ( linkq != 0 )
-          wirelessCount++;
-    }
+  while ( !stats.eof() ) {
+    stats >> devname;
+    if ( stats.good() )
+      count++;
+    stats.ignore(1024, '\n');
   }
 
-  return wirelessCount;
+  return count;
 }
 
-const char *WirelessMeter::wirelessStr(int num){
-  static char buffer[8] = "WLAN";
-
-  if (num != 1)
-    snprintf(buffer + 4, 3, "%d", num);
-
+const char *WirelessMeter::wirelessStr(int num) {
+  static char buffer[8] = "WL";
+  snprintf(buffer + 2, 5, "%d", num);
   buffer[7] = '\0';
   return buffer;
 }
