@@ -24,7 +24,7 @@ public:
   static int getkernelversion(void);
 protected:
   int _lineNum;
-  long long cputime_[2][10];
+  unsigned long long cputime_[2][10];
   int cpuindex_;
   int kernel_;
   int statfields_;

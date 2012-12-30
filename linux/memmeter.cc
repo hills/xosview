@@ -112,27 +112,17 @@ void MemMeter::getmemstat(const char *fname, LineInfo *infos, int ninfos){
     exit(1);
   }
 
-  char buf[256];
-
   // Get the info from the "standard" meminfo file.
-  int lineNum = 0;
-  int inum = 0;
-  while (!meminfo.eof()){
+  int lineNum = 0, inum = 0;
+  unsigned long long val;
+  char buf[256];
+  while (inum < ninfos && !meminfo.eof()){
     meminfo.getline(buf, 256);
-    lineNum++;
-    if (lineNum != infos[inum].line())
+    if (++lineNum != infos[inum].line())
       continue;
 
-    std::string sline(buf, 256);
-    std::istringstream line(sline);
-    unsigned long val;
-    std::string ignore;
-    line >> ignore >> val;
+    val = strtoull(buf + infos[inum].idlen() + 1, NULL, 10);
     /*  All stats are in KB.  */
-    infos[inum].setVal((double)val*1024.0);	/*  Multiply by 1024 bytes per K  */
-
-    inum++;
-    if (inum >= ninfos)
-      break;
+    infos[inum++].setVal((double)(val<<10));	/*  Multiply by 1024 bytes per K  */
   }
 }

@@ -136,10 +136,7 @@ void NetMeter::checkeventNew(void)
         return;
         }
 
-    std::string str_in;
-    unsigned long long in, out, ig;
-    unsigned long long totin = 0, totout = 0;
-    char buf[1024];
+    unsigned long long ig, totin = 0, totout = 0;
 
     fields_[2] = maxpackets_;     // assume no
     fields_[0] = fields_[1] = 0;  // network activity
@@ -147,6 +144,8 @@ void NetMeter::checkeventNew(void)
     _timer.stop();
 
     if (_usechains)
+      {
+      char buf[1024];
       while (ifs)
         {
 	ifs >> buf;
@@ -158,48 +157,43 @@ void NetMeter::checkeventNew(void)
 
 	ifs.ignore(1024, '\n');
         }
+      }
     else
         {
-	  std::string ifname;
-	  ifs.ignore(1024, '\n');
-	  ifs.ignore(1024, '\n');
+	std::string line, ifname;
+	ifs.ignore(1024, '\n');
+	ifs.ignore(1024, '\n');
 
-	  while (ifs)
-	      {
-		if (netIface_ == "False" )
-		  {
-		    ifs.ignore(1024, ':');
-		  }
-		else
-		  {
-		    ifs.get(buf, 128, ':');
-		    ifname = buf;
-		    ifs.ignore(1, ':');
-		    ifname.erase(0, ifname.find_first_not_of(" ") );
-		    if ( (!ignored_ && ifname != netIface_) || (ignored_ && ifname == netIface_) )
-		      {
-			ifs.ignore(1024,'\n');
-			continue;
-		      }
-		  }
+	while (!ifs.eof())
+	    {
+	    unsigned long long vals[9];
+	    std::getline(ifs, line);
+	    if (!ifs.good())
+		break;
+	    int colon = line.find_first_of(':');
+	    ifname = line.substr(0, colon);
+	    ifname.erase(0, ifname.find_first_not_of(' '));
+	    if (netIface_ != "False" )
+		{
+		if ( (!ignored_ && ifname != netIface_) ||
+		     ( ignored_ && ifname == netIface_) )
+		    continue;
+		}
 
-	      ifs >> str_in;
-              if (str_in == "No")
-                continue;
-              else
-                {
-                  in = strtoull(str_in.c_str(), NULL, 10);
-                  ifs >> ig >> ig >> ig >> ig >> ig >> ig >> ig >> out;
-                }
-
-	      if (!ifs.eof())
-		  {
-		  totin += in;
-		  totout += out;
-		  }
-
-	      ifs.ignore(1024, '\n');
-	      }
+	    const char *cur = line.erase(0, colon + 1).c_str();
+	    if (strncmp(cur, " No ", 4) == 0)
+		continue; // xxx: No statistics available.
+	    char *end = NULL;
+	    for (int i = 0; i < 9; i++)
+		{
+		vals[i] = strtoull(cur, &end, 10);
+		cur = end;
+		}
+	    totin += vals[0];
+	    totout += vals[8];
+	    XOSDEBUG("%s: %llu bytes received, %llu bytes sent.\n", 
+		     ifname.c_str(), vals[0], vals[8]);
+	    }
 	}
 
     float t = 1000000.0 / _timer.report_usecs();

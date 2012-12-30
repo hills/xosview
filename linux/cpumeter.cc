@@ -229,6 +229,7 @@ void CPUMeter::getcputime( void ){
   total_ = 0;
   std::string tmp;
   std::ifstream stats( STATFILENAME );
+  char *end = NULL;
 
   if ( !stats ){
     std::cerr <<"Can not open file : " <<STATFILENAME << std::endl;
@@ -238,20 +239,17 @@ void CPUMeter::getcputime( void ){
   // read until we are at the right line.
   for (int i = 0 ; i < _lineNum ; i++) {
     if (stats.eof())
-      break;
-    getline(stats, tmp);
+      return;
+    stats.ignore(1024, '\n');
   }
+  std::getline(stats, tmp);
 
-  stats >>tmp >>cputime_[cpuindex_][0]
-	      >>cputime_[cpuindex_][1]
-	      >>cputime_[cpuindex_][2]
-	      >>cputime_[cpuindex_][3]
-	      >>cputime_[cpuindex_][4]
-	      >>cputime_[cpuindex_][5]
-	      >>cputime_[cpuindex_][6]
-	      >>cputime_[cpuindex_][7]
-	      >>cputime_[cpuindex_][8]
-	      >>cputime_[cpuindex_][9];
+  int col = 0;
+  const char *line = tmp.substr(tmp.find_first_of(' ')).c_str();
+  while (*line) {
+    cputime_[cpuindex_][col++] = strtoull(line, &end, 10);
+    line = end;
+  }
 
   // Guest time already included in user time.
   cputime_[cpuindex_][0] -= cputime_[cpuindex_][8];
@@ -262,8 +260,9 @@ void CPUMeter::getcputime( void ){
   // zero all the fields
   memset(fields_, 0, numfields_*sizeof(fields_[0]));
   for ( int i = 0 ; i < statfields_ ; i++ ){
-    // counters in /proc/stat do sometimes go backwards
-    int time = ( cputime_[cpuindex_][i] > cputime_[oldindex][i] ? cputime_[cpuindex_][i] - cputime_[oldindex][i] : 0 );
+    int time = cputime_[cpuindex_][i] - cputime_[oldindex][i];
+    if (time < 0)    // counters in /proc/stat do sometimes go backwards
+      time = 0;
     fields_[cputime_to_field[i]] += time;
     total_ += time;
 //     XOSDEBUG("cputime_[%d] = %2d  fields_[%d] = %d\n", i, time, cputime_to_field[i], (int)fields_[cputime_to_field[i]]);

@@ -11,10 +11,9 @@
 #include <map>
 #include <stdlib.h>
 
-
 static const char *INTFILE     = "/proc/interrupts";
+static std::map<int,int> realintnum;
 
-std::map<int,int> realintnum;
 
 IntMeter::IntMeter( XOSView *parent, int cpu)
   : BitMeter( parent, "INTS", "", 1, 0, 0 ), _cpu(cpu) {
@@ -51,7 +50,10 @@ void IntMeter::checkResources( void ){
 
 void IntMeter::getirqs( void ){
   std::ifstream intfile( INTFILE );
-  int intno, count, tmp, idx;
+  std::string line;
+  int intno, idx, i;
+  unsigned long count, tmp;
+  char *end = NULL;
 
   if ( !intfile ){
     std::cerr <<"Can not open file : " <<INTFILE << std::endl;
@@ -62,22 +64,21 @@ void IntMeter::getirqs( void ){
       intfile.ignore(1024, '\n');
 
   while ( !intfile.eof() ){
-    count = tmp = 0;
-    intfile >> idx;
+    std::getline(intfile, line);
+    if ( line.find_first_of("0123456789") > line.find_first_of(':') )
+      break;  // reached non-numeric interrupts
+    idx = strtoul(line.c_str(), &end, 10);
     intno = realintnum[idx];
-    if(intno>=numBits())
-    	updateirqcount(intno,false);
-    if (!intfile) break;
-    intfile.ignore(1);
-    if ( !intfile.eof() ){
-      for (int i = 0; i <= _cpu; i++) {
-        intfile >> tmp;
-        count += tmp;
-      }
-      intfile.ignore(1024, '\n');
-
-      irqs_[intno] = ( separate_ ? tmp : count );
+    if ( intno >= numBits() )
+      updateirqcount(intno, false);
+    const char *cur = end + 1;
+    count = tmp = i = 0;
+    while (*cur && i++ <= _cpu) {
+      tmp = strtoul(cur, &end, 10);
+      count += tmp;
+      cur = end;
     }
+    irqs_[intno] = ( separate_ ? tmp : count );
   }
 }
 
