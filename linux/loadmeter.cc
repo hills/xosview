@@ -133,34 +133,22 @@ void LoadMeter::getloadinfo( void ){
 
   setUsed(fields_[0], (float) 1.0);
 }
-// just check /proc/cpuinfo for the speed of cpu0
+
+// just check /proc/cpuinfo for the speed of cpu
 // (average multi-cpus on different speeds)
-// display is intended mainly for laptops ...
-// (yes - i know about devices/system/cpu/cpu0/cpufreq )
+// (yes - i know about devices/system/cpu/cpu*/cpufreq )
 void LoadMeter::getspeedinfo( void ){
+  std::ifstream speedinfo(SPEEDFILENAME);
+  std::string line, val;
+  unsigned int total_cpu = 0, ncpus = 0;
 
-  std::string filename;
-  std::ifstream speedinfo;
-  std::string inp_line;
-
-  std::string argname;
-  std::string argval;
-
-  unsigned int total_cpu = 0;
-  unsigned int ncpus = 0;
-
-  speedinfo.open(SPEEDFILENAME );
   while ( speedinfo.good() ) {
-    argname.clear();
-    std::getline(speedinfo,argname,':');
-    argval.clear();
-    std::getline(speedinfo,argval);
-        // XOSDEBUG("speed: a=\"%s\" v=\"%s\"\n",argname.c_str(),argval.c_str() );
-
-    if ( argname.substr(0,7) == "cpu MHz" ) {
-        XOSDEBUG("SPEED: %s\n",argval.c_str() );
-        total_cpu += atoi(argval.c_str());
-	ncpus++;
+    std::getline(speedinfo, line);
+    if ( strncmp(line.c_str(), "cpu MHz", 7) == 0 ) {
+      val = line.substr(line.find_last_of(':') + 1);
+      XOSDEBUG("SPEED: %s\n", val.c_str());
+      total_cpu += atoi(val.c_str());
+      ncpus++;
     }
   }
 
@@ -169,7 +157,4 @@ void LoadMeter::getspeedinfo( void ){
     cur_cpu_speed_ = total_cpu / ncpus;
   else
     cur_cpu_speed_ = 0;
-
-  speedinfo.close(); speedinfo.clear();
-
 }
