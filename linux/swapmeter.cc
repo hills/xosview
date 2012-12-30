@@ -48,30 +48,22 @@ void SwapMeter::getswapinfo( void ){
   total_ = fields_[0] = fields_[1] = 0;
 
   char buf[256];
-  std::string ignore, unit;
+  bool found_total = false, found_free = false;
+  unsigned long long val;
 
   // Get the info from the "standard" meminfo file.
-  while (!meminfo.eof()){
+  while ( !meminfo.eof() && !(found_total && found_free) ){
     meminfo.getline(buf, 256);
-    std::istringstream line(std::string(buf, 256));
 
-    if(!strncmp("SwapTotal", buf, strlen("SwapTotal"))){
-      line >> ignore >> total_ >> unit;
-      if (strncasecmp(unit.c_str(), "kB", 2) == 0)
-        total_ *= 1024.0;
-      if (strncasecmp(unit.c_str(), "MB", 2) == 0)
-        total_ *= 1024.0*1024.0;
-      if (strncasecmp(unit.c_str(), "GB", 2) == 0)
-        total_ *= 1024.0*1024.0*1024.0;
+    if ( !strncmp(buf, "SwapTotal", 9) ){
+      val = strtoull(buf+10, NULL, 10);
+      total_ = val<<10; // unit is always kB
+      found_total = true;
     }
-    if(!strncmp("SwapFree", buf, strlen("SwapFree"))){
-      line >> ignore >> fields_[1] >> unit;
-      if (strncasecmp(unit.c_str(), "kB", 2) == 0)
-        fields_[1] *= 1024.0;
-      if (strncasecmp(unit.c_str(), "MB", 2) == 0)
-        fields_[1] *= 1024.0*1024.0;
-      if (strncasecmp(unit.c_str(), "GB", 2) == 0)
-        fields_[1] *= 1024.0*1024.0*1024.0;
+    if ( !strncmp(buf, "SwapFree", 8) ){
+      val = strtoull(buf+9, NULL, 10);
+      fields_[1] = val<<10; // unit is always kB
+      found_free = true;
     }
   }
 

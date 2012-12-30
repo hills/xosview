@@ -86,24 +86,27 @@ void PageMeter::getvmpageinfo(void)
     {
     total_ = 0;
     char buf[MAX_PROCSTAT_LENGTH];
+    bool found_in = false, found_out = false;
     std::ifstream stats(_statFileName);
     if (!stats)
         {
         std::cerr <<"Cannot open file : " << _statFileName << std::endl;
         exit(1);
         }
-    do
+    while (!stats.eof() && !(found_in && found_out))
         {
-        stats >> buf;
-        } while (!stats.eof() && strncasecmp(buf, "pswpin", 7));
-    stats >>pageinfo_[pageindex_][0];
-
-    do
-        {
-        stats >> buf;
-        } while (!stats.eof() && strncasecmp(buf, "pswpout", 8));
-    stats >> pageinfo_[pageindex_][1];
-
+        stats.getline(buf, MAX_PROCSTAT_LENGTH);
+        if (!strncmp(buf, "pswpin", 6))
+            {
+            pageinfo_[pageindex_][0] = strtoul(buf+7, NULL, 10);
+            found_in = true;
+            }
+        if (!strncmp(buf, "pswpout", 7))
+            {
+            pageinfo_[pageindex_][1] = strtoul(buf+8, NULL, 10);
+            found_out = true;
+            }
+        }
     updateinfo();
     }
 

@@ -19,7 +19,7 @@ public:
 
   void checkResources( void );
 protected:
-  float pageinfo_[2][2];
+  unsigned long pageinfo_[2][2];
   int pageindex_;
   float maxspeed_;
   bool _vmstat;
