@@ -8,6 +8,11 @@
 #define _DISKMETER_H_
 
 #include "fieldmetergraph.h"
+#include <map>
+#include <string>
+
+typedef std::map<std::string, unsigned long> diskmap;
+
 
 class DiskMeter : public FieldMeterGraph
     {
@@ -21,9 +26,9 @@ class DiskMeter : public FieldMeterGraph
         void checkResources( void );
     protected:
 
-	// sysfs:
-	void update_info(unsigned long long rsum, unsigned long long wsum);
-	void getsysfsdiskinfo( void );
+        // sysfs:
+        void update_info(const diskmap &reads, const diskmap &writes);
+        void getsysfsdiskinfo( void );
 
         void getdiskinfo( void );
         void getvmdiskinfo( void );
@@ -31,9 +36,8 @@ class DiskMeter : public FieldMeterGraph
           int fudgeFactor);
     private:
 
-	// sysfs:
-	unsigned long long sysfs_read_prev_;
-	unsigned long long sysfs_write_prev_;
+        // sysfs:
+        diskmap sysfs_read_prev_, sysfs_write_prev_;
         bool _sysfs;
 
         unsigned long int read_prev_;

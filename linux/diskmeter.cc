@@ -13,9 +13,10 @@
 #include <unistd.h>
 #include <dirent.h>
 #include <errno.h>
-
+#include <limits.h>
 
 #define MAX_PROCSTAT_LENGTH 2048
+
 
 DiskMeter::DiskMeter( XOSView *parent, float max ) : FieldMeterGraph(
   parent, 3, "DISK", "READ/WRITE/IDLE"), _vmstat(false),
@@ -26,7 +27,6 @@ DiskMeter::DiskMeter( XOSView *parent, float max ) : FieldMeterGraph(
     maxspeed_ = max;
 
     _sysfs=_vmstat=false;
-    sysfs_read_prev_=sysfs_write_prev_=0L;
     struct stat buf;
 
     // first - try sysfs:
@@ -204,23 +204,44 @@ void DiskMeter::getdiskinfo( void )
 }
 
 // sysfs version - works with long-long !!
-// (no dependency on sector-size here )
-void DiskMeter::update_info(unsigned long long rsum, unsigned long long wsum)
+void DiskMeter::update_info(const diskmap &reads, const diskmap &writes)
 {
     float itim = IntervalTimeInMicrosecs();
+    // the sum of all disks
+    unsigned long long all_bytes_read = 0, all_bytes_written = 0;
+    unsigned int sect_size = 512; // disk stats in /sys are always in 512 byte units
 
     // avoid strange values at first call
     // (by this - the first value displayed becomes zero)
-    if(sysfs_read_prev_ == 0L)
+    if (sysfs_read_prev_.empty())
     {
-        sysfs_read_prev_  = rsum;
-        sysfs_write_prev_ = wsum;
-        itim = 1; 	// itim is garbage here too. Valgrind complains.
+        sysfs_read_prev_  = reads;
+        sysfs_write_prev_ = writes;
+        itim = 1;	// itim is garbage here too. Valgrind complains.
     }
 
+    for (diskmap::const_iterator it = reads.begin(); it != reads.end(); it++)
+    {
+        if (it->second < sysfs_read_prev_[it->first]) // counter wrapped
+            all_bytes_read += ULONG_MAX - sysfs_read_prev_[it->first] + it->second;
+        else
+            all_bytes_read += it->second - sysfs_read_prev_[it->first];
+    }
+    for (diskmap::const_iterator it = writes.begin(); it != writes.end(); it++)
+    {
+        if (it->second < sysfs_write_prev_[it->first]) // counter wrapped
+            all_bytes_written += ULONG_MAX - sysfs_write_prev_[it->first] + it->second;
+        else
+            all_bytes_written += it->second - sysfs_write_prev_[it->first];
+    }
+
+    all_bytes_read *= sect_size;
+    all_bytes_written *= sect_size;
+    XOSDEBUG("disk: read: %llu, written: %llu\n", all_bytes_read, all_bytes_written);
+
     // convert rate from bytes/microsec into bytes/second
-    fields_[0] = ((rsum - sysfs_read_prev_ ) * 1e6 ) / itim;
-    fields_[1] = ((wsum - sysfs_write_prev_) * 1e6 ) / itim;
+    fields_[0] = all_bytes_read * 1e6 / itim;
+    fields_[1] = all_bytes_written * 1e6 / itim;
 
     // fix overflow (conversion bug?)
     if (fields_[0] < 0.0)
@@ -235,16 +256,16 @@ void DiskMeter::update_info(unsigned long long rsum, unsigned long long wsum)
     fields_[2] = total_ - (fields_[0] + fields_[1]);
 
     // save old vals for next round
-    sysfs_read_prev_  = rsum;
-    sysfs_write_prev_ = wsum;
+    sysfs_read_prev_  = reads;
+    sysfs_write_prev_ = writes;
 
-    setUsed((fields_[0]+fields_[1]), total_);
+    setUsed(fields_[0] + fields_[1], total_);
     IntervalTimerStart();
 }
 
 // XXX: sysfs - read Documentation/iostats.txt !!!
 // extract stats from /sys/block/*/stat
-// each disk reports a 32bit u_int, which can WRAP around
+// each disk reports an unsigned long, which can WRAP around
 void DiskMeter::getsysfsdiskinfo( void )
 {
         // field-3: sects read since boot (but can wrap!)
@@ -257,10 +278,7 @@ void DiskMeter::getsysfsdiskinfo( void )
   std::ifstream diskstat;
   char line[128];
   unsigned long vals[7];
-
-  // the sum of all disks:
-  unsigned long long all_bytes_read = 0, all_bytes_written = 0;
-  unsigned int sect_size = 512; // disk stats in /sys are always in 512 byte units
+  diskmap reads, writes;
 
   IntervalTimerStop();
   total_ = maxspeed_;
@@ -282,37 +300,27 @@ void DiskMeter::getsysfsdiskinfo( void )
     if (stat(disk.c_str(), &buf) == 0 && buf.st_mode & S_IFDIR) {
       // is a dir, locate 'stat' file in it
       disk += "/stat";
-      if (stat(disk.c_str(), &buf) == 0 && buf.st_mode & S_IFREG) {
-        XOSDEBUG("disk stat: %s\n", disk.c_str());
-        diskstat.open(disk.c_str());
-        if (diskstat.good()) {
-          diskstat.getline(line, 128);
-          char *cur = line, *end = NULL;
-          for (int i = 0; i < 7; i++) {
-            vals[i] = strtoul(cur, &end, 10);
-            cur = end;
-          }
-          // XXX: ignoring wrap around case for each disk
-          // (would require saving old vals for each disk etc..)
-          all_bytes_read    += vals[2];
-          all_bytes_written += vals[6];
-
-          XOSDEBUG("disk stat: %s | read: %lu, written: %lu\n", disk.c_str(), vals[2], vals[6]);
-          diskstat.close();
-          diskstat.clear();
+      diskstat.open(disk.c_str());
+      if (diskstat.good()) {
+        diskstat.getline(line, 128);
+        char *cur = line, *end = NULL;
+        for (int i = 0; i < 7; i++) {
+          vals[i] = strtoul(cur, &end, 10);
+          cur = end;
         }
-        else
-          XOSDEBUG("disk stat open: %s - errno=%d\n", disk.c_str(), errno);
+        reads[dirent->d_name]  = vals[2];
+        writes[dirent->d_name] = vals[6];
+
+        XOSDEBUG("disk stat: %s | read: %lu, written: %lu\n", disk.c_str(), vals[2], vals[6]);
+        diskstat.close();
+        diskstat.clear();
       }
       else
-        XOSDEBUG("disk stat is not file: %s - errno=%d\n", disk.c_str(), errno);
+        XOSDEBUG("disk stat open: %s - errno=%d\n", disk.c_str(), errno);
     }
     else
       XOSDEBUG("disk is not dir: %s - errno=%d\n", disk.c_str(), errno);
   } // for
   closedir(dir);
-  all_bytes_read *= sect_size;
-  all_bytes_written *= sect_size;
-  XOSDEBUG("disk: read: %llu, written: %llu\n", all_bytes_read, all_bytes_written);
-  update_info(all_bytes_read, all_bytes_written);
+  update_info(reads, writes);
 }
