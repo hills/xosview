@@ -32,12 +32,8 @@ protected:
   void getcoretemp( void );
 
 private:
-  int _type;                // 0: Intel / 1: AMD
-  int _pkg;
-  int _cpu;
-  int _high;
-  std::string _node;        // hwmon node (hwmonN) for k8temp/k10temp
-  std::vector<int> _cpus;   // sysfs indices (tempN_input) for max and avg
+  int _pkg, _cpu, _high;
+  std::vector<std::string> _cpus;
   unsigned long _actcolor, _highcolor;
 };
 

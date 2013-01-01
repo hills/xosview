@@ -20,16 +20,15 @@
 #include <sys/types.h>
 #include <fstream>
 
+#define PATH_SIZE 128
+
 static const char SYS_HWMON[] = "/sys/class/hwmon";
 static const char SYS_CORETEMP[] = "/sys/devices/platform/coretemp";
 
 
 CoreTemp::CoreTemp( XOSView *parent, const char *label, const char *caption, int pkg, int cpu )
-  : FieldMeter( parent, 3, label, caption, 1, 1, 1 ) {
-  _pkg = pkg;
-  _cpu = cpu;
+  : FieldMeter( parent, 3, label, caption, 1, 1, 1 ), _pkg(pkg), _cpu(cpu) {
   _high = 0;
-  checkResources();
 }
 
 CoreTemp::~CoreTemp( void ) {
@@ -47,9 +46,8 @@ void CoreTemp::checkResources( void ) {
   priority_ = atoi( parent_->getResource( "coretempPriority" ) );
   SetUsedFormat( parent_->getResource( "coretempUsedFormat" ) );
 
-  int cpu = 0;
   unsigned int cpucount = countCpus(_pkg);
-  char name[80];
+  char name[PATH_SIZE];
   std::string dummy;
   std::ifstream file;
   DIR *dir;
@@ -57,18 +55,17 @@ void CoreTemp::checkResources( void ) {
 
   dir = opendir(SYS_HWMON);
   if (!dir) {
-    std::cout << "Can not open " << SYS_HWMON << " directory." << std::endl;
+    std::cerr << "Can not open " << SYS_HWMON << " directory." << std::endl;
     parent_->done(1);
     return;
   }
 
   while ( (dent = readdir(dir)) ) {
-    if (!strncmp(dent->d_name, ".", 1))
-      continue;
-    if (!strncmp(dent->d_name, "..", 2))
+    if ( !strncmp(dent->d_name, ".", 1) ||
+         !strncmp(dent->d_name, "..", 2) )
       continue;
 
-    snprintf(name, 80, "%s/%s/device/name", SYS_HWMON, dent->d_name);
+    snprintf(name, PATH_SIZE, "%s/%s/device/name", SYS_HWMON, dent->d_name);
     file.open(name);
     if (!file)
       continue;
@@ -76,21 +73,24 @@ void CoreTemp::checkResources( void ) {
     file.close();
 
     if (strncmp(dummy.c_str(), "k8temp", 6) == 0) {
-      _type = 1;
-      _node = dent->d_name;
-      if (_cpu < 0)  // avg or max
-        for (uint i = 1; i <= cpucount; i++)
-          _cpus.push_back(i);
-      else      // single sensor (each core has two)
-        _cpu++; // sysfs indice starts from one
+      // each core has two sensors with index starting from 1
+      if (_cpu < 0) {  // avg or max
+        for (uint i = 1; i <= cpucount; i++) {
+          snprintf(name, PATH_SIZE, "%s/%s/device/temp%d_input", SYS_HWMON, dent->d_name, i);
+          _cpus.push_back(name);
+        }
+      }
+      else {  // single sensor
+        snprintf(name, PATH_SIZE, "%s/%s/device/temp%d_input", SYS_HWMON, dent->d_name, _cpu + 1);
+        _cpus.push_back(name);
+      }
     }
     else if (strncmp(dummy.c_str(), "coretemp", 8) == 0) {
-      int i = 0;
-      _type = 0;
+      int i = 0, cpu = 0;
       // Gather the sysfs indices which are not the same as core numbers.
       // Core numbers are not unique across physical CPUs, but sysfs indices are.
       while (_cpus.size() != cpucount) {
-        snprintf(name, 80, "%s.%d/temp%d_label", SYS_CORETEMP, _pkg, i);
+        snprintf(name, PATH_SIZE, "%s.%d/temp%d_label", SYS_CORETEMP, _pkg, i);
         file.open(name);
         if (!file) {
           i++;
@@ -102,19 +102,19 @@ void CoreTemp::checkResources( void ) {
           i++;
           continue;
         }
-        if (cpu == _cpu) {
-          _cpu = i;           // for one core
-          _cpus.push_back(i);
+        snprintf(name, PATH_SIZE, "%s.%d/temp%d_input", SYS_CORETEMP, _pkg, i++);
+        if (_cpu < 0)
+          _cpus.push_back(name);
+        else if (cpu == _cpu) {
+          _cpus.push_back(name);
           break;
         }
-        _cpus.push_back(i++); // for avg and max
       }
     }
     else if (strncmp(dummy.c_str(), "k10temp", 7) == 0) {
-      _type = 1;
-      _node = dent->d_name;
       _cpu = 1;
-      _cpus.push_back(1);  // K10 has only one sensor per physical CPU
+      snprintf(name, PATH_SIZE, "%s/%s/device/temp%d_input", SYS_HWMON, dent->d_name, _cpu);
+      _cpus.push_back(name);  // K10 has only one sensor per physical CPU
     }
 
     if (_cpus.empty())
@@ -122,11 +122,9 @@ void CoreTemp::checkResources( void ) {
 
     // sysfs node was found
     // get TjMax and use it for total if available
-    if (_type == 0)
-      snprintf(name, 80, "%s.%d/temp%d_crit", SYS_CORETEMP, _pkg, _cpus.front());
-    else
-      snprintf(name, 80, "%s/%s/device/temp1_crit", SYS_HWMON, dent->d_name);
-    file.open(name);
+    dummy = _cpus.front();
+    dummy.replace(dummy.find_last_of('_'), 6, "_crit");
+    file.open(dummy.c_str());
     if (file) {
       file >> total_;
       file.close();
@@ -139,7 +137,7 @@ void CoreTemp::checkResources( void ) {
     closedir(dir);
     return;
   }
-  std::cout << "You do not seem to have CPU temperature sensor available." << std::endl;
+  std::cerr << "You do not seem to have CPU temperature sensor available." << std::endl;
   parent_->done(1);
 }
 
@@ -149,7 +147,6 @@ void CoreTemp::checkevent( void ) {
 }
 
 void CoreTemp::getcoretemp( void ) {
-  char name[80];
   std::ifstream file;
   double dummy, high;
 
@@ -157,13 +154,9 @@ void CoreTemp::getcoretemp( void ) {
   high = 0.0;
 
   if (_cpu >= 0) {  // only one core
-    if (_type == 0)
-      snprintf(name, 80, "%s.%d/temp%d_input", SYS_CORETEMP, _pkg, _cpu);
-    else if (_type == 1)
-      snprintf(name, 80, "%s/%s/device/temp%d_input", SYS_HWMON, _node.c_str(), _cpu);
-    file.open(name);
+    file.open(_cpus.back().c_str());
     if (!file) {
-      std::cerr << "Can not open file : " << name << std::endl;
+      std::cerr << "Can not open file : " << _cpus.back().c_str() << std::endl;
       parent_->done(1);
       return;
     }
@@ -172,13 +165,9 @@ void CoreTemp::getcoretemp( void ) {
   }
   else if (_cpu == -1) {  // average
     for (uint i = 0; i < _cpus.size(); i++) {
-      if (_type == 0)
-        snprintf(name, 80, "%s.%d/temp%d_input", SYS_CORETEMP, _pkg, _cpus[i]);
-      else
-        snprintf(name, 80, "%s/%s/device/temp%d_input", SYS_HWMON, _node.c_str(), _cpus[i]);
-      file.open(name);
+      file.open(_cpus[i].c_str());
       if (!file) {
-        std::cerr << "Can not open file : " << name << std::endl;
+        std::cerr << "Can not open file : " << _cpus[i].c_str() << std::endl;
         parent_->done(1);
         return;
       }
@@ -190,13 +179,9 @@ void CoreTemp::getcoretemp( void ) {
   }
   else if (_cpu == -2) {  // maximum
     for (uint i = 0; i < _cpus.size(); i++) {
-      if (_type == 0)
-        snprintf(name, 80, "%s.%d/temp%d_input", SYS_CORETEMP, _pkg, _cpus[i]);
-      else
-        snprintf(name, 80, "%s/%s/device/temp%d_input", SYS_HWMON, _node.c_str(), _cpus[i]);
-      file.open(name);
+      file.open(_cpus[i].c_str());
       if (!file) {
-        std::cerr << "Can not open file : " << name << std::endl;
+        std::cerr << "Can not open file : " << _cpus[i].c_str() << std::endl;
         parent_->done(1);
         return;
       }
@@ -212,22 +197,22 @@ void CoreTemp::getcoretemp( void ) {
     return;
   }
 
-  // Use tCase (when maximum cooling needs to be turned on) as high.
+  // Use tCase (when maximum cooling needs to be turned on) as high, if found.
   // Not found on k8temp, which uses user defined total as high (or default 100).
-  if (_type == 0)
-    snprintf(name, 80, "%s.%d/temp%d_max", SYS_CORETEMP, _pkg, _cpus.front());
-  else
-    snprintf(name, 80, "%s/%s/device/temp%d_max", SYS_HWMON, _node.c_str(), _cpus.front());
-  file.open(name);
+  // This is the same for all cores in package. I don't know if this ever
+  // changes in real world, so it could be read once in checkResources().
+  std::string tcase = _cpus.front();
+  tcase.replace(tcase.find_last_of('_'), 6, "_max");
+  file.open(tcase.c_str());
   if (file) {
     file >> high;
     file.close();
+    high /= 1000.0;
   }
   else
-    high = _high * 1000.0;
+    high = _high;
 
   fields_[0] /= 1000.0;
-  high /= 1000.0;
 
   fields_[1] = high - fields_[0];
   if (fields_[1] < 0) { // alarm: T > high
@@ -251,9 +236,10 @@ void CoreTemp::getcoretemp( void ) {
   setUsed( fields_[0], total_ );
 
   if (high != _high) {
+    char l[16];
     _high = high;
-    snprintf(name, 80, "ACT/%d/%d", (int)high, (int)total_);
-    legend(name);
+    snprintf(l, 16, "ACT/%d/%d", (int)high, (int)total_);
+    legend(l);
     drawlegend();
   }
 }
@@ -262,15 +248,15 @@ void CoreTemp::getcoretemp( void ) {
 unsigned int CoreTemp::countCpus(int pkg)
 {
   glob_t gbuf;
-  char s[80];
+  char s[PATH_SIZE];
   struct stat sbuf;
   int count = 0;
   std::string dummy;
   std::ifstream file;
 
-  snprintf(s, 80, "%s.%d", SYS_CORETEMP, pkg);
+  snprintf(s, PATH_SIZE, "%s.%d", SYS_CORETEMP, pkg);
   if (stat(s, &sbuf) == 0) {
-    strncat(s, "/temp*_label", 80);
+    strncat(s, "/temp*_label", PATH_SIZE - strlen(s) - 1);
     glob(s, 0, NULL, &gbuf);
     // loop through paths in gbuf and check if it is a core or package
     for (uint i = 0; i < gbuf.gl_pathc; i++) {
@@ -291,17 +277,17 @@ unsigned int CoreTemp::countCpus(int pkg)
 
     // loop through hwmon devices and if AMD sensor if found, count its inputs
     while ( (dent = readdir(dir)) ) {
-      if (!strncmp(dent->d_name, ".", 1))
-        continue;
-      if (!strncmp(dent->d_name, "..", 2))
+      if ( !strncmp(dent->d_name, ".", 1) ||
+           !strncmp(dent->d_name, "..", 2) )
         continue;
 
-      snprintf(s, 80, "%s/%s/device/name", SYS_HWMON, dent->d_name);
+      snprintf(s, PATH_SIZE, "%s/%s/device/name", SYS_HWMON, dent->d_name);
       file.open(s);
       file >> dummy;
       file.close();
-      if (strncmp(dummy.c_str(), "k8temp", 6) == 0 || strncmp(dummy.c_str(), "k10temp", 7) == 0) {
-        snprintf(s, 80, "%s/%s/device/temp*_input", SYS_HWMON, dent->d_name);
+      if ( strncmp(dummy.c_str(), "k8temp", 6) == 0 ||
+           strncmp(dummy.c_str(), "k10temp", 7) == 0 ) {
+        snprintf(s, PATH_SIZE, "%s/%s/device/temp*_input", SYS_HWMON, dent->d_name);
         break;
       }
     }
