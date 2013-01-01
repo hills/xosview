@@ -13,6 +13,7 @@
 
 
 #include "fieldmeter.h"
+#include <string>
 
 
 class LmsTemp : public FieldMeter {
@@ -27,9 +28,9 @@ public:
 protected:
 
   void getlmstemp( void );
-  bool checksensors(int isproc, const char *dir, const char* tempfile, const char* highfile);
+  bool checksensors(int isproc, const std::string dir, const char* tempfile, const char* highfile);
 private:
-  char *_tempfile, *_highfile;
+  std::string _tempfile, _highfile;
   int _high;
   int _isproc;
   unsigned long _actcolor, _highcolor;

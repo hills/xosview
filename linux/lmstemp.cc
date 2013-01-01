@@ -15,7 +15,6 @@
 #include "lmstemp.h"
 #include "xosview.h"
 #include <fstream>
-#include <math.h>
 #include <stdlib.h>
 #include <dirent.h>
 #include <sys/stat.h>
@@ -26,8 +25,6 @@ static const char PROC_SENSORS_26[] = "/sys/class/hwmon";
 
 LmsTemp::LmsTemp( XOSView *parent, const char *tempfile, const char *highfile, const char *label, const char *caption)
   : FieldMeter( parent, 3, label, caption, 1, 1, 0 ){
-  _highfile = NULL;
-  _tempfile = new char[PATH_MAX];
   if (!checksensors(1, PROC_SENSORS_24, tempfile, highfile)) {
     if (!checksensors(0, PROC_SENSORS_26, tempfile, highfile)) {
       std::cerr << label << " : Can not find file ";
@@ -54,16 +51,14 @@ LmsTemp::LmsTemp( XOSView *parent, const char *tempfile, const char *highfile, c
       parent_->done(1);
     }
   }
+  _high = 0;
 }
 
 LmsTemp::~LmsTemp( void ){
-  delete[] _tempfile;
-  if (_highfile)
-    delete[] _highfile;
 }
 
 /* this part is adapted from ProcMeter3.2 */
-bool LmsTemp::checksensors(int isproc, const char *dir, const char* tempfile, const char *highfile) {
+bool LmsTemp::checksensors(int isproc, const std::string dir, const char* tempfile, const char *highfile) {
   bool temp_found = false, high_found = false;
   DIR *d1, *d2;
   struct dirent *ent1, *ent2;
@@ -72,7 +67,7 @@ bool LmsTemp::checksensors(int isproc, const char *dir, const char* tempfile, co
   /* First, check if absolute paths were given. */
   if (tempfile[0] == '/') {
     if (stat(tempfile, &buf) == 0 && S_ISREG(buf.st_mode)) {
-      strncpy(_tempfile, tempfile, PATH_MAX);
+      _tempfile = tempfile;
       temp_found = true;
     }
     else
@@ -83,8 +78,7 @@ bool LmsTemp::checksensors(int isproc, const char *dir, const char* tempfile, co
   else {
     if (highfile[0] == '/') {
       if (stat(highfile, &buf) == 0 && S_ISREG(buf.st_mode)) {
-        _highfile = new char[PATH_MAX];
-        strncpy(_highfile, highfile, PATH_MAX);
+        _highfile = highfile;
         high_found = true;
       }
       else
@@ -92,44 +86,41 @@ bool LmsTemp::checksensors(int isproc, const char *dir, const char* tempfile, co
     }
   }
   if (temp_found && high_found) {
-    _isproc = ( strncmp(_tempfile, "/proc", 5) ? 0 : 1 );
+    _isproc = ( strncmp(_tempfile.c_str(), "/proc", 5) ? 0 : 1 );
     return true;
   }
 
   /* Then, try to find the given file. */
-  d1 = opendir(dir);
+  d1 = opendir(dir.c_str());
   if (!d1)
     return false;
   else {
-    char dirname[64];
-
+    std::string dirname, f;
     while ( !(temp_found && high_found) && (ent1 = readdir(d1)) ) {
       if ( !strncmp(ent1->d_name, ".", 1) ||
            !strncmp(ent1->d_name, "..", 2) )
         continue;
 
-      snprintf(dirname, 64, "%s/%s", dir, ent1->d_name);
+      dirname = dir + '/' + ent1->d_name;
       for (int i = 0; i < (isproc ? 1 : 2); i++) {
-        if ( stat(dirname, &buf) == 0 && S_ISDIR(buf.st_mode) ) {
-          d2 = opendir(dirname);
+        if ( stat(dirname.c_str(), &buf) == 0 && S_ISDIR(buf.st_mode) ) {
+          d2 = opendir(dirname.c_str());
           if (!d2)
-            std::cerr << "The directory " << dirname
-                      << "exists but cannot be read." << std::endl;
+            std::cerr << "The directory " << dirname << " exists but cannot be read." << std::endl;
           else {
             while ((ent2 = readdir(d2))) {
-              if (!strncmp(ent2->d_name, ".", 1) ||
-                  !strncmp(ent2->d_name, "..", 2) )
-                continue;
-              char f[80];
-              snprintf(f, 80, "%s/%s", dirname, ent2->d_name);
-              if ( stat(f, &buf) != 0 || !S_ISREG(buf.st_mode) )
+              if ( !strncmp(ent2->d_name, ".", 1) ||
+                   !strncmp(ent2->d_name, "..", 2) )
                 continue;
 
+              f = dirname + '/' + ent2->d_name;
+              if ( stat(f.c_str(), &buf) != 0 || !S_ISREG(buf.st_mode) )
+                continue;
               if (isproc) {
                 if ( !strncmp(ent2->d_name, tempfile, strlen(tempfile)) ) {
                   temp_found = true;
                   high_found = true;
-                  strncpy(_tempfile, f, PATH_MAX);
+                  _tempfile = f;
                 }
               }
               else {
@@ -137,15 +128,12 @@ bool LmsTemp::checksensors(int isproc, const char *dir, const char* tempfile, co
                 if ( !strncmp(ent2->d_name, tempfile, strlen(tempfile)) ) {
                   if ( !temp_found && ( strlen(tempfile) == strlen(ent2->d_name) ||
                       !strncmp(ent2->d_name + strlen(tempfile), "_input", 6) ) ) {
-                    std::cout << f << std::endl;
-                    strncpy(_tempfile, f, PATH_MAX);
+                    _tempfile = f;
                     temp_found = true;
                   }
                   // check for tempfile_max as highfile, if no highfile was given
                   if ( !highfile && !strncmp(ent2->d_name + strlen(tempfile), "_max", 4) ) {
-                    std::cout << f << std::endl;
-                    _highfile = new char[PATH_MAX];
-                    strncpy(_highfile, f, PATH_MAX);
+                    _highfile = f;
                     high_found = true;
                   }
                 }
@@ -153,9 +141,7 @@ bool LmsTemp::checksensors(int isproc, const char *dir, const char* tempfile, co
                 if ( !high_found && !strncmp(ent2->d_name, highfile, strlen(highfile)) ) {
                   if ( strlen(highfile) == strlen(ent2->d_name) ||
                       !strncmp(ent2->d_name + strlen(highfile), "_max", 4) ) {
-                    std::cout << f << std::endl;
-                    _highfile = new char[PATH_MAX];
-                    strncpy(_highfile, f, PATH_MAX);
+                    _highfile = f;
                     high_found = true;
                   }
                 }
@@ -172,7 +158,7 @@ bool LmsTemp::checksensors(int isproc, const char *dir, const char* tempfile, co
         }
         // Some /sys sensors have the readings in subdirectory /device
         if (!isproc)
-          strncat(dirname, "/device", sizeof(dirname) - strlen(dirname) - 1);
+          dirname += "/device";
       }
     }
   }
@@ -229,7 +215,7 @@ void LmsTemp::getlmstemp( void ){
   double dummy, high;
   bool do_legend = false;
 
-  std::ifstream tempfile( _tempfile );
+  std::ifstream tempfile( _tempfile.c_str() );
   if (!tempfile) {
     std::cerr << "Can not open file : " << _tempfile << std::endl;
     parent_->done(1);
@@ -242,8 +228,8 @@ void LmsTemp::getlmstemp( void ){
   else {
     tempfile >> fields_[0];
     fields_[0] /= 1000;
-    if (_highfile) {
-      std::ifstream highfile( _highfile );
+    if ( !_highfile.empty() ) {
+      std::ifstream highfile( _highfile.c_str() );
       if (!highfile) {
         std::cerr << "Can not open file : " << _highfile << std::endl;
         parent_->done(1);
@@ -261,7 +247,7 @@ void LmsTemp::getlmstemp( void ){
     if ( high > total_ )
       total_ = 10 * (int)((high * 1.25) / 10);
     _high = high;
-    if ( _highfile )
+    if ( !_highfile.empty() )
       snprintf(l, 16, "ACT/%d/%d", (int)high, (int)total_);
     else
       snprintf(l, 16, "ACT/HIGH/%d", (int)total_);
