@@ -1,5 +1,6 @@
 -include .config
 
+AWK ?= awk
 INSTALL ?= install
 PLATFORM ?= linux
 
@@ -103,7 +104,7 @@ xosview:	$(OBJS)
 		$(CXX) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 defaultstring.cc:	Xdefaults defresources.awk
-		gawk -f defresources.awk Xdefaults > defaultstring.cc
+		$(AWK) -f defresources.awk Xdefaults > defaultstring.cc
 
 Xrm.o:		CXXFLAGS += -Wno-write-strings
 
