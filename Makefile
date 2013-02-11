@@ -114,8 +114,8 @@ dist:
 		./mkdist $(VERSION)
 
 install:	xosview
-		[ -d $(DESTDIR)$(BINDIR) ] || $(INSTALL) -d $(DESTDIR)$(BINDIR)
-		[ -d $(DESTDIR)$(MANDIR)/man1 ] || $(INSTALL) -d $(DESTDIR)$(MANDIR)/man1
+		$(INSTALL) -d $(DESTDIR)$(BINDIR)
+		$(INSTALL) -d $(DESTDIR)$(MANDIR)/man1
 		$(INSTALL) -m 755 xosview $(DESTDIR)$(BINDIR)/xosview
 		$(INSTALL) -m 644 xosview.1 $(DESTDIR)$(MANDIR)/man1/xosview.1
 
