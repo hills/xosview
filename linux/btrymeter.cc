@@ -684,8 +684,7 @@ bool BtryMeter::sys_parse_battery(const std::string& dirname)
 	loadinfo >> value;
 	XOSDEBUG("status (%s): v=\"%s\"\n", filename.c_str(), value.c_str() );
 
-    if ( value == "Full" )
-        battery.charging_state=0;
+    battery.charging_state=0;
     if ( value == "Discharging" )
         battery.charging_state=-1;
     if ( value == "Charging" )
