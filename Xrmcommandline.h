@@ -88,6 +88,12 @@ static XrmOptionDescRec options[] = {
 // lmstemp resources
 { "-lmstemp", "*lmstemp", XrmoptionNoArg, "False" },
 { "+lmstemp", "*lmstemp", XrmoptionNoArg, "True" },
+// coretemp resources
+{ "-coretemp", "*coretemp", XrmoptionNoArg, "False" },
+{ "+coretemp", "*coretemp", XrmoptionNoArg, "True" },
+// acpitemp resources
+{ "-acpitemp", "*acpitemp", XrmoptionNoArg, "False" },
+{ "+acpitemp", "*acpitemp", XrmoptionNoArg, "True" },
 
 //  Special, catch-all option here --
 //    xosview -xrm "*memFreeColor: purple" should work, for example.
