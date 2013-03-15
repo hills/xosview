@@ -40,11 +40,6 @@ FieldMeterDecay::FieldMeterDecay( XOSView *parent,
 {
   decay_ = new double[numfields];
   lastDecayval_ = new double[numfields];
-  for (int decayCtr = 0; decayCtr < numfields; decayCtr++) {
-    decay_[decayCtr] = 0.0;
-    lastDecayval_[decayCtr] = 0.0;
-  }
-  decay_[numfields-1] = 1.0;  //  Initialize to all free...
   firsttime_ = 1;
   dodecay_ = 1;
 }
@@ -56,6 +51,7 @@ FieldMeterDecay::~FieldMeterDecay( void ){
 
 void FieldMeterDecay::drawfields( int manditory ){
   int twidth, x = x_;
+  int decay_changed = 0;
 
   if (!dodecay_)
   {
@@ -78,6 +74,7 @@ void FieldMeterDecay::drawfields( int manditory ){
 
   if (firsttime_) {
     firsttime_ = 0;
+    manditory = 1;
     for (int i = 0; i < numfields_; i++)
          {
                 decay_[i] = 1.0*fields_[i]/total_;
@@ -133,17 +130,18 @@ void FieldMeterDecay::drawfields( int manditory ){
     parent_->setForeground( colors_[i] );
     parent_->setStippleN(i%4);
 
-      //  drawFilledRectangle() adds one to its width and height.
-      //    Let's correct for that here.
+    //  drawFilledRectangle() adds one to its width and height.
+    //    Let's correct for that here.
     if ( manditory || (twidth != lastvals_[i]) || (x != lastx_[i]) ){
       if (!checkX(x, twidth))
         std::cerr <<__FILE__ << ":" << __LINE__ <<std::endl;
       parent_->drawFilledRectangle( x, y_, twidth, halfheight );
     }
 
-    if ( manditory || (decay_[i] != lastDecayval_[i]) ){
+    if ( manditory || decay_changed || (decay_[i] != lastDecayval_[i]) ){
       if (!checkX(decayx, decaytwidth))
         std::cerr <<__FILE__ << ":" << __LINE__ <<std::endl;
+      decay_changed = 1;
       parent_->drawFilledRectangle( decayx, y_+halfheight+1,
             decaytwidth, height_ - halfheight-1);
     }

@@ -280,7 +280,7 @@ void FieldMeter::drawfields( int manditory ){
 }
 
 void FieldMeter::checkevent( void ){
-  drawfields();
+  drawfields(0);
 }
 
 void FieldMeter::setNumFields(int n){
