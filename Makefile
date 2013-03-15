@@ -120,6 +120,6 @@ install:	xosview
 		$(INSTALL) -m 644 xosview.1 $(DESTDIR)$(MANDIR)/man1/xosview.1
 
 clean:
-		rm -f xosview $(OBJS) $(DEPS)
+		rm -f xosview $(OBJS) $(DEPS) defaultstring.cc
 
 -include $(DEPS)
