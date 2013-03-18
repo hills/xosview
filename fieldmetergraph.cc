@@ -20,7 +20,7 @@
 //   4.  Make the meter call FieldMeterGraph::checkResources(),
 //       to pick up graphNumCols resource.
 //   5.  Make the checkResources () function in the meter set the
-//	 useGraph_ variable according to the, e.g., xosview*cpuGraph resource.
+//       useGraph_ variable according to the, e.g., xosview*cpuGraph resource.
 
 #include <fstream>
 #include <math.h>		//  For fabs()
@@ -29,8 +29,8 @@
 #include "xosview.h"
 
 FieldMeterGraph::FieldMeterGraph( XOSView *parent,
-                int numfields, const char *title,
-                const char *legend, int docaptions, int dolegends,
+				int numfields, const char *title,
+				const char *legend, int docaptions, int dolegends,
   int dousedlegends )
 : FieldMeterDecay (parent, numfields, title, legend, docaptions,
   dolegends, dousedlegends)
@@ -38,7 +38,7 @@ FieldMeterGraph::FieldMeterGraph( XOSView *parent,
 
 	useGraph_ = 0;
 	heightfield_ = NULL;
-	firstTimeDrawn_ = 1;
+	lastWinState = XOSView::OBSCURED;
 
 	// set number of columns to a reasonable default in case we can't
 	// find the resource
@@ -54,6 +54,7 @@ FieldMeterGraph::~FieldMeterGraph( void )
 void FieldMeterGraph::drawfields( int manditory )
 {
 	int i,j;
+	enum XOSView::windowVisibilityState currWinState;
 
 	if( !useGraph_ )
 	{
@@ -112,11 +113,10 @@ void FieldMeterGraph::drawfields( int manditory )
 		heightfield_[graphpos_*numfields_+i] = a;
 	}
 
-	/*  For the first time, we need to draw everything, so
-	 *  skip the optimized copyArea case.  Also, if we are
-	 *  not fully visible, then the copy-area won't work
-	 *  properly.  */
-	if( !firstTimeDrawn_ && parent_->hasBeenExposedAtLeastOnce() && !parent_->isExposed() && parent_->isFullyVisible() )
+	currWinState = parent_->getWindowVisibilityState();
+
+	// Try to avoid having to redraw everything.
+	if (!manditory && currWinState == XOSView::FULLY_VISIBLE && currWinState == lastWinState)
 	{
 		// scroll area
 		int col_width = width_/graphNumCols_;
@@ -132,28 +132,22 @@ void FieldMeterGraph::drawfields( int manditory )
 			parent_->copyArea( sx, y_, swidth, sheight, x_, y_ );
 		drawBar( graphNumCols_ - 1 );
 	} else {
-		if (firstTimeDrawn_ &&
-		    parent_->isAtLeastPartiallyVisible() &&
-		    parent_->hasBeenExposedAtLeastOnce()) {
-			XOSDEBUG("True exposure! %d\n", firstTimeDrawn_);
-			firstTimeDrawn_ = 0;
-		}
-		else XOSDEBUG("Full draw:  isAtLeastPart %d, hasBeenExposed %d\n",
-			parent_->isAtLeastPartiallyVisible(),
-			parent_->hasBeenExposedAtLeastOnce());
-		// need to draw entire graph on expose event
+		// need to draw entire graph for some reason
 		for( i = 0; i < graphNumCols_; i++ ) {
 			drawBar( i );
 		}
 	}
 
+	lastWinState = currWinState;
 	graphpos_++;
-    parent_->setStippleN(0);	//  Restore all-bits stipple.
-    if ( dousedlegends_ )
-    {
-    	drawused( manditory );
-    }
+	parent_->setStippleN(0);	//  Restore all-bits stipple.
+	if ( dousedlegends_ )
+	{
+		drawused( manditory );
+	}
 }
+
+
 void FieldMeterGraph::drawBar( int i )
 {
 	int j;
@@ -167,14 +161,14 @@ void FieldMeterGraph::drawBar( int i )
 		for( j = 0 ; j < numfields_; j++ )
 		{
 			/*  Round up, by adding 0.5 before
-		 	*  converting to an int.  */
+			*  converting to an int.  */
 			barheight = (int)((heightfield_[i*numfields_+j]*height_)+0.5);
 
 			parent_->setForeground( colors_[j] );
-  			parent_->setStippleN(j%4);
+			parent_->setStippleN(j%4);
 
 			if( barheight > (y-y_) )
-  				barheight = (y-y_);
+				barheight = (y-y_);
 
 			// hack to ensure last field always reaches top of graph area
 			if( j == numfields_-1 )
@@ -193,7 +187,7 @@ void FieldMeterGraph::checkResources( void )
   const char *ptr = parent_->getResource( "graphNumCols" );
   if( ptr )
   {
-    int i;
+	int i;
 	if( sscanf( ptr, "%d", &i ) == 1 )
 	{
 		if( i>0 )

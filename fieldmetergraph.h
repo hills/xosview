@@ -32,13 +32,13 @@ protected:
   int useGraph_;
   int graphNumCols_;
   int graphpos_;
-  int firstTimeDrawn_;
   /*  There's some sort of corruption going on -- we can't have
    *  variables after the heightfield_ below, otherwise they get
    *  corrupted???  */
   double *heightfield_;
 private:
   void drawBar( int i );
+  enum XOSView::windowVisibilityState lastWinState;
 };
 
 #endif

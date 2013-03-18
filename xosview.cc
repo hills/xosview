@@ -101,12 +101,9 @@ XOSView::XOSView( const char * instName, int argc, char *argv[] ) : XWin(),
   nummeters_ = 0;
   meters_ = NULL;
   name_ = const_cast<char *>("xosview");
-  _isvisible = false;
-  _ispartiallyvisible = false;
-  _defer_resize = true;
-  exposed_once_flag_ = 0;
-
-  expose_flag_ = 1;
+  _deferred_resize = true;
+  _deferred_redraw = true;
+  windowVisibility = OBSCURED;
 
   //  set up the X events
   addEvent( new Event( this, ConfigureNotify,
@@ -301,57 +298,47 @@ XOSView::~XOSView( void ){
   }
 }
 
-void XOSView::reallydraw( void ){
-  XOSDEBUG("Doing draw.\n");
-  clear();
-  MeterNode *tmp = meters_;
+void XOSView::draw(void) {
+  if (windowVisibility != OBSCURED) {
+    MeterNode *tmp = meters_;
 
-  while ( tmp != NULL ){
-    tmp->meter_->draw();
-    tmp = tmp->next_;
-  }
+    XOSDEBUG("Doing draw.\n");
+    clear();
 
-  expose_flag_ = 0;
-}
-
-void XOSView::draw ( void ) {
-  if (hasBeenExposedAtLeastOnce() && isAtLeastPartiallyVisible())
-    reallydraw();
-  else {
-    if (!hasBeenExposedAtLeastOnce()) {
-      XOSDEBUG("Skipping draw:  not yet exposed.\n");
-    } else if (!isAtLeastPartiallyVisible()) {
-      XOSDEBUG("Skipping draw:  not visible.\n");
+    while (tmp != NULL) {
+      tmp->meter_->draw();
+      tmp = tmp->next_;
     }
+  }
+  else {
+    XOSDEBUG("Skipping draw:  not visible.\n");
   }
 }
 
 void XOSView::run( void ){
-  while( !done_ ){
+  while(!done_) {
+    // Check for X11 events
     checkevent();
 
-    if (_isvisible){
-      MeterNode *tmp = meters_;
-      while ( tmp != NULL ){
-        if ( tmp->meter_->requestevent() )
-          tmp->meter_->checkevent();
-        tmp = tmp->next_;
-      }
-    }
-
-    /* To avoid long streams of redraw, we defer this until
-     * all events are exhausted, before sleeping */
-
-    if (_defer_resize) {
+    // Check if the window has been resized (at least once)
+    if (_deferred_resize) {
       resize();
-      _defer_resize = false;
-      expose_flag_ = 1;
-      _defer_draw = true;
+      _deferred_resize = false;
+      _deferred_redraw = true;
     }
 
-    if (_defer_draw) {
+    // redraw everything if needed
+    if (_deferred_redraw) {
       draw();
-      _defer_draw = false;
+      _deferred_redraw = false;
+    }
+
+    // Update the metrics & meters
+    MeterNode *tmp = meters_;
+    while ( tmp != NULL ){
+      if ( tmp->meter_->requestevent() )
+        tmp->meter_->checkevent();
+      tmp = tmp->next_;
     }
 
     flush();
@@ -418,18 +405,9 @@ void XOSView::checkArgs (int argc, char** argv) const
   }
 }
 
-void XOSView::exposeEvent( XExposeEvent &event ) {
-  _isvisible = true;
-  if ( event.count == 0 )
-  {
-    expose_flag_ = 1;
-    _defer_draw = true;
-  }
+void XOSView::exposeEvent(XExposeEvent &event) {
+  _deferred_redraw = true;
   XOSDEBUG("Got expose event.\n");
-  if (!exposed_once_flag_) {
-    exposed_once_flag_ = 1;
-    _defer_draw = true;
-  }
 }
 
 /*
@@ -448,24 +426,32 @@ void XOSView::resizeEvent( XConfigureEvent &event ) {
   width(event.width);
   height(event.height);
 
-  _defer_resize = true;
+  _deferred_resize = true;
 }
 
-
-void XOSView::visibilityEvent( XVisibilityEvent &event ){
-  _ispartiallyvisible = false;
-  if (event.state == VisibilityPartiallyObscured){
-    _ispartiallyvisible = true;
+void XOSView::visibilityEvent(XVisibilityEvent &event) {
+  if (event.state == VisibilityPartiallyObscured) {
+    if (windowVisibility != FULLY_VISIBLE)
+      _deferred_redraw = true;
+    windowVisibility = PARTIALLY_VISIBILE;
   }
-
-  if (event.state == VisibilityFullyObscured){
-    _isvisible = false;
+  else if (event.state == VisibilityFullyObscured) {
+    windowVisibility = OBSCURED;
+    _deferred_redraw = false;
   }
   else {
-    _isvisible = true;
+    if (windowVisibility != FULLY_VISIBLE)
+      _deferred_redraw = true;
+    windowVisibility = FULLY_VISIBLE;
   }
-  XOSDEBUG("Got visibility event; %d and %d\n",
-      _ispartiallyvisible, _isvisible);
+
+  XOSDEBUG("Got visibility event: %s\n",
+    (windowVisibility == FULLY_VISIBLE)
+        ? "Full"
+        : (windowVisibility == PARTIALLY_VISIBILE)
+            ? "Partial"
+            : "Obscured"
+    );
 }
 
 void XOSView::unmapEvent( XUnmapEvent & ev ){
@@ -473,5 +459,5 @@ void XOSView::unmapEvent( XUnmapEvent & ev ){
      we get the unmap event if the cursor is moved again. Don't treat it
      as main window unmap */
   if(ev.window == window_)
-    _isvisible = false;
+    windowVisibility = OBSCURED;
 }

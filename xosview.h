@@ -23,7 +23,6 @@ public:
 
   void figureSize ( void );
   void resize( void );
-  void reallydraw( void );
   void draw ( void );
   void run( void );
   const char *winname( void );
@@ -32,10 +31,8 @@ public:
   int xoff(void) const { return xoff_; }
   int newypos( void );
 
-  int hasBeenExposedAtLeastOnce() const {return exposed_once_flag_; }
-  int isExposed() const { return expose_flag_; }
-  int isFullyVisible() const { return _isvisible && !_ispartiallyvisible; }
-  int isAtLeastPartiallyVisible() const { return _isvisible; }
+  enum windowVisibilityState { FULLY_VISIBLE, PARTIALLY_VISIBILE, OBSCURED };
+  enum windowVisibilityState getWindowVisibilityState(void) { return windowVisibility; }
 
 protected:
 
@@ -55,8 +52,6 @@ protected:
   int hmargin_, vmargin_, vspacing_;
   unsigned long sleeptime_, usleeptime_;
 
-  int expose_flag_, exposed_once_flag_;
-
   void usleep_via_select( unsigned long usec );
   void addmeter( Meter *fm );
   void checkMeterResources( void );
@@ -75,10 +70,9 @@ protected:
 
 private:
 
-  bool _isvisible;
-  bool _ispartiallyvisible;
-  bool _defer_resize;
-  bool _defer_draw;
+  bool _deferred_resize;
+  bool _deferred_redraw;
+  enum windowVisibilityState windowVisibility;
 };
 
 #ifdef DEBUG
