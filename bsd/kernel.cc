@@ -1252,7 +1252,7 @@ BSDGetCPUTemperature(float *temps, float *tjmax) {
 void
 BSDGetSensor(const char *name, const char *valname, float *value) {
 	if (!name || !valname || !value)
-		errx(EX_SOFTWARE, "NULL pointer passed to BSDGetCPUTemperature().");
+		errx(EX_SOFTWARE, "NULL pointer passed to BSDGetSensor().");
 #if defined(XOSVIEW_NETBSD)
 	/* Adapted from envstat. */
 	// All kinds of sensors are read with libprop. Specific device and value
