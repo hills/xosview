@@ -180,7 +180,8 @@ void NetMeter::checkeventNew(void)
 		    continue;
 		}
 
-	    const char *cur = line.erase(0, colon + 1).c_str();
+	    std::string l = line.erase(0, colon + 1);
+	    const char *cur = l.c_str();
 	    if (strncmp(cur, " No ", 4) == 0)
 		continue; // xxx: No statistics available.
 	    char *end = NULL;

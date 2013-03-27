@@ -245,7 +245,8 @@ void CPUMeter::getcputime( void ){
   std::getline(stats, tmp);
 
   int col = 0;
-  const char *line = tmp.substr(tmp.find_first_of(' ')).c_str();
+  std::string l = tmp.substr(tmp.find_first_of(' ') + 1);
+  const char *line = l.c_str();
   while (*line) {
     cputime_[cpuindex_][col++] = strtoull(line, &end, 10);
     line = end;
