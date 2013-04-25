@@ -22,6 +22,7 @@ To specify a particular platform, use one of:
   $ make PLATFORM=bsd
   $ make PLATFORM=irix65
   $ make PLATFORM=sunos5
+  $ make PLATFORM=gnu
 
 Please see the README file for your platform for any special
 instructions for running xosview on that platform.
