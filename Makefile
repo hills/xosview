@@ -98,6 +98,16 @@ OBJS += sunos5/MeterMaker.o \
 CPPFLAGS += -Isunos5/
 endif
 
+ifeq ($(PLATFORM), gnu)
+OBJS += gnu/get_def_pager.o \
+	gnu/loadmeter.o \
+	gnu/memmeter.o \
+	gnu/MeterMaker.o \
+	gnu/pagemeter.o \
+	gnu/swapmeter.o
+CPPFLAGS += -Ignu/
+endif
+
 DEPS := $(OBJS:.o=.d)
 
 xosview:	$(OBJS)
