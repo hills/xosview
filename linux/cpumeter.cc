@@ -13,6 +13,9 @@
 #include <string>
 #include <sstream>
 #include <ctype.h>
+#if defined(USE_SYSCALLS) && (USE_SYSCALLS > 0)
+# include <sys/utsname.h>
+#endif
 
 static const char STATFILENAME[] = "/proc/stat";
 static const char VERSIONFILENAME[] = "/proc/sys/kernel/osrelease";
@@ -337,17 +340,23 @@ const char *CPUMeter::toUpper(const char *str){
 }
 
 int CPUMeter::getkernelversion(void){
-  std::ifstream f(VERSIONFILENAME);
-  if (!f) {
-    std::cerr << "Can not get kernel version from " << VERSIONFILENAME << "." << std::endl;
-    exit(1);
+  static int major = 0, minor = 0, micro = 0;
+  if (!major) {
+#if defined(USE_SYSCALLS) && (USE_SYSCALLS > 0)
+    struct utsname myosrelease;
+    uname(&myosrelease);
+    sscanf(myosrelease.release, "%d.%d.%d", &major, &minor, &micro);
+#else
+    std::ifstream f(VERSIONFILENAME);
+    if (!f) {
+      std::cerr << "Can not get kernel version from " << VERSIONFILENAME << "." << std::endl;
+      exit(1);
+    }
+
+    std::string version;
+    f >> version;
+    sscanf(version.c_str(), "%d.%d.%d", &major, &minor, &micro);
+#endif
   }
-
-  std::string version;
-  int major = 0, minor = 0, micro = 0;
-
-  f >> version;
-  sscanf(version.c_str(), "%d.%d.%d", &major, &minor, &micro);
-
-  return ( major*1000000 + minor*1000 + micro);
+  return (major*1000000 + minor*1000 + micro);
 }

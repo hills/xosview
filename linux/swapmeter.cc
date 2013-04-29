@@ -9,6 +9,9 @@
 #include <fstream>
 #include <sstream>
 #include <stdlib.h>
+#if defined(USE_SYSCALLS) && (USE_SYSCALLS > 0)
+# include <sys/sysinfo.h>
+#endif
 
 static const char MEMFILENAME[] = "/proc/meminfo";
 
@@ -37,7 +40,25 @@ void SwapMeter::checkevent( void ){
   drawfields();
 }
 
+#if defined(USE_SYSCALLS) && (USE_SYSCALLS > 0)
+void SwapMeter::getswapinfo( void ){
+  struct sysinfo sinfo;
+  typeof (sinfo.mem_unit) unit;
 
+  sysinfo(&sinfo);
+  unit = (sinfo.mem_unit ? sinfo.mem_unit : 1);
+  total_ = (double)sinfo.totalswap * unit;
+  fields_[0] = (double)(sinfo.totalswap - sinfo.freeswap) * unit;
+
+  if ( total_ == 0 ){
+    total_ = 1;
+    fields_[0] = 0;
+  }
+
+  if (total_)
+    setUsed (fields_[0], total_);
+}
+#else
 void SwapMeter::getswapinfo( void ){
   std::ifstream meminfo( MEMFILENAME );
   if ( !meminfo ){
@@ -78,3 +99,4 @@ void SwapMeter::getswapinfo( void ){
   if (total_)
     setUsed (fields_[0], total_);
 }
+#endif

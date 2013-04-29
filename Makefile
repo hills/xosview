@@ -3,6 +3,7 @@
 AWK ?= awk
 INSTALL ?= install
 PLATFORM ?= linux
+USE_SYSCALLS ?= 0
 
 # Installation paths
 
@@ -55,6 +56,9 @@ OBJS += linux/MeterMaker.o \
 	linux/acpitemp.o \
 	linux/coretemp.o
 CPPFLAGS += -Ilinux/
+ifneq ($(USE_SYSCALLS),0)
+CPPFLAGS += -DUSE_SYSCALLS
+endif
 endif
 
 ifeq ($(PLATFORM), bsd)
