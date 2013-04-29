@@ -209,7 +209,6 @@ void DiskMeter::update_info(const diskmap &reads, const diskmap &writes)
     float itim = IntervalTimeInMicrosecs();
     // the sum of all disks
     unsigned long long all_bytes_read = 0, all_bytes_written = 0;
-    unsigned int sect_size = 512; // disk stats in /sys are always in 512 byte units
 
     // avoid strange values at first call
     // (by this - the first value displayed becomes zero)
@@ -235,13 +234,11 @@ void DiskMeter::update_info(const diskmap &reads, const diskmap &writes)
             all_bytes_written += it->second - sysfs_write_prev_[it->first];
     }
 
-    all_bytes_read *= sect_size;
-    all_bytes_written *= sect_size;
     XOSDEBUG("disk: read: %llu, written: %llu\n", all_bytes_read, all_bytes_written);
 
     // convert rate from bytes/microsec into bytes/second
-    fields_[0] = all_bytes_read * 1e6 / itim;
-    fields_[1] = all_bytes_written * 1e6 / itim;
+    fields_[0] = all_bytes_read * 1e5 / itim;
+    fields_[1] = all_bytes_written * 1e5 / itim;
 
     // fix overflow (conversion bug?)
     if (fields_[0] < 0.0)
@@ -273,9 +270,7 @@ void DiskMeter::getsysfsdiskinfo( void )
         // just sum up everything in /sys/block/*/stat
 
   std::string sysfs_dir = _statFileName;
-  std::string disk;
   struct stat buf;
-  std::ifstream diskstat;
   char line[128];
   unsigned long vals[7];
   diskmap reads, writes;
@@ -292,12 +287,65 @@ void DiskMeter::getsysfsdiskinfo( void )
 
   // visit every /sys/block/*/stat and sum up the values:
   for (struct dirent *dirent; (dirent = readdir(dir)) != NULL; ) {
+    std::string disk;
+    std::ifstream diskstat;
+    unsigned long sect_size;
+
     if (strncmp(dirent->d_name, ".", 1) == 0 ||
-        strncmp(dirent->d_name, "..", 2) == 0)
+	strncmp(dirent->d_name, "..", 2) == 0 ||
+	strncmp(dirent->d_name, "loop", 4) == 0 ||
+	strncmp(dirent->d_name, "ram", 3) == 0 ||
+	strncmp(dirent->d_name, "fd", 2) == 0)
       continue;
 
     disk = sysfs_dir + dirent->d_name;
     if (stat(disk.c_str(), &buf) == 0 && buf.st_mode & S_IFDIR) {
+      std::string tmp;
+
+      // only scan for real HW (raid, md, and lvm all mapped on them)
+      tmp = disk + "/device";
+      if (lstat(tmp.c_str(), &buf) != 0 || (buf.st_mode & S_IFLNK) == 0)
+	continue;
+
+      // ignore removable devices
+      tmp = disk + "/removable";
+      if (stat(tmp.c_str(), &buf) == 0 && buf.st_mode & S_IFREG) {
+	std::ifstream removable;
+	int isremovable = 0;
+
+	removable.open(tmp.c_str());
+	if (removable.good()) {
+	  removable >> isremovable;
+	  removable.close();
+	  removable.clear();
+	}
+	if (isremovable)
+	  continue;
+      }
+
+      tmp = "/dev/";
+      tmp += dirent->d_name;
+      if (lstat(tmp.c_str(), &buf) == 0)
+	sect_size = (unsigned long)buf.st_blksize;
+
+      if (sect_size == 0UL) {
+	tmp = disk + "/queue/hw_sectors_kb";
+	if (stat(tmp.c_str(), &buf) == 0 && (buf.st_mode & S_IFREG)) {
+	  std::ifstream hw_sectors_kb;
+
+	  hw_sectors_kb.open(tmp.c_str());
+	  if (hw_sectors_kb.good()) {
+	    hw_sectors_kb >> sect_size;
+	    //XOSDEBUG("disk stat: %lu\n", sect_size);
+	    hw_sectors_kb.close();
+	    hw_sectors_kb.clear();
+	  }
+	}
+      }
+
+      if (sect_size == 0UL)
+	sect_size = 512;
+
       // is a dir, locate 'stat' file in it
       disk += "/stat";
       diskstat.open(disk.c_str());
@@ -308,8 +356,8 @@ void DiskMeter::getsysfsdiskinfo( void )
           vals[i] = strtoul(cur, &end, 10);
           cur = end;
         }
-        reads[dirent->d_name]  = vals[2];
-        writes[dirent->d_name] = vals[6];
+        reads[dirent->d_name]  = (unsigned long long)vals[2] * (unsigned long long)sect_size;
+        writes[dirent->d_name] = (unsigned long long)vals[6] * (unsigned long long)sect_size;
 
         XOSDEBUG("disk stat: %s | read: %lu, written: %lu\n", disk.c_str(), vals[2], vals[6]);
         diskstat.close();
