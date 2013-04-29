@@ -111,7 +111,7 @@ void MeterMaker::makeMeters(void){
 
 
   // check for the serial meters.
-#if defined (__arm__) || defined(__mc68000__) || defined(__powerpc__) || defined(__sparc__) || defined(__s390__) || defined(__s390x__)
+#if defined(__aarch64__) || defined (__arm__) || defined(__mc68000__) || defined(__powerpc__) || defined(__powerpc64__) || defined(__sparc__) || defined(__s390__) || defined(__s390x__)
   /* these architectures have no ioperm() */
 #else
   for (int i = 0 ; i < SerialMeter::numDevices() ; i++)
