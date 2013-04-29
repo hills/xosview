@@ -12,11 +12,11 @@
 #include <stdlib.h>
 
 static const char *INTFILE     = "/proc/interrupts";
-static std::map<int,int> realintnum;
+static std::map<const int,int> realintnum;
 
 
 IntMeter::IntMeter( XOSView *parent, int cpu)
-  : BitMeter( parent, "INTS", "", 1, 0, 0 ), _cpu(cpu) {
+  : BitMeter( parent, "INTS", "", 1, 0, 0 ), _cpu(cpu), max(1024) {
   _old = ( CPUMeter::getkernelversion() <= 2000000 ? true : false );
   irqs_ = lastirqs_ = NULL;
   initirqcount();
@@ -61,13 +61,15 @@ void IntMeter::getirqs( void ){
   }
 
   if (!_old)
-      intfile.ignore(1024, '\n');
+      intfile.ignore(max, '\n');
 
   while ( !intfile.eof() ){
     std::getline(intfile, line);
     if ( line.find_first_of("0123456789") > line.find_first_of(':') )
       break;  // reached non-numeric interrupts
     idx = strtoul(line.c_str(), &end, 10);
+    if (idx >= max)
+      break;
     intno = realintnum[idx];
     if ( intno >= numBits() )
       updateirqcount(intno, false);
@@ -164,7 +166,7 @@ void IntMeter::initirqcount( void ){
   if (!_old) {
     for (i=0; i<16; i++)
       realintnum[i] = i;
-    intfile.ignore(1024, '\n');
+    intfile.ignore(max, '\n');
   }
 
   /* just looking for the highest number interrupt that
@@ -181,7 +183,7 @@ void IntMeter::initirqcount( void ){
 	intno = idx;
 	realintnum[i] = idx++;
     }
-    intfile.ignore(1024, '\n');
+    intfile.ignore(max, '\n');
   }
   updateirqcount(intno, true);
 }

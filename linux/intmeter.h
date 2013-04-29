@@ -27,6 +27,7 @@ protected:
   int _cpu;
   bool _old;
   bool separate_;
+  const int max;
 
   void getirqs( void );
   void updateirqcount( int n, bool init );
