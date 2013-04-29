@@ -55,6 +55,8 @@ OBJS += linux/MeterMaker.o \
 	linux/acpitemp.o \
 	linux/coretemp.o
 CPPFLAGS += -Ilinux/
+LDLIBS += -lXpm
+xwin.o: CPPFLAGS += -DHAVE_XPM
 endif
 
 ifeq ($(PLATFORM), bsd)
@@ -73,6 +75,8 @@ OBJS += bsd/MeterMaker.o \
         bsd/coretemp.o \
         bsd/sensor.o
 CPPFLAGS += -Ibsd/
+LDLIBS += -lXpm
+xwin.o: CPPFLAGS += -DHAVE_XPM
 endif
 
 ifeq ($(PLATFORM), irix65)

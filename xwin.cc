@@ -1,4 +1,7 @@
 #include <X11/Xatom.h>
+#ifdef HAVE_XPM
+# include <X11/xpm.h>
+#endif
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -106,6 +109,14 @@ void XWin::init( int argc, char **argv ){
   xswa.bit_gravity = NorthWestGravity;
   XChangeWindowAttributes(display_, window_,
 			  (CWColormap | CWBitGravity), &xswa);
+
+#ifdef HAVE_XPM
+  Pixmap background_pixmap;
+
+  // If there is a pixmap file, set it as the background
+  if (getPixmap(&background_pixmap))
+    XSetWindowBackgroundPixmap(display_,window_,background_pixmap);
+#endif
 
   // add the events
   Event *tmp = events_;
@@ -217,6 +228,40 @@ void XWin::setColors( void ){
 }
 //-----------------------------------------------------------------------------
 
+int XWin::getPixmap(Pixmap *pixmap)
+{
+#ifdef HAVE_XPM
+  char	*pixmap_file;
+  XWindowAttributes	root_att;
+  XpmAttributes		pixmap_att;
+
+  pixmap_file = (char*) getResourceOrUseDefault("pixmapName",NULL);
+
+  if (!pixmap_file)
+    return 0;
+
+  XGetWindowAttributes(display_, DefaultRootWindow(display_),&root_att);
+  pixmap_att.closeness=30000;
+  pixmap_att.colormap=root_att.colormap;
+  pixmap_att.valuemask=XpmSize|XpmReturnPixels|XpmColormap|XpmCloseness;
+
+  if (XpmReadFileToPixmap(display_,DefaultRootWindow(display_),pixmap_file,
+      pixmap, NULL, &pixmap_att))
+  {
+    std::cerr << "Pixmap " << pixmap_file  << " not found" << std::endl;
+    std::cerr << "Defaulting to blank" << std::endl;
+    pixmap = NULL;
+    return 0;
+  }
+
+  return 1;
+#else
+  pixmap = NULL;
+  return 0;
+#endif
+}
+
+//-----------------------------------------------------------------------------
 void XWin::getGeometry( void ){
   char                 default_geometry[80];
   int                  bitmask;
