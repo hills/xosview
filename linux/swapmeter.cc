@@ -9,9 +9,7 @@
 #include <fstream>
 #include <sstream>
 #include <stdlib.h>
-#if defined(USE_SYSCALLS) && (USE_SYSCALLS > 0)
-# include <sys/sysinfo.h>
-#endif
+#include <sys/sysinfo.h>
 
 static const char MEMFILENAME[] = "/proc/meminfo";
 
@@ -40,7 +38,6 @@ void SwapMeter::checkevent( void ){
   drawfields();
 }
 
-#if defined(USE_SYSCALLS) && (USE_SYSCALLS > 0)
 void SwapMeter::getswapinfo( void ){
   struct sysinfo sinfo;
   typeof (sinfo.mem_unit) unit;
@@ -58,45 +55,3 @@ void SwapMeter::getswapinfo( void ){
   if (total_)
     setUsed (fields_[0], total_);
 }
-#else
-void SwapMeter::getswapinfo( void ){
-  std::ifstream meminfo( MEMFILENAME );
-  if ( !meminfo ){
-    std::cerr <<"Cannot open file : " <<MEMFILENAME << std::endl;
-    exit( 1 );
-  }
-
-  total_ = fields_[0] = fields_[1] = 0;
-
-  char buf[256];
-  bool found_total = false, found_free = false;
-  unsigned long long val;
-
-  // Get the info from the "standard" meminfo file.
-  while ( !meminfo.eof() && !(found_total && found_free) ){
-    meminfo.getline(buf, 256);
-
-    if ( !strncmp(buf, "SwapTotal", 9) ){
-      val = strtoull(buf+10, NULL, 10);
-      total_ = val<<10; // unit is always kB
-      found_total = true;
-    }
-    if ( !strncmp(buf, "SwapFree", 8) ){
-      val = strtoull(buf+9, NULL, 10);
-      fields_[1] = val<<10; // unit is always kB
-      found_free = true;
-    }
-  }
-
-  fields_[0] = total_ - fields_[1];
-
-  if ( total_ == 0 ){
-    total_ = 1;
-    fields_[0] = 0;
-    fields_[1] = 1;
-  }
-
-  if (total_)
-    setUsed (fields_[0], total_);
-}
-#endif
