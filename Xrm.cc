@@ -154,6 +154,10 @@ Listed from weakest to strongest:
     XrmQuarkToString(_class));
   if (result >= 0 && result < rlen)
     XrmCombineFileDatabase (rfilename, &_db, 1);
+  result = snprintf(rfilename, sizeof rfilename, "/usr/share/X11/app-defaults/%s",
+    XrmQuarkToString(_class));
+  if (result >= 0 && result < rlen)
+    XrmCombineFileDatabase (rfilename, &_db, 1);
   //  Try a few more, for SunOS/Solaris folks.
   result = snprintf(rfilename, sizeof rfilename, "/usr/openwin/lib/X11/app-defaults/%s",
     XrmQuarkToString(_class));
