@@ -307,22 +307,6 @@ void DiskMeter::getsysfsdiskinfo( void )
       if (lstat(tmp.c_str(), &buf) != 0 || (buf.st_mode & S_IFLNK) == 0)
 	continue;
 
-      // ignore removable devices
-      tmp = disk + "/removable";
-      if (stat(tmp.c_str(), &buf) == 0 && buf.st_mode & S_IFREG) {
-	std::ifstream removable;
-	int isremovable = 0;
-
-	removable.open(tmp.c_str());
-	if (removable.good()) {
-	  removable >> isremovable;
-	  removable.close();
-	  removable.clear();
-	}
-	if (isremovable)
-	  continue;
-      }
-
       tmp = "/dev/";
       tmp += dirent->d_name;
       if (lstat(tmp.c_str(), &buf) == 0)
