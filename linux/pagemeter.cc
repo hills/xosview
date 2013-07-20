@@ -12,7 +12,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#define MAX_PROCSTAT_LENGTH 2048
+#define MAX_PROCSTAT_LENGTH 4096
 
 
 PageMeter::PageMeter( XOSView *parent, float max )

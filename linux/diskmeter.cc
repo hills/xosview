@@ -15,7 +15,7 @@
 #include <errno.h>
 #include <limits.h>
 
-#define MAX_PROCSTAT_LENGTH 2048
+#define MAX_PROCSTAT_LENGTH 4096
 
 
 DiskMeter::DiskMeter( XOSView *parent, float max ) : FieldMeterGraph(
