@@ -18,7 +18,7 @@ OPTFLAGS ?= -Wall -O3
 # Required build arguments
 
 CPPFLAGS += $(OPTFLAGS) -I. -MMD
-LDLIBS += -lX11
+LDLIBS += -lX11 -lXpm
 
 OBJS = Host.o \
 	Xrm.o \
@@ -55,8 +55,6 @@ OBJS += linux/MeterMaker.o \
 	linux/acpitemp.o \
 	linux/coretemp.o
 CPPFLAGS += -Ilinux/
-LDLIBS += -lXpm
-xwin.o: CPPFLAGS += -DHAVE_XPM
 endif
 
 ifeq ($(PLATFORM), bsd)
@@ -75,8 +73,6 @@ OBJS += bsd/MeterMaker.o \
         bsd/coretemp.o \
         bsd/sensor.o
 CPPFLAGS += -Ibsd/
-LDLIBS += -lXpm
-xwin.o: CPPFLAGS += -DHAVE_XPM
 endif
 
 ifeq ($(PLATFORM), irix65)

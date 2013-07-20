@@ -1,7 +1,5 @@
 #include <X11/Xatom.h>
-#ifdef HAVE_XPM
-# include <X11/xpm.h>
-#endif
+#include <X11/xpm.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -81,6 +79,7 @@ XWin::~XWin( void ){
 void XWin::init( int argc, char **argv ){
   XGCValues            gcv;
   XSetWindowAttributes xswa;
+  Pixmap background_pixmap;
 
   setFont();
   setColors();
@@ -110,13 +109,9 @@ void XWin::init( int argc, char **argv ){
   XChangeWindowAttributes(display_, window_,
 			  (CWColormap | CWBitGravity), &xswa);
 
-#ifdef HAVE_XPM
-  Pixmap background_pixmap;
-
   // If there is a pixmap file, set it as the background
   if (getPixmap(&background_pixmap))
     XSetWindowBackgroundPixmap(display_,window_,background_pixmap);
-#endif
 
   // add the events
   Event *tmp = events_;
@@ -230,7 +225,6 @@ void XWin::setColors( void ){
 
 int XWin::getPixmap(Pixmap *pixmap)
 {
-#ifdef HAVE_XPM
   char	*pixmap_file;
   XWindowAttributes	root_att;
   XpmAttributes		pixmap_att;
@@ -255,10 +249,6 @@ int XWin::getPixmap(Pixmap *pixmap)
   }
 
   return 1;
-#else
-  pixmap = NULL;
-  return 0;
-#endif
 }
 
 //-----------------------------------------------------------------------------
