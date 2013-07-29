@@ -11,7 +11,8 @@
 #include <map>
 #include <string>
 
-typedef std::map<std::string, unsigned long long> diskmap;
+typedef std::map<std::string, unsigned long> diskmap;
+
 
 class DiskMeter : public FieldMeterGraph
     {
