@@ -293,10 +293,9 @@ void DiskMeter::getsysfsdiskinfo( void )
   // visit every /sys/block/*/stat and sum up the values:
   for (struct dirent *dirent; (dirent = readdir(dir)) != NULL; ) {
     if (strncmp(dirent->d_name, ".", 1) == 0 ||
-	strncmp(dirent->d_name, "..", 2) == 0 ||
-	strncmp(dirent->d_name, "loop", 4) == 0 ||
-	strncmp(dirent->d_name, "ram", 3) == 0 ||
-	strncmp(dirent->d_name, "fd", 2) == 0)
+        strncmp(dirent->d_name, "..", 2) == 0 ||
+        strncmp(dirent->d_name, "loop", 4) == 0 ||
+        strncmp(dirent->d_name, "ram", 3) == 0)
       continue;
 
     disk = sysfs_dir + dirent->d_name;
