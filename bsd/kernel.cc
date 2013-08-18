@@ -285,7 +285,7 @@ BSDGetCPUSpeed() {
 	if ( sysctl(mib_spd, 2, &cpu_speed, &size, NULL, 0) < 0 )
 		err(EX_OSERR, "syscl hw.cpuspeed failed");
 #else  /* XOSVIEW_NETBSD || XOSVIEW_DFBSD */
-	long speed = 0;
+	uint64_t speed = 0;
 	size = sizeof(speed);
 #if defined(XOSVIEW_NETBSD)
 	if ( sysctlbyname("machdep.tsc_freq", &speed, &size, NULL, 0) < 0 )
