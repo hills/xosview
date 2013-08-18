@@ -498,8 +498,20 @@ BSDGetNetInOut(unsigned long long *inbytes, unsigned long long *outbytes, const 
 				skipif = true;
 		}
 		if (!skipif) {
+#if defined(XOSVIEW_DFBSD) && __DragonFly_version > 300304
+			struct ifdata_pcpu *ifdatap = ifnet.if_data_pcpu;
+			struct ifdata_pcpu ifdata;
+			int ncpus = BSDCountCpus();
+			for (int cpu = 0; cpu < ncpus; cpu++) {
+				safe_kvm_read((u_long)ifdatap + cpu * sizeof(ifdata),
+				              &ifdata, sizeof(ifdata));
+				*inbytes  += ifdata.ifd_ibytes;
+				*outbytes += ifdata.ifd_obytes;
+			}
+#else
 			*inbytes  += ifnet.if_ibytes;
 			*outbytes += ifnet.if_obytes;
+#endif
 		}
 	}
 #endif  /* XOSVIEW_OPENBSD */
