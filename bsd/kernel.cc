@@ -35,8 +35,18 @@
 #include <sys/sysctl.h>
 #include <net/if.h>
 
-#if defined(XOSVIEW_FREEBSD)
+#if defined(XOSVIEW_DFBSD)
+#define _KERNEL_STRUCTURES
+#include <kinfo.h>
+#endif
+
+#if defined(XOSVIEW_FREEBSD) || defined(XOSVIEW_DFBSD)
+static const char ACPIDEV[] = "/dev/acpi";
+static const char APMDEV[] = "/dev/apm";
 #include <net/if_var.h>
+#include <sys/ioctl.h>
+#include <dev/acpica/acpiio.h>
+#include <machine/apm_bios.h>
 #endif
 
 #if defined(XOSVIEW_NETBSD)
@@ -59,12 +69,6 @@ static int mib_spd[2] = { CTL_HW, HW_CPUSPEED };
 static int mib_cpt[2] = { CTL_KERN, KERN_CPTIME };
 static int mib_ifl[6] = { CTL_NET, AF_ROUTE, 0, 0, NET_RT_IFLIST, 0 };
 static int mib_bcs[3] = { CTL_VFS, VFS_GENERIC, VFS_BCACHESTAT };
-#endif
-
-#if defined(XOSVIEW_DFBSD)
-#define _KERNEL_STRUCTURES
-#include <net/if_var.h>
-#include <kinfo.h>
 #endif
 
 #if defined(XOSVIEW_OPENBSD) || defined(XOSVIEW_DFBSD)
@@ -1404,5 +1408,242 @@ BSDGetSensor(const char *name, const char *valname, float *value) {
 		}
 	}
 #endif
+#endif
+}
+
+
+//  ---------------------- Battery Meter stuff ---------------------------------
+
+bool
+BSDHasBattery() {
+#if defined(XOSVIEW_NETBSD)
+	int fd;
+	prop_dictionary_t pdict;
+	prop_object_t pobj;
+
+	if ( (fd = open(_PATH_SYSMON, O_RDONLY)) == -1 )
+		return false;
+	if ( prop_dictionary_recv_ioctl(fd, ENVSYS_GETDICTIONARY, &pdict) )
+		err(EX_OSERR, "Could not get sensor dictionary");
+	if ( close(fd) == -1 )
+		err(EX_OSERR, "Could not close %s", _PATH_SYSMON);
+
+	if ( prop_dictionary_count(pdict) == 0 )
+		return false;
+	pobj = prop_dictionary_get(pdict, "acpibat0"); // just check for 1st battery
+	if ( prop_object_type(pobj) != PROP_TYPE_ARRAY )
+		return false;
+	return true;
+#elif defined(XOSVIEW_OPENBSD)
+	// check if we can get full capacity of the 1st battery
+	float val = -1.0;
+	BSDGetSensor("acpibat0", "amphour0", &val);
+	if (val < 0)
+		return false;
+	return true;
+#else // XOSVIEW_FREEBSD || XOSVIEW_DFBSD
+	int fd;
+	if ( (fd = open(ACPIDEV, O_RDONLY)) == -1 ) {
+		// No ACPI -> try APM
+		if ( (fd = open(APMDEV, O_RDONLY)) == -1 )
+			return false;
+		struct apm_info aip;
+		if ( ioctl(fd, APMIO_GETINFO, &aip) == -1 )
+			return false;
+		if ( close(fd) == -1 )
+			err(EX_OSERR, "Could not close %s", APMDEV);
+		if (aip.ai_batt_stat == 0xff || aip.ai_batt_life == 0xff)
+			return false;
+		return true;
+	}
+
+	union acpi_battery_ioctl_arg battio;
+	battio.unit = ACPI_BATTERY_ALL_UNITS;
+	if ( ioctl(fd, ACPIIO_BATT_GET_BATTINFO, &battio) == -1 )
+		return false;
+	if ( close(fd) == -1 )
+		err(EX_OSERR, "Could not close %s", ACPIDEV);
+	return ( battio.battinfo.state != ACPI_BATT_STAT_NOT_PRESENT );
+#endif
+}
+
+void
+BSDGetBatteryInfo(int *remaining, unsigned int *state) {
+	*state = XOSVIEW_BATT_NONE;
+#if defined(XOSVIEW_NETBSD) || defined(XOSVIEW_OPENBSD)
+	int batteries = 0;
+#if defined(XOSVIEW_NETBSD)
+	/* Again adapted from envstat. */
+	// All kinds of sensors are read with libprop. We have to go through them
+	// to find the batteries. We need capacity, charge, presence, charging
+	// status and discharge rate for each battery for the calculations.
+	// For simplicity, assume all batteries have the same
+	// charge/discharge status.
+	int fd;
+	int total_capacity = 0, total_charge = 0, total_low = 0, total_crit = 0;
+	const char *name = NULL;
+	prop_dictionary_t pdict;
+	prop_object_t pobj, pobj1;
+	prop_object_iterator_t piter, piter2;
+	prop_array_t parray;
+
+	if ( (fd = open(_PATH_SYSMON, O_RDONLY)) == -1 ) {
+		warn("Could not open %s", _PATH_SYSMON);
+		return;  // this seems to happen occasionally, so only warn
+	}
+	if ( prop_dictionary_recv_ioctl(fd, ENVSYS_GETDICTIONARY, &pdict) )
+		err(EX_OSERR, "Could not get sensor dictionary");
+	if ( close(fd) == -1 )
+		err(EX_OSERR, "Could not close %s", _PATH_SYSMON);
+
+	if ( prop_dictionary_count(pdict) == 0 ) {
+		warn("No sensors found");
+		return;
+	}
+	if ( !(piter = prop_dictionary_iterator(pdict)) )
+		err(EX_OSERR, "Could not get sensor iterator");
+
+	while ( (pobj = prop_object_iterator_next(piter)) ) {
+		int present = 0, capacity = 0, charge = 0, low = 0, crit = 0;
+		name = prop_dictionary_keysym_cstring_nocopy((prop_dictionary_keysym_t)pobj);
+		if ( strncmp(name, "acpibat", 7) )
+			continue;
+		parray = (prop_array_t)prop_dictionary_get_keysym(pdict, (prop_dictionary_keysym_t)pobj);
+		if ( prop_object_type(parray) != PROP_TYPE_ARRAY )
+			continue;
+		if ( !(piter2 = prop_array_iterator(parray)) )
+			err(EX_OSERR, "Could not get sensor iterator");
+
+		while ( (pobj = prop_object_iterator_next(piter2)) ) {
+			if ( !(pobj1 = prop_dictionary_get((prop_dictionary_t)pobj, "state")) )
+				continue;
+			if ( prop_string_equals_cstring((prop_string_t)pobj1, "invalid") ||
+			     prop_string_equals_cstring((prop_string_t)pobj1, "unknown") )
+				continue; // skip sensors without valid data
+			if ( !(pobj1 = prop_dictionary_get((prop_dictionary_t)pobj, "description")) )
+				continue;
+			name = prop_string_cstring_nocopy((prop_string_t)pobj1);
+			if ( strncmp(name, "present", 7) == 0 ) { // is battery present
+				if ( (pobj1 = prop_dictionary_get((prop_dictionary_t)pobj, "cur-value")) )
+					present = prop_number_integer_value((prop_number_t)pobj1);
+			}
+			else if ( strncmp(name, "design cap", 10) == 0 ) { // get full capacity
+				if ( (pobj1 = prop_dictionary_get((prop_dictionary_t)pobj, "cur-value")) )
+					capacity = prop_number_integer_value((prop_number_t)pobj1);
+			}
+			else if ( strncmp(name, "charge", 7) == 0 ) { // get present charge, low and critical levels
+				if ( (pobj1 = prop_dictionary_get((prop_dictionary_t)pobj, "cur-value")) )
+					charge = prop_number_integer_value((prop_number_t)pobj1);
+				if ( (pobj1 = prop_dictionary_get((prop_dictionary_t)pobj, "warning-capacity")) )
+					low = prop_number_integer_value((prop_number_t)pobj1);
+				if ( (pobj1 = prop_dictionary_get((prop_dictionary_t)pobj, "critical-capacity")) )
+					crit = prop_number_integer_value((prop_number_t)pobj1);
+			}
+			else if ( strncmp(name, "charging", 8) == 0 ) { // charging or not?
+				if ( (pobj1 = prop_dictionary_get((prop_dictionary_t)pobj, "cur-value")) )
+					if ( prop_number_integer_value((prop_number_t)pobj1) )
+						*state |= XOSVIEW_BATT_CHARGING;
+			}
+			else if ( strncmp(name, "discharge rate", 14) == 0 ) { // discharging or not?
+				if ( (pobj1 = prop_dictionary_get((prop_dictionary_t)pobj, "cur-value")) )
+					if ( prop_number_integer_value((prop_number_t)pobj1) )
+						*state |= XOSVIEW_BATT_DISCHARGING;
+			}
+		}
+		if (present) {
+			total_capacity += capacity;
+			total_charge += charge;
+			total_low += low;
+			total_crit += crit;
+			batteries++;
+		}
+		prop_object_iterator_release(piter2);
+	}
+	prop_object_iterator_release(piter);
+	prop_object_release(pdict);
+#else // XOSVIEW_OPENBSD
+	float total_capacity = 0, total_charge = 0, total_low = 0, total_crit = 0;
+	char battery[16];
+	while (batteries < 1024) {
+		float val = -1.0;
+		snprintf(battery, 15, "acpibat%d", batteries);
+		BSDGetSensor(battery, "amphour0", &val); // full capacity
+		if (val < 0) // no more batteries
+			break;
+		batteries++;
+		total_capacity += val;
+		BSDGetSensor(battery, "amphour1", &val); // warning capacity
+		total_low += val;
+		BSDGetSensor(battery, "amphour2", &val); // low capacity
+		total_crit += val;
+		BSDGetSensor(battery, "amphour3", &val); // remaining
+		total_charge += val;
+		BSDGetSensor(battery, "raw0", &val); // state
+		if ((int)val == 1)
+			*state |= XOSVIEW_BATT_DISCHARGING;
+		else if ((int)val == 2)
+			*state |= XOSVIEW_BATT_CHARGING;
+		// there's also 0 state for idle/full
+	}
+#endif
+	if (batteries == 0) { // all batteries are off
+		*state = XOSVIEW_BATT_NONE;
+		*remaining = 0;
+		return;
+	}
+	*remaining = 100 * total_charge / total_capacity;
+	if ( !(*state & XOSVIEW_BATT_CHARGING) &&
+	     !(*state & XOSVIEW_BATT_DISCHARGING) )
+		*state |= XOSVIEW_BATT_FULL;  // it's full when not charging nor discharging
+	if (total_capacity < total_low)
+		*state |= XOSVIEW_BATT_LOW;
+	if (total_capacity < total_crit)
+		*state |= XOSVIEW_BATT_CRITICAL;
+#else // XOSVIEW_FREEBSD || XOSVIEW_DFBSD
+	/* Adapted from acpiconf and apm. */
+	int fd;
+	if ( (fd = open(ACPIDEV, O_RDONLY)) == -1 ) {
+		// No ACPI -> try APM
+		if ( (fd = open(APMDEV, O_RDONLY)) == -1 )
+			err(EX_OSFILE, "could not open %s or %s", ACPIDEV, APMDEV);
+		struct apm_info aip;
+		if ( ioctl(fd, APMIO_GETINFO, &aip) == -1 )
+			err(EX_IOERR, "failed to get APM battery info");
+		if ( close(fd) == -1 )
+			err(EX_OSERR, "Could not close %s", APMDEV);
+		if (0 <= aip.ai_batt_life && aip.ai_batt_life <= 100)
+			*remaining = aip.ai_batt_life; // only 0-100 are valid values
+		else
+			*remaining = 0;
+		if (aip.ai_batt_stat == 0)
+			*state |= XOSVIEW_BATT_FULL;
+		else if (aip.ai_batt_stat == 1)
+			*state |= XOSVIEW_BATT_LOW;
+		else if (aip.ai_batt_stat == 2)
+			*state |= XOSVIEW_BATT_CRITICAL;
+		else if (aip.ai_batt_stat == 3)
+			*state |= XOSVIEW_BATT_CHARGING;
+		else
+			*state = XOSVIEW_BATT_NONE;
+		return;
+	}
+	// ACPI
+	union acpi_battery_ioctl_arg battio;
+	battio.unit = ACPI_BATTERY_ALL_UNITS;
+	if ( ioctl(fd, ACPIIO_BATT_GET_BATTINFO, &battio) == -1 )
+		err(EX_IOERR, "failed to get ACPI battery info");
+	if ( close(fd) == -1 )
+		err(EX_OSERR, "Could not close %s", ACPIDEV);
+	*remaining = battio.battinfo.cap;
+	if (battio.battinfo.state != ACPI_BATT_STAT_NOT_PRESENT) {
+		if (battio.battinfo.state == 0)
+			*state |= XOSVIEW_BATT_FULL;
+		if (battio.battinfo.state & ACPI_BATT_STAT_CRITICAL)
+			*state |= XOSVIEW_BATT_CRITICAL;
+		if (battio.battinfo.state & ACPI_BATT_STAT_DISCHARG)
+			*state |= XOSVIEW_BATT_DISCHARGING;
+		if (battio.battinfo.state & ACPI_BATT_STAT_CHARGING)
+			*state |= XOSVIEW_BATT_CHARGING;
+	}
 #endif
 }

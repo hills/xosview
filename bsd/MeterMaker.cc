@@ -18,9 +18,7 @@
 #include "kernel.h"
 #include "MeterMaker.h"
 #include "xosview.h"
-#ifdef HAVE_BATTERY_METER
 #include "btrymeter.h"
-#endif
 #include "cpumeter.h"
 #include "memmeter.h"
 #include "swapmeter.h"
@@ -67,6 +65,9 @@ void MeterMaker::makeMeters(void) {
 
 	if ( _xos->isResourceTrue("irqrate") )
 		push(new IrqRateMeter(_xos));
+
+	if ( _xos->isResourceTrue("battery") && BSDHasBattery() )
+		push(new BtryMeter(_xos));
 
 	if ( _xos->isResourceTrue("coretemp") ) {
 		char caption[25];

@@ -1,35 +1,35 @@
 //
-//  Copyright (c) 1997 by Mike Romberg ( romberg@fsl.noaa.gov )
+//  Copyright (c) 2013 by Tomi Tapper ( tomi.o.tapper@student.jyu.fi )
+//
+//  Based on linux/btrymeter.h:
+//  Copyright (c) 1997, 2005, 2006 by Mike Romberg ( mike.romberg@noaa.gov )
 //
 //  This file may be distributed under terms of the GPL
-//  Ported to NetBSD by David W. Talmage
-//  (talmage@jefferson.cmf.nrl.navy.mil)
 //
 
 #ifndef _BTRYMETER_H_
 #define _BTRYMETER_H_
 
-#include "defines.h"
 #include "fieldmeter.h"
 
-#ifdef HAVE_BATTERY_METER
 
 class BtryMeter : public FieldMeter {
 public:
-  BtryMeter( XOSView *parent );
-  ~BtryMeter( void );
+	BtryMeter( XOSView *parent );
+	~BtryMeter( void );
 
-  const char *name( void ) const { return "BtryMeter"; }
-  void checkevent( void );
+	const char *name( void ) const { return "BtryMeter"; }
+	void checkevent( void );
+	void checkResources( void );
 
-  void checkResources( void );
 protected:
+	void getstats( void );
 
-  void getpwrinfo( void );
 private:
-  int alarmThreshold;
+	unsigned long leftcolor_, usedcolor_, chargecolor_, fullcolor_,
+	              lowcolor_, critcolor_, nonecolor_;
+	unsigned int  old_state_;
 };
 
-#endif  // HAVE_BATTERY_METER
 
 #endif
