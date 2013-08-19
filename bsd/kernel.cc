@@ -68,7 +68,6 @@ static int mib_dsk[3] = { CTL_HW, HW_IOSTATS, sizeof(struct io_sysctl) };
 static int mib_spd[2] = { CTL_HW, HW_CPUSPEED };
 static int mib_cpt[2] = { CTL_KERN, KERN_CPTIME };
 static int mib_ifl[6] = { CTL_NET, AF_ROUTE, 0, 0, NET_RT_IFLIST, 0 };
-static int mib_bcs[3] = { CTL_VFS, VFS_GENERIC, VFS_BCACHESTAT };
 #endif
 
 #if defined(XOSVIEW_OPENBSD) || defined(XOSVIEW_DFBSD)
