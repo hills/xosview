@@ -11,9 +11,7 @@
 #include "xosview.h"
 #include "cpumeter.h"
 #include <fstream>
-#include <sstream>
 #include <stdlib.h>
-#include <math.h>
 
 static const char LOADFILENAME[] = "/proc/loadavg";
 static const char SPEEDFILENAME[] = "/proc/cpuinfo";
@@ -78,15 +76,14 @@ void LoadMeter::checkResources( void ){
 void LoadMeter::checkevent( void ){
   getloadinfo();
   if ( do_cpu_speed ) {
-         getspeedinfo();
-         if ( old_cpu_speed_ != cur_cpu_speed_ ) {
-        // update the legend:
-        std::ostringstream legnd;
-        XOSDEBUG("SPEED: %d\n",cur_cpu_speed_);
-        legnd << "PROCS/MIN" << " " << cur_cpu_speed_ << " MHz"<< std::ends;
-            legend( legnd.str().c_str() );
-	drawlegend();
-     }
+    getspeedinfo();
+    if ( old_cpu_speed_ != cur_cpu_speed_ ) {
+      // update the legend:
+      char l[32];
+      snprintf(l, 32, "PROCS/MIN %d MHz", cur_cpu_speed_);
+      legend(l);
+      drawlegend();
+    }
   }
 
   drawfields();
