@@ -110,18 +110,12 @@ void LoadMeter::getloadinfo( void ) {
 		lastalarmstate_ = alarmstate_;
 	}
 
-	//  This method of auto-adjust is better than the old way.
-	//  If fields[0] is less than 20% of display, shrink display to be
-	//  full-width.  Then, if full-width < 1.0, set it to be 1.0.
-	if (fields_[0] * 5.0 < total_)
-		total_ = fields_[0];
-	else
-		//  If fields[0] is larger, then set it to be 1/5th of full.
-		if (fields_[0] > total_)
-			total_ = fields_[0] * 5.0;
-
-	if (total_ < 1.0)
-		total_ = 1.0;
+	// Adjust total to next power-of-two of the current load.
+	if ( (fields_[0]*5.0 < total_ && total_ > 1.0) || fields_[0] > total_ ) {
+		unsigned int i = fields_[0];
+		i |= i >> 1; i |= i >> 2; i |= i >> 4; i |= i >> 8; i |= i >> 16;  // i = 2^n - 1
+		total_ = i + 1;
+	}
 
 	fields_[1] = total_ - fields_[0];
 	setUsed(fields_[0], total_);

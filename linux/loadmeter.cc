@@ -117,14 +117,12 @@ void LoadMeter::getloadinfo( void ){
     lastalarmstate = alarmstate;
   }
 
-  if ( fields_[0]*5.0<total_ )
-    total_ = fields_[0];
-  else
-  if ( fields_[0]>total_ )
-    total_ = fields_[0]*5.0;
-
-  if ( total_ < 1.0)
-    total_ = 1.0;
+  // Adjust total to next power-of-two of the current load.
+  if ( (fields_[0]*5.0 < total_ && total_ > 1.0) || fields_[0] > total_ ) {
+    unsigned int i = fields_[0];
+    i |= i >> 1; i |= i >> 2; i |= i >> 4; i |= i >> 8; i |= i >> 16;  // i = 2^n - 1
+    total_ = i + 1;
+  }
 
   fields_[1] = (float) (total_ - fields_[0]);
 
