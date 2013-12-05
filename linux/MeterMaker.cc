@@ -185,20 +185,24 @@ void MeterMaker::makeMeters(void){
 
   // check for the LmsTemp meter
   if (_xos->isResourceTrue("lmstemp")){
-    char caption[80];
-    snprintf(caption, 80, "ACT/HIGH/%s",
-      _xos->getResourceOrUseDefault("lmstempHighest", "100"));
+    char caption[16], s[16];
+    const char *tempfile, *highfile, *lowfile, *name, *label;
+    snprintf( caption, 16, "ACT/HIGH/%s",
+              _xos->getResourceOrUseDefault("lmstempHighest", "100") );
     for (int i = 1 ; ; i++) {
-      char s[20];
-      snprintf(s, 20, "lmstemp%d", i);
-      const char *tempfile = _xos->getResourceOrUseDefault(s, NULL);
+      snprintf(s, 16, "lmstemp%d", i);
+      tempfile = _xos->getResourceOrUseDefault(s, NULL);
       if (!tempfile || !*tempfile)
         break;
-      snprintf(s, 20, "lmshigh%d", i);
-      const char *highfile = _xos->getResourceOrUseDefault(s, NULL);
-      snprintf(s, 20, "lmstempLabel%d", i);
-      const char *lab = _xos->getResourceOrUseDefault(s, "TMP");
-      push(new LmsTemp(_xos, tempfile, highfile, lab, caption));
+      snprintf(s, 16, "lmshigh%d", i);
+      highfile = _xos->getResourceOrUseDefault(s, NULL);
+      snprintf(s, 16, "lmslow%d", i);
+      lowfile = _xos->getResourceOrUseDefault(s, NULL);
+      snprintf(s, 16, "lmsname%d", i);
+      name = _xos->getResourceOrUseDefault(s, NULL);
+      snprintf(s, 16, "lmstempLabel%d", i);
+      label = _xos->getResourceOrUseDefault(s, "TMP");
+      push(new LmsTemp(_xos, name, tempfile, highfile, lowfile, label, caption, i));
     }
   }
 

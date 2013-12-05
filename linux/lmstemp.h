@@ -18,7 +18,9 @@
 
 class LmsTemp : public FieldMeter {
 public:
-  LmsTemp( XOSView *parent, const char *tempfile, const char *highfile, const char *label, const char * caption);
+  LmsTemp( XOSView *parent, const char *name, const char *tempfile,
+           const char *highfile, const char *lowfile, const char *label,
+           const char *caption, unsigned int nbr );
   ~LmsTemp( void );
 
   const char *name( void ) const { return "LmsTemp"; }
@@ -28,12 +30,16 @@ public:
 protected:
 
   void getlmstemp( void );
-  bool checksensors(int isproc, const std::string dir, const char* tempfile, const char* highfile);
+  bool checksensors( const char *name, const char *tempfile,
+                     const char *highfile, const char *lowfile );
 private:
-  std::string _tempfile, _highfile;
-  int _high;
-  int _isproc;
-  unsigned long _actcolor, _highcolor;
+  void updateLegend( void );
+  void determineScale( void );
+  std::string _tempfile, _highfile, _lowfile;
+  unsigned int _nbr;
+  double _high, _low, _scale;
+  bool _isproc, _has_high, _name_found, _temp_found, _high_found, _low_found;
+  unsigned long _actcolor, _highcolor, _lowcolor;
 };
 
 

@@ -19,164 +19,317 @@
 #include <dirent.h>
 #include <sys/stat.h>
 
-static const char PROC_SENSORS_24[] = "/proc/sys/dev/sensors";
-static const char PROC_SENSORS_26[] = "/sys/class/hwmon";
+static const char PROC_SENSORS[] = "/proc/sys/dev/sensors";
+static const char SYS_SENSORS[]  = "/sys/class/hwmon";
 
 
-LmsTemp::LmsTemp( XOSView *parent, const char *tempfile, const char *highfile, const char *label, const char *caption)
+LmsTemp::LmsTemp( XOSView *parent, const char *name, const char *tempfile,
+                  const char *highfile, const char *lowfile, const char *label,
+                  const char *caption, unsigned int nbr )
   : FieldMeter( parent, 3, label, caption, 1, 1, 0 ){
-  if (!checksensors(1, PROC_SENSORS_24, tempfile, highfile)) {
-    if (!checksensors(0, PROC_SENSORS_26, tempfile, highfile)) {
-      std::cerr << label << " : Can not find file ";
-      if (tempfile[0] == '/') {
-        std::cerr << tempfile;
-        if (highfile) {
-          if (highfile[0] == '/')
-            std::cerr << " or " << highfile;
-          else
-            std::cerr << ", or " << highfile << " under " << PROC_SENSORS_24 << " or " << PROC_SENSORS_26;
-        }
-      }
-      else {
-        if (highfile) {
-          if (highfile[0] == '/')
-            std::cerr << tempfile << " under " << PROC_SENSORS_24 << " or " << PROC_SENSORS_26 << ", or " << highfile;
-          else
-            std::cerr << tempfile << " or " << highfile << " under " << PROC_SENSORS_24 << " or " << PROC_SENSORS_26;
-        }
-        else
-          std::cerr << tempfile << " under " << PROC_SENSORS_24 << " or " << PROC_SENSORS_26;
-      }
-      std::cerr << "." << std::endl;
-      parent_->done(1);
-    }
+  _nbr = nbr;
+  _scale = 1.0;
+  _isproc = false;
+  _high = _low = 0.0;
+  _name_found = _temp_found = _high_found = _low_found = _has_high = false;
+
+  // Check if high is given as value
+  if ( highfile && ('0' <= highfile[0] && highfile[0] <= '9') ) {
+    _high = atof(highfile);
+    _has_high = _high_found = true;
+    highfile = NULL;
   }
-  _high = 0;
+  // Check if low is given as value
+  if ( lowfile && ('0' <= lowfile[0] && lowfile[0] <= '9') ) {
+    _low = atof(lowfile);
+    _low_found = true;
+    lowfile = NULL;
+  }
+
+  if ( !checksensors(name, tempfile, highfile, lowfile) ) {
+    if ( !_name_found &&
+         (( !_temp_found && tempfile[0] != '/' ) ||
+          ( !_high_found && (highfile && highfile[0] != '/') ) ||
+          ( !_low_found && (lowfile && lowfile[0] != '/') )) )
+      std::cerr << label << " : No sensor named " << name << " was found in "
+                << SYS_SENSORS << "." << std::endl;
+    else {
+      if (!_temp_found && tempfile[0] != '/') {
+        std::cerr << label << " : Could not find file " << tempfile << "{,_input}";
+        if (name)
+          std::cerr << " under " << name << " in " << SYS_SENSORS;
+        else
+          std::cerr << " under " << PROC_SENSORS << " or " << SYS_SENSORS;
+        std::cerr << "." << std::endl;
+      }
+      if (!_high_found && highfile && highfile[0] != '/') {
+        std::cerr << label << " : Could not find file " << highfile;
+        if (name)
+          std::cerr << " under " << name << " in " << SYS_SENSORS;
+        else
+          std::cerr << " under " << SYS_SENSORS;
+        std::cerr << "." << std::endl;
+      }
+      if (!_low_found && lowfile && lowfile[0] != '/') {
+        std::cerr << label << " : Could not find file " << lowfile;
+        if (name)
+          std::cerr << " under " << name << " in " << SYS_SENSORS;
+        else
+          std::cerr << " under " << SYS_SENSORS;
+        std::cerr << "." << std::endl;
+      }
+    }
+    parent_->done(1);
+  }
 }
 
 LmsTemp::~LmsTemp( void ){
 }
 
-/* this part is adapted from ProcMeter3.2 */
-bool LmsTemp::checksensors(int isproc, const std::string dir, const char* tempfile, const char *highfile) {
-  bool temp_found = false, high_found = false;
-  DIR *d1, *d2;
-  struct dirent *ent1, *ent2;
+bool LmsTemp::checksensors( const char *name, const char *tempfile,
+                            const char *highfile, const char *lowfile ) {
+// Logic:
+//  0) tempfile must always be found, highfile and lowfile only if given
+//  1) absolute path in any filename must match as is
+//  2) if name is given, only files in that sysfs node can match
+//  3) any filename matches as is
+//  4) tempfile + "_input" matches and tempfile + "_max" and/or
+//     tempfile + "_min" matches
+  DIR *dir;
+  struct dirent *ent;
   struct stat buf;
+  std::string dirname, f, f2, n;
 
   /* First, check if absolute paths were given. */
   if (tempfile[0] == '/') {
-    if (stat(tempfile, &buf) == 0 && S_ISREG(buf.st_mode)) {
+    if ( stat(tempfile, &buf) == 0 && S_ISREG(buf.st_mode) ) {
       _tempfile = tempfile;
-      temp_found = true;
+      _temp_found = true;
     }
     else
-      return false;
+      std::cerr << title() << " : Could not find file " << tempfile << "." << std::endl;
   }
-  if (!highfile)
-    high_found = true;
-  else {
-    if (highfile[0] == '/') {
-      if (stat(highfile, &buf) == 0 && S_ISREG(buf.st_mode)) {
-        _highfile = highfile;
-        high_found = true;
-      }
-      else
-        return false;
+  if (highfile && highfile[0] == '/') {
+    if ( stat(highfile, &buf) == 0 && S_ISREG(buf.st_mode) ) {
+      _highfile = highfile;
+      _high_found = true;
     }
+    else
+      std::cerr << title() << " : Could not find file " << highfile << "." << std::endl;
   }
-  if (temp_found && high_found) {
-    _isproc = ( strncmp(_tempfile.c_str(), "/proc", 5) ? 0 : 1 );
+  if (lowfile && lowfile[0] == '/') {
+    if ( stat(lowfile, &buf) == 0 && S_ISREG(buf.st_mode) ) {
+      _lowfile = lowfile;
+      _low_found = true;
+    }
+    else
+      std::cerr << title() << " : Could not find file " << lowfile << "." << std::endl;
+  }
+
+  if ( _temp_found && (_high_found || !highfile) && (_low_found || !lowfile) ) {
+    _isproc = ( strncmp(_tempfile.c_str(), "/proc", 5) ? false : true );
     return true;
   }
 
   /* Then, try to find the given file. */
-  d1 = opendir(dir.c_str());
-  if (!d1)
-    return false;
-  else {
-    std::string dirname, f;
-    while ( !(temp_found && high_found) && (ent1 = readdir(d1)) ) {
-      if ( !strncmp(ent1->d_name, ".", 1) ||
-           !strncmp(ent1->d_name, "..", 2) )
+  /* Try /proc first. */
+  if ( (dir = opendir(PROC_SENSORS)) ) {
+    while ( !_temp_found && (ent = readdir(dir)) ) {
+      if ( !strncmp(ent->d_name, ".", 1) ||
+           !strncmp(ent->d_name, "..", 2) )
         continue;
 
-      dirname = dir + '/' + ent1->d_name;
-      for (int i = 0; i < (isproc ? 1 : 2); i++) {
-        if ( stat(dirname.c_str(), &buf) == 0 && S_ISDIR(buf.st_mode) ) {
-          d2 = opendir(dirname.c_str());
-          if (!d2)
-            std::cerr << "The directory " << dirname << " exists but cannot be read." << std::endl;
-          else {
-            while ((ent2 = readdir(d2))) {
-              if ( !strncmp(ent2->d_name, ".", 1) ||
-                   !strncmp(ent2->d_name, "..", 2) )
-                continue;
-
-              f = dirname + '/' + ent2->d_name;
-              if ( stat(f.c_str(), &buf) != 0 || !S_ISREG(buf.st_mode) )
-                continue;
-              if (isproc) {
-                if ( !strncmp(ent2->d_name, tempfile, strlen(tempfile)) ) {
-                  temp_found = true;
-                  high_found = true;
-                  _tempfile = f;
-                }
-              }
-              else {
-                // check for tempfile and tempfile_input
-                if ( !strncmp(ent2->d_name, tempfile, strlen(tempfile)) ) {
-                  if ( !temp_found && ( strlen(tempfile) == strlen(ent2->d_name) ||
-                      !strncmp(ent2->d_name + strlen(tempfile), "_input", 6) ) ) {
-                    _tempfile = f;
-                    temp_found = true;
-                  }
-                  // check for tempfile_max as highfile, if no highfile was given
-                  if ( !highfile && !strncmp(ent2->d_name + strlen(tempfile), "_max", 4) ) {
-                    _highfile = f;
-                    high_found = true;
-                  }
-                }
-                // check for highfile and highfile_max
-                if ( !high_found && !strncmp(ent2->d_name, highfile, strlen(highfile)) ) {
-                  if ( strlen(highfile) == strlen(ent2->d_name) ||
-                      !strncmp(ent2->d_name + strlen(highfile), "_max", 4) ) {
-                    _highfile = f;
-                    high_found = true;
-                  }
-                }
-              }
-            }
-            closedir(d2);
-          }
+      dirname = PROC_SENSORS;
+      dirname += '/'; dirname += ent->d_name;
+      if ( stat(dirname.c_str(), &buf) == 0 && S_ISDIR(buf.st_mode) ) {
+        f = dirname + '/' + tempfile;
+        if ( stat(f.c_str(), &buf) == 0 && S_ISREG(buf.st_mode) ) {
+          _temp_found = true;
+          _tempfile = f;
+          _isproc = true;
         }
-
-        if (temp_found && high_found) {
-          _isproc = isproc;
-          closedir(d1);
-          return true;
-        }
-        // Some /sys sensors have the readings in subdirectory /device
-        if (!isproc)
-          dirname += "/device";
       }
     }
+    closedir(dir);
+    if (_temp_found)
+      return true;
   }
-  closedir(d1);
-  return (temp_found & high_found);
+
+  /* Next, try /sys. */
+  if ( !(dir = opendir(SYS_SENSORS)) )
+    return false;
+
+  while ( !(_temp_found && (_high_found || !highfile) && (_low_found || !lowfile) ) &&
+           (ent = readdir(dir)) ) {
+    if ( !strncmp(ent->d_name, ".", 1) ||
+         !strncmp(ent->d_name, "..", 2) )
+      continue;
+
+    // Try every node under /sys/class/hwmon
+    dirname = SYS_SENSORS;
+    dirname += '/'; dirname += ent->d_name;
+
+    int i = 0;
+    do {
+      if ( stat(dirname.c_str(), &buf) == 0 && S_ISDIR(buf.st_mode) ) {
+        // Try to get the sensor's name
+        f = dirname + "/name";
+        std::ifstream namefile( f.c_str() );
+        if ( namefile.good() ) {
+          namefile >> n;
+          namefile.close();
+        }
+        if (!name || n == name) {
+          // Either no name was given, or the name matches.
+          // Check if the files exist here.
+          _name_found = true;
+          if (highfile && !_high_found) {
+            f = dirname + '/' + highfile;
+            if ( stat(f.c_str(), &buf) == 0 && S_ISREG(buf.st_mode) ) {
+              _high_found = true;
+              _highfile = f;
+            }
+          }
+          if (lowfile && !_low_found) {
+            f = dirname + '/' + lowfile;
+            if ( stat(f.c_str(), &buf) == 0 && S_ISREG(buf.st_mode) ) {
+              _low_found = true;
+              _lowfile = f;
+            }
+          }
+          f = dirname + '/' + tempfile;
+          if ( stat(f.c_str(), &buf) == 0 && S_ISREG(buf.st_mode) ) {
+            _temp_found = true;
+            _tempfile = f;
+          }
+          else {
+            f2 = f + "_input";
+            if ( stat(f2.c_str(), &buf) == 0 && S_ISREG(buf.st_mode) ) {
+              _temp_found = true;
+              _tempfile = f2;
+              f2 = f + "_max";
+              if ( !_high_found && !highfile &&
+                   stat(f2.c_str(), &buf) == 0 && S_ISREG(buf.st_mode) ) {
+                _high_found = true;
+                _highfile = f2;
+              }
+              f2 = f + "_min";
+              if ( !_low_found && !lowfile &&
+                   stat(f2.c_str(), &buf) == 0 && S_ISREG(buf.st_mode) ) {
+                _low_found = true;
+                _lowfile = f2;
+              }
+            }
+          }
+        }
+      }
+
+      // Some /sys sensors have the files in subdirectory /device
+      dirname += "/device";
+    } while ( ++i < 2 && !( _temp_found && (_high_found || !highfile) &&
+                           (_low_found || !lowfile) ) );
+  }
+  closedir(dir);
+  // No highfile or lowfile is OK.
+  if (!highfile)
+    _high_found = true;
+  if (!lowfile)
+    _low_found = true;
+
+  return (_temp_found & _high_found & _low_found);
+}
+
+/* Adapted from libsensors. */
+void LmsTemp::determineScale( void ){
+  char type[16], subtype[32];
+  int n;
+  std::string basename = _tempfile.substr(_tempfile.find_last_of('/') + 1);
+  if ( sscanf(basename.c_str(), "%[a-z]%d_%s", type, &n, subtype) == 3 ) {
+    if (( !strncmp(type, "in", strlen(type)) &&
+          !strncmp(subtype, "input", strlen(subtype)) ) ||
+        ( !strncmp(type, "temp", strlen(type)) &&
+          !strncmp(subtype, "input", strlen(subtype)) ) ||
+        ( !strncmp(type, "temp", strlen(type)) &&
+          !strncmp(subtype, "offset", strlen(subtype)) ) ||
+        ( !strncmp(type, "curr", strlen(type)) &&
+          !strncmp(subtype, "input", strlen(subtype)) ) ||
+        ( !strncmp(type, "power", strlen(type)) &&
+          !strncmp(subtype, "average_interval", strlen(subtype)) ) ||
+        ( !strncmp(type, "cpu", strlen(type)) &&
+          !strncmp(subtype, "vid", strlen(subtype)) )) {
+      _scale = 1000.0;
+      return;
+    }
+    if (( !strncmp(type, "power", strlen(type)) &&
+          !strncmp(subtype, "average", strlen(subtype)) ) ||
+        ( !strncmp(type, "energy", strlen(type)) &&
+          !strncmp(subtype, "input", strlen(subtype)) )) {
+      _scale = 1000000.0;
+      return;
+    }
+  }
+  _scale = 1.0;
+}
+
+void LmsTemp::updateLegend( void ){
+  char l[16];
+  if (_has_high) {
+    if (total_ < 10)
+      snprintf(l, 16, "ACT/%.1f/%.1f", _high, total_);
+    else
+      snprintf(l, 16, "ACT/%d/%d", (int)_high, (int)total_);
+  }
+  else {
+    if (total_ < 10)
+      snprintf(l, 16, "ACT/HIGH/%.1f", total_);
+    else
+      snprintf(l, 16, "ACT/HIGH/%d", (int)total_);
+  }
+  legend(l);
 }
 
 void LmsTemp::checkResources( void ){
   FieldMeter::checkResources();
 
+  char s[32];
+  const char *tmp = NULL;
   _actcolor  = parent_->allocColor( parent_->getResource( "lmstempActColor" ) );
   _highcolor = parent_->allocColor( parent_->getResource( "lmstempHighColor" ) );
+  _lowcolor  = parent_->allocColor( parent_->getResource( "lmstempLowColor" ) );
   setfieldcolor( 0, _actcolor );
   setfieldcolor( 1, parent_->getResource( "lmstempIdleColor") );
   setfieldcolor( 2, _highcolor );
-  total_ = atoi( parent_->getResourceOrUseDefault( "lmstempHighest", "100" ) );
-  priority_ = atoi (parent_->getResource( "lmstempPriority" ) );
-  SetUsedFormat(parent_->getResource( "lmstempUsedFormat" ) );
+  tmp = parent_->getResourceOrUseDefault( "lmstempHighest", "100" );
+  snprintf(s, 32, "lmstempHighest%d", _nbr);
+  total_ = atof( parent_->getResourceOrUseDefault(s, tmp) );
+  priority_ = atoi( parent_->getResource( "lmstempPriority" ) );
+  tmp = parent_->getResource( "lmstempUsedFormat" );
+  snprintf(s, 32, "lmstempUsedFormat%d", _nbr);
+  SetUsedFormat( parent_->getResourceOrUseDefault(s, tmp) );
+
+  // Sanity checks.
+  if (_has_high) {
+    if (_high > total_) {
+      std::cerr << "Warning: lmshigh" << _nbr << " (" << _high
+                << ") was greater than lmstempHighest" << _nbr << " ("
+                << total_ << ")." << std::endl;
+      _high = total_;
+    }
+    if (_low > _high) {
+      std::cerr << "Warning: lmslow" << _nbr << " (" << _low
+                << ") was greater than lmshigh" << _nbr << " (" << _high
+                << ")." << std::endl;
+      _low = _high;
+    }
+  }
+  else
+    _high = total_;
+
+  if ( !_highfile.empty() )
+    _has_high = true;
+
+  determineScale();
+  updateLegend();
 }
 
 void LmsTemp::checkevent( void ){
@@ -185,34 +338,8 @@ void LmsTemp::checkevent( void ){
   drawfields();
 }
 
-// Note:
-// procentry looks like
-// high low actual
-//
-// if actual >= high alarm is triggered, fan starts and high is set to
-//   a higher value by BIOS
-//   after fan cooled down the chips, high get's reset
-// if  this happens display color of actual is set to HighColor
-// this could be very machine depended
-//
-// a typical entry on my machine (Gericom Overdose 2 XXL, PIII 600) looks like:
-//
-// $ sensors
-// max1617-i2c-0-4e
-// Adapter: SMBus PIIX4 adapter at 1400
-// Algorithm: Non-I2C SMBus adapter
-// temp:       52 C (limit:   55 C, hysteresis:  -55 C)
-// remote_temp:
-//             56 C (limit:   90 C, hysteresis:  -55 C)
-//
-// after alarm limits are set to 60 / 127 respectively
-// low/hysteresis looks broken ;-)
-//
-
 void LmsTemp::getlmstemp( void ){
-  // dummy, high changed from integer to double to allow it to display
-  // the full value, unfit for an int. (See Debian bug #183695)
-  double dummy, high;
+  double high = _high;
   bool do_legend = false;
 
   std::ifstream tempfile( _tempfile.c_str() );
@@ -222,12 +349,11 @@ void LmsTemp::getlmstemp( void ){
     return;
   }
 
-  if (_isproc) {
-    tempfile >> high >> dummy >> fields_[0];
-  }
+  if (_isproc)
+    tempfile >> high >> _low >> fields_[0];
   else {
     tempfile >> fields_[0];
-    fields_[0] /= 1000;
+    fields_[0] /= _scale;
     if ( !_highfile.empty() ) {
       std::ifstream highfile( _highfile.c_str() );
       if (!highfile) {
@@ -236,22 +362,24 @@ void LmsTemp::getlmstemp( void ){
         return;
       }
       highfile >> high;
-      high /= 1000;
+      high /= _scale;
     }
-    else
-      high = total_;
+    if ( !_lowfile.empty() ) {
+      std::ifstream lowfile( _lowfile.c_str() );
+      if (!lowfile) {
+        std::cerr << "Can not open file : " << _lowfile << std::endl;
+        parent_->done(1);
+        return;
+      }
+      lowfile >> _low;
+      _low /= _scale;
+    }
   }
-
-  if ( high > total_ || high != _high ) {
-    char l[16];
-    if ( high > total_ )
+  if (high != _high) {
+    if (high > total_)
       total_ = 10 * (int)((high * 1.25) / 10);
     _high = high;
-    if ( !_highfile.empty() )
-      snprintf(l, 16, "ACT/%d/%d", (int)high, (int)total_);
-    else
-      snprintf(l, 16, "ACT/HIGH/%d", (int)total_);
-    legend(l);
+    updateLegend();
     do_legend = true;
   }
 
@@ -263,6 +391,12 @@ void LmsTemp::getlmstemp( void ){
       do_legend = true;
     }
   }
+  else if (fields_[0] < _low) { // alarm: T < min
+    if (colors_[0] != _lowcolor) {
+      setfieldcolor( 0, _lowcolor );
+      do_legend = true;
+    }
+  }
   else {
     if (colors_[0] != _actcolor) {
       setfieldcolor( 0, _actcolor );
@@ -270,11 +404,12 @@ void LmsTemp::getlmstemp( void ){
     }
   }
 
+  setUsed(fields_[0], total_);
   fields_[2] = total_ - fields_[1] - fields_[0];
   if (fields_[2] < 0)
     fields_[2] = 0;
-
-  setUsed(fields_[0], total_);
+  if (fields_[0] > total_)
+    fields_[0] = total_;
 
   if (do_legend)
     drawlegend();
