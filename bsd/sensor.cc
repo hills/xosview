@@ -16,6 +16,7 @@
 
 BSDSensor::BSDSensor( XOSView *parent, const char *name, const char *high, const char *label, const char *caption, int nbr )
 	: FieldMeter( parent, 3, label, caption, 1, 1, 1 ) {
+	metric_ = true;
 	name_ = name;
 	high_ = high;
 	nbr_ = nbr;

@@ -28,6 +28,7 @@ static const char SYS_CORETEMP[] = "/sys/devices/platform/coretemp";
 
 CoreTemp::CoreTemp( XOSView *parent, const char *label, const char *caption, int pkg, int cpu )
   : FieldMeter( parent, 3, label, caption, 1, 1, 1 ), _pkg(pkg), _cpu(cpu) {
+  metric_ = true;
   _high = 0;
 }
 

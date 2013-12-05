@@ -27,6 +27,7 @@ LmsTemp::LmsTemp( XOSView *parent, const char *name, const char *tempfile,
                   const char *highfile, const char *lowfile, const char *label,
                   const char *caption, unsigned int nbr )
   : FieldMeter( parent, 3, label, caption, 1, 1, 0 ){
+  metric_ = true;
   _nbr = nbr;
   _scale = 1.0;
   _isproc = false;

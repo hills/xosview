@@ -47,6 +47,7 @@ protected:
   UsedType print_;
   int printedZeroTotalMesg_;
   int numWarnings_;
+  bool metric_;
 
   void SetUsedFormat ( const char * const str );
   void drawlegend( void );

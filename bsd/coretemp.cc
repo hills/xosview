@@ -20,6 +20,7 @@
 
 CoreTemp::CoreTemp( XOSView *parent, const char *label, const char *caption, int cpu)
 	: FieldMeter( parent, 2, label, caption, 1, 1, 1 ) {
+	metric_ = true;
 	cpu_ = cpu;
 	checkResources();
 }
