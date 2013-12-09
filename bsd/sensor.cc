@@ -14,36 +14,87 @@
 #include "sensor.h"
 
 
-BSDSensor::BSDSensor( XOSView *parent, const char *name, const char *high, const char *label, const char *caption, int nbr )
-	: FieldMeter( parent, 3, label, caption, 1, 1, 1 ) {
+BSDSensor::BSDSensor( XOSView *parent, const char *name, const char *high,
+                      const char *low, const char *label, const char *caption, int nbr )
+	: FieldMeter( parent, 3, label, caption, 1, 1, 0 ) {
 	metric_ = true;
-	name_ = name;
-	high_ = high;
+	hashigh_ = false;
 	nbr_ = nbr;
+	high_ = low_ = 0.0;
+	highname_[0] = highval_[0] = '\0';
+	lowname_[0] = lowval_[0] = '\0';
+	std::string n(name), tmp;
+	tmp = n.substr( 0, n.find_first_of('.') );
+	strncpy(name_, tmp.c_str(), NAMESIZE);
+	tmp = n.substr( n.find_first_of('.') + 1 );
+	strncpy(val_, tmp.c_str(), NAMESIZE);
+	if (high) {
+		hashigh_ = true;
+		if ('0' <= high[0] && high[0] <= '9')  // high given as number
+			high_ = atof(high);
+		else {
+			n = high;
+			tmp = n.substr( 0, n.find_first_of('.') );
+			strncpy(highname_, tmp.c_str(), NAMESIZE);
+			tmp = n.substr( n.find_first_of('.') + 1 );
+			strncpy(highval_, tmp.c_str(), NAMESIZE);
+		}
+	}
+	if (low) {
+		if ('0' <= low[0] && low[0] <= '9')  // low given as number
+			low_ = atof(low);
+		else {
+			n = low;
+			tmp = n.substr( 0, n.find_first_of('.') );
+			strncpy(lowname_, tmp.c_str(), NAMESIZE);
+			tmp = n.substr( n.find_first_of('.') + 1 );
+			strncpy(lowval_, tmp.c_str(), NAMESIZE);
+		}
+	}
 }
 
 BSDSensor::~BSDSensor( void ) {
 }
 
+void BSDSensor::updateLegend( void ) {
+	char l[32];
+	if (hashigh_) {
+		if (total_ < 10)
+			snprintf(l, 32, "ACT/%.1f/%.1f", high_, total_);
+		else
+			snprintf(l, 32, "ACT/%d/%d", (int)high_, (int)total_);
+	}
+	else {
+		if (total_ < 10)
+			snprintf(l, 32, "ACT/HIGH/%.1f", total_);
+		else
+			snprintf(l, 32, "ACT/HIGH/%d", (int)total_);
+	}
+	legend(l);
+}
+
 void BSDSensor::checkResources( void ) {
 	FieldMeter::checkResources();
 
-	setfieldcolor( 0, parent_->getResource( "bsdsensorActColor" ) );
-	setfieldcolor( 1, parent_->getResource( "bsdsensorIdleColor") );
-	setfieldcolor( 2, parent_->getResource( "bsdsensorHighColor" ) );
-
+	actcolor_  = parent_->allocColor( parent_->getResource( "bsdsensorActColor" ) );
+	highcolor_ = parent_->allocColor( parent_->getResource( "bsdsensorHighColor" ) );
+	lowcolor_  = parent_->allocColor( parent_->getResource( "bsdsensorLowColor" ) );
+	setfieldcolor( 0, actcolor_  );
+	setfieldcolor( 1, parent_->getResource( "bsdsensorIdleColor" ) );
+	setfieldcolor( 2, highcolor_ );
 	priority_ = atoi( parent_->getResource( "bsdsensorPriority" ) );
-	if ('0' < high_[0] && high_[0] <= '9') {  // high given as number
-		total_ = atoi( high_.c_str() );
-		high_.erase();
-	}
-	else
-		total_ = 100;  // guess something and adjust later
 
-	char s[30];
-	snprintf(s, 30, "bsdsensorUsedFormat%d", nbr_);
+	char s[32];
+	const char *tmp = parent_->getResourceOrUseDefault( "bsdsensorHighest", "100" );
+	snprintf(s, 32, "bsdsensorHighest%d", nbr_);
+	total_ = atof( parent_->getResourceOrUseDefault(s, tmp) );
+	snprintf(s, 32, "bsdsensorUsedFormat%d", nbr_);
 	const char *f = parent_->getResourceOrUseDefault(s, NULL);
 	SetUsedFormat( f ? f : parent_->getResource( "bsdsensorUsedFormat" ) );
+
+	if (!hashigh_)
+		high_ = total_;
+	updateLegend();
 }
 
 void BSDSensor::checkevent( void ) {
@@ -53,29 +104,47 @@ void BSDSensor::checkevent( void ) {
 
 void BSDSensor::getsensor( void ) {
 	float value;
-	std::string name = name_.substr(0, name_.find_first_of('.'));
-	std::string valname = name_.substr(name_.find_first_of('.') + 1);
-	BSDGetSensor( name.c_str(), valname.c_str(), &value );
-	if ( !high_.empty() ) {
+	BSDGetSensor(name_, val_, &value);
+	if ( strlen(highname_) ) {
 		float high;
-		name = high_.substr(0, high_.find_first_of('.'));
-		valname = high_.substr(high_.find_first_of('.') + 1);
-		BSDGetSensor( name.c_str(), valname.c_str(), &high );
-		if (high != total_) {
-			char l[20];
-			snprintf(l, 20, "ACT/HIGH/%d", (int)high);
-			legend(l);
+		BSDGetSensor(highname_, highval_, &high);
+		if (high != high_) {
+			high_ = high;
+			if (high_ > total_)
+				total_ = 10 * (int)((high_ * 1.25) / 10);
+			updateLegend();
 			drawlegend();
-			total_ = high;
 		}
 	}
-	fields_[0] = (double)value;
-	fields_[1] = total_ - fields_[0];
-	if (fields_[1] < 0.0) {
+	if ( strlen(lowname_) )
+		BSDGetSensor(lowname_, lowval_, &low_);
+
+	fields_[0] = value;
+	fields_[1] = high_ - fields_[0];
+	if (fields_[1] < 0.0) { // alarm: T > max
 		fields_[1] = 0.0;
-		setfieldcolor( 0, parent_->getResource( "bsdsensorHighColor" ) );
+		if (colors_[0] != highcolor_) {
+			setfieldcolor( 0, highcolor_ );
+			drawlegend();
+		}
 	}
-	else
-		setfieldcolor( 0, parent_->getResource( "bsdsensorActColor" ) );
+	else if (fields_[0] < low_) { // alarm: T < min
+		if (colors_[0] != lowcolor_) {
+			setfieldcolor(0, lowcolor_);
+			drawlegend();
+		}
+	}
+	else {
+		if (colors_[0] != actcolor_) {
+			setfieldcolor(0, actcolor_);
+			drawlegend();
+		}
+	}
+
 	setUsed(fields_[0], total_);
+	fields_[2] = total_ - fields_[1] - fields_[0];
+	if (fields_[0] > total_)
+		fields_[0] = total_;
+	if (fields_[2] < 0.0)
+		fields_[2] = 0.0;
 }

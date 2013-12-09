@@ -1121,6 +1121,12 @@ Display the highest core temperature of a multi-core CPU.
 
 .xt bsdsensor
 
+xosview*bsdsensorHighest: 100
+.RS
+Highest value displayed, default 100. Can be overridden for any meter with
+bsdsensorHighest\fIN\fP.
+.RE
+
 xosview*bsdsensorActColor: \fIcolor\fP
 .RS
 Color of actual value.
@@ -1128,60 +1134,72 @@ Color of actual value.
 
 xosview*bsdsensorHighColor: \fIcolor\fP
 .RS
-Color above alarm value, also used to indicate alarm.
+Color above high alarm value, also used to indicate alarm.
+.RE
+
+xosview*bsdsensorLowColor: \fIcolor\fP
+.RS
+Color of actual value, when it is below low alarm value.
 .RE
 
 xosview*bsdsensorIdleColor: \fIcolor\fP
 .RS
-Color between actual and alarm values.
+Color between actual and high alarm values.
 .RE
 
 xosview*bsdsensor\fIN\fP:     \fIname.type\fP
 .br
 xosview*bsdsensorHigh\fIN\fP: \fIname.type\fP
-.RS
-Here, the name is the sensor driver, and type is the wanted value. Also static
-numerical value is accepted for bsdsensorHigh\fIN\fP.
 .br
-You can find the correct pair for OpenBSD and DragonflyBSD with systat
+xosview*bsdsensorLow\fIN\fP:  \fIname.type\fP
+.RS
+These define where the actual value, high alarm value and low alarm value for
+meter N=1,2,3,... will be read from. The name is the sensor driver, and type is
+the wanted value. Both alarm values are optional, and can also be given as
+static numerical values.
+.br
+
+You can find the correct pair for OpenBSD and DragonFly BSD with systat
 command, e.g.
 .br
 xosview*bsdsensor1:     it0.temp1
 .br
 xosview*bsdsensorHigh1: 100
-.RE
 
-.RS
 On NetBSD, you can find the driver name with envstat command. Value name for
-the actual reading is typically 'cur-value' and for alarm level 'max-critical',
-e.g.
+the actual reading is typically 'cur-value' and for high alarm 'critical-max'
+and for low alarm 'critical-min', e.g.
 .br
 xosview*bsdsensor2:     coretemp0.cur-value
 .br
-xosview*bsdsensorHigh2: coretemp0.max-critical
-.RE
+xosview*bsdsensorHigh2: coretemp0.critical-max
 
-.RS
 For all possible NetBSD value names, refer to envstat source code.
-.RE
 
-.RS
-FreeBSD has no sensor drivers as of version 9.0. However, ACPI thermal zones
-can be used by defining the sysctl node below hw.acpi.thermal, e.g.
+FreeBSD has no usable sensor drivers as of version 9.0. However, ACPI thermal
+zones can be used by defining the sysctl node below hw.acpi.thermal, e.g.
 .br
 xosview*bsdsensor1:     tz0.temperature
 .br
 xosview*bsdsensorHigh1: tz0._CRT
 .br
+
+ACPI thermal zones can be used like this on DragonFly BSD as well.
 .RE
 
-.RS
-ACPI thermal zones work similarly on DragonflyBSD as well.
-.RE
-
-xosview*bsdsensorLabel\fIN\fP:	\fILabelstring\fP
+xosview*bsdsensorLabel\fIN\fP: \fIstring\fP
 .RS
 N-th label for above meters, default is SEN\fIN\fP.
+.RE
+
+xosview*bsdsensorHighest\fIN\fP: \fInumber\fP
+.RS
+Override default bsdsensorHighest for meter N.
+.RE
+
+xosview*bsdsensorUsedFormat\fIN\fP: (float, percent or autoscale)
+.RS
+Override default bsdsensorUsedFormat for meter N.
 .RE
 
 .pp bsdsensor

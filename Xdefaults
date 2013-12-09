@@ -282,6 +282,7 @@ xosview*coretempDisplayType:      separate    ! separate, maximum or average
 xosview*bsdsensor:               False
 xosview*bsdsensorActColor:       blue
 xosview*bsdsensorHighColor:      red
+xosview*bsdsensorLowColor:       orange
 xosview*bsdsensorIdleColor:      aquamarine
 xosview*bsdsensorPriority:       20
 xosview*bsdsensorUsedFormat:     float

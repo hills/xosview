@@ -92,20 +92,23 @@ void MeterMaker::makeMeters(void) {
 	}
 
 	if ( _xos->isResourceTrue("bsdsensor") ) {
-		char caption[25], label[5];
+		char caption[16], l[8], s[16];
 		for (int i = 1 ; ; i++) {
-			char s[20];
-			snprintf(s, 20, "bsdsensorHigh%d", i);
-			const char *high = _xos->getResourceOrUseDefault(s, "100");
-			snprintf(caption, 25, "ACT/HIGH/%s", high);
-			snprintf(s, 20, "bsdsensor%d", i);
-			const char *res = _xos->getResourceOrUseDefault(s, NULL);
-			if (!res || !*res)
+			snprintf(s, 16, "bsdsensorHighest%d", i);
+			float highest = atof( _xos->getResourceOrUseDefault(s, "100") );
+			snprintf(caption, 16, "ACT/HIGH/%f", highest);
+			snprintf(s, 16, "bsdsensor%d", i);
+			const char *name = _xos->getResourceOrUseDefault(s, NULL);
+			if (!name || !*name)
 				break;
-			snprintf(s, 20, "bsdsensorLabel%d", i);
-			snprintf(label, 5, "SEN%d", i);
-			const char *lab = _xos->getResourceOrUseDefault(s, label);
-			push(new BSDSensor(_xos, res, high, lab, caption, i));
+			snprintf(s, 16, "bsdsensorHigh%d", i);
+			const char *high = _xos->getResourceOrUseDefault(s, NULL);
+			snprintf(s, 16, "bsdsensorLow%d", i);
+			const char *low = _xos->getResourceOrUseDefault(s, NULL);
+			snprintf(s, 16, "bsdsensorLabel%d", i);
+			snprintf(l, 8, "SEN%d", i);
+			const char *label = _xos->getResourceOrUseDefault(s, l);
+			push(new BSDSensor(_xos, name, high, low, label, caption, i));
 		}
 	}
 

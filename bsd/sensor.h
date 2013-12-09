@@ -15,10 +15,13 @@
 #include "fieldmeter.h"
 #include <string>
 
+#define NAMESIZE 32
+
 
 class BSDSensor : public FieldMeter {
 public:
-	BSDSensor( XOSView *parent, const char *name, const char *high, const char *label, const char *caption, int nbr);
+	BSDSensor( XOSView *parent, const char *name, const char *high,
+	           const char *low, const char *label, const char *caption, int nbr );
 	~BSDSensor( void );
 
 	const char *name( void ) const { return "BSDSensor"; }
@@ -29,7 +32,12 @@ protected:
 	void getsensor( void );
 
 private:
-	std::string name_, high_;
+	void updateLegend( void );
+	char name_[NAMESIZE], highname_[NAMESIZE], lowname_[NAMESIZE];
+	char val_[NAMESIZE], highval_[NAMESIZE], lowval_[NAMESIZE];
+	unsigned long actcolor_, highcolor_, lowcolor_;
+	float high_, low_;
+	bool hashigh_;
 	int nbr_;
 };
 
