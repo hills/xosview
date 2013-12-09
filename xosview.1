@@ -1068,8 +1068,15 @@ N-th label for above temperatures, default is TMP.
 
 xosview*coretempHighest: 100
 .RS
-Highest temp value displayed, default 100. If none is given, TjMax value is
-used, if available.
+Highest temp value displayed, default 100. If CPU throttling temperature
+(tjMax) is supplied by the operating system, it is used instead.
+.RE
+
+xosview*coretempHigh: \fInumber\fP
+.RS
+Value to use as alarm temperature, default is coretempHighest. If a usable
+value, such as the temperature for which maximum cooling is required, is
+supplied by the operating system, it is used instead.
 .RE
 
 xosview*coretempActColor:  \fIcolor\fP

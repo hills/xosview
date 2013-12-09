@@ -19,24 +19,54 @@
 
 
 CoreTemp::CoreTemp( XOSView *parent, const char *label, const char *caption, int cpu)
-	: FieldMeter( parent, 2, label, caption, 1, 1, 1 ) {
+	: FieldMeter( parent, 3, label, caption, 1, 1, 1 ) {
 	metric_ = true;
 	cpu_ = cpu;
-	checkResources();
+	cpucount_ = BSDCountCpus();
+	temps_ = (float *)calloc(cpucount_, sizeof(float));
 }
 
 CoreTemp::~CoreTemp( void ) {
+	free(temps_);
 }
 
 void CoreTemp::checkResources( void ) {
 	FieldMeter::checkResources();
 
-	setfieldcolor( 0, parent_->getResource( "coretempActColor" ) );
+	actcolor_  = parent_->allocColor( parent_->getResource( "coretempActColor" ) );
+	highcolor_ = parent_->allocColor( parent_->getResource( "coretempHighColor" ) );
+	setfieldcolor( 0, actcolor_ );
 	setfieldcolor( 1, parent_->getResource( "coretempIdleColor") );
+	setfieldcolor( 2, highcolor_ );
 
 	priority_ = atoi( parent_->getResource( "coretempPriority" ) );
-	oldtotal_ = total_ = atoi( parent_->getResourceOrUseDefault( "coretempHighest", "100" ) );
+	const char *highest = parent_->getResourceOrUseDefault( "coretempHighest", "100" );
+	total_ = atoi( highest );
+	const char *high = parent_->getResourceOrUseDefault( "coretempHigh", NULL );
 	SetUsedFormat( parent_->getResource( "coretempUsedFormat" ) );
+
+	// Get tjMax here and use as total.
+	float total = -300.0;
+	float *tjmax = (float *)calloc(cpucount_, sizeof(float));
+	BSDGetCPUTemperature(temps_, tjmax);
+	for (int i = 0; i < cpucount_; i++) {
+		if (tjmax[i] > total)
+			total = tjmax[i];
+	}
+	free(tjmax);
+	if (total > 0.0)
+		total_ = total;
+
+	char l[16];
+	if (!high) {
+		high_ = total_;
+		snprintf(l, 16, "ACT/HIGH/%d", (int)total_);
+	}
+	else {
+		high_ = atoi( high );
+		snprintf(l, 16, "ACT/%d/%d", (int)high_, (int)total_);
+	}
+	legend(l);
 }
 
 void CoreTemp::checkevent( void ) {
@@ -45,36 +75,25 @@ void CoreTemp::checkevent( void ) {
 }
 
 void CoreTemp::getcoretemp( void ) {
-	int cpus = BSDCountCpus();
-	float *temps = (float *)calloc(cpus, sizeof(float));
-	float *tjmax = (float *)calloc(cpus, sizeof(float));
-
-	BSDGetCPUTemperature(temps, tjmax);
+	BSDGetCPUTemperature(temps_, NULL);
 
 	fields_[0] = 0.0;
-	if ( cpu_ >= 0 && cpu_ < cpus ) {  // one core
-		fields_[0] = temps[cpu_];
-		total_ = ( tjmax[cpu_] > 0.0 ? tjmax[cpu_] : oldtotal_ );
+	if ( cpu_ >= 0 && cpu_ < cpucount_ ) {  // one core
+		fields_[0] = temps_[cpu_];
 	}
 	else if ( cpu_ == -1 ) {  // average
-		float tempval = 0.0, temphigh = 0.0;
-		for (int i = 0; i < cpus; i++) {
-			tempval += temps[i];
-			temphigh += ( tjmax[i] > 0.0 ? tjmax[i] : oldtotal_ );
-		}
-		fields_[0] = tempval / (float)cpus;
-		total_ = temphigh / (float)cpus;
+		float tempval = 0.0;
+		for (int i = 0; i < cpucount_; i++)
+			tempval += temps_[i];
+		fields_[0] = tempval / (float)cpucount_;
 	}
 	else if ( cpu_ == -2 ) {  // maximum
-		float tempval = -300.0, temphigh = -300.0;
-		for (int i = 0; i < cpus; i++) {
-			if (temps[i] > tempval)
-				tempval = temps[i];
-			if (tjmax[i] > temphigh)
-				temphigh = ( tjmax[i] > 0.0 ? tjmax[i] : oldtotal_ );
+		float tempval = -300.0;
+		for (int i = 0; i < cpucount_; i++) {
+			if (temps_[i] > tempval)
+				tempval = temps_[i];
 		}
 		fields_[0] = tempval;
-		total_ = temphigh;
 	}
 	else {    // should not happen
 		std::cerr << "Unknown CPU core number in coretemp." << std::endl;
@@ -82,24 +101,25 @@ void CoreTemp::getcoretemp( void ) {
 		return;
 	}
 
-	free(temps);
-	free(tjmax);
-
-	fields_[1] = total_ - fields_[0];
-	if (fields_[1] < 0.0) {   // alarm
-		fields_[1] = 0.0;
-		setfieldcolor( 0, parent_->getResource( "coretempHighColor" ) );
-	}
-	else
-		setfieldcolor( 0, parent_->getResource( "coretempActColor" ) );
-
 	setUsed(fields_[0], total_);
+	fields_[1] = high_ - fields_[0];
+	fields_[2] = total_ - fields_[1] - fields_[0];
+	if (fields_[0] > total_)
+		fields_[0] = total_;
+	if (fields_[2] < 0)
+		fields_[2] = 0;
 
-	if (total_ != oldtotal_) {
-		char l[25];
-		snprintf(l, 25, "TEMPERATURE (C)/%d", (int)total_);
-		legend(l);
-		drawlegend();
-		oldtotal_ = total_;
+	if (fields_[1] < 0) { // alarm: T > high
+		fields_[1] = 0;
+		if (colors_[0] != highcolor_) {
+			setfieldcolor( 0, highcolor_ );
+			drawlegend();
+		}
+	}
+	else {
+		if (colors_[0] != actcolor_) {
+			setfieldcolor( 0, actcolor_ );
+			drawlegend();
+		}
 	}
 }

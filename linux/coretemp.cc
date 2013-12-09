@@ -134,7 +134,17 @@ void CoreTemp::checkResources( void ) {
     else
       total_ = atoi(parent_->getResourceOrUseDefault("coretempHighest", "100"));
 
-    _high = total_;
+    const char *high = parent_->getResourceOrUseDefault("coretempHigh", NULL);
+    char l[16];
+    if (high) {
+      _high = atoi(high);
+      snprintf(l, 16, "ACT/%d/%d", (int)_high, (int)total_);
+    }
+    else {
+      _high = total_;
+      snprintf(l, 16, "ACT/HIGH/%d", (int)total_);
+    }
+    legend(l);
     closedir(dir);
     return;
   }

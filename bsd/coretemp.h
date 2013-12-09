@@ -28,8 +28,9 @@ protected:
 	void getcoretemp( void );
 
 private:
-	int   cpu_;
-	float oldtotal_;
+	int   cpu_, cpucount_;
+	float high_, *temps_;
+	unsigned long actcolor_, highcolor_;
 };
 
 
