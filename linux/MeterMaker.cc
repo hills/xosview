@@ -71,19 +71,6 @@ void MeterMaker::makeMeters(void){
   if (_xos->isResourceTrue("disk"))
       push(new DiskMeter(_xos, atof(_xos->getResource("diskBandwidth"))));
 
-  // check for the wireless meter
-  if ( _xos->isResourceTrue("wireless") ) {
-    ifstream stats( WLFILENAME );
-    if (!stats)
-      std::cerr << "Wireless Meter needs Linux Wireless Extensions or cfg80211-"
-                << "WEXT compatibility to work." << std::endl;
-    else {
-      int count = WirelessMeter::countdevices();
-      for (int i = 0; i < count; i++)
-        push(new WirelessMeter(_xos, i, ( count == 1 ? "WLAN" : WirelessMeter::wirelessStr(i))));
-    }
-  }
-
   // check for the RAID meter
   if (_xos->isResourceTrue("RAID")){
     int RAIDCount = atoi(_xos->getResource("RAIDdevicecount"));
@@ -96,6 +83,19 @@ void MeterMaker::makeMeters(void){
 
   if (_xos->isResourceTrue("page"))
     push(new PageMeter(_xos, atof(_xos->getResource("pageBandwidth"))));
+
+  // check for the wireless meter
+  if ( _xos->isResourceTrue("wireless") ) {
+    ifstream stats( WLFILENAME );
+    if (!stats)
+      std::cerr << "Wireless Meter needs Linux Wireless Extensions or cfg80211-"
+                << "WEXT compatibility to work." << std::endl;
+    else {
+      int count = WirelessMeter::countdevices();
+      for (int i = 0; i < count; i++)
+        push(new WirelessMeter(_xos, i, ( count == 1 ? "WLAN" : WirelessMeter::wirelessStr(i))));
+    }
+  }
 
   // check for the net meter
   if (_xos->isResourceTrue("net"))
