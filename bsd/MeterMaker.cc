@@ -30,8 +30,7 @@
 #include "intratemeter.h"
 #include "coretemp.h"
 #include "sensor.h"
-//  This one is not yet supported under *BSD.
-//#include "serialmeter.h"
+
 
 MeterMaker::MeterMaker(XOSView *xos) {
 	_xos = xos;
@@ -111,14 +110,4 @@ void MeterMaker::makeMeters(void) {
 			push(new BSDSensor(_xos, name, high, low, label, caption, i));
 		}
 	}
-
-
-#ifdef HAVE_BATTERY_METER
-	//  NOTE:  None of the recent *BSDs supports the Battery Meter any longer.
-	//  This one is done in its own file, not kernel.cc
-	if ( _xos->isResourceTrue("battery") )
-		push(new BtryMeter(_xos));
-#endif
-
-	//  The serial meters are not yet available for the BSDs.  BCG
 }
