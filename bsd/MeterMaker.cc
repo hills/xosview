@@ -76,7 +76,7 @@ void MeterMaker::makeMeters(void) {
 		const char *displayType = _xos->getResourceOrUseDefault("coretempDisplayType", "separate");
 		if (strncmp(displayType, "separate", 1) == 0) {
 			char name[5];
-			for (int i = 0; i < BSDCountCpus(); i++) {
+			for (uint i = 0; i < CoreTemp::countCpus(); i++) {
 				snprintf(name, 5, "CPU%d", i);
 				push(new CoreTemp(_xos, name, caption, i));
 			}

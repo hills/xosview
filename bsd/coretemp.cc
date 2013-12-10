@@ -22,7 +22,7 @@ CoreTemp::CoreTemp( XOSView *parent, const char *label, const char *caption, int
 	: FieldMeter( parent, 3, label, caption, 1, 1, 1 ) {
 	metric_ = true;
 	cpu_ = cpu;
-	cpucount_ = BSDCountCpus();
+	cpucount_ = countCpus();
 	temps_ = (float *)calloc(cpucount_, sizeof(float));
 }
 
@@ -67,6 +67,10 @@ void CoreTemp::checkResources( void ) {
 		snprintf(l, 32, "ACT(\260C)/%d/%d", (int)high_, (int)total_);
 	}
 	legend(l);
+}
+
+unsigned int CoreTemp::countCpus( void ) {
+	return BSDGetCPUTemperature(NULL, NULL);
 }
 
 void CoreTemp::checkevent( void ) {

@@ -24,6 +24,8 @@ public:
 	void checkevent( void );
 	void checkResources( void );
 
+	static unsigned int countCpus( void );
+
 protected:
 	void getcoretemp( void );
 

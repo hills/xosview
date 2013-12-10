@@ -1132,10 +1132,9 @@ BSDCountCpus(void) {
 	return cpus;
 }
 
-void
+unsigned int
 BSDGetCPUTemperature(float *temps, float *tjmax) {
-	if (!temps)
-		errx(EX_SOFTWARE, "NULL pointer passed to BSDGetCPUTemperature().");
+	unsigned int nbr = 0;
 #if defined(XOSVIEW_NETBSD)
 	// All kinds of sensors are read with libprop. We have to go through them
 	// to find either Intel Core 2 or AMD ones. Actual temperature is in
@@ -1151,7 +1150,7 @@ BSDGetCPUTemperature(float *temps, float *tjmax) {
 
 	if ( (fd = open(_PATH_SYSMON, O_RDONLY)) == -1 ) {
 		warn("Could not open %s", _PATH_SYSMON);
-		return;  // this seems to happen occasionally, so only warn
+		return 0;  // this seems to happen occasionally, so only warn
 	}
 	if (prop_dictionary_recv_ioctl(fd, ENVSYS_GETDICTIONARY, &pdict))
 		err(EX_OSERR, "Could not get sensor dictionary");
@@ -1160,7 +1159,7 @@ BSDGetCPUTemperature(float *temps, float *tjmax) {
 
 	if (prop_dictionary_count(pdict) == 0) {
 		warn("No sensors found");
-		return;
+		return 0;
 	}
 	if ( !(piter = prop_dictionary_iterator(pdict)) )
 		err(EX_OSERR, "Could not get sensor iterator");
@@ -1180,8 +1179,11 @@ BSDGetCPUTemperature(float *temps, float *tjmax) {
 		while ( (pobj = prop_object_iterator_next(piter2)) ) {
 			if ( !(pobj1 = prop_dictionary_get((prop_dictionary_t)pobj, "type")) )
 				continue;
-			if ( (pobj1 = prop_dictionary_get((prop_dictionary_t)pobj, "cur-value")) )
-				temps[i] = (prop_number_integer_value((prop_number_t)pobj1) / 1000000.0) - 273.15;
+			if ( (pobj1 = prop_dictionary_get((prop_dictionary_t)pobj, "cur-value")) ) {
+				if (temps)
+					temps[i] = (prop_number_integer_value((prop_number_t)pobj1) / 1000000.0) - 273.15;
+				nbr++;
+			}
 			if ( (pobj2 = prop_dictionary_get((prop_dictionary_t)pobj, "critical-max")) && tjmax )
 				tjmax[i] = (prop_number_integer_value((prop_number_t)pobj2) / 1000000.0) - 273.15;
 		}
@@ -1199,7 +1201,7 @@ BSDGetCPUTemperature(float *temps, float *tjmax) {
 	// Values are in microdegrees Kelvin.
 	struct sensordev sd;
 	struct sensor s;
-	int nbr = 0;
+	int cpu = 0;
 	char dummy[10];
 
 	for (int dev = 0; dev < 1024; dev++) {  // go through all sensor devices
@@ -1214,7 +1216,7 @@ BSDGetCPUTemperature(float *temps, float *tjmax) {
 		}
 		if ( strncmp(sd.xname, "cpu", 3) )
 			continue;  // not CPU sensor
-		sscanf(sd.xname, "%[^0-9]%d", dummy, &nbr);
+		sscanf(sd.xname, "%[^0-9]%d", dummy, &cpu);
 
 		mib_sen[3] = SENSOR_TEMP;  // for each device, get temperature sensors
 		for (int i = 0; i < sd.maxnumt[SENSOR_TEMP]; i++) {
@@ -1224,7 +1226,9 @@ BSDGetCPUTemperature(float *temps, float *tjmax) {
 				continue;  // no sensor on this core?
 			if (s.flags & SENSOR_FINVALID)
 				continue;
-			temps[nbr] = (float)(s.value - 273150000) / 1000000.0;
+			if (temps)
+				temps[cpu] = (float)(s.value - 273150000) / 1000000.0;
+			nbr++;
 		}
 	}
 #else  /* XOSVIEW_FREEBSD */
@@ -1236,16 +1240,18 @@ BSDGetCPUTemperature(float *temps, float *tjmax) {
 	int cpus = BSDCountCpus();
 	for (int i = 0; i < cpus; i++) {
 		snprintf(name, 25, "dev.cpu.%d.temperature", i);
-		if ( sysctlbyname(name, &val, &size, NULL, 0) == 0)
+		if ( sysctlbyname(name, &val, &size, NULL, 0) == 0) {
+			nbr++;
+			if (temps)
 #if __FreeBSD_version >= 702106
-			temps[i] = ((float)val - 2732.0) / 10.0;
+				temps[i] = ((float)val - 2732.0) / 10.0;
 #else
-			temps[i] = (float)val;
+				temps[i] = (float)val;
 #endif
-		else {
-			warn("sysctl %s failed", name);
-			temps[i] = -300.0;
 		}
+		else
+			warn("sysctl %s failed", name);
+
 		if (tjmax) {
 			snprintf(name, 25, "dev.cpu.%d.coretemp.tjmax", i);
 			if ( sysctlbyname(name, &val, &size, NULL, 0) == 0 )
@@ -1254,14 +1260,13 @@ BSDGetCPUTemperature(float *temps, float *tjmax) {
 #else
 				tjmax[i] = (float)val;
 #endif
-			else {
+			else
 				warn("sysctl %s failed", name);
-				tjmax[i] = -300.0;
-			}
 		}
 	}
 #endif
 #endif
+	return nbr;
 }
 
 void

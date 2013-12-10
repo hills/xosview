@@ -72,7 +72,7 @@ BSDGetIntrStats(unsigned long *intrCount, unsigned int *intrNbrs);
 int
 BSDCountCpus(void);
 
-void
+unsigned int
 BSDGetCPUTemperature(float *temps, float *tjmax);
 
 void
