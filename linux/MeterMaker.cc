@@ -151,23 +151,24 @@ void MeterMaker::makeMeters(void){
 
   // Check for the Intel Core temperature meter
   if (_xos->isResourceTrue("coretemp")) {
-    char caption[25];
-    snprintf(caption, 25, "ACT/HIGH/%s", _xos->getResourceOrUseDefault( "coretempHighest", "100" ) );
+    char caption[32];
+    snprintf(caption, 32, "ACT(\260C)/HIGH/%s",
+             _xos->getResourceOrUseDefault( "coretempHighest", "100" ) );
     const char *displayType = _xos->getResourceOrUseDefault( "coretempDisplayType", "separate" );
     for (uint i = 1 ; ; i++) {
-      char s[80];
-      snprintf(s, 80, "coretemp%dPackage", i);
+      char s[32];
+      snprintf(s, 32, "coretemp%dPackage", i);
       const char *dummy = _xos->getResourceOrUseDefault(s, NULL);
       if (i > 1 && ( !dummy || !*dummy ))
         break;
       int pkg = ( dummy ? atoi(dummy) : 0 );
-      snprintf(s, 80, "coretemp%dDisplayType", i);
+      snprintf(s, 32, "coretemp%dDisplayType", i);
       displayType = _xos->getResourceOrUseDefault( s, displayType );
       if (strncmp(displayType, "separate", 1) == 0) {
         unsigned int cpuCount = CoreTemp::countCpus(pkg);
-        char name[10];
+        char name[8];
         for (uint cpu = 0; cpu < cpuCount; cpu++) {
-          sprintf(name, "CPU%d", cpu);
+          snprintf(name, 8, "CPU%d", cpu);
           push(new CoreTemp(_xos, name, caption, pkg, cpu));
         }
       }
@@ -208,19 +209,20 @@ void MeterMaker::makeMeters(void){
 
   // check for the ACPITemp meter
   if (_xos->isResourceTrue("acpitemp")) {
-    char caption[80];
-    snprintf(caption, 80, "ACT/HIGH/%s", _xos->getResourceOrUseDefault("acpitempHighest", "100"));
+    char caption[32];
+    snprintf(caption, 32, "ACT(\260C)/HIGH/%s",
+             _xos->getResourceOrUseDefault("acpitempHighest", "100"));
     for (int i = 1 ; ; i++) {
-      char s[20];
-      snprintf(s, 20, "acpitemp%d", i);
+      char s[16];
+      snprintf(s, 16, "acpitemp%d", i);
       const char *tempfile = _xos->getResourceOrUseDefault(s, NULL);
       if (!tempfile || !*tempfile)
         break;
-      snprintf(s, 20, "acpihigh%d", i);
+      snprintf(s, 16, "acpihigh%d", i);
       const char *highfile = _xos->getResourceOrUseDefault(s, NULL);
       if (!highfile || !*highfile)
         break;
-      snprintf(s, 20, "acpitempLabel%d", i);
+      snprintf(s, 16, "acpitempLabel%d", i);
       const char *lab = _xos->getResourceOrUseDefault(s, "TMP");
       push(new ACPITemp(_xos, tempfile, highfile, lab, caption));
     }

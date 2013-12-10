@@ -23,6 +23,7 @@ BSDSensor::BSDSensor( XOSView *parent, const char *name, const char *high,
 	high_ = low_ = 0.0;
 	highname_[0] = highval_[0] = '\0';
 	lowname_[0] = lowval_[0] = '\0';
+	unit_[0] = '\0';
 	std::string n(name), tmp;
 	tmp = n.substr( 0, n.find_first_of('.') );
 	strncpy(name_, tmp.c_str(), NAMESIZE);
@@ -59,16 +60,32 @@ BSDSensor::~BSDSensor( void ) {
 void BSDSensor::updateLegend( void ) {
 	char l[32];
 	if (hashigh_) {
-		if (total_ < 10)
-			snprintf(l, 32, "ACT/%.1f/%.1f", high_, total_);
-		else
-			snprintf(l, 32, "ACT/%d/%d", (int)high_, (int)total_);
+		if (total_ < 10) {
+			if ( strlen(unit_) )
+				snprintf(l, 32, "ACT(%s)/%.1f/%.1f", unit_, high_, total_);
+			else
+				snprintf(l, 32, "ACT/%.1f/%.1f", high_, total_);
+		}
+		else {
+			if ( strlen(unit_) )
+				snprintf(l, 32, "ACT(%s)/%d/%d", unit_, (int)high_, (int)total_);
+			else
+				snprintf(l, 32, "ACT/%d/%d", (int)high_, (int)total_);
+		}
 	}
 	else {
-		if (total_ < 10)
-			snprintf(l, 32, "ACT/HIGH/%.1f", total_);
-		else
-			snprintf(l, 32, "ACT/HIGH/%d", (int)total_);
+		if (total_ < 10) {
+			if ( strlen(unit_) )
+				snprintf(l, 32, "ACT(%s)/HIGH/%.1f", unit_, total_);
+			else
+				snprintf(l, 32, "ACT/HIGH/%.1f", total_);
+		}
+		else {
+			if ( strlen(unit_) )
+				snprintf(l, 32, "ACT(%s)/HIGH/%d", unit_, (int)total_);
+			else
+				snprintf(l, 32, "ACT/HIGH/%d", (int)total_);
+		}
 	}
 	legend(l);
 }
@@ -94,6 +111,10 @@ void BSDSensor::checkResources( void ) {
 
 	if (!hashigh_)
 		high_ = total_;
+
+	// Get the unit.
+	float dummy;
+	BSDGetSensor(name_, val_, &dummy, unit_);
 	updateLegend();
 }
 

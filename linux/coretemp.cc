@@ -135,14 +135,14 @@ void CoreTemp::checkResources( void ) {
       total_ = atoi(parent_->getResourceOrUseDefault("coretempHighest", "100"));
 
     const char *high = parent_->getResourceOrUseDefault("coretempHigh", NULL);
-    char l[16];
+    char l[32];
     if (high) {
       _high = atoi(high);
-      snprintf(l, 16, "ACT/%d/%d", (int)_high, (int)total_);
+      snprintf(l, 32, "ACT(\260C)/%d/%d", (int)_high, (int)total_);
     }
     else {
       _high = total_;
-      snprintf(l, 16, "ACT/HIGH/%d", (int)total_);
+      snprintf(l, 32, "ACT(\260C)/HIGH/%d", (int)total_);
     }
     legend(l);
     closedir(dir);
@@ -247,9 +247,9 @@ void CoreTemp::getcoretemp( void ) {
   setUsed( fields_[0], total_ );
 
   if (high != _high) {
-    char l[16];
+    char l[32];
     _high = high;
-    snprintf(l, 16, "ACT/%d/%d", (int)high, (int)total_);
+    snprintf(l, 32, "ACT(\260C)/%d/%d", (int)high, (int)total_);
     legend(l);
     drawlegend();
   }

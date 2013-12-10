@@ -35,6 +35,7 @@ private:
 	void updateLegend( void );
 	char name_[NAMESIZE], highname_[NAMESIZE], lowname_[NAMESIZE];
 	char val_[NAMESIZE], highval_[NAMESIZE], lowval_[NAMESIZE];
+	char unit_[4];
 	unsigned long actcolor_, highcolor_, lowcolor_;
 	float high_, low_;
 	bool hashigh_;

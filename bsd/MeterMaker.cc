@@ -70,8 +70,8 @@ void MeterMaker::makeMeters(void) {
 		push(new BtryMeter(_xos));
 
 	if ( _xos->isResourceTrue("coretemp") ) {
-		char caption[16];
-		snprintf(caption, 16, "ACT/HIGH/%s",
+		char caption[32];
+		snprintf(caption, 32, "ACT(\260C)/HIGH/%s",
 		         _xos->getResourceOrUseDefault( "coretempHighest", "100" ) );
 		const char *displayType = _xos->getResourceOrUseDefault("coretempDisplayType", "separate");
 		if (strncmp(displayType, "separate", 1) == 0) {

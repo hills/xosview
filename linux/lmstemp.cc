@@ -28,6 +28,7 @@ LmsTemp::LmsTemp( XOSView *parent, const char *name, const char *tempfile,
                   const char *caption, unsigned int nbr )
   : FieldMeter( parent, 3, label, caption, 1, 1, 0 ){
   metric_ = true;
+  _unit[0] = '\0';
   _nbr = nbr;
   _scale = 1.0;
   _isproc = false;
@@ -272,19 +273,62 @@ void LmsTemp::determineScale( void ){
   _scale = 1.0;
 }
 
+void LmsTemp::determineUnit( void ){
+  char type[16], subtype[32];
+  int n;
+  std::string basename = _tempfile.substr(_tempfile.find_last_of('/') + 1);
+  if ( sscanf(basename.c_str(), "%[a-z]%d_%s", type, &n, subtype) == 3 ) {
+    if ( !strncmp(type, "temp", strlen(type)) )
+      strncpy(_unit, "\260C", 4);
+    else if ( !strncmp(type, "in", strlen(type)) ||
+              !strncmp(subtype, "vid", strlen(type)) )
+      strncpy(_unit, "V", 4);
+    else if ( !strncmp(type, "fan", strlen(type)) )
+      strncpy(_unit, "RPM", 4);
+    else if ( !strncmp(type, "power", strlen(type)) ) {
+      if ( strncmp(subtype, "average_interval", strlen(type)) )
+        strncpy(_unit, "s", 4);
+      else
+        strncpy(_unit, "W", 4);
+    }
+    else if ( !strncmp(type, "energy", strlen(type)) )
+      strncpy(_unit, "J", 4);
+    else if ( !strncmp(type, "curr", strlen(type)) )
+      strncpy(_unit, "A", 4);
+    else if ( !strncmp(type, "humidity", strlen(type)) )
+      strncpy(_unit, "%", 4);
+  }
+}
+
 void LmsTemp::updateLegend( void ){
-  char l[16];
+  char l[32];
   if (_has_high) {
-    if (total_ < 10)
-      snprintf(l, 16, "ACT/%.1f/%.1f", _high, total_);
-    else
-      snprintf(l, 16, "ACT/%d/%d", (int)_high, (int)total_);
+    if (total_ < 10) {
+      if ( strlen(_unit) )
+        snprintf(l, 32, "ACT(%s)/%.1f/%.1f", _unit, _high, total_);
+      else
+        snprintf(l, 32, "ACT/%.1f/%.1f", _high, total_);
+    }
+    else {
+      if ( strlen(_unit) )
+        snprintf(l, 32, "ACT(%s)/%d/%d", _unit, (int)_high, (int)total_);
+      else
+        snprintf(l, 32, "ACT/%d/%d", (int)_high, (int)total_);
+    }
   }
   else {
-    if (total_ < 10)
-      snprintf(l, 16, "ACT/HIGH/%.1f", total_);
-    else
-      snprintf(l, 16, "ACT/HIGH/%d", (int)total_);
+    if (total_ < 10) {
+      if ( strlen(_unit) )
+        snprintf(l, 32, "ACT(%s)/HIGH/%.1f", _unit, total_);
+      else
+        snprintf(l, 32, "ACT/HIGH/%.1f", total_);
+    }
+    else {
+      if ( strlen(_unit) )
+        snprintf(l, 32, "ACT(%s)/HIGH/%d", _unit, (int)total_);
+      else
+        snprintf(l, 32, "ACT/HIGH/%d", (int)total_);
+    }
   }
   legend(l);
 }
@@ -330,6 +374,7 @@ void LmsTemp::checkResources( void ){
     _has_high = true;
 
   determineScale();
+  determineUnit();
   updateLegend();
 }
 

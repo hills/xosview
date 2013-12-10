@@ -76,7 +76,7 @@ void
 BSDGetCPUTemperature(float *temps, float *tjmax);
 
 void
-BSDGetSensor(const char *name, const char *valname, float *value);
+BSDGetSensor(const char *name, const char *valname, float *value, char *unit = NULL);
 
 bool
 BSDHasBattery();

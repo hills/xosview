@@ -57,14 +57,14 @@ void CoreTemp::checkResources( void ) {
 	if (total > 0.0)
 		total_ = total;
 
-	char l[16];
+	char l[32];
 	if (!high) {
 		high_ = total_;
-		snprintf(l, 16, "ACT/HIGH/%d", (int)total_);
+		snprintf(l, 32, "ACT(\260C)/HIGH/%d", (int)total_);
 	}
 	else {
 		high_ = atoi( high );
-		snprintf(l, 16, "ACT/%d/%d", (int)high_, (int)total_);
+		snprintf(l, 32, "ACT(\260C)/%d/%d", (int)high_, (int)total_);
 	}
 	legend(l);
 }

@@ -35,7 +35,9 @@ protected:
 private:
   void updateLegend( void );
   void determineScale( void );
+  void determineUnit( void );
   std::string _tempfile, _highfile, _lowfile;
+  char _unit[4];
   unsigned int _nbr;
   double _high, _low, _scale;
   bool _isproc, _has_high, _name_found, _temp_found, _high_found, _low_found;

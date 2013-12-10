@@ -144,7 +144,7 @@ void ACPITemp::getacpitemp( void ) {
     if (high > total_)
       total_ = 10 * (int)((high * 1.25) / 10);
     _high = high;
-    snprintf(l, 16, "ACT/%d/%d", (int)high, (int)total_);
+    snprintf(l, 16, "ACT(\260C)/%d/%d", (int)high, (int)total_);
     legend(l);
     do_legend = true;
   }
