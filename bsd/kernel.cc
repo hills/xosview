@@ -1697,7 +1697,7 @@ BSDGetBatteryInfo(int *remaining, unsigned int *state) {
 			err(EX_IOERR, "failed to get APM battery info");
 		if ( close(fd) == -1 )
 			err(EX_OSERR, "Could not close %s", APMDEV);
-		if (0 <= aip.ai_batt_life && aip.ai_batt_life <= 100)
+		if (aip.ai_batt_life <= 100)
 			*remaining = aip.ai_batt_life; // only 0-100 are valid values
 		else
 			*remaining = 0;

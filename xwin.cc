@@ -367,7 +367,7 @@ const char *XWin::getResource( const char *name ){
     std::cerr << "Error:  Couldn't find '" << name << "' resource in the resource database!\n";
     exit (-1);
       /*  Some compilers aren't smart enough to know that exit() exits.  */
-    return '\0';
+    return NULL;
   }
 }
 

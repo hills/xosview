@@ -163,7 +163,7 @@ void NFSStats::checkResources( void ){
 void NFSStats::checkevent(void)
 {
 	char buf[4096], name[64];
-	unsigned long calls, retrns, authrefresh, maxpackets_;
+	unsigned long calls = 0, retrns = 0, authrefresh = 0, maxpackets_;
 
     std::ifstream ifs(_statfile);
 
