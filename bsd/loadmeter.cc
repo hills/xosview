@@ -21,6 +21,7 @@
 
 LoadMeter::LoadMeter( XOSView *parent )
 	: FieldMeterGraph( parent, 2, "LOAD", "PROCS/MIN", 1, 1, 0 ) {
+	total_ = -1.0;
 }
 
 LoadMeter::~LoadMeter( void ) {
