@@ -134,15 +134,32 @@ void CoreTemp::checkResources( void ) {
     else
       total_ = atoi(parent_->getResourceOrUseDefault("coretempHighest", "100"));
 
-    const char *high = parent_->getResourceOrUseDefault("coretempHigh", NULL);
+    // Use tTarget (when maximum cooling needs to be turned on) as high, if found.
+    // On older Cores this MSR is empty and kernel sets this equal to tjMax.
+    // This is the same for all cores in package.
+    // Not found on k8temp. On k10temp this is fixed value.
     char l[32];
-    if (high) {
-      _high = atoi(high);
+    std::string ttarget = _cpus.front();
+    ttarget.replace(ttarget.find_last_of('_'), 6, "_max");
+    file.open(ttarget.c_str());
+    if (file) {
+      file >> _high;
+      file.close();
+      _high /= 1000.0;
       snprintf(l, 32, "ACT(\260C)/%d/%d", (int)_high, (int)total_);
     }
-    else {
+    else
       _high = total_;
-      snprintf(l, 32, "ACT(\260C)/HIGH/%d", (int)total_);
+
+    if (_high == total_) {  // No tTarget
+      // Use user-defined high, or "no high".
+      const char *high = parent_->getResourceOrUseDefault("coretempHigh", NULL);
+      if (high) {
+        _high = atoi(high);
+        snprintf(l, 32, "ACT(\260C)/%d/%d", (int)_high, (int)total_);
+      }
+      else
+        snprintf(l, 32, "ACT(\260C)/HIGH/%d", (int)total_);
     }
     legend(l);
     closedir(dir);
@@ -159,10 +176,8 @@ void CoreTemp::checkevent( void ) {
 
 void CoreTemp::getcoretemp( void ) {
   std::ifstream file;
-  double dummy, high;
-
+  double dummy;
   fields_[0] = 0.0;
-  high = 0.0;
 
   if (_cpu >= 0) {  // only one core
     file.open(_cpus.back().c_str());
@@ -208,24 +223,9 @@ void CoreTemp::getcoretemp( void ) {
     return;
   }
 
-  // Use tCase (when maximum cooling needs to be turned on) as high, if found.
-  // Not found on k8temp, which uses user defined total as high (or default 100).
-  // This is the same for all cores in package. I don't know if this ever
-  // changes in real world, so it could be read once in checkResources().
-  std::string tcase = _cpus.front();
-  tcase.replace(tcase.find_last_of('_'), 6, "_max");
-  file.open(tcase.c_str());
-  if (file) {
-    file >> high;
-    file.close();
-    high /= 1000.0;
-  }
-  else
-    high = _high;
-
   fields_[0] /= 1000.0;
 
-  fields_[1] = high - fields_[0];
+  fields_[1] = _high - fields_[0];
   if (fields_[1] < 0) { // alarm: T > high
     fields_[1] = 0;
     if (colors_[0] != _highcolor) {
@@ -245,14 +245,6 @@ void CoreTemp::getcoretemp( void ) {
     fields_[2] = 0;
 
   setUsed( fields_[0], total_ );
-
-  if (high != _high) {
-    char l[32];
-    _high = high;
-    snprintf(l, 32, "ACT(\260C)/%d/%d", (int)high, (int)total_);
-    legend(l);
-    drawlegend();
-  }
 }
 
 /* Count sensors available to coretemp in the given package. */
