@@ -227,11 +227,14 @@ void FieldMeter::drawused( int manditory ){
         scaled_used = used_/(1UL<<20);
     }
     else if (used_ >= 999.5){
-      scale='K';
-      if (metric_)
+      if (metric_) {
+        scale='k';
         scaled_used = used_/1e3;
-      else
+      }
+      else {
+        scale='K';
         scaled_used = used_/(1UL<<10);
+      }
     }
     else {
       scale='\0';
