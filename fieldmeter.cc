@@ -146,6 +146,8 @@ void FieldMeter::drawlegend( void ){
   for ( int i = 0 ; i < numfields_ ; i++ ){
     n = 0;
     while ( (*tmp2 != '/') && (*tmp2 != '\0') ){
+      if ( (*tmp2 == '\\') && (*(tmp2 + 1) == '/') ) // allow '/' in field as '\/'
+        memmove( tmp2, tmp2 + 1, strlen(tmp2) );
       tmp2++;
       n++;
     }
