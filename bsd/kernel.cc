@@ -1318,34 +1318,44 @@ BSDGetSensor(const char *name, const char *valname, float *value, char *unit) {
 		if ( strncmp(type, "Temperature", 4) == 0 ) {
 			*value = (val / 1000000.0) - 273.15;  // temperatures are in microkelvins
 			if (unit)
-				strncpy(unit, "\260C", 4);
+				strcpy(unit, "\260C");
 		}
 		else if ( strncmp(type, "Fan", 3) == 0 ) {
 			*value = (float)val;                  // plain integer value
 			if (unit)
-				strncpy(unit, "RPM", 4);
+				strcpy(unit, "RPM");
 		}
 		else if ( strncmp(type, "Integer", 3) == 0 )
 			*value = (float)val;                  // plain integer value
 		else if ( strncmp(type, "Voltage", 4) == 0 ) {
 			*value = (float)val / 1000000.0;      // electrical units are in micro{V,A,W,Ohm}
 			if (unit)
-				strncpy(unit, "V", 4);
+				strcpy(unit, "V");
 		}
-		else if ( strncmp(type, "Ampere", 4) == 0 ) {
+		else if ( strncmp(type, "Ampere hour", 7) == 0 ) {
 			*value = (float)val / 1000000.0;      // electrical units are in micro{V,A,W,Ohm}
 			if (unit)
-				strncpy(unit, "A", 4);
+				strcpy(unit, "Ah");
 		}
-		else if ( strncmp(type, "Watt", 4) == 0 ) {
+		else if ( strncmp(type, "Ampere", 7) == 0 ) {
 			*value = (float)val / 1000000.0;      // electrical units are in micro{V,A,W,Ohm}
 			if (unit)
-				strncpy(unit, "W", 4);
+				strcpy(unit, "A");
+		}
+		else if ( strncmp(type, "Watt hour", 5) == 0 ) {
+			*value = (float)val / 1000000.0;      // electrical units are in micro{V,A,W,Ohm}
+			if (unit)
+				strcpy(unit, "Wh");
+		}
+		else if ( strncmp(type, "Watts", 5) == 0 ) {
+			*value = (float)val / 1000000.0;      // electrical units are in micro{V,A,W,Ohm}
+			if (unit)
+				strcpy(unit, "W");
 		}
 		else if ( strncmp(type, "Ohms", 4) == 0 ) {
 			*value = (float)val / 1000000.0;      // electrical units are in micro{V,A,W,Ohm}
 			if (unit)
-				strncpy(unit, "Ohm", 4);
+				strcpy(unit, "Ohm");
 		}
 	}
 	prop_object_iterator_release(piter);
@@ -1365,7 +1375,7 @@ BSDGetSensor(const char *name, const char *valname, float *value, char *unit) {
 			err(EX_OSERR, "sysctl %s failed", dummy);
 		*value = ((float)val - 2732.0) / 10.0;
 		if (unit)
-			strncpy(unit, "\260C", 4);
+			strcpy(unit, "\260C");
 		return;
 	}
 	// If Dragonfly and tzN specified, return. Otherwise, fall through.
@@ -1412,80 +1422,96 @@ BSDGetSensor(const char *name, const char *valname, float *value, char *unit) {
 				case SENSOR_TEMP:
 					*value = (float)(s.value - 273150000) / 1000000.0;
 					if (unit)
-						strncpy(unit, "\260C", 4);
+						strcpy(unit, "\260C");
 					break;
 				case SENSOR_FANRPM:
 					*value = (float)s.value;
 					if (unit)
-						strncpy(unit, "RPM", 4);
-					break;
-				case SENSOR_OHMS:
-					*value = (float)s.value;
-					if (unit)
-						strncpy(unit, "Ohm", 4);
-					break;
-				case SENSOR_INDICATOR:
-				case SENSOR_INTEGER:
-					*value = (float)s.value;
+						strcpy(unit, "RPM");
 					break;
 				case SENSOR_VOLTS_DC:
 				case SENSOR_VOLTS_AC:
 					*value = (float)s.value / 1000000.0;
 					if (unit)
-						strncpy(unit, "V", 4);
+						strcpy(unit, "V");
+					break;
+				case SENSOR_OHMS:
+					*value = (float)s.value;
+					if (unit)
+						strcpy(unit, "Ohm");
 					break;
 				case SENSOR_WATTS:
 					*value = (float)s.value / 1000000.0;
 					if (unit)
-						strncpy(unit, "W", 4);
+						strcpy(unit, "W");
 					break;
 				case SENSOR_AMPS:
 					*value = (float)s.value / 1000000.0;
 					if (unit)
-						strncpy(unit, "A", 4);
+						strcpy(unit, "A");
 					break;
 				case SENSOR_WATTHOUR:
 					*value = (float)s.value / 1000000.0;
 					if (unit)
-						strncpy(unit, "Wh", 4);
+						strcpy(unit, "Wh");
 					break;
 				case SENSOR_AMPHOUR:
 					*value = (float)s.value / 1000000.0;
 					if (unit)
-						strncpy(unit, "Ah", 4);
+						strcpy(unit, "Ah");
+					break;
+				case SENSOR_PERCENT:
+					*value = (float)s.value / 1000.0;
+					if (unit)
+						strcpy(unit, "%");
 					break;
 				case SENSOR_LUX:
 					*value = (float)s.value / 1000000.0;
 					if (unit)
-						strncpy(unit, "lx", 4);
-					break;
-#if defined(XOSVIEW_OPENBSD)
-				case SENSOR_FREQ:
-					*value = (float)s.value / 1000000.0;
-					if (unit)
-						strncpy(unit, "Hz", 4);
-					break;
-				case SENSOR_ANGLE:
-					*value = (float)s.value / 1000000.0;
-					if (unit)
-						strncpy(unit, "\260", 4);
-					break;
-				case SENSOR_HUMIDITY:
-					*value = (float)s.value / 1000.0;
-					if (unit)
-						strncpy(unit, "%", 4);
-					break;
-#endif
-				case SENSOR_PERCENT:
-					*value = (float)s.value / 1000.0;
-					if (unit)
-						strncpy(unit, "%", 4);
+						strcpy(unit, "lx");
 					break;
 				case SENSOR_TIMEDELTA:
 					*value = (float)s.value / 1000000000.0;
 					if (unit)
-						strncpy(unit, "s", 4);
+						strcpy(unit, "s");
 					break;
+#if defined(XOSVIEW_OPENBSD)
+				case SENSOR_HUMIDITY:
+					*value = (float)s.value / 1000.0;
+					if (unit)
+						strcpy(unit, "%");
+					break;
+				case SENSOR_FREQ:
+					*value = (float)s.value / 1000000.0;
+					if (unit)
+						strcpy(unit, "Hz");
+					break;
+				case SENSOR_ANGLE:
+					*value = (float)s.value / 1000000.0;
+					if (unit)
+						strcpy(unit, "\260");
+					break;
+#if OpenBSD > 201211
+				case SENSOR_DISTANCE:
+					*value = (float)s.value / 1000000.0;
+					if (unit)
+						strcpy(unit, "m");
+					break;
+				case SENSOR_PRESSURE:
+					*value = (float)s.value / 1000.0;
+					if (unit)
+						strcpy(unit, "Pa");
+					break;
+				case SENSOR_ACCEL:
+					*value = (float)s.value / 1000000.0;
+					if (unit)
+						strcpy(unit, "m\\/s\262"); // m/s²
+					break;
+#endif
+#endif
+				case SENSOR_INDICATOR:
+				case SENSOR_INTEGER:
+				case SENSOR_DRIVE:
 				default:
 					*value = (float)s.value;
 					break;
