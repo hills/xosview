@@ -151,31 +151,36 @@ void MeterMaker::makeMeters(void){
 
   // Check for the Intel Core temperature meter
   if (_xos->isResourceTrue("coretemp")) {
-    char caption[32];
+    char caption[32], name[8] = "CPU";
+    unsigned int cpuCount = 0, coreCount, pkg;
     snprintf(caption, 32, "ACT(\260C)/HIGH/%s",
              _xos->getResourceOrUseDefault( "coretempHighest", "100" ) );
     const char *displayType = _xos->getResourceOrUseDefault( "coretempDisplayType", "separate" );
-    for (uint i = 1 ; ; i++) {
-      char s[32];
-      snprintf(s, 32, "coretemp%dPackage", i);
-      const char *dummy = _xos->getResourceOrUseDefault(s, NULL);
-      if (i > 1 && ( !dummy || !*dummy ))
+    // First count all available cpus.
+    for (pkg = 0 ; ; pkg++) {
+      if ( (coreCount = CoreTemp::countCpus(pkg)) == 0)
         break;
-      int pkg = ( dummy ? atoi(dummy) : 0 );
-      snprintf(s, 32, "coretemp%dDisplayType", i);
-      displayType = _xos->getResourceOrUseDefault( s, displayType );
-      if (strncmp(displayType, "separate", 1) == 0) {
-        unsigned int cpuCount = CoreTemp::countCpus(pkg);
-        char name[8];
-        for (uint cpu = 0; cpu < cpuCount; cpu++) {
+      cpuCount += coreCount;
+    }
+    for (pkg = 0 ; cpuCount > 0 ; pkg++) {
+      if ( (coreCount = CoreTemp::countCpus(pkg)) == 0)
+        break;
+      if ( strncmp(displayType, "separate", 1) == 0 ) {
+        for (uint cpu = 0; cpu < coreCount; cpu++) {
           snprintf(name, 8, "CPU%d", cpu);
           push(new CoreTemp(_xos, name, caption, pkg, cpu));
         }
       }
-      else if (strncmp(displayType, "average", 1) == 0)
-        push(new CoreTemp(_xos, "CPU", caption, pkg, -1));
-      else if (strncmp(displayType, "maximum", 1) == 0)
+      else if (strncmp(displayType, "average", 1) == 0) {
+        if (coreCount != cpuCount)
+          snprintf(name, 8, "CPU%d", pkg);
+        push(new CoreTemp(_xos, name, caption, pkg, -1));
+      }
+      else if (strncmp(displayType, "maximum", 1) == 0) {
+        if (coreCount != cpuCount)
+          snprintf(name, 8, "CPU%d", pkg);
         push(new CoreTemp(_xos, "CPU", caption, pkg, -2));
+      }
       else {
         std::cerr << "Unknown value of coretempDisplayType: " << displayType << std::endl;
         std::cerr << "Supported types are: separate, average and maximum." << std::endl;

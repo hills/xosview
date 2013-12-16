@@ -68,7 +68,7 @@ void MeterMaker::makeMeters(void) {
 	if ( _xos->isResourceTrue("battery") && BSDHasBattery() )
 		push(new BtryMeter(_xos));
 
-	if ( _xos->isResourceTrue("coretemp") ) {
+	if ( _xos->isResourceTrue("coretemp") && CoreTemp::countCpus() > 0 ) {
 		char caption[32];
 		snprintf(caption, 32, "ACT(\260C)/HIGH/%s",
 		         _xos->getResourceOrUseDefault( "coretempHighest", "100" ) );
