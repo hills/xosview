@@ -258,7 +258,7 @@ unsigned int CoreTemp::countCpus(int pkg)
   std::ifstream file;
 
   snprintf(s, PATH_SIZE, "%s.%d", SYS_CORETEMP, pkg);
-  if (stat(s, &sbuf) == 0) {
+  if ( stat(s, &sbuf) == 0 && S_ISDIR(sbuf.st_mode) ) {
     strncat(s, "/temp*_label", PATH_SIZE - strlen(s) - 1);
     glob(s, 0, NULL, &gbuf);
     // loop through paths in gbuf and check if it is a core or package
@@ -286,19 +286,19 @@ unsigned int CoreTemp::countCpus(int pkg)
 
       snprintf(s, PATH_SIZE, "%s/%s/device/name", SYS_HWMON, dent->d_name);
       file.open(s);
-      file >> dummy;
-      file.close();
-      if ( strncmp(dummy.c_str(), "k8temp", 6) == 0 ||
-           strncmp(dummy.c_str(), "k10temp", 7) == 0 ) {
-        snprintf(s, PATH_SIZE, "%s/%s/device/temp*_input", SYS_HWMON, dent->d_name);
-        break;
+      if (file.good()) {
+        file >> dummy;
+        file.close();
+        if ( strncmp(dummy.c_str(), "k8temp", 6) == 0 ||
+             strncmp(dummy.c_str(), "k10temp", 7) == 0 ) {
+          snprintf(s, PATH_SIZE, "%s/%s/device/temp*_input", SYS_HWMON, dent->d_name);
+          glob(s, 0, NULL, &gbuf);
+          count += gbuf.gl_pathc;
+          globfree(&gbuf);
+        }
       }
     }
     closedir(dir);
-
-    glob(s, 0, NULL, &gbuf);
-    count = gbuf.gl_pathc;
-    globfree(&gbuf);
   }
   return count;
 }
