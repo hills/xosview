@@ -37,6 +37,7 @@ OBJS = Host.o \
 # Optional platform type
 
 ifeq ($(PLATFORM), linux)
+ARCH = $(shell uname -m)
 OBJS += linux/MeterMaker.o \
 	linux/btrymeter.o \
 	linux/cpumeter.o \
@@ -52,12 +53,15 @@ OBJS += linux/MeterMaker.o \
 	linux/serialmeter.o \
 	linux/swapmeter.o \
 	linux/wirelessmeter.o \
-	linux/acpitemp.o \
-	linux/coretemp.o
+	linux/acpitemp.o
+ifeq ($(findstring 86,$(ARCH)),86)
+OBJS += linux/coretemp.o
+endif
 CPPFLAGS += -Ilinux/
 endif
 
 ifeq ($(PLATFORM), bsd)
+ARCH = $(shell uname -m)
 OBJS += bsd/MeterMaker.o \
         bsd/btrymeter.o \
         bsd/cpumeter.o \
@@ -70,8 +74,10 @@ OBJS += bsd/MeterMaker.o \
         bsd/netmeter.o \
         bsd/pagemeter.o \
         bsd/swapmeter.o \
-        bsd/coretemp.o \
         bsd/sensor.o
+ifeq ($(ARCH),$(filter $(ARCH),i386 amd64 x86_64))
+OBJS += bsd/coretemp.o
+endif
 CPPFLAGS += -Ibsd/
 endif
 

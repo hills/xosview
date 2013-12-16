@@ -72,8 +72,10 @@ BSDGetIntrStats(unsigned long *intrCount, unsigned int *intrNbrs);
 int
 BSDCountCpus(void);
 
+#if defined(__i386__) || defined(__x86_64)
 unsigned int
 BSDGetCPUTemperature(float *temps, float *tjmax);
+#endif
 
 void
 BSDGetSensor(const char *name, const char *valname, float *value, char *unit = NULL);

@@ -22,7 +22,9 @@
 #include "raidmeter.h"
 #include "lmstemp.h"
 #include "acpitemp.h"
+#if defined(__i386__) || defined(__x86_64__)
 #include "coretemp.h"
+#endif
 #include "nfsmeter.h"
 
 #include <stdlib.h>
@@ -149,6 +151,7 @@ void MeterMaker::makeMeters(void){
   if (_xos->isResourceTrue("battery") && BtryMeter::has_source())
     push(new BtryMeter(_xos));
 
+#if defined(__i386__) || defined(__x86_64__)
   // Check for the Intel Core temperature meter
   if (_xos->isResourceTrue("coretemp")) {
     char caption[32], name[8] = "CPU";
@@ -188,6 +191,7 @@ void MeterMaker::makeMeters(void){
       }
     }
   }
+#endif
 
   // check for the LmsTemp meter
   if (_xos->isResourceTrue("lmstemp")){

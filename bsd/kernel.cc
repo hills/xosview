@@ -1132,6 +1132,7 @@ BSDCountCpus(void) {
 	return cpus;
 }
 
+#if defined(__i386__) || defined(__x86_64__)
 unsigned int
 BSDGetCPUTemperature(float *temps, float *tjmax) {
 	unsigned int nbr = 0;
@@ -1268,6 +1269,7 @@ BSDGetCPUTemperature(float *temps, float *tjmax) {
 #endif
 	return nbr;
 }
+#endif
 
 void
 BSDGetSensor(const char *name, const char *valname, float *value, char *unit) {

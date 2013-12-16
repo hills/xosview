@@ -28,7 +28,9 @@
 #include "pagemeter.h"
 #include "intmeter.h"
 #include "intratemeter.h"
+#if defined(__i386__) || defined(__x86_64__)
 #include "coretemp.h"
+#endif
 #include "sensor.h"
 
 
@@ -68,6 +70,7 @@ void MeterMaker::makeMeters(void) {
 	if ( _xos->isResourceTrue("battery") && BSDHasBattery() )
 		push(new BtryMeter(_xos));
 
+#if defined(__i386__) || defined(__x86_64__)
 	if ( _xos->isResourceTrue("coretemp") && CoreTemp::countCpus() > 0 ) {
 		char caption[32];
 		snprintf(caption, 32, "ACT(\260C)/HIGH/%s",
@@ -89,6 +92,7 @@ void MeterMaker::makeMeters(void) {
 			_xos->done(1);
 		}
 	}
+#endif
 
 	if ( _xos->isResourceTrue("bsdsensor") ) {
 		char caption[16], l[8], s[16];
