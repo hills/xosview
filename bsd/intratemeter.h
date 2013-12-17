@@ -24,7 +24,7 @@ public:
 	void checkResources( void );
 
 private:
-	unsigned long *irqs_, *lastirqs_;
+	uint64_t *irqs_, *lastirqs_;
 	unsigned int irqcount_;
 
 protected:

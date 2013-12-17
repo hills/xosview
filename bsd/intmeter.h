@@ -22,7 +22,7 @@ public:
 	void checkResources( void );
 
 private:
-	unsigned long *irqs_, *lastirqs_;
+	uint64_t *irqs_, *lastirqs_;
 	unsigned int *inbrs_;
 	unsigned int irqcount_;
 	std::map<int,int> realintnum_;

@@ -16,8 +16,8 @@ IntMeter::IntMeter( XOSView *parent, const char *, const char *, int dolegends, 
 	if (!BSDIntrInit())
 		disableMeter();
 	irqcount_ = BSDNumInts();
-	irqs_ = (unsigned long *)calloc(irqcount_ + 1, sizeof(long));
-	lastirqs_ = (unsigned long *)calloc(irqcount_ + 1, sizeof(long));
+	irqs_ = (uint64_t *)calloc(irqcount_ + 1, sizeof(uint64_t));
+	lastirqs_ = (uint64_t *)calloc(irqcount_ + 1, sizeof(uint64_t));
 	inbrs_ = (unsigned int *)calloc(irqcount_ + 1, sizeof(int));
 	updateirqcount(true);
 }

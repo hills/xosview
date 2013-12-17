@@ -51,7 +51,7 @@ void CPUMeter::checkevent( void ) {
 
 void CPUMeter::getcputime( void ) {
 #if defined(XOSVIEW_NETBSD) || defined(XOSVIEW_DFBSD)
-	u_int64_t tempCPU[CPUSTATES];
+	uint64_t tempCPU[CPUSTATES];
 #else
 	long tempCPU[CPUSTATES];
 #endif

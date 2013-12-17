@@ -22,7 +22,7 @@
 
 class NetMeter : public FieldMeterGraph {
 public:
-	NetMeter( XOSView *parent, float max );
+	NetMeter( XOSView *parent, double max );
 	~NetMeter( void );
 
 	const char *name( void ) const { return "NetMeter"; }
@@ -33,8 +33,8 @@ protected:
 	void getstats(void);
 
 private:
-	unsigned long long lastBytesIn_, lastBytesOut_;
-	float netBandwidth_;
+	uint64_t lastBytesIn_, lastBytesOut_;
+	double netBandwidth_;
 	std::string netIface_;
 	bool ignored_;
 };

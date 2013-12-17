@@ -38,7 +38,11 @@ protected:
 	void getcputime( void );
 
 private:
+#if defined(XOSVIEW_NETBSD) || defined(XOSVIEW_DFBSD)
+	uint64_t cputime_[2][CPUSTATES];
+#else
 	long cputime_[2][CPUSTATES];
+#endif
 	int cpuindex_;
 };
 

@@ -178,7 +178,7 @@ static char kernelFileName[_POSIX2_LINE_MAX];
 //  Since this is C++, it's an inline function rather than a macro.
 
 static inline void
-safe_kvm_read(u_long kernel_addr, void* user_addr, size_t nbytes) {
+safe_kvm_read(unsigned long kernel_addr, void* user_addr, size_t nbytes) {
 	/*  Check for obvious bad symbols (i.e., from /netbsd when we
 	 *  booted off of /netbsd.old), such as symbols that reference
 	 *  0x00000000 (or anywhere in the first 256 bytes of memory).  */
@@ -308,7 +308,7 @@ BSDPageInit() {
 /* meminfo[5]  = { active, inactive, wired, cached, free } */
 /* pageinfo[2] = { pages_in, pages_out }                   */
 void
-BSDGetPageStats(u_int64_t *meminfo, u_int64_t *pageinfo) {
+BSDGetPageStats(uint64_t *meminfo, uint64_t *pageinfo) {
 #if defined(HAVE_UVM)
 #ifdef VM_UVMEXP2
 	struct uvmexp_sysctl uvm;
@@ -321,18 +321,18 @@ BSDGetPageStats(u_int64_t *meminfo, u_int64_t *pageinfo) {
 
 	if (meminfo) {
 		// UVM excludes kernel memory -> assume it is active mem
-		meminfo[0] = (u_int64_t)(uvm.npages - uvm.inactive - uvm.wired - uvm.free) * uvm.pagesize;
-		meminfo[1] = (u_int64_t)uvm.inactive * uvm.pagesize;
-		meminfo[2] = (u_int64_t)uvm.wired * uvm.pagesize;
+		meminfo[0] = (uint64_t)(uvm.npages - uvm.inactive - uvm.wired - uvm.free) * uvm.pagesize;
+		meminfo[1] = (uint64_t)uvm.inactive * uvm.pagesize;
+		meminfo[2] = (uint64_t)uvm.wired * uvm.pagesize;
 
 		// cache is already included in active and inactive memory and
 		// there's no way to know how much is in which -> disable cache
 		meminfo[3] = 0;
-		meminfo[4] = (u_int64_t)uvm.free * uvm.pagesize;
+		meminfo[4] = (uint64_t)uvm.free * uvm.pagesize;
 	}
 	if (pageinfo) {
-		pageinfo[0] = (u_int64_t)uvm.pgswapin;
-		pageinfo[1] = (u_int64_t)uvm.pgswapout;
+		pageinfo[0] = (uint64_t)uvm.pgswapin;
+		pageinfo[1] = (uint64_t)uvm.pgswapout;
 	}
 #else  /* HAVE_UVM */
 	struct vmmeter vm;
@@ -349,22 +349,22 @@ BSDGetPageStats(u_int64_t *meminfo, u_int64_t *pageinfo) {
 #endif
 	if (meminfo) {
 #if defined(XOSVIEW_FREEBSD)
-		meminfo[0] = (u_int64_t)vm.v_active_count * vm.v_page_size;
-		meminfo[1] = (u_int64_t)vm.v_inactive_count * vm.v_page_size;
-		meminfo[2] = (u_int64_t)vm.v_wire_count * vm.v_page_size;
-		meminfo[3] = (u_int64_t)vm.v_cache_count * vm.v_page_size;
-		meminfo[4] = (u_int64_t)vm.v_free_count * vm.v_page_size;
+		meminfo[0] = (uint64_t)vm.v_active_count * vm.v_page_size;
+		meminfo[1] = (uint64_t)vm.v_inactive_count * vm.v_page_size;
+		meminfo[2] = (uint64_t)vm.v_wire_count * vm.v_page_size;
+		meminfo[3] = (uint64_t)vm.v_cache_count * vm.v_page_size;
+		meminfo[4] = (uint64_t)vm.v_free_count * vm.v_page_size;
 #else  /* XOSVIEW_DFBSD */
-		meminfo[0] = (u_int64_t)vms.v_active_count * vms.v_page_size;
-		meminfo[1] = (u_int64_t)vms.v_inactive_count * vms.v_page_size;
-		meminfo[2] = (u_int64_t)vms.v_wire_count * vms.v_page_size;
-		meminfo[3] = (u_int64_t)vms.v_cache_count * vms.v_page_size;
-		meminfo[4] = (u_int64_t)vms.v_free_count * vms.v_page_size;
+		meminfo[0] = (uint64_t)vms.v_active_count * vms.v_page_size;
+		meminfo[1] = (uint64_t)vms.v_inactive_count * vms.v_page_size;
+		meminfo[2] = (uint64_t)vms.v_wire_count * vms.v_page_size;
+		meminfo[3] = (uint64_t)vms.v_cache_count * vms.v_page_size;
+		meminfo[4] = (uint64_t)vms.v_free_count * vms.v_page_size;
 #endif
 	}
 	if (pageinfo) {
-		pageinfo[0] = (u_int64_t)vm.v_vnodepgsin + (u_int64_t)vm.v_swappgsin;
-		pageinfo[1] = (u_int64_t)vm.v_vnodepgsout + (u_int64_t)vm.v_swappgsout;
+		pageinfo[0] = (uint64_t)vm.v_vnodepgsin + (uint64_t)vm.v_swappgsin;
+		pageinfo[1] = (uint64_t)vm.v_vnodepgsout + (uint64_t)vm.v_swappgsout;
 	}
 #endif
 }
@@ -379,7 +379,7 @@ BSDCPUInit() {
 
 void
 #if defined(XOSVIEW_NETBSD) || defined(XOSVIEW_DFBSD)
-BSDGetCPUTimes(u_int64_t *timeArray) {
+BSDGetCPUTimes(uint64_t *timeArray) {
 #else
 BSDGetCPUTimes(long *timeArray) {
 #endif
@@ -429,7 +429,7 @@ BSDNetInit() {
 }
 
 void
-BSDGetNetInOut(unsigned long long *inbytes, unsigned long long *outbytes, const char *netIface, bool ignored) {
+BSDGetNetInOut(uint64_t *inbytes, uint64_t *outbytes, const char *netIface, bool ignored) {
 	char ifname[IFNAMSIZ];
 	*inbytes = 0;
 	*outbytes = 0;
@@ -482,7 +482,7 @@ BSDGetNetInOut(unsigned long long *inbytes, unsigned long long *outbytes, const 
 	while (ifnetp) {
 		bool skipif = false;
 		//  Now, dereference the pointer to get the ifnet struct.
-		safe_kvm_read((u_long)ifnetp, &ifnet, sizeof(ifnet));
+		safe_kvm_read((unsigned long)ifnetp, &ifnet, sizeof(ifnet));
 		strlcpy(ifname, ifnet.if_xname, sizeof(ifname));
 #if defined(XOSVIEW_NETBSD)
 		ifnetp = TAILQ_NEXT(&ifnet, if_list);
@@ -502,7 +502,7 @@ BSDGetNetInOut(unsigned long long *inbytes, unsigned long long *outbytes, const 
 			struct ifdata_pcpu ifdata;
 			int ncpus = BSDCountCpus();
 			for (int cpu = 0; cpu < ncpus; cpu++) {
-				safe_kvm_read((u_long)ifdatap + cpu * sizeof(ifdata),
+				safe_kvm_read((unsigned long)ifdatap + cpu * sizeof(ifdata),
 				              &ifdata, sizeof(ifdata));
 				*inbytes  += ifdata.ifd_ibytes;
 				*outbytes += ifdata.ifd_obytes;
@@ -526,7 +526,7 @@ BSDSwapInit() {
 }
 
 void
-BSDGetSwapInfo(u_int64_t *total, u_int64_t *used) {
+BSDGetSwapInfo(uint64_t *total, uint64_t *used) {
 #if defined(HAVE_SWAPCTL)
 	//  This code is based on a patch sent in by Scott Stevens
 	//  (s.k.stevens@ic.ac.uk, at the time).
@@ -549,8 +549,8 @@ BSDGetSwapInfo(u_int64_t *total, u_int64_t *used) {
 	swapiter = sep;
 	bsize = 512;  // block size is that of underlying device, *usually* 512 bytes
 	for ( ; rnswap-- > 0; swapiter++) {
-		*total += (u_int64_t)swapiter->se_nblks * bsize;
-		*used += (u_int64_t)swapiter->se_inuse * bsize;
+		*total += (uint64_t)swapiter->se_nblks * bsize;
+		*used += (uint64_t)swapiter->se_inuse * bsize;
 	}
 	free(sep);
 #else
@@ -560,8 +560,8 @@ BSDGetSwapInfo(u_int64_t *total, u_int64_t *used) {
 	if ( kvm_getswapinfo(kd, &kswap, 1, 0) )
 		err(EX_OSERR, "BSDGetSwapInfo(): kvm_getswapinfo failed");
 
-	*total = (u_int64_t)kswap.ksw_total * pgsize;
-	*used = (u_int64_t)kswap.ksw_used * pgsize;
+	*total = (uint64_t)kswap.ksw_total * pgsize;
+	*used = (uint64_t)kswap.ksw_used * pgsize;
 #endif
 }
 
@@ -670,11 +670,11 @@ DevStat_Init(void) {
 	}
 }
 
-u_int64_t
-DevStat_Get(u_int64_t *read_bytes, u_int64_t *write_bytes) {
+uint64_t
+DevStat_Get(uint64_t *read_bytes, uint64_t *write_bytes) {
 	register int dn;
 	long double busy_seconds;
-	u_int64_t reads, writes, total_bytes = 0;
+	uint64_t reads, writes, total_bytes = 0;
 	struct devinfo *tmp_dinfo;
 
 	if (nodisk > 0)
@@ -798,8 +798,8 @@ BSDDiskInit() {
 	return 1;
 }
 
-u_int64_t
-BSDGetDiskXFerBytes(u_int64_t *read_bytes, u_int64_t *write_bytes) {
+uint64_t
+BSDGetDiskXFerBytes(uint64_t *read_bytes, uint64_t *write_bytes) {
 #if defined(HAVE_DEVSTAT)
 	return DevStat_Get(read_bytes, write_bytes);
 #else
@@ -836,7 +836,7 @@ BSDGetDiskXFerBytes(u_int64_t *read_bytes, u_int64_t *write_bytes) {
 	safe_kvm_read_symbol(DISKLIST_SYM_INDEX, &kvmdisklist, sizeof(kvmdisklist));
 	kvmdiskptr = TAILQ_FIRST(&kvmdisklist);
 	while (kvmdiskptr != NULL) {
-		safe_kvm_read((u_long)kvmdiskptr, &kvmcurrdisk, sizeof(kvmcurrdisk));
+		safe_kvm_read((unsigned long)kvmdiskptr, &kvmcurrdisk, sizeof(kvmcurrdisk));
 		*read_bytes += kvmcurrdisk.dk_rbytes;
 		*write_bytes += kvmcurrdisk.dk_wbytes;
 		kvmdiskptr = TAILQ_NEXT(&kvmcurrdisk, dk_link);
@@ -855,7 +855,7 @@ BSDIntrInit() {
 	// Make sure the intr counter array is nonzero in size.
 #if defined(XOSVIEW_FREEBSD)
 # if __FreeBSD_version >= 900040
-	int nintr;
+	size_t nintr;
 	safe_kvm_read(nlst[EINTRCNT_SYM_INDEX].n_value, &nintr, sizeof(nintr));
 	return ValidSymbol(INTRCNT_SYM_INDEX) && ValidSymbol(EINTRCNT_SYM_INDEX) && (nintr > 0);
 # else
@@ -872,8 +872,7 @@ BSDNumInts() {
 	/* This code is stolen from vmstat. */
 	int count = 0, nbr = 0;
 #if defined(XOSVIEW_FREEBSD)
-	int nintr = 0;
-	size_t inamlen;
+	size_t inamlen, nintr;
 	char *intrnames, *intrs;
 
 # if __FreeBSD_version >= 900040
@@ -888,13 +887,13 @@ BSDNumInts() {
 		return 0;
 	}
 
-	intrnames = intrs = (char *)malloc((size_t)inamlen);
+	intrnames = intrs = (char *)malloc(inamlen);
 	if (!intrs)
 		err(EX_OSERR, "BSDNumInts(): malloc failed");
-	safe_kvm_read(nlst[INTRNAMES_SYM_INDEX].n_value, intrs, (size_t)inamlen);
+	safe_kvm_read(nlst[INTRNAMES_SYM_INDEX].n_value, intrs, inamlen);
 	nintr /= sizeof(long);
-	while (--nintr >= 0) {
-		if ( sscanf(intrnames, "irq%d", &nbr) && nbr > count )
+	for (uint i = 0; i < nintr; i++) {
+		if ( intrnames[0] && sscanf(intrnames, "irq%d", &nbr) == 1 && nbr > count )
 			count = nbr;
 		intrnames += strlen(intrnames) + 1;
 	}
@@ -908,11 +907,11 @@ BSDNumInts() {
 	safe_kvm_read(nlst[ALLEVENTS_SYM_INDEX].n_value, &events, sizeof(events));
 	evptr = TAILQ_FIRST(&events);
 	while (evptr) {
-		safe_kvm_read((u_long)evptr, &evcnt, sizeof(evcnt));
+		safe_kvm_read((unsigned long)evptr, &evcnt, sizeof(evcnt));
 		if (evcnt.ev_type == EVCNT_TYPE_INTR) {
 			if ( !(name = (char *)malloc(evcnt.ev_namelen + 1)) )
 				err(EX_OSERR, "BSDNumInts(): malloc failed");
-			safe_kvm_read((u_long)evcnt.ev_name, name, evcnt.ev_namelen + 1);
+			safe_kvm_read((unsigned long)evcnt.ev_name, name, evcnt.ev_namelen + 1);
 			if ( sscanf(name, "%s%d", dummy, &nbr) == 2 && nbr > count )
 				count = nbr;
 			free(name);
@@ -972,14 +971,13 @@ BSDNumInts() {
 }
 
 void
-BSDGetIntrStats(unsigned long *intrCount, unsigned int *intrNbrs) {
+BSDGetIntrStats(uint64_t *intrCount, unsigned int *intrNbrs) {
 	/* This code is stolen from vmstat */
 	int nbr = 0;
 #if defined(XOSVIEW_FREEBSD)
 	unsigned long *kvm_intrcnt, *intrcnt;
 	char *kvm_intrnames, *intrnames;
-	size_t inamlen;
-	int nintr = 0;
+	size_t inamlen, nintr;
 
 # if __FreeBSD_version >= 900040
 	safe_kvm_read(nlst[EINTRCNT_SYM_INDEX].n_value, &nintr, sizeof(nintr));
@@ -1007,9 +1005,9 @@ BSDGetIntrStats(unsigned long *intrCount, unsigned int *intrNbrs) {
 	/* kvm_intrname has the ASCII names of the IRQs, every null-terminated
 	 * string corresponds to a value in the kvm_intrcnt array
 	 * e.g. irq1: atkbd0   */
-	while (--nintr >= 0) {
+	for (uint i = 0; i < nintr; i++) {
 		/* Figure out which irq we have here */
-		if ( sscanf(kvm_intrnames, "irq%d", &nbr) == 1 ) {
+		if ( kvm_intrnames[0] && sscanf(kvm_intrnames, "irq%d", &nbr) == 1 ) {
 			intrCount[nbr] = *kvm_intrcnt;
 			if (intrNbrs)
 				intrNbrs[nbr] = 1;
@@ -1028,11 +1026,11 @@ BSDGetIntrStats(unsigned long *intrCount, unsigned int *intrNbrs) {
 	safe_kvm_read(nlst[ALLEVENTS_SYM_INDEX].n_value, &events, sizeof(events));
 	evptr = TAILQ_FIRST(&events);
 	while (evptr) {
-		safe_kvm_read((u_long)evptr, &evcnt, sizeof(evcnt));
+		safe_kvm_read((unsigned long)evptr, &evcnt, sizeof(evcnt));
 		if (evcnt.ev_type == EVCNT_TYPE_INTR) {
 			if ( !(name = (char *)malloc(evcnt.ev_namelen + 1)) )
 				err(EX_OSERR, "BSDGetIntrStats(): malloc failed");
-			safe_kvm_read((u_long)evcnt.ev_name, name, evcnt.ev_namelen + 1);
+			safe_kvm_read((unsigned long)evcnt.ev_name, name, evcnt.ev_namelen + 1);
 			if ( sscanf(name, "%s%d", dummy, &nbr) == 2 ) {
 				intrCount[nbr] = evcnt.ev_count;
 				if (intrNbrs)
@@ -1044,7 +1042,7 @@ BSDGetIntrStats(unsigned long *intrCount, unsigned int *intrNbrs) {
 	}
 #elif defined(XOSVIEW_OPENBSD)
 	int nintr = 0;
-	u_quad_t count = 0;
+	uint64_t count = 0;
 	size_t size = sizeof(nintr);
 	int mib_int[4] = { CTL_KERN, KERN_INTRCNT, KERN_INTRCNT_NUM };
 	if ( sysctl(mib_int, 3, &nintr, &size, NULL, 0) < 0 ) {

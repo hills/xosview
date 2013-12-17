@@ -62,7 +62,7 @@ void DiskMeter::checkevent( void ) {
 }
 
 void DiskMeter::getstats( void ) {
-	u_int64_t reads = 0, writes = 0;
+	uint64_t reads = 0, writes = 0;
 	//  Reset to desired full-scale settings.
 	total_ = maxBandwidth_;
 

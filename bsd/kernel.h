@@ -30,14 +30,14 @@ void
 BSDPageInit();
 
 void
-BSDGetPageStats(u_int64_t *meminfo, u_int64_t *pageinfo);
+BSDGetPageStats(uint64_t *meminfo, uint64_t *pageinfo);
 
 void
 BSDCPUInit();
 
 void
 #if defined(XOSVIEW_NETBSD) || defined(XOSVIEW_DFBSD)
-BSDGetCPUTimes(u_int64_t *timesArray);
+BSDGetCPUTimes(uint64_t *timesArray);
 #else
 BSDGetCPUTimes(long *timesArray);
 #endif
@@ -46,19 +46,19 @@ int
 BSDNetInit();
 
 void
-BSDGetNetInOut(unsigned long long *inbytes, unsigned long long *outbytes, const char *netIface, bool ignored);
+BSDGetNetInOut(uint64_t *inbytes, uint64_t *outbytes, const char *netIface, bool ignored);
 
 int
 BSDSwapInit();
 
 void
-BSDGetSwapInfo(u_int64_t* total, u_int64_t* free);
+BSDGetSwapInfo(uint64_t *total, uint64_t *free);
 
 int
 BSDDiskInit();
 
-u_int64_t
-BSDGetDiskXFerBytes(u_int64_t *read_bytes, u_int64_t *write_bytes);
+uint64_t
+BSDGetDiskXFerBytes(uint64_t *read_bytes, uint64_t *write_bytes);
 
 int
 BSDIntrInit();
@@ -67,7 +67,7 @@ int
 BSDNumInts();
 
 void
-BSDGetIntrStats(unsigned long *intrCount, unsigned int *intrNbrs);
+BSDGetIntrStats(uint64_t *intrCount, unsigned int *intrNbrs);
 
 int
 BSDCountCpus(void);

@@ -44,7 +44,7 @@ void SwapMeter::checkevent( void ) {
 }
 
 void SwapMeter::getswapinfo( void ) {
-	u_int64_t total = 0, used = 0;
+	uint64_t total = 0, used = 0;
 
 	BSDGetSwapInfo(&total, &used);
 

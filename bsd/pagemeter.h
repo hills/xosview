@@ -32,7 +32,7 @@ protected:
 	void getpageinfo( void );
 
 private:
-	u_int64_t previnfo_[2];
+	uint64_t previnfo_[2];
 };
 
 

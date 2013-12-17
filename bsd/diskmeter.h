@@ -32,7 +32,7 @@ protected:
 
 private:
 #ifndef HAVE_DEVSTAT
-	u_int64_t prevreads_, prevwrites_;
+	uint64_t prevreads_, prevwrites_;
 #endif
 	double maxBandwidth_;
 };

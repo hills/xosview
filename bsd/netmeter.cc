@@ -19,7 +19,7 @@
 #include "netmeter.h"
 
 
-NetMeter::NetMeter( XOSView *parent, float max )
+NetMeter::NetMeter( XOSView *parent, double max )
 	: FieldMeterGraph( parent, 3, "NET", "IN/OUT/IDLE" ) {
 	if (!BSDNetInit()) {
 		warnx("The kernel does not seem to have the symbols needed for the NetMeter.");
@@ -27,8 +27,7 @@ NetMeter::NetMeter( XOSView *parent, float max )
 		disableMeter ();
 	}
 	else {
-		netBandwidth_ = max;
-		total_ = netBandwidth_;
+		total_ = netBandwidth_ = max;
 		lastBytesIn_ = lastBytesOut_ = 0;
 		netIface_ = "False";
 		ignored_ = false;
@@ -67,7 +66,7 @@ void NetMeter::getstats(void) {
 	//  will be adjusted in adjust().  bgrayson
 	total_ = netBandwidth_;
 	fields_[0] = fields_[1] = 0;
-	unsigned long long nowBytesIn, nowBytesOut;
+	uint64_t nowBytesIn, nowBytesOut;
 
 	IntervalTimerStop();
 	BSDGetNetInOut(&nowBytesIn, &nowBytesOut, netIface_.c_str(), ignored_);
