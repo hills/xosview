@@ -248,14 +248,16 @@ OpenKDIfNeeded() {
 	//  Look at all of the returned symbols, and check for bad lookups.
 	//  (This may be unnecessary, but better to check than not to...  )
 	struct nlist *nlp = nlst;
-	while (nlp && nlp->n_name && strncmp(nlp->n_name, DUMMY_SYM, strlen(DUMMY_SYM))) {
-		if ( nlp->n_type == 0 || nlp->n_value == 0 )
+	while (nlp && nlp->n_name) {
+		if ( strncmp(nlp->n_name, DUMMY_SYM, strlen(DUMMY_SYM))) {
+			if ( nlp->n_type == 0 || nlp->n_value == 0 )
 #if defined(XOSVIEW_FREEBSD) && defined(__alpha__)
-			/* XXX: this should be properly fixed. */
-			;
+				/* XXX: this should be properly fixed. */
+				;
 #else
-			warnx("kvm_nlist() lookup failed for symbol '%s'.", nlp->n_name);
+				warnx("kvm_nlist() lookup failed for symbol '%s'.", nlp->n_name);
 #endif
+		}
 		nlp++;
 	}
 }
