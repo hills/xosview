@@ -25,7 +25,7 @@ MemMeter::MemMeter( XOSView *parent )
 #if defined(HAVE_UVM)
 	: FieldMeterGraph( parent, 4, "MEM", "ACT/INACT/WRD/FREE" ) {
 #else
-	: FieldMeterGraph( parent, 5, "MEM", "ACT/INACT/WRD/CA/FRE" ) {
+	: FieldMeterGraph( parent, 5, "MEM", "ACT/INACT/WRD/CA/FREE" ) {
 #endif
 	BSDPageInit();
 }
