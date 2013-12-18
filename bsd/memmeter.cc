@@ -68,6 +68,6 @@ void MemMeter::getmeminfo( void ) {
 	fields_[3] = (double)meminfo_[3];
 	fields_[4] = (double)meminfo_[4];
 #endif
-	total_ = fields_[0] + fields_[1] + fields_[2] + fields_[3] + fields_[4];
+	total_ = (double)(meminfo_[0] + meminfo_[1] + meminfo_[2] + meminfo_[3] + meminfo_[4]);
 	setUsed(total_ - (double)meminfo_[4], total_);
 }
