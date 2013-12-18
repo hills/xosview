@@ -36,11 +36,7 @@ void
 BSDCPUInit();
 
 void
-#if defined(XOSVIEW_NETBSD) || defined(XOSVIEW_DFBSD)
-BSDGetCPUTimes(uint64_t *timesArray);
-#else
-BSDGetCPUTimes(long *timesArray);
-#endif
+BSDGetCPUTimes(uint64_t *timesArray, unsigned int cpu = 0);
 
 int
 BSDNetInit();

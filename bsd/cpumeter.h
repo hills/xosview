@@ -18,16 +18,19 @@
 
 #include "fieldmetergraph.h"
 
-#if defined(XOSVIEW_DFBSD)
-#define CPUSTATES 5
-#else
+// for CPUSTATES
+#if defined(XOSVIEW_NETBSD)
+#include <sys/sched.h>
+#elif defined(XOSVIEW_OPENBSD)
 #include <sys/dkstat.h>
+#else
+#include <sys/resource.h>
 #endif
 
 
 class CPUMeter : public FieldMeterGraph {
 public:
-	CPUMeter( XOSView *parent );
+	CPUMeter( XOSView *parent, unsigned int nbr );
 	~CPUMeter( void );
 
 	const char *name( void ) const { return "CPUMeter"; }
@@ -38,12 +41,8 @@ protected:
 	void getcputime( void );
 
 private:
-#if defined(XOSVIEW_NETBSD) || defined(XOSVIEW_DFBSD)
 	uint64_t cputime_[2][CPUSTATES];
-#else
-	long cputime_[2][CPUSTATES];
-#endif
-	int cpuindex_;
+	unsigned int cpuindex_, nbr_;
 };
 
 

@@ -20,11 +20,17 @@
 #include "cpumeter.h"
 
 
-CPUMeter::CPUMeter( XOSView *parent )
+CPUMeter::CPUMeter( XOSView *parent, unsigned int nbr )
 	: FieldMeterGraph( parent, 5, "CPU", "USR/NICE/SYS/INT/FREE" ) {
+	nbr_ = nbr;
 	cpuindex_ = 0;
 	bzero(cputime_, 10 * sizeof(cputime_[0][0]));
 	BSDCPUInit();
+
+	char t[8] = "CPU";
+	if (nbr_ > 0)
+		snprintf(t, 8, "CPU%d", nbr_ - 1);
+	title(t);
 }
 
 CPUMeter::~CPUMeter( void ) {
@@ -50,14 +56,10 @@ void CPUMeter::checkevent( void ) {
 }
 
 void CPUMeter::getcputime( void ) {
-#if defined(XOSVIEW_NETBSD) || defined(XOSVIEW_DFBSD)
 	uint64_t tempCPU[CPUSTATES];
-#else
-	long tempCPU[CPUSTATES];
-#endif
 	total_ = 0;
 
-	BSDGetCPUTimes(tempCPU);
+	BSDGetCPUTimes(tempCPU, nbr_);
 
 	int oldindex = (cpuindex_ + 1) % 2;
 	for (int i = 0; i < CPUSTATES; i++) {
@@ -65,6 +67,8 @@ void CPUMeter::getcputime( void ) {
 		fields_[i] = cputime_[cpuindex_][i] - cputime_[oldindex][i];
 		total_ += fields_[i];
 	}
-	setUsed(total_ - fields_[4], total_);
-	cpuindex_ = (cpuindex_ + 1) % 2;
+	if (total_) {
+		setUsed(total_ - fields_[4], total_);
+		cpuindex_ = (cpuindex_ + 1) % 2;
+	}
 }

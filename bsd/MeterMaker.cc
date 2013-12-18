@@ -43,8 +43,29 @@ void MeterMaker::makeMeters(void) {
 	if ( _xos->isResourceTrue("load") )
 		push(new LoadMeter(_xos));
 
-	if ( _xos->isResourceTrue("cpu") )
-		push(new CPUMeter(_xos));
+	if ( _xos->isResourceTrue("cpu") ) {
+		bool single, both, all;
+		unsigned int cpuCount = BSDCountCpus();
+
+		single = ( strncmp(_xos->getResource("cpuFormat"), "single", 2) == 0 );
+		both = ( strncmp(_xos->getResource("cpuFormat"), "both", 2) == 0 );
+		all = ( strncmp(_xos->getResource("cpuFormat"), "all", 2) == 0 );
+
+		if ( strncmp(_xos->getResource("cpuFormat"), "auto", 2) == 0 ) {
+			if (cpuCount == 1 || cpuCount > 4)
+				single = true;
+			else
+				all = true;
+		}
+
+		if (single || both)
+			push(new CPUMeter(_xos, 0));
+
+		if (all || both) {
+			for (unsigned int i = 1; i <= cpuCount; i++)
+				push(new CPUMeter(_xos, i));
+		}
+	}
 
 	if ( _xos->isResourceTrue("mem") )
 		push(new MemMeter(_xos));

@@ -43,8 +43,10 @@
 #if defined(XOSVIEW_FREEBSD) || defined(XOSVIEW_DFBSD)
 static const char ACPIDEV[] = "/dev/acpi";
 static const char APMDEV[] = "/dev/apm";
+static int maxcpus = 1;
 #include <net/if_var.h>
 #include <sys/ioctl.h>
+#include <sys/resource.h>
 #include <dev/acpica/acpiio.h>
 #include <machine/apm_bios.h>
 #endif
@@ -62,11 +64,13 @@ static int mib_dsk[3] = { CTL_HW, HW_IOSTATS, sizeof(struct io_sysctl) };
 #if defined(XOSVIEW_OPENBSD)
 #include <sys/sched.h>
 #include <sys/disk.h>
+#include <sys/dkstat.h>
 #include <sys/mount.h>
 #include <net/route.h>
 #include <net/if_dl.h>
 static int mib_spd[2] = { CTL_HW, HW_CPUSPEED };
 static int mib_cpt[2] = { CTL_KERN, KERN_CPTIME };
+static int mib_cpt2[3] = { CTL_KERN, KERN_CPTIME2, 0 };
 static int mib_ifl[6] = { CTL_NET, AF_ROUTE, 0, 0, NET_RT_IFLIST, 0 };
 #endif
 
@@ -76,11 +80,6 @@ static int mib_sen[5] = { CTL_HW, HW_SENSORS };
 #endif
 
 #if defined(HAVE_DEVSTAT)
-#if defined(XOSVIEW_DFBSD)
-#define CPUSTATES 5
-#else
-#include <sys/dkstat.h>
-#endif
 #include <devstat.h>
 #endif
 
@@ -377,45 +376,91 @@ BSDGetPageStats(uint64_t *meminfo, uint64_t *pageinfo) {
 void
 BSDCPUInit() {
 	OpenKDIfNeeded();
+#if defined(XOSVIEW_FREEBSD)
+	size_t size = sizeof(maxcpus);
+	if ( sysctlbyname("kern.smp.maxcpus", &maxcpus, &size, NULL, 0) < 0 )
+		err(EX_OSERR, "sysctl kern.smp.maxcpus failed");
+#elif defined(XOSVIEW_DFBSD)
+	if ( kinfo_get_cpus(&maxcpus) )
+		err(EX_OSERR, "kinfo_get_cpus() failed");
+#endif
 }
 
 void
-#if defined(XOSVIEW_NETBSD) || defined(XOSVIEW_DFBSD)
-BSDGetCPUTimes(uint64_t *timeArray) {
-#else
-BSDGetCPUTimes(long *timeArray) {
-#endif
-#if defined(XOSVIEW_DFBSD)
-	struct kinfo_cputime cpu;
-#elif defined(XOSVIEW_NETBSD)
-	uint64_t cpu[CPUSTATES];
-#else
-	long cpu[CPUSTATES];
-#endif
+BSDGetCPUTimes(uint64_t *timeArray, unsigned int cpu) {
+	// timeArray is CPUSTATES long.
+	// cpu is the number of CPU to return, starting from 1. If cpu == 0,
+	// return aggregate times for all CPUs.
+	// All BSDs have separate calls for aggregate and separate times. Only
+	// OpenBSD returns one CPU per call, others return all at once.
 	if (!timeArray)
-		errx(EX_SOFTWARE, "BSDGetCPUTimes(): passed pointer was null.");
-	if (CPUSTATES != 5)
-		errx(EX_SOFTWARE, "xosview for *BSD expects 5 cpu states.");
+		err(EX_SOFTWARE, "BSDGetCPUTimes(): passed pointer was null.");
+	size_t size;
+#if defined(XOSVIEW_DFBSD)
+	size = sizeof(struct kinfo_cputime);
+	struct kinfo_cputime *times = (struct kinfo_cputime *)calloc(maxcpus + 1, size);
+#elif defined(XOSVIEW_NETBSD)
+	size = CPUSTATES * sizeof(uint64_t);
+	uint64_t *times = (uint64_t*)calloc(BSDCountCpus() + 1, size);
+#elif defined(XOSVIEW_FREEBSD)
+	size = CPUSTATES * sizeof(long);
+	long *times = (long*)calloc(maxcpus + 1, size);
+#else // XOSVIEW_OPENBSD
+	uint64_t *times = (uint64_t*)calloc(CPUSTATES, sizeof(uint64_t));
+#endif
+	// this array will have aggregate values at 0, then each CPU (except on
+	// OpenBSD), so that cpu can be used as index
+	if (!times)
+		err(EX_OSERR, "BSDGetCPUTimes(): malloc failed");
 
 #if defined(XOSVIEW_DFBSD)
-	if (kinfo_get_sched_cputime(&cpu))
-		err(EX_OSERR, "kinfo_get_sched_cputime() failed");
-	timeArray[0] = cpu.cp_user;
-	timeArray[1] = cpu.cp_nice;
-	timeArray[2] = cpu.cp_sys;
-	timeArray[3] = cpu.cp_intr;
-	timeArray[4] = cpu.cp_idle;
-#else
-	size_t size = sizeof(cpu);
-#if defined(XOSVIEW_NETBSD) || defined(XOSVIEW_OPENBSD)
-	if ( sysctl(mib_cpt, 2, cpu, &size, NULL, 0) < 0 )
-#else
-	if ( sysctlbyname("kern.cp_time", cpu, &size, NULL, 0) < 0 )
+	if (cpu == 0) {
+		if (kinfo_get_sched_cputime(times))
+			err(EX_OSERR, "kinfo_get_sched_cputime() failed");
+	}
+	else {
+		size = maxcpus * sizeof(times[0]);
+		if ( sysctlbyname("kern.cputime", times + 1, &size, NULL, 0) < 0 )
+			err(EX_OSERR, "sysctl kern.cputime failed");
+	}
+	timeArray[0] = times[cpu].cp_user;
+	timeArray[1] = times[cpu].cp_nice;
+	timeArray[2] = times[cpu].cp_sys;
+	timeArray[3] = times[cpu].cp_intr;
+	timeArray[4] = times[cpu].cp_idle;
+#else  // !XOSVIEW_DFBSD
+	size = CPUSTATES * sizeof(times[0]);
+	if (cpu == 0) {  // aggregate times
+#if defined(XOSVIEW_FREEBSD)
+		if ( sysctlbyname("kern.cp_time", times, &size, NULL, 0) < 0 )
+#else  // XOSVIEW_NETBSD || XOSVIEW_OPENBSD
+		if ( sysctl(mib_cpt, 2, times, &size, NULL, 0) < 0 )
 #endif
-		err(EX_OSERR, "sysctl kern.cp_time failed");
+			err(EX_OSERR, "sysctl kern.cp_time failed");
+	}
+	else {  // separate times
+#if defined(XOSVIEW_FREEBSD)
+		size *= maxcpus;
+		if ( sysctlbyname("kern.cp_times", times + CPUSTATES, &size, NULL, 0) < 0 )
+			err(EX_OSERR, "sysctl kern.cp_times failed");
+#elif defined(XOSVIEW_NETBSD)
+		size *= BSDCountCpus();
+		if ( sysctl(mib_cpt, 2, times + CPUSTATES, &size, NULL, 0) < 0 )
+			err(EX_OSERR, "sysctl kern.cp_time failed");
+#else  // XOSVIEW_OPENBSD
+		mib_cpt2[2] = cpu - 1;
+		if ( sysctl(mib_cpt2, 3, times, &size, NULL, 0) < 0 )
+			err(EX_OSERR, "sysctl kern.cp_time2 failed");
+#endif
+	}
 	for (int i = 0; i < CPUSTATES; i++)
-		timeArray[i] = cpu[i];
+#if defined(XOSVIEW_OPENBSD) // aggregates are long, singles uint64_t
+		timeArray[i] = ( cpu ? times[i] : ((long*)(times))[i] );
+#else  // XOSVIEW_FREEBSD || XOSVIEW_NETBSD
+		timeArray[i] = times[cpu * CPUSTATES + i];
 #endif
+#endif
+	free(times);
 }
 
 
