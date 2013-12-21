@@ -50,6 +50,7 @@ protected:
   UsedType print_;
   int printedZeroTotalMesg_;
   int numWarnings_;
+  bool metric_;
 
   unsigned long onColor_, offColor_;
   char *bits_, *lastbits_;

@@ -23,6 +23,7 @@ BitFieldMeter::BitFieldMeter( XOSView *parent, int numBits, int numfields,
   lastbits_ = NULL;
   numWarnings_ = printedZeroTotalMesg_ = 0;
   print_ = PERCENT;
+  metric_ = false;
   used_ = 0;
   lastused_ = -1;
   fields_ = NULL;
@@ -171,6 +172,8 @@ void BitFieldMeter::drawfieldlegend( void ){
   for ( int i = 0 ; i < numfields_ ; i++ ){
     n = 0;
     while ( (*tmp2 != '/') && (*tmp2 != '\0') ){
+      if ( (*tmp2 == '\\') && (*(tmp2 + 1) == '/') ) // allow '/' in field as '\/'
+        memmove( tmp2, tmp2 + 1, strlen(tmp2) );
       tmp2++;
       n++;
     }
@@ -210,25 +213,76 @@ void BitFieldMeter::drawused( int manditory ){
       /*  Unfortunately, we have to do our comparisons by 1000s (otherwise
        *  a value of 1020, which is smaller than 1K, could end up
        *  being printed as 1020, which is wider than what can fit)  */
-      /*  However, we do divide by 1024, so a K really is a K, and not
-       *  1000.  */
+      /*  However, we do divide by 1024, unless the meter is defined as metric,
+       *  so a K really is a K.  */
       /*  In addition, we need to compare against 999.5*1000, because
        *  999.5, if not rounded up to 1.0 K, will be rounded by the
        *  %.0f to be 1000, which is too wide.  So anything at or above
        *  999.5 needs to be bumped up.  */
-    if (used_ >= 999.5*1000*1000*1000*1000*1000*1000)
-	{scale='E'; scaled_used = used_/1024/1024/1024/1024/1024/1024;}
-    else if (used_ >= 999.5*1000*1000*1000*1000)
-	{scale='P'; scaled_used = used_/1024/1024/1024/1024/1024;}
-    else if (used_ >= 999.5*1000*1000*1000)
-	{scale='T'; scaled_used = used_/1024/1024/1024/1024;}
-    else if (used_ >= 999.5*1000*1000)
-	{scale='G'; scaled_used = used_/1024/1024/1024;}
-    else if (used_ >= 999.5*1000)
-	{scale='M'; scaled_used = used_/1024/1024;}
-    else if (used_ >= 999.5)
-	{scale='K'; scaled_used = used_/1024;}
-    else {scale=' '; scaled_used = used_;}
+    if (used_ >= 999.5*1e15){
+      scale='E';
+      if (metric_)
+        scaled_used = used_/1e18;
+      else
+        scaled_used = used_/(1ULL<<60);
+    }
+    else if (used_ >= 999.5*1e12){
+      scale='P';
+      if (metric_)
+        scaled_used = used_/1e15;
+      else
+        scaled_used = used_/(1ULL<<50);
+    }
+    else if (used_ >= 999.5*1e9){
+      scale='T';
+      if (metric_)
+        scaled_used = used_/1e12;
+      else
+        scaled_used = used_/(1ULL<<40);
+    }
+    else if (used_ >= 999.5*1e6){
+      scale='G';
+      if (metric_)
+        scaled_used = used_/1e9;
+      else
+        scaled_used = used_/(1UL<<30);
+    }
+    else if (used_ >= 999.5*1e3){
+      scale='M';
+      if (metric_)
+        scaled_used = used_/1e6;
+      else
+        scaled_used = used_/(1UL<<20);
+    }
+    else if (used_ >= 999.5){
+      if (metric_) {
+        scale='k';
+        scaled_used = used_/1e3;
+      }
+      else {
+        scale='K';
+        scaled_used = used_/(1UL<<10);
+      }
+    }
+    else if (used_ < 0.9995 && metric_) {
+      if (used_ >= 0.9995/1e3) {
+        scale='m';
+        scaled_used = used_*1e3;
+      }
+      else if (used_ >= 0.9995/1e6) {
+        scale='\265';
+        scaled_used = used_*1e6;
+      }
+      else {
+        scale='n';
+        scaled_used = used_*1e9;
+      }
+      // add more if needed
+    }
+    else {
+      scale='\0';
+      scaled_used = used_;
+    }
       /*  For now, we can only print 3 characters, plus the optional
        *  suffix, without overprinting the legends.  Thus, we can
        *  print 965, or we can print 34, but we can't print 34.7 (the
