@@ -186,7 +186,7 @@ FreeBSD, OpenBSD, DragonflyBSD).
 
 \fBSensors\fP: Readings from sensors
    Linux  : I2C/hwmon sensors (lmstemp)
-            Intel Core/AMD K8+ temperature (coretemp)
+            Intel Core/AMD K8+/VIA C7 temperature (coretemp)
             ACPI thermal zones (acpitemp)
    *BSD   : I2C sensors (bsdsensor)
             Intel Core/AMD K8+ temperature (coretemp)
@@ -1062,7 +1062,7 @@ N-th label for above temperatures, default is TMP.
 .uf acpitemp
 
 
-\fBIntel Core / AMD K8+ Temperature Sensor Resources\fP
+\fBIntel Core / AMD K8+ / VIA C7 Temperature Sensor Resources\fP
 
 .xt coretemp
 
@@ -1094,10 +1094,10 @@ xosview*coretempIdleColor:   \fIcolor\fP
 Color between actual and alarm temperatures.
 .RE
 
-xosview*coretemp\fIN\fPDisplayType: (separate, average or maximum)
+xosview*coretempDisplayType: (separate, average or maximum)
 .RS
-This resource tells xosview how to display the temperature for meter N. The
-formats work as follows:
+This resource tells xosview how to display the CPU temperature. The formats
+work as follows:
 
 \fBseparate\fP:
 .RS
@@ -1105,11 +1105,13 @@ Display one meter for each CPU core of a multi-core CPU. This is the default.
 .RE
 \fBaverage\fP:
 .RS
-Display average temperature of a multi-core CPU.
+Display the average of core temperatures of a multi-core CPU. On multi-socket
+machines, one meter per physical CPU is displayed.
 .RE
 \fBmaximum\fP:
 .RS
-Display the highest core temperature of a multi-core CPU.
+Display the highest core temperature of a multi-core CPU. On multi-socket
+machines, one meter per physical CPU is displayed.
 .RE
 .RE
 

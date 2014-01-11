@@ -1,5 +1,5 @@
 //
-//  Copyright (c) 2008 by Tomi Tapper <tomi.o.tapper@jyu.fi>
+//  Copyright (c) 2008-2014 by Tomi Tapper <tomi.o.tapper@jyu.fi>
 //
 //  File based on linux/lmstemp.* by
 //  Copyright (c) 2000, 2006 by Leopold Toetsch <lt@toetsch.at>
@@ -26,12 +26,14 @@ public:
   void checkevent( void );
   void checkResources( void );
 
-  static unsigned int countCpus(int pkg);
+  static unsigned int countCores( unsigned int pkg );
+  static unsigned int countCpus( void );
 
 protected:
   void getcoretemp( void );
 
 private:
+  void findSysFiles( void );
   int _pkg, _cpu, _high;
   std::vector<std::string> _cpus;
   unsigned long _actcolor, _highcolor;
