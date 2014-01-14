@@ -159,9 +159,9 @@ void XOSView::checkVersion(int argc, char *argv[]) const
 void XOSView::figureSize ( void ) {
   if ( legend_ ){
     if ( !usedlabels_ )
-      xoff_ = textWidth( "XXXXX" );
+      xoff_ = textWidth( "XXXXXX" );
     else
-      xoff_ = textWidth( "XXXXXXXXX" );
+      xoff_ = textWidth( "XXXXXXXXXX" );
 
     yoff_ = caption_ ? textHeight() + textHeight() / 4 : 0;
   }
@@ -215,9 +215,9 @@ void XOSView::addmeter( Meter *fm ){
 int XOSView::findx( void ){
   if ( legend_ ){
     if ( !usedlabels_ )
-      return textWidth( "XXXXXXXXXXXXXXXXXXXXXXXX" );
+      return textWidth( "XXXXXXXXXXXXXXXXXXXXXXXXX" );
     else
-      return textWidth( "XXXXXXXXXXXXXXXXXXXXXXXXXXXXX" );
+      return textWidth( "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" );
   }
   return 80;
 }

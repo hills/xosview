@@ -48,6 +48,7 @@ protected:
   int printedZeroTotalMesg_;
   int numWarnings_;
   bool metric_;
+  int usedoffset_;
 
   void SetUsedFormat ( const char * const str );
   void drawlegend( void );

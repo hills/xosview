@@ -88,9 +88,9 @@ void BitMeter::draw( void ){
 
     int offset;
     if ( dousedlegends_ )
-      offset = parent_->textWidth( "XXXXXXXXX" );
+      offset = parent_->textWidth( "XXXXXXXXXX" );
     else
-      offset = parent_->textWidth( "XXXXX" );
+      offset = parent_->textWidth( "XXXXXX" );
 
     parent_->drawString( x_ - offset + 1, y_ + height_, title_ );
     parent_->setForeground( onColor_ );

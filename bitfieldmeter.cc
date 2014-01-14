@@ -7,6 +7,7 @@
 //
 #include <fstream>
 #include <stdlib.h>
+#include <math.h>
 #include "bitfieldmeter.h"
 #include "xosview.h"
 
@@ -24,6 +25,7 @@ BitFieldMeter::BitFieldMeter( XOSView *parent, int numBits, int numfields,
   numWarnings_ = printedZeroTotalMesg_ = 0;
   print_ = PERCENT;
   metric_ = false;
+  usedoffset_ = 0;
   used_ = 0;
   lastused_ = -1;
   fields_ = NULL;
@@ -148,9 +150,9 @@ void BitFieldMeter::draw( void ){
 
     int offset;
     if ( dousedlegends_ )
-      offset = parent_->textWidth( "XXXXXXXXX" );
+      offset = parent_->textWidth( "XXXXXXXXXX" );
     else
-      offset = parent_->textWidth( "XXXXX" );
+      offset = parent_->textWidth( "XXXXXX" );
 
     parent_->drawString( x_ - offset + 1, y_ + height_, title_ );
 
@@ -200,8 +202,9 @@ void BitFieldMeter::drawused( int manditory ){
 
   parent_->setStippleN(0);	/*  Use all-bits stipple.  */
   static const int onechar = parent_->textWidth( "X" );
-  static int xoffset = parent_->textWidth( "XXXXX" );
-
+  if (!usedoffset_)  // metric meters need extra space for '-' sign
+    usedoffset_ = ( metric_ ? parent_->textWidth( "XXXXXX" )
+                            : parent_->textWidth( "XXXXX" ) );
   char buf[10];
 
   if (print_ == PERCENT){
@@ -209,7 +212,7 @@ void BitFieldMeter::drawused( int manditory ){
   }
   else if (print_ == AUTOSCALE){
     char scale;
-    double scaled_used;
+    double scaled_used, used = fabs(used_);
       /*  Unfortunately, we have to do our comparisons by 1000s (otherwise
        *  a value of 1020, which is smaller than 1K, could end up
        *  being printed as 1020, which is wider than what can fit)  */
@@ -219,42 +222,42 @@ void BitFieldMeter::drawused( int manditory ){
        *  999.5, if not rounded up to 1.0 K, will be rounded by the
        *  %.0f to be 1000, which is too wide.  So anything at or above
        *  999.5 needs to be bumped up.  */
-    if (used_ >= 999.5*1e15){
+    if (used >= 999.5*1e15){
       scale='E';
       if (metric_)
         scaled_used = used_/1e18;
       else
         scaled_used = used_/(1ULL<<60);
     }
-    else if (used_ >= 999.5*1e12){
+    else if (used >= 999.5*1e12){
       scale='P';
       if (metric_)
         scaled_used = used_/1e15;
       else
         scaled_used = used_/(1ULL<<50);
     }
-    else if (used_ >= 999.5*1e9){
+    else if (used >= 999.5*1e9){
       scale='T';
       if (metric_)
         scaled_used = used_/1e12;
       else
         scaled_used = used_/(1ULL<<40);
     }
-    else if (used_ >= 999.5*1e6){
+    else if (used >= 999.5*1e6){
       scale='G';
       if (metric_)
         scaled_used = used_/1e9;
       else
         scaled_used = used_/(1UL<<30);
     }
-    else if (used_ >= 999.5*1e3){
+    else if (used >= 999.5*1e3){
       scale='M';
       if (metric_)
         scaled_used = used_/1e6;
       else
         scaled_used = used_/(1UL<<20);
     }
-    else if (used_ >= 999.5){
+    else if (used >= 999.5){
       if (metric_) {
         scale='k';
         scaled_used = used_/1e3;
@@ -264,12 +267,12 @@ void BitFieldMeter::drawused( int manditory ){
         scaled_used = used_/(1UL<<10);
       }
     }
-    else if (used_ < 0.9995 && metric_) {
-      if (used_ >= 0.9995/1e3) {
+    else if (used < 0.9995 && metric_) {
+      if (used >= 0.9995/1e3) {
         scale='m';
         scaled_used = used_*1e3;
       }
-      else if (used_ >= 0.9995/1e6) {
+      else if (used >= 0.9995/1e6) {
         scale='\265';
         scaled_used = used_*1e6;
       }
@@ -283,31 +286,39 @@ void BitFieldMeter::drawused( int manditory ){
       scale='\0';
       scaled_used = used_;
     }
-      /*  For now, we can only print 3 characters, plus the optional
-       *  suffix, without overprinting the legends.  Thus, we can
-       *  print 965, or we can print 34, but we can't print 34.7 (the
-       *  decimal point takes up one character).  bgrayson   */
+    /*  For now, we can only print 3 characters, plus the optional sign and
+     *  suffix, without overprinting the legends.  Thus, we can
+     *  print 965, or we can print 34, but we can't print 34.7 (the
+     *  decimal point takes up one character).  bgrayson   */
     if (scaled_used == 0.0)
       snprintf (buf, 10, "0");
-    else if (scaled_used < 9.95)  //  9.95 or above would get
-				  //  rounded to 10.0, which is too wide.
-      snprintf (buf, 10, "%.1f%c", scaled_used, scale);
-    /*  We don't need to check against 99.5 -- it all gets %.0f.  */
-    /*else if (scaled_used < 99.5)*/
-      /*snprintf (buf, 10, "%.0f%c", scaled_used, scale);*/
-    else
-      snprintf (buf, 10, "%.0f%c", scaled_used, scale);
+    else {
+      if (scaled_used < 0 && !metric_)
+        snprintf (buf, 10, "-");
+      else if ( fabs(scaled_used) < 9.95 ) {
+        //  9.95 or above would get
+        //  rounded to 10.0, which is too wide.
+        if (scale)
+          snprintf (buf, 10, "%.1f%c", scaled_used, scale);
+        else
+          snprintf (buf, 10, "%.1f", scaled_used);
+      }
+      else {
+        if (scale)
+          snprintf (buf, 10, "%.0f%c", scaled_used, scale);
+        else
+          snprintf (buf, 10, "%.0f", scaled_used);
+      }
+    }
   }
-  else {
+  else
     snprintf( buf, 10, "%.1f", used_ );
-  }
 
-  parent_->clear( x_ - xoffset, y_ + height_ - parent_->textHeight(),
-		 xoffset - onechar / 2, parent_->textHeight() + 1 );
+  parent_->clear( x_ - usedoffset_, y_ + height_ - parent_->textHeight(),
+                  usedoffset_ - onechar / 2, parent_->textHeight() + 1 );
   parent_->setForeground( usedcolor_ );
   parent_->drawString( x_ - (strlen( buf ) + 1 ) * onechar + 2,
-		      y_ + height_, buf );
-
+                       y_ + height_, buf );
   lastused_ = used_;
 }
 
@@ -343,7 +354,7 @@ void BitFieldMeter::drawfields( int manditory ){
 
   for ( int i = 0 ; i < numfields_ ; i++ ){
     /*  Look for bogus values.  */
-    if (fields_[i] < 0.0) {
+    if (fields_[i] < 0.0 && !metric_) {
       /*  Only print a warning 5 times per meter, followed by a
        *  message about no more warnings.  */
       numWarnings_ ++;
@@ -355,8 +366,7 @@ void BitFieldMeter::drawfields( int manditory ){
 	  "will not be displayed.\n", name());
     }
 
-    twidth = (int) (((width_/2 - 3) * (double) fields_[i]) / total_);
-//    twidth = (int)((fields_[i] * width_) / total_);
+    twidth = (int)fabs(((width_/2 - 3) * fields_[i]) / total_);
     if ( (i == numfields_ - 1) && ((x + twidth) != (x_ + width_)) )
       twidth = width_ + x_ - x;
 

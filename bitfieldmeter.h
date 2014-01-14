@@ -51,6 +51,7 @@ protected:
   int printedZeroTotalMesg_;
   int numWarnings_;
   bool metric_;
+  int usedoffset_;
 
   unsigned long onColor_, offColor_;
   char *bits_, *lastbits_;
