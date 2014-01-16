@@ -38,7 +38,8 @@ OBJS = Host.o \
 
 ifeq ($(PLATFORM), linux)
 ARCH = $(shell uname -m)
-OBJS += linux/MeterMaker.o \
+OBJS += sensorfieldmeter.o \
+	linux/MeterMaker.o \
 	linux/btrymeter.o \
 	linux/cpumeter.o \
 	linux/diskmeter.o \
@@ -58,11 +59,13 @@ ifeq ($(findstring 86,$(ARCH)),86)
 OBJS += linux/coretemp.o
 endif
 CPPFLAGS += -Ilinux/
+LDLIBS += -lm
 endif
 
 ifeq ($(PLATFORM), bsd)
 ARCH = $(shell uname -m)
-OBJS += bsd/MeterMaker.o \
+OBJS += sensorfieldmeter.o \
+        bsd/MeterMaker.o \
         bsd/btrymeter.o \
         bsd/cpumeter.o \
         bsd/diskmeter.o \
@@ -79,6 +82,7 @@ ifeq ($(ARCH),$(filter $(ARCH),i386 amd64 x86_64))
 OBJS += bsd/coretemp.o
 endif
 CPPFLAGS += -Ibsd/
+LDLIBS += -lm
 endif
 
 ifeq ($(PLATFORM), irix65)

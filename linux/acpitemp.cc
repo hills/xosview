@@ -149,6 +149,10 @@ void ACPITemp::getacpitemp( void ) {
     do_legend = true;
   }
 
+  setUsed( fields_[0], total_ );
+  if (fields_[0] < 0)
+    fields_[0] = 0.0;
+
   fields_[1] = high - fields_[0];
   if (fields_[1] < 0) { // alarm: T > high
     fields_[1] = 0;
@@ -167,8 +171,6 @@ void ACPITemp::getacpitemp( void ) {
   fields_[2] = total_ - fields_[1] - fields_[0];
   if (fields_[2] < 0)
     fields_[2] = 0;
-
-  setUsed( fields_[0], total_ );
 
   if (do_legend)
     drawlegend();

@@ -106,6 +106,8 @@ void CoreTemp::getcoretemp( void ) {
 	}
 
 	setUsed(fields_[0], total_);
+	if (fields_[0] < 0)
+		fields_[0] = 0;
 	fields_[1] = high_ - fields_[0];
 	fields_[2] = total_ - fields_[1] - fields_[0];
 	if (fields_[0] > total_)

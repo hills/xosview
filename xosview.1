@@ -914,9 +914,10 @@ This is the color that will be used to show "inactive" interrupts.
 
 .xt lmstemp
 
-xosview*lmstempHighest: 100
+xosview*lmstempHighest: \fInumber\fP
 .RS
-Highest value displayed, default 100. Can be overridden for any meter with
+Highest value displayed. If not given, or too small, the meter will adjust
+to fit actual and alarm values. Can be overridden for any meter with
 lmstempHighest\fIN\fP.
 .RE
 
@@ -1124,9 +1125,10 @@ machines, one meter per physical CPU is displayed.
 
 .xt bsdsensor
 
-xosview*bsdsensorHighest: 100
+xosview*bsdsensorHighest: \fInumber\fP
 .RS
-Highest value displayed, default 100. Can be overridden for any meter with
+Highest value displayed. If not given, or too small, the meter will adjust
+to fit actual and alarm values. Can be overridden for any meter with
 bsdsensorHighest\fIN\fP.
 .RE
 

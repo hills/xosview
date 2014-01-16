@@ -223,7 +223,10 @@ void CoreTemp::getcoretemp( void ) {
   }
 
   fields_[0] /= 1000.0;
+  setUsed( fields_[0], total_ );
 
+  if (fields_[0] < 0)
+    fields_[0] = 0.0;
   fields_[1] = _high - fields_[0];
   if (fields_[1] < 0) { // alarm: T > high
     fields_[1] = 0;
@@ -242,8 +245,6 @@ void CoreTemp::getcoretemp( void ) {
   fields_[2] = total_ - fields_[1] - fields_[0];
   if (fields_[2] < 0)
     fields_[2] = 0;
-
-  setUsed( fields_[0], total_ );
 }
 
 /* Count sensors available to coretemp in the given package. */

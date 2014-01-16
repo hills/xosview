@@ -231,7 +231,6 @@ xosview*lmstempLowColor:       orange
 xosview*lmstempIdleColor:      aquamarine
 xosview*lmstempPriority: 20
 xosview*lmstempUsedFormat: autoscale
-xosview*lmstempHighest:	100
 ! xosview*lmstemp1:	temp
 ! xosview*lmstemp2:	remote_temp
 ! for more sensors just add entries here

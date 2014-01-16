@@ -14,8 +14,12 @@
 //
 #include "lmstemp.h"
 #include "xosview.h"
+#include <string>
 #include <fstream>
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <math.h>
 #include <dirent.h>
 #include <sys/stat.h>
 
@@ -26,25 +30,19 @@ static const char SYS_SENSORS[]  = "/sys/class/hwmon";
 LmsTemp::LmsTemp( XOSView *parent, const char *name, const char *tempfile,
                   const char *highfile, const char *lowfile, const char *label,
                   const char *caption, unsigned int nbr )
-  : FieldMeter( parent, 3, label, caption, 1, 1, 0 ){
-  metric_ = true;
-  _unit[0] = '\0';
+  : SensorFieldMeter( parent, label, caption, 1, 1, 0 ){
   _nbr = nbr;
   _scale = 1.0;
-  _isproc = false;
-  _high = _low = 0.0;
-  _name_found = _temp_found = _high_found = _low_found = _has_high = false;
+  _isproc = _name_found = _temp_found = _high_found = _low_found = false;
 
   // Check if high is given as value
-  if ( highfile && ('0' <= highfile[0] && highfile[0] <= '9') ) {
-    _high = atof(highfile);
-    _has_high = _high_found = true;
+  if ( highfile && sscanf(highfile, "%lf", &high_) > 0 ) {
+    has_high_ = _high_found = true;
     highfile = NULL;
   }
   // Check if low is given as value
-  if ( lowfile && ('0' <= lowfile[0] && lowfile[0] <= '9') ) {
-    _low = atof(lowfile);
-    _low_found = true;
+  if ( lowfile && sscanf(lowfile, "%lf", &low_) > 0 ) {
+    has_low_ = _low_found = true;
     lowfile = NULL;
   }
 
@@ -279,99 +277,55 @@ void LmsTemp::determineUnit( void ){
   std::string basename = _tempfile.substr(_tempfile.find_last_of('/') + 1);
   if ( sscanf(basename.c_str(), "%[a-z]%d_%s", type, &n, subtype) == 3 ) {
     if ( !strncmp(type, "temp", strlen(type)) )
-      strncpy(_unit, "\260C", 4);
+      strcpy(unit_, "\260C");
     else if ( !strncmp(type, "in", strlen(type)) ||
               !strncmp(subtype, "vid", strlen(type)) )
-      strncpy(_unit, "V", 4);
+      strcpy(unit_, "V");
     else if ( !strncmp(type, "fan", strlen(type)) )
-      strncpy(_unit, "RPM", 4);
+      strcpy(unit_, "RPM");
     else if ( !strncmp(type, "power", strlen(type)) ) {
       if ( strncmp(subtype, "average_interval", strlen(type)) )
-        strncpy(_unit, "s", 4);
+        strcpy(unit_, "s");
       else
-        strncpy(_unit, "W", 4);
+        strcpy(unit_, "W");
     }
     else if ( !strncmp(type, "energy", strlen(type)) )
-      strncpy(_unit, "J", 4);
+      strcpy(unit_, "J");
     else if ( !strncmp(type, "curr", strlen(type)) )
-      strncpy(_unit, "A", 4);
+      strcpy(unit_, "A");
     else if ( !strncmp(type, "humidity", strlen(type)) )
-      strncpy(_unit, "%", 4);
+      strcpy(unit_, "%");
   }
-}
-
-void LmsTemp::updateLegend( void ){
-  char l[32];
-  if (_has_high) {
-    if (total_ < 10) {
-      if ( strlen(_unit) )
-        snprintf(l, 32, "ACT(%s)/%.1f/%.1f", _unit, _high, total_);
-      else
-        snprintf(l, 32, "ACT/%.1f/%.1f", _high, total_);
-    }
-    else {
-      if ( strlen(_unit) )
-        snprintf(l, 32, "ACT(%s)/%d/%d", _unit, (int)_high, (int)total_);
-      else
-        snprintf(l, 32, "ACT/%d/%d", (int)_high, (int)total_);
-    }
-  }
-  else {
-    if (total_ < 10) {
-      if ( strlen(_unit) )
-        snprintf(l, 32, "ACT(%s)/HIGH/%.1f", _unit, total_);
-      else
-        snprintf(l, 32, "ACT/HIGH/%.1f", total_);
-    }
-    else {
-      if ( strlen(_unit) )
-        snprintf(l, 32, "ACT(%s)/HIGH/%d", _unit, (int)total_);
-      else
-        snprintf(l, 32, "ACT/HIGH/%d", (int)total_);
-    }
-  }
-  legend(l);
 }
 
 void LmsTemp::checkResources( void ){
-  FieldMeter::checkResources();
+  SensorFieldMeter::checkResources();
 
   char s[32];
   const char *tmp = NULL;
-  _actcolor  = parent_->allocColor( parent_->getResource( "lmstempActColor" ) );
-  _highcolor = parent_->allocColor( parent_->getResource( "lmstempHighColor" ) );
-  _lowcolor  = parent_->allocColor( parent_->getResource( "lmstempLowColor" ) );
-  setfieldcolor( 0, _actcolor );
+  actcolor_  = parent_->allocColor( parent_->getResource( "lmstempActColor" ) );
+  highcolor_ = parent_->allocColor( parent_->getResource( "lmstempHighColor" ) );
+  lowcolor_  = parent_->allocColor( parent_->getResource( "lmstempLowColor" ) );
+  setfieldcolor( 0, actcolor_ );
   setfieldcolor( 1, parent_->getResource( "lmstempIdleColor") );
-  setfieldcolor( 2, _highcolor );
-  tmp = parent_->getResourceOrUseDefault( "lmstempHighest", "100" );
+  setfieldcolor( 2, highcolor_ );
+  tmp = parent_->getResourceOrUseDefault( "lmstempHighest", "0" );
   snprintf(s, 32, "lmstempHighest%d", _nbr);
-  total_ = atof( parent_->getResourceOrUseDefault(s, tmp) );
+  total_ = fabs( atof( parent_->getResourceOrUseDefault(s, tmp) ) );
   priority_ = atoi( parent_->getResource( "lmstempPriority" ) );
   tmp = parent_->getResource( "lmstempUsedFormat" );
   snprintf(s, 32, "lmstempUsedFormat%d", _nbr);
   SetUsedFormat( parent_->getResourceOrUseDefault(s, tmp) );
 
-  // Sanity checks.
-  if (_has_high) {
-    if (_high > total_) {
-      std::cerr << "Warning: lmshigh" << _nbr << " (" << _high
-                << ") was greater than lmstempHighest" << _nbr << " ("
-                << total_ << ")." << std::endl;
-      _high = total_;
-    }
-    if (_low > _high) {
-      std::cerr << "Warning: lmslow" << _nbr << " (" << _low
-                << ") was greater than lmshigh" << _nbr << " (" << _high
-                << ")." << std::endl;
-      _low = _high;
-    }
-  }
-  else
-    _high = total_;
-
   if ( !_highfile.empty() )
-    _has_high = true;
+    has_high_ = true;
+  if ( !_lowfile.empty() )
+    has_low_ = true;
+
+  if (!has_high_)
+    high_ = total_;
+  if (!has_low_)
+    low_ = 0;
 
   determineScale();
   determineUnit();
@@ -385,8 +339,7 @@ void LmsTemp::checkevent( void ){
 }
 
 void LmsTemp::getlmstemp( void ){
-  double high = _high;
-  bool do_legend = false;
+  double high = high_, low = low_;
 
   std::ifstream tempfile( _tempfile.c_str() );
   if (!tempfile) {
@@ -396,7 +349,7 @@ void LmsTemp::getlmstemp( void ){
   }
 
   if (_isproc)
-    tempfile >> high >> _low >> fields_[0];
+    tempfile >> high >> low >> fields_[0];
   else {
     tempfile >> fields_[0];
     fields_[0] /= _scale;
@@ -417,46 +370,10 @@ void LmsTemp::getlmstemp( void ){
         parent_->done(1);
         return;
       }
-      lowfile >> _low;
-      _low /= _scale;
-    }
-  }
-  if (high != _high) {
-    if (high > total_)
-      total_ = 10 * (int)((high * 1.25) / 10);
-    _high = high;
-    updateLegend();
-    do_legend = true;
-  }
-
-  fields_[1] = high - fields_[0];
-  if (fields_[1] < 0) { // alarm: T > max
-    fields_[1] = 0;
-    if (colors_[0] != _highcolor) {
-      setfieldcolor( 0, _highcolor );
-      do_legend = true;
-    }
-  }
-  else if (fields_[0] < _low) { // alarm: T < min
-    if (colors_[0] != _lowcolor) {
-      setfieldcolor( 0, _lowcolor );
-      do_legend = true;
-    }
-  }
-  else {
-    if (colors_[0] != _actcolor) {
-      setfieldcolor( 0, _actcolor );
-      do_legend = true;
+      lowfile >> low;
+      low /= _scale;
     }
   }
 
-  setUsed(fields_[0], total_);
-  fields_[2] = total_ - fields_[1] - fields_[0];
-  if (fields_[2] < 0)
-    fields_[2] = 0;
-  if (fields_[0] > total_)
-    fields_[0] = total_;
-
-  if (do_legend)
-    drawlegend();
+  checkFields(low, high);
 }

@@ -11,12 +11,11 @@
 #ifndef _LMSTEMP_H_
 #define _LMSTEMP_H_
 
-
-#include "fieldmeter.h"
+#include "sensorfieldmeter.h"
 #include <string>
 
 
-class LmsTemp : public FieldMeter {
+class LmsTemp : public SensorFieldMeter {
 public:
   LmsTemp( XOSView *parent, const char *name, const char *tempfile,
            const char *highfile, const char *lowfile, const char *label,
@@ -25,23 +24,19 @@ public:
 
   const char *name( void ) const { return "LmsTemp"; }
   void checkevent( void );
-
   void checkResources( void );
-protected:
 
+protected:
   void getlmstemp( void );
   bool checksensors( const char *name, const char *tempfile,
                      const char *highfile, const char *lowfile );
 private:
-  void updateLegend( void );
   void determineScale( void );
   void determineUnit( void );
   std::string _tempfile, _highfile, _lowfile;
-  char _unit[4];
   unsigned int _nbr;
-  double _high, _low, _scale;
-  bool _isproc, _has_high, _name_found, _temp_found, _high_found, _low_found;
-  unsigned long _actcolor, _highcolor, _lowcolor;
+  double _scale;
+  bool _isproc, _name_found, _temp_found, _high_found, _low_found;
 };
 
 
