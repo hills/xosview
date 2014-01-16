@@ -47,6 +47,8 @@ public:
 
   virtual void checkResources( void );
 
+  static double scaleValue( double value, char *scale, bool metric );
+
 protected:
   XOSView *parent_;
   int x_, y_, width_, height_, docaptions_, dolegends_, dousedlegends_;

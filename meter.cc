@@ -62,3 +62,53 @@ void Meter::resize( int x, int y, int width, int height ){
   height_ = (height>=0) ? height : 0; // beware of values < 0 !
   width_ &= ~1;                       // only allow even width_ values
 }
+
+double Meter::scaleValue( double value, char *scale, bool metric ){
+  double scaled = ( value < 0 ? -value : value );
+
+  if (scaled >= 999.5*1e15){
+    scale[0] = 'E';
+    scaled = value / ( metric ? 1e18 : 1ULL<<60 );
+  }
+  else if (scaled >= 999.5*1e12){
+    scale[0] = 'P';
+    scaled = value / ( metric ? 1e15 : 1ULL<<50 );
+  }
+  else if (scaled >= 999.5*1e9){
+    scale[0] = 'T';
+    scaled = value / ( metric ? 1e12 : 1ULL<<40 );
+  }
+  else if (scaled >= 999.5*1e6){
+    scale[0] = 'G';
+    scaled = value / ( metric ? 1e9 : 1UL<<30 );
+  }
+  else if (scaled >= 999.5*1e3){
+    scale[0] = 'M';
+    scaled = value / ( metric ? 1e6 : 1UL<<20 );
+  }
+  else if (scaled >= 999.5){
+    scale[0] = ( metric ? 'k' : 'K' );
+    scaled = value / ( metric ? 1e3 : 1UL<<10 );
+  }
+  else if (scaled < 0.9995 && metric){
+    if (scaled >= 0.9995/1e3){
+      scale[0] = 'm';
+      scaled = value * 1e3;
+    }
+    else if (scaled >= 0.9995/1e6){
+      scale[0] = '\265';
+      scaled = value * 1e6;
+    }
+    else {
+      scale[0] = 'n';
+      scaled = value * 1e9;
+    }
+    // add more if needed
+  }
+  else {
+    scale[0] = '\0';
+    scaled = value;
+  }
+  scale[1] = '\0';
+  return scaled;
+}

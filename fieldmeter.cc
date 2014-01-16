@@ -185,81 +185,8 @@ void FieldMeter::drawused( int manditory ){
     snprintf( buf, 10, "%d%%", (int)used_ );
   }
   else if (print_ == AUTOSCALE){
-    char scale;
-    double scaled_used, used = fabs(used_);
-      /*  Unfortunately, we have to do our comparisons by 1000s (otherwise
-       *  a value of 1020, which is smaller than 1K, could end up
-       *  being printed as 1020, which is wider than what can fit)  */
-      /*  However, we do divide by 1024, unless the meter is defined as metric,
-       *  so a K really is a K.  */
-      /*  In addition, we need to compare against 999.5*1000, because
-       *  999.5, if not rounded up to 1.0 K, will be rounded by the
-       *  %.0f to be 1000, which is too wide.  So anything at or above
-       *  999.5 needs to be bumped up.  */
-    if (used >= 999.5*1e15){
-      scale='E';
-      if (metric_)
-        scaled_used = used_/1e18;
-      else
-        scaled_used = used_/(1ULL<<60);
-    }
-    else if (used >= 999.5*1e12){
-      scale='P';
-      if (metric_)
-        scaled_used = used_/1e15;
-      else
-        scaled_used = used_/(1ULL<<50);
-    }
-    else if (used >= 999.5*1e9){
-      scale='T';
-      if (metric_)
-        scaled_used = used_/1e12;
-      else
-        scaled_used = used_/(1ULL<<40);
-    }
-    else if (used >= 999.5*1e6){
-      scale='G';
-      if (metric_)
-        scaled_used = used_/1e9;
-      else
-        scaled_used = used_/(1UL<<30);
-    }
-    else if (used >= 999.5*1e3){
-      scale='M';
-      if (metric_)
-        scaled_used = used_/1e6;
-      else
-        scaled_used = used_/(1UL<<20);
-    }
-    else if (used >= 999.5){
-      if (metric_) {
-        scale='k';
-        scaled_used = used_/1e3;
-      }
-      else {
-        scale='K';
-        scaled_used = used_/(1UL<<10);
-      }
-    }
-    else if (used < 0.9995 && metric_) {
-      if (used >= 0.9995/1e3) {
-        scale='m';
-        scaled_used = used_*1e3;
-      }
-      else if (used >= 0.9995/1e6) {
-        scale='\265';
-        scaled_used = used_*1e6;
-      }
-      else {
-        scale='n';
-        scaled_used = used_*1e9;
-      }
-      // add more if needed
-    }
-    else {
-      scale='\0';
-      scaled_used = used_;
-    }
+    char scale[2];
+    double scaled_used = scaleValue(used_, scale, metric_);
     /*  For now, we can only print 3 characters, plus the optional sign and
      *  suffix, without overprinting the legends.  Thus, we can
      *  print 965, or we can print 34, but we can't print 34.7 (the
@@ -269,20 +196,12 @@ void FieldMeter::drawused( int manditory ){
     else {
       if (scaled_used < 0 && !metric_)
         snprintf (buf, 10, "-");
-      else if ( fabs(scaled_used) < 9.95 ) {
+      else if ( fabs(scaled_used) < 9.95 )
         //  9.95 or above would get
         //  rounded to 10.0, which is too wide.
-        if (scale)
-          snprintf (buf, 10, "%.1f%c", scaled_used, scale);
-        else
-          snprintf (buf, 10, "%.1f", scaled_used);
-      }
-      else {
-        if (scale)
-          snprintf (buf, 10, "%.0f%c", scaled_used, scale);
-        else
-          snprintf (buf, 10, "%.0f", scaled_used);
-      }
+        snprintf (buf, 10, "%.1f%s", scaled_used, scale);
+      else
+        snprintf (buf, 10, "%.0f%s", scaled_used, scale);
     }
   }
   else
