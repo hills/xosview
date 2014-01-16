@@ -16,7 +16,6 @@
 #include <sys/utsname.h>
 
 static const char STATFILENAME[] = "/proc/stat";
-static const char VERSIONFILENAME[] = "/proc/sys/kernel/osrelease";
 static int cputime_to_field[10] = { 0, 1, 2, 9, 5, 4, 3, 8, 6, 7 };
 
 #define MAX_PROCSTAT_LENGTH 4096

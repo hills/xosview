@@ -11,8 +11,6 @@
 #include <stdlib.h>
 #include <sys/sysinfo.h>
 
-static const char MEMFILENAME[] = "/proc/meminfo";
-
 
 SwapMeter::SwapMeter( XOSView *parent )
 : FieldMeterGraph( parent, 2, "SWAP", "USED/FREE" ){
