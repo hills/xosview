@@ -30,6 +30,7 @@ static XrmOptionDescRec options[] = {
 //  CPU resources
 { "-cpu", "*cpu", XrmoptionNoArg, "False" },
 { "+cpu", "*cpu", XrmoptionNoArg, "True" },
+{ "-cpus", "*cpuFormat", XrmoptionNoArg, "single" },
 { "+cpus", "*cpuFormat", XrmoptionNoArg, "all" },
 // Load resources
 { "-load", "*load", XrmoptionNoArg, "False" },
