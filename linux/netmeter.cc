@@ -7,91 +7,24 @@
 //  This file may be distributed under terms of the GPL
 //
 
-//-----------------------------------------------------------------------
-//
-// To use this meter, ipaccounting needs to be configured in the kernel and
-// accounting needs to be set up.  Here are a couple of lines from my
-// rc.local which add ip accounting on all packets to and from my ip
-// address (192.168.0.3):
-//
-// /sbin/ipfw add accounting all iface 192.168.0.3 from 192.168.0.3 to 0/0
-// /sbin/ipfw add accounting all iface 192.168.0.3 from 0/0 to 192.168.0.3
-//
-// If you have more than one ip address you can add lines similar to the
-// ones above for the other addresses and this class will combine them in
-// its display.
-//-----------------------------------------------------------------------
-
-
 #include "netmeter.h"
-#include "cpumeter.h"
-#include "xosview.h"
-
-#include <unistd.h>
-#include <fstream>
 #include <string.h>
 #include <stdlib.h>
-#include <sys/socket.h>
-#include <sys/ioctl.h>
-#if defined(GNULIBC) || defined(__GLIBC__)
-#include <net/if.h>
-#else
-#include <linux/if.h>
-#endif
-#include <netinet/in.h>
 #include <errno.h>
 #include <iostream>
-#include <iomanip>
+#include <fstream>
 #include <string>
+
 
 NetMeter::NetMeter( XOSView *parent, float max )
   : FieldMeterGraph( parent, 3, "NET", "IN/OUT/IDLE" ){
-  _timer.start();
-  maxpackets_ = max;
+  _maxpackets = max;
   _lastBytesIn = _lastBytesOut = 0;
-  _usechains = false;
-  ignored_ = false;
-
-  checkOSVersion();
+  _ignored = false;
 }
 
 NetMeter::~NetMeter( void ){
-  close (_ipsock);
 }
-
-void NetMeter::checkOSVersion(void)
-    {
-    if (CPUMeter::getkernelversion() >= 2001000)
-        {
-	// check presence of iacct and oacct chains
-        std::ifstream chains("/proc/net/ip_fwchains");
-	int n = 0;
-	char buf[1024];
-
-        while (chains && !chains.eof())
-            {
-            chains >> buf;
-            chains.ignore(1024, '\n');
-
-            if (!strncmp(buf, "iacct", 5))
-                n |= 1;
-            if (!strncmp(buf, "oacct", 5))
-                n |= 2;
-            }
-
-	if (n == 3)
-            {
-            _netfilename = "/proc/net/ip_fwchains";
-            _usechains = true;
-            }
-	else
-            _netfilename = "/proc/net/dev";
-
-	_bytesInDev = 1;
-        }
-    else
-        _netfilename = "/proc/net/ip_acct";
-    }
 
 void NetMeter::checkResources( void ){
   FieldMeterGraph::checkResources();
@@ -99,223 +32,88 @@ void NetMeter::checkResources( void ){
   setfieldcolor( 0, parent_->getResource( "netInColor" ) );
   setfieldcolor( 1, parent_->getResource( "netOutColor" ) );
   setfieldcolor( 2, parent_->getResource( "netBackground" ) );
-  priority_ = atoi (parent_->getResource( "netPriority" ) );
+  priority_ = atoi( parent_->getResource( "netPriority" ) );
   useGraph_ = parent_->isResourceTrue( "netGraph" );
   dodecay_ = parent_->isResourceTrue( "netDecay" );
-  SetUsedFormat (parent_->getResource("netUsedFormat"));
-  netIface_ = parent_->getResource( "netIface" );
-  if (netIface_[0] == '-') {
-    ignored_ = true;
-    netIface_.erase(0, netIface_.find_first_not_of("- "));
-  }
-
-  _ipsock = socket(AF_INET, SOCK_DGRAM, 0);
-  if (_ipsock == -1) {
-    std::cerr <<"Can not open socket : " <<strerror( errno ) << std::endl;
-    parent_->done(1);
-    return;
+  SetUsedFormat( parent_->getResource("netUsedFormat") );
+  _netIface = parent_->getResource( "netIface" );
+  if (_netIface[0] == '-') {
+    _ignored = true;
+    _netIface.erase(0, _netIface.find_first_not_of("- "));
   }
 }
 
-void NetMeter::checkevent(void)
-    {
-    if (_bytesInDev)
-        checkeventNew();
-    else
-        checkeventOld();
+void NetMeter::checkevent( void ){
+  unsigned long long totin = 0, totout = 0;
+  std::ifstream ifs(NETFILENAME);
+  std::string line, ifname;
+
+  if (!ifs) {
+    std::cerr << "Can not open file : " << NETFILENAME << std::endl;
+    parent_->done(1);
+    return;
+  }
+
+  fields_[2] = _maxpackets;     // assume no
+  fields_[0] = fields_[1] = 0;  // network activity
+
+  ifs.ignore(1024, '\n');
+  ifs.ignore(1024, '\n');
+
+  IntervalTimerStop();
+  while ( !ifs.eof() ) {
+    unsigned long long vals[9];
+    std::getline(ifs, line);
+    if ( !ifs.good() )
+      break;
+
+    int colon = line.find_first_of(':');
+    ifname = line.substr(0, colon);
+    ifname.erase(0, ifname.find_first_not_of(' '));
+    if (_netIface != "False") {
+      if ( (!_ignored && ifname != _netIface) ||
+           ( _ignored && ifname == _netIface) )
+        continue;
     }
 
-void NetMeter::checkeventNew(void)
-    {
-    std::ifstream ifs(_netfilename);
+    std::string l = line.erase(0, colon + 1);
+    const char *cur = l.c_str();
+    if ( strncmp(cur, " No ", 4) == 0 )
+      continue; // xxx: No statistics available.
 
-    if (!ifs)
-        {
-        std::cerr <<"Can not open file : " <<_netfilename << std::endl;
-        parent_->done(1);
-        return;
-        }
+    char *end = NULL;
+    for (int i = 0; i < 9; i++) {
+      vals[i] = strtoull(cur, &end, 10);
+      cur = end;
+    }
+    totin += vals[0];
+    totout += vals[8];
+    XOSDEBUG("%s: %llu bytes received, %llu bytes sent.\n",
+             ifname.c_str(), vals[0], vals[8]);
+  }
 
-    unsigned long long ig, totin = 0, totout = 0;
+  double t = IntervalTimeInSecs();
+  IntervalTimerStart();
 
-    fields_[2] = maxpackets_;     // assume no
-    fields_[0] = fields_[1] = 0;  // network activity
-
-    _timer.stop();
-
-    if (_usechains)
-      {
-      char buf[1024];
-      while (ifs)
-        {
-	ifs >> buf;
-
-	if (!strncmp(buf, "iacct", 5))
-	  ifs >> buf >> buf >> ig >> ig >> ig >> ig >> ig >> ig >> totin;
-	else if (!strncmp(buf, "oacct", 5))
-	  ifs >> buf >> buf >> ig >> ig >> ig >> ig >> ig >> ig >> totout;
-
-	ifs.ignore(1024, '\n');
-        }
-      }
-    else
-        {
-	std::string line, ifname;
-	ifs.ignore(1024, '\n');
-	ifs.ignore(1024, '\n');
-
-	while (!ifs.eof())
-	    {
-	    unsigned long long vals[9];
-	    std::getline(ifs, line);
-	    if (!ifs.good())
-		break;
-	    int colon = line.find_first_of(':');
-	    ifname = line.substr(0, colon);
-	    ifname.erase(0, ifname.find_first_not_of(' '));
-	    if (netIface_ != "False" )
-		{
-		if ( (!ignored_ && ifname != netIface_) ||
-		     ( ignored_ && ifname == netIface_) )
-		    continue;
-		}
-
-	    std::string l = line.erase(0, colon + 1);
-	    const char *cur = l.c_str();
-	    if (strncmp(cur, " No ", 4) == 0)
-		continue; // xxx: No statistics available.
-	    char *end = NULL;
-	    for (int i = 0; i < 9; i++)
-		{
-		vals[i] = strtoull(cur, &end, 10);
-		cur = end;
-		}
-	    totin += vals[0];
-	    totout += vals[8];
-	    XOSDEBUG("%s: %llu bytes received, %llu bytes sent.\n", 
-		     ifname.c_str(), vals[0], vals[8]);
-	    }
-	}
-
-    float t = 1000000.0 / _timer.report_usecs();
-
-    if (t < 0)
-        t = 0.1;
-
-    fields_[0] = (totin - _lastBytesIn) * t;
-    fields_[1] = (totout - _lastBytesOut) * t;
-
+  if (_lastBytesIn == 0 && _lastBytesOut == 0) {  // first run
     _lastBytesIn = totin;
     _lastBytesOut = totout;
+  }
 
-    adjust();
+  fields_[0] = (totin - _lastBytesIn) / t;
+  fields_[1] = (totout - _lastBytesOut) / t;
 
-    if (total_)
-        setUsed(fields_[0] + fields_[1], total_);
-    _timer.start();
-    drawfields();
-    }
+  _lastBytesIn = totin;
+  _lastBytesOut = totout;
 
-void NetMeter::checkeventOld(void)
-    {
-    _timer.stop();
-    fields_[2] = maxpackets_;     // assume no
-    fields_[0] = fields_[1] = 0;  // network activity
+  total_ = fields_[0] + fields_[1];
+  if (total_ > _maxpackets)
+    fields_[2] = 0;
+  else {
+    total_ = _maxpackets;
+    fields_[2] = total_ - fields_[0] - fields_[1];
+  }
 
-    std::ifstream ifs(_netfilename);
-    if (!ifs)
-        {
-        std::cerr <<"Can not open file : " << _netfilename << std::endl;
-        parent_->done(1);
-        return;
-        }
-
-    struct ifconf ifc;
-    char buff[1024];
-    ifc.ifc_len = sizeof(buff);
-    ifc.ifc_buf = buff;
-    if (ioctl(_ipsock, SIOCGIFCONF, &ifc) < 0)
-        {
-        std::cerr <<"Can not get interface list : " <<strerror( errno )
-          << std::endl;
-        parent_->done(1);
-        return;
-        }
-
-    char c;
-    unsigned long long sa, da, sm, dm, bytes;
-    unsigned long long tot_in = 0, tot_out = 0;
-
-    ifs.ignore(1024, '\n');
-
-    while (ifs)
-        {
-        ifs >> std::hex >> sa >> c >> sm >> c >> c >> da >> c >> dm;
-        for (int index = 0 ; index < 7 ; index++)
-            ifs.ignore(9999, ' ');
-        ifs >> std::dec >> bytes;
-
-        ifs.ignore(9999, '\n');
-
-        if (!ifs.eof())
-            {
-            struct ifreq *ifr = ifc.ifc_req;
-            for (int i = ifc.ifc_len / sizeof(struct ifreq);
-                 --i >= 0; ifr++)
-                {
-                unsigned long adr = ntohl(
-                  ((struct sockaddr_in *)&ifr->ifr_addr)->sin_addr.s_addr);
-                if (sm == 0 && da == adr)
-                    {
-                    tot_in += bytes;
-                    break;
-                    }
-                if (dm == 0 && sa == adr)
-                    {
-                    tot_out += bytes;
-                    break;
-                    }
-                }
-            }
-        }
-
-    // This will happen when a dynamic connection (SLIP/PPP) goes down.
-    if ((tot_in < _lastBytesIn) || (tot_out < _lastBytesOut))
-        {
-        fields_[0] = fields_[1] = 0;
-        _lastBytesIn = tot_in;
-        _lastBytesOut = tot_out;
-        }
-    else
-        {
-        float t = 1000000.0 / _timer.report_usecs();
-
-        if (t < 0)  // can happen when system clock is reset. (ntp, timed, etc)
-            t = 0.1;
-
-        fields_[0] = (tot_in - _lastBytesIn) * t;
-        fields_[1] = (tot_out - _lastBytesOut) * t;
-
-        _lastBytesIn = tot_in;
-        _lastBytesOut = tot_out;
-        }
-
-    adjust();
-    if (total_)
-        setUsed(fields_[0] + fields_[1], total_);
-    _timer.start();
-    drawfields();
-    }
-
-void NetMeter::adjust(void)
-    {
-    total_ = fields_[0] + fields_[1];
-
-    if (total_ > maxpackets_)
-        fields_[2] = 0;
-    else
-        {
-        total_ = maxpackets_;
-        fields_[2] = total_ - fields_[0] - fields_[1];
-        }
-    }
+  setUsed(fields_[0] + fields_[1], total_);
+  drawfields();
+}

@@ -8,9 +8,11 @@
 #define _NETMETER_H_
 
 #include "fieldmetergraph.h"
-#include "timer.h"
+#include "xosview.h"
+#include <string>
 
-class Host;
+#define NETFILENAME "/proc/net/dev"
+
 
 class NetMeter : public FieldMeterGraph {
 public:
@@ -21,23 +23,13 @@ public:
   void checkevent( void );
 
   void checkResources( void );
-protected:
-  float maxpackets_;
-  std::string netIface_;
-  bool ignored_;
+
 private:
-  int _ipsock;
-  Timer _timer;
+  float _maxpackets;
+  std::string _netIface;
+  bool _ignored;
   unsigned long long _lastBytesIn, _lastBytesOut;
-  const char *_netfilename;
-  bool _usechains;
-  int _bytesInDev;
-
-  void adjust(void);
-  void checkOSVersion(void);
-
-  void checkeventOld(void);
-  void checkeventNew(void);
 };
+
 
 #endif
