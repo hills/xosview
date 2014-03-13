@@ -230,8 +230,12 @@ void BitFieldMeter::drawused( int manditory ){
         snprintf (buf, 10, "%.0f%s", scaled_used, scale);
     }
   }
-  else
-    snprintf( buf, 10, "%.1f", used_ );
+  else {
+    if ( fabs(used_) < 99.95 )
+      snprintf( buf, 10, "%.1f", used_ );
+    else  // drop the decimal if the string gets too long
+      snprintf( buf, 10, "%.0f", used_ );
+  }
 
   parent_->clear( x_ - usedoffset_, y_ + height_ - parent_->textHeight(),
                   usedoffset_ - onechar / 2, parent_->textHeight() + 1 );
