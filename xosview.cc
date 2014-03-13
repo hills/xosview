@@ -215,9 +215,9 @@ void XOSView::addmeter( Meter *fm ){
 int XOSView::findx( void ){
   if ( legend_ ){
     if ( !usedlabels_ )
-      return textWidth( "XXXXXXXXXXXXXXXXXXXXXXXXX" );
+      return textWidth( "XXXXXXXXXXXXXXXXXXXXXXXX" );
     else
-      return textWidth( "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" );
+      return textWidth( "XXXXXXXXXXXXXXXXXXXXXXXXXXXXX" );
   }
   return 80;
 }
