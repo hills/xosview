@@ -8,19 +8,28 @@
 //
 
 #include "netmeter.h"
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <dirent.h>
 #include <string.h>
 #include <stdlib.h>
-#include <errno.h>
 #include <iostream>
 #include <fstream>
 #include <string>
+
+static const char PROCNETDEV[] = "/proc/net/dev";
+static const char SYSCLASSNET[] = "/sys/class/net";
 
 
 NetMeter::NetMeter( XOSView *parent, float max )
   : FieldMeterGraph( parent, 3, "NET", "IN/OUT/IDLE" ){
   _maxpackets = max;
   _lastBytesIn = _lastBytesOut = 0;
-  _ignored = false;
+  _usesysfs = _ignored = false;
+
+  struct stat buf;
+  if ( stat(SYSCLASSNET, &buf) == 0 && S_ISDIR(buf.st_mode) )
+    _usesysfs = true;
 }
 
 NetMeter::~NetMeter( void ){
@@ -45,22 +54,104 @@ void NetMeter::checkResources( void ){
 
 void NetMeter::checkevent( void ){
   unsigned long long totin = 0, totout = 0;
-  std::ifstream ifs(NETFILENAME);
-  std::string line, ifname;
+  fields_[2] = _maxpackets;     // assume no
+  fields_[0] = fields_[1] = 0;  // network activity
 
-  if (!ifs) {
-    std::cerr << "Can not open file : " << NETFILENAME << std::endl;
+  IntervalTimerStop();
+  if (_usesysfs)
+    getSysStats(totin, totout);
+  else
+    getProcStats(totin, totout);
+
+  double t = IntervalTimeInSecs();
+  IntervalTimerStart();
+
+  if (_lastBytesIn == 0 && _lastBytesOut == 0) {  // first run
+    _lastBytesIn = totin;
+    _lastBytesOut = totout;
+  }
+
+  fields_[0] = (totin - _lastBytesIn) / t;
+  fields_[1] = (totout - _lastBytesOut) / t;
+
+  _lastBytesIn = totin;
+  _lastBytesOut = totout;
+
+  total_ = fields_[0] + fields_[1];
+  if (total_ > _maxpackets)
+    fields_[2] = 0;
+  else {
+    total_ = _maxpackets;
+    fields_[2] = total_ - fields_[0] - fields_[1];
+  }
+
+  setUsed(fields_[0] + fields_[1], total_);
+  drawfields();
+}
+
+void NetMeter::getSysStats( unsigned long long &totin, unsigned long long &totout ){
+  DIR *dir;
+  struct dirent *ent;
+  char filename[128];
+  std::ifstream ifs;
+  unsigned long long value;
+
+  if ( !(dir = opendir(SYSCLASSNET)) ) {
+    std::cerr << "Can not open directory : " << SYSCLASSNET << std::endl;
     parent_->done(1);
     return;
   }
 
-  fields_[2] = _maxpackets;     // assume no
-  fields_[0] = fields_[1] = 0;  // network activity
+  // walk through /sys/class/net/*/statistics/{r,t}x_bytes
+  while ( (ent = readdir(dir)) ) {
+    if ( !strncmp(ent->d_name, ".", 1) ||
+         !strncmp(ent->d_name, "..", 2) )
+      continue;
+    if ( _netIface != "False" &&
+         ( (!_ignored && ent->d_name != _netIface) ||
+           ( _ignored && ent->d_name == _netIface) ) )
+        continue;
+
+    snprintf(filename, 128, "%s/%s/statistics/rx_bytes", SYSCLASSNET, ent->d_name);
+    ifs.open(filename);
+    if ( !ifs.good() ) {
+      std::cerr << "Can not open file : " << filename << std::endl;
+      parent_->done(1);
+      return;
+    }
+    ifs >> value;
+    ifs.close();
+    totin += value;
+    XOSDEBUG("%s: %llu bytes received", ent->d_name, value);
+
+    snprintf(filename, 128, "%s/%s/statistics/tx_bytes", SYSCLASSNET, ent->d_name);
+    ifs.open(filename);
+    if ( !ifs.good() ) {
+      std::cerr << "Can not open file : " << filename << std::endl;
+      parent_->done(1);
+      return;
+    }
+    ifs >> value;
+    ifs.close();
+    totout += value;
+    XOSDEBUG(", %llu bytes sent.\n", value);
+  }
+  closedir(dir);
+}
+
+void NetMeter::getProcStats( unsigned long long &totin, unsigned long long &totout ){
+  std::ifstream ifs(PROCNETDEV);
+  std::string line, ifname;
+
+  if (!ifs) {
+    std::cerr << "Can not open file : " << PROCNETDEV << std::endl;
+    parent_->done(1);
+    return;
+  }
 
   ifs.ignore(1024, '\n');
   ifs.ignore(1024, '\n');
 
-  IntervalTimerStop();
   while ( !ifs.eof() ) {
     unsigned long long vals[9];
     std::getline(ifs, line);
@@ -91,29 +182,4 @@ void NetMeter::checkevent( void ){
     XOSDEBUG("%s: %llu bytes received, %llu bytes sent.\n",
              ifname.c_str(), vals[0], vals[8]);
   }
-
-  double t = IntervalTimeInSecs();
-  IntervalTimerStart();
-
-  if (_lastBytesIn == 0 && _lastBytesOut == 0) {  // first run
-    _lastBytesIn = totin;
-    _lastBytesOut = totout;
-  }
-
-  fields_[0] = (totin - _lastBytesIn) / t;
-  fields_[1] = (totout - _lastBytesOut) / t;
-
-  _lastBytesIn = totin;
-  _lastBytesOut = totout;
-
-  total_ = fields_[0] + fields_[1];
-  if (total_ > _maxpackets)
-    fields_[2] = 0;
-  else {
-    total_ = _maxpackets;
-    fields_[2] = total_ - fields_[0] - fields_[1];
-  }
-
-  setUsed(fields_[0] + fields_[1], total_);
-  drawfields();
 }
