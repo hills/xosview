@@ -13,27 +13,28 @@
 
 static const char *INTFILE     = "/proc/interrupts";
 static std::map<const int,int> realintnum;
+static const int max = 1024;
 
 
-IntMeter::IntMeter( XOSView *parent, int cpu)
-  : BitMeter( parent, "INTS", "", 1, 0, 0 ), _cpu(cpu), max(1024) {
-  irqs_ = lastirqs_ = NULL;
+IntMeter::IntMeter( XOSView *parent, int cpu )
+  : BitMeter( parent, "INTS", "", 1, 0, 0 ), _cpu(cpu) {
+  _irqs = _lastirqs = NULL;
   initirqcount();
 }
 
 IntMeter::~IntMeter( void ){
-   if(irqs_)
-   	delete [] irqs_;
-   if(lastirqs_)
-   	delete [] lastirqs_;
+  if (_irqs)
+    delete[] _irqs;
+  if (_lastirqs)
+    delete[] _lastirqs;
 }
 
 void IntMeter::checkevent( void ){
   getirqs();
 
   for ( int i = 0 ; i < numBits() ; i++ ){
-    bits_[i] = ((irqs_[i] - lastirqs_[i]) != 0);
-    lastirqs_[i] = irqs_[i];
+    bits_[i] = ((_irqs[i] - _lastirqs[i]) != 0);
+    _lastirqs[i] = _irqs[i];
   }
 
   BitMeter::checkevent();
@@ -43,8 +44,8 @@ void IntMeter::checkResources( void ){
   BitMeter::checkResources();
   onColor_  = parent_->allocColor( parent_->getResource( "intOnColor" ) );
   offColor_ = parent_->allocColor( parent_->getResource( "intOffColor" ) );
-  priority_ = atoi(parent_->getResource("intPriority"));
-  separate_ = parent_->isResourceTrue("intSeparate");
+  priority_ = atoi( parent_->getResource( "intPriority" ) );
+  _separate = parent_->isResourceTrue( "intSeparate" );
 }
 
 void IntMeter::getirqs( void ){
@@ -78,7 +79,7 @@ void IntMeter::getirqs( void ){
       count += tmp;
       cur = end;
     }
-    irqs_[intno] = ( separate_ ? tmp : count );
+    _irqs[intno] = ( _separate ? tmp : count );
   }
 }
 
@@ -88,9 +89,9 @@ void IntMeter::getirqs( void ){
  * Must call with init = true the first time.
  */
 void IntMeter::updateirqcount( int n, bool init ){
-   int old_bits=numBits();
-   setNumBits(n+1);
-   std::ostringstream os;
+  int old_bits = numBits();
+  setNumBits(n + 1);
+  std::ostringstream os;
 
   os << "0";
   if (realintnum.upper_bound(15) == realintnum.end()) // only 16 ints
@@ -122,30 +123,30 @@ void IntMeter::updateirqcount( int n, bool init ){
     }
     os << std::ends;
   }
-   legend(os.str().c_str());
-   unsigned long *old_irqs_=irqs_, *old_lastirqs_=lastirqs_;
-   irqs_=new unsigned long[n+1];
-   lastirqs_=new unsigned long[n+1];
-   /* If we are in init, set it to zero,
-    * otherwise copy over the old set */
-   if( init ) {
-	   for( int i=0; i < numBits(); i++)
-		irqs_[i]=lastirqs_[i]=0;
-   }
-   else {
-   	for( int i=0; i < old_bits; i++) {
-	   irqs_[i]=old_irqs_[i];
-	   lastirqs_[i]=old_lastirqs_[i];
-	}
-	// zero to the end the irq's that haven't been seen before
-	for( int i=old_bits; i< numBits(); i++) {
-	   irqs_[i]=lastirqs_[i]=0;
-        }
-   }
-   if(old_irqs_)
-   	delete [] old_irqs_;
-   if(old_lastirqs_)
-   	delete [] old_lastirqs_;
+
+  legend(os.str().c_str());
+  unsigned long *old_irqs = _irqs, *old_lastirqs = _lastirqs;
+  _irqs = new unsigned long[n+1];
+  _lastirqs = new unsigned long[n+1];
+  /* If we are in init, set it to zero,
+   * otherwise copy over the old set */
+  if (init) {
+    for (int i = 0; i < numBits(); i++)
+      _irqs[i] = _lastirqs[i] = 0;
+  }
+  else {
+    for (int i = 0; i < old_bits; i++) {
+      _irqs[i] = old_irqs[i];
+      _lastirqs[i] = old_lastirqs[i];
+    }
+    // zero to the end the irq's that haven't been seen before
+    for (int i = old_bits; i < numBits(); i++)
+      _irqs[i] = _lastirqs[i] = 0;
+  }
+  if (old_irqs)
+    delete[] old_irqs;
+  if (old_lastirqs)
+    delete[] old_lastirqs;
 }
 
 /* Find the highest number of interrupts and call updateirqcount to
@@ -161,7 +162,7 @@ void IntMeter::initirqcount( void ){
     exit( 1 );
   }
 
-  for (i=0; i<16; i++)
+  for (i = 0; i < 16; i++)
     realintnum[i] = i;
 
   intfile.ignore(max, '\n');
@@ -173,12 +174,13 @@ void IntMeter::initirqcount( void ){
   while ( !intfile.eof() ){
     intfile >> i;
     /* break when reaching non-numeric special interrupts */
-    if (!intfile) break;
+    if (!intfile)
+      break;
     if (i < 16)
-	intno = i;
+      intno = i;
     else {
-	intno = idx;
-	realintnum[i] = idx++;
+      intno = idx;
+      realintnum[i] = idx++;
     }
     intfile.ignore(max, '\n');
   }

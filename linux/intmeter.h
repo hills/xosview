@@ -12,21 +12,17 @@
 
 class IntMeter : public BitMeter {
 public:
-  IntMeter( XOSView *parent, int cpu = 0);
+  IntMeter( XOSView *parent, int cpu = 0 );
   ~IntMeter( void );
 
   void checkevent( void );
-
   void checkResources( void );
+  static int countCPUs( void ) { return CPUMeter::countCPUs(); }
 
-  static int countCPUs(void) { return CPUMeter::countCPUs(); }
-
-protected:
-  unsigned long *irqs_, *lastirqs_;
-
+private:
+  unsigned long *_irqs, *_lastirqs;
   int _cpu;
-  bool separate_;
-  const int max;
+  bool _separate;
 
   void getirqs( void );
   void updateirqcount( int n, bool init );
