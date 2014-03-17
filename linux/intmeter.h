@@ -25,7 +25,6 @@ protected:
   unsigned long *irqs_, *lastirqs_;
 
   int _cpu;
-  bool _old;
   bool separate_;
   const int max;
 

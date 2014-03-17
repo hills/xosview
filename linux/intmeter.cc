@@ -17,7 +17,6 @@ static std::map<const int,int> realintnum;
 
 IntMeter::IntMeter( XOSView *parent, int cpu)
   : BitMeter( parent, "INTS", "", 1, 0, 0 ), _cpu(cpu), max(1024) {
-  _old = ( CPUMeter::getkernelversion() <= 2000000 ? true : false );
   irqs_ = lastirqs_ = NULL;
   initirqcount();
 }
@@ -60,8 +59,7 @@ void IntMeter::getirqs( void ){
     exit( 1 );
   }
 
-  if (!_old)
-      intfile.ignore(max, '\n');
+  intfile.ignore(max, '\n');
 
   while ( !intfile.eof() ){
     std::getline(intfile, line);
@@ -163,11 +161,10 @@ void IntMeter::initirqcount( void ){
     exit( 1 );
   }
 
-  if (!_old) {
-    for (i=0; i<16; i++)
-      realintnum[i] = i;
-    intfile.ignore(max, '\n');
-  }
+  for (i=0; i<16; i++)
+    realintnum[i] = i;
+
+  intfile.ignore(max, '\n');
 
   /* just looking for the highest number interrupt that
    * is in use, ignore the rest of the data
