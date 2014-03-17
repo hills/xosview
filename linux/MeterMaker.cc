@@ -13,6 +13,7 @@
 #include "pagemeter.h"
 #include "netmeter.h"
 #include "intmeter.h"
+#include "intratemeter.h"
 #include "serialmeter.h"
 #include "loadmeter.h"
 #include "btrymeter.h"
@@ -146,6 +147,10 @@ void MeterMaker::makeMeters(void){
     else
       push(new IntMeter(_xos, cpuCount-1));
   }
+
+  // check for irqrate meter
+  if (_xos->isResourceTrue("irqrate"))
+    push(new IrqRateMeter(_xos));
 
   // check for the battery meter
   if (_xos->isResourceTrue("battery") && BtryMeter::has_source())

@@ -169,6 +169,7 @@ FreeBSD, OpenBSD, DragonflyBSD).
    *BSD   : IRQs
 
 \fBInterrupt Rate\fP: Per second
+   Linux  : interrupts | free
    *BSD   : interrupts | free
 
 \fBSerial Port Status\fP: "leds" which show the serial port parameters
@@ -908,6 +909,30 @@ This is the color that will be used to show "inactive" interrupts.
 
 .\"  Do the priority resource
 .pp int
+
+
+\fBInterrupt Rate Meter Resources\fP
+
+xosview*irqrate: (True or False)
+.RS
+If True then xosview will display an interrupt rate meter.
+.RE
+
+xosview*irqrateUsedColor: \fIcolor\fP
+.RS
+This is the color that will be used to show the interrupt rate.
+.RE
+
+.cc irqrate Idle idle
+
+.\"  Priority, decay, usedFormat resources:
+.pp irqrate
+
+.dc irqrate
+
+.dg irqrate
+
+.uf irqrate
 
 
 \fBLm Sensors Resources\fP
