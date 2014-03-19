@@ -130,9 +130,8 @@ XOSView::XOSView( const char * instName, int argc, char *argv[] ) : XWin(),
   for (int i = 1 ; i <= mm.n() ; i++)
     addmeter(mm[i]);
 
-  if (nummeters_ == 0)
-  {
-    fprintf (stderr, "No meters were enabled!  Exiting...\n");
+  if (nummeters_ == 0) {
+    std::cerr << "No meters were enabled!  Exiting..." << std::endl;
     exit (0);
   }
 

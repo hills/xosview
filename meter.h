@@ -8,7 +8,7 @@
 #define _METER_H_
 
 #include "xosview.h"
-#include <stdio.h>
+#include <iostream>
 
 
 class Meter {
@@ -30,8 +30,8 @@ public:
   void dousedlegends( int val ) { dousedlegends_ = val; }
   int requestevent( void ){
     if (priority_ == 0) {
-      fprintf(stderr, "Warning:  meter %s had an invalid priority "
-	      "of 0.  Resetting to 1...\n", name());
+      std::cerr << "Warning:  meter " << name() << " had an invalid priority "
+                << "of 0. Resetting to 1..." << std::endl;
       priority_ = 1;
     }
     int rval = counter_ % priority_;
