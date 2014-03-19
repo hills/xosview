@@ -16,9 +16,10 @@
 //    authors for a copy.
 //
 
-#include <stdlib.h>
-#include "kernel.h"
 #include "memmeter.h"
+#include "defines.h"
+#include "kernel.h"
+#include <stdlib.h>
 
 
 MemMeter::MemMeter( XOSView *parent )

@@ -8,11 +8,11 @@
 //    authors for a copy.
 //
 
+#include "intratemeter.h"
+#include "kernel.h"
 #include <stdlib.h>
 #include <strings.h>
 #include <err.h>
-#include "kernel.h"
-#include "intratemeter.h"
 
 
 IrqRateMeter::IrqRateMeter( XOSView *parent )

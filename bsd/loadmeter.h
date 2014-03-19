@@ -17,6 +17,7 @@
 #define _LOADMETER_H_
 
 #include "fieldmetergraph.h"
+#include "xosview.h"
 
 
 class LoadMeter : public FieldMeterGraph {

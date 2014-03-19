@@ -5,9 +5,6 @@
 //
 
 #include "swapmeter.h"
-#include "xosview.h"
-#include <fstream>
-#include <sstream>
 #include <stdlib.h>
 #include <sys/sysinfo.h>
 

@@ -5,7 +5,7 @@
 //
 
 #include "bitmeter.h"
-#include "xosview.h"
+
 
 BitMeter::BitMeter( XOSView *parent,
 		    const char *title, const char *legend, int numBits,

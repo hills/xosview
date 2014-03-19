@@ -8,8 +8,8 @@
 #define _BITMETER_H_
 
 #include "meter.h"
+#include "xosview.h"
 
-class XOSView;
 
 class BitMeter : public Meter {
 public:

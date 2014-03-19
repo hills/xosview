@@ -17,6 +17,7 @@
 #define _PAGEMETER_H_
 
 #include "fieldmetergraph.h"
+#include "xosview.h"
 
 
 class PageMeter : public FieldMeterGraph {

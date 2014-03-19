@@ -1,10 +1,11 @@
+#include "xwin.h"
+#include "Xrm.h"
 #include <X11/Xatom.h>
 #include <X11/xpm.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
-#include "xwin.h"
-#include "Xrm.h"
+#include <iostream>
 
 //-----------------------------------------------------------------------------
 

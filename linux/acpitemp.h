@@ -13,6 +13,7 @@
 
 
 #include "fieldmeter.h"
+#include "xosview.h"
 
 #define PATH_SIZE 128
 

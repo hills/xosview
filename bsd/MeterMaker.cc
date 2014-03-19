@@ -11,27 +11,28 @@
 //    authors for a copy.
 //
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+#include "MeterMaker.h"
 #include "defines.h"
 #include "kernel.h"
-#include "MeterMaker.h"
-#include "xosview.h"
-#include "btrymeter.h"
+#include "loadmeter.h"
 #include "cpumeter.h"
 #include "memmeter.h"
 #include "swapmeter.h"
-#include "netmeter.h"
-#include "loadmeter.h"
-#include "diskmeter.h"
 #include "pagemeter.h"
+#include "netmeter.h"
+#include "diskmeter.h"
 #include "intmeter.h"
 #include "intratemeter.h"
+#include "btrymeter.h"
 #if defined(__i386__) || defined(__x86_64__)
 #include "coretemp.h"
 #endif
 #include "sensor.h"
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <iostream>
 
 
 MeterMaker::MeterMaker(XOSView *xos) {

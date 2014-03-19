@@ -10,6 +10,7 @@
 #define _SENSORFIELDMETER_H_
 
 #include "fieldmeter.h"
+#include "xosview.h"
 
 
 class SensorFieldMeter : public FieldMeter {

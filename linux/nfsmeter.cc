@@ -8,22 +8,10 @@
 //
 
 #include "nfsmeter.h"
-#include "xosview.h"
-
-#include <unistd.h>
+#include <string.h>
+#include <stdio.h>
 #include <fstream>
-#include <stdlib.h>
-#include <sys/socket.h>
-#include <sys/ioctl.h>
-#if defined(GNULIBC) || defined(__GLIBC__)
-#include <net/if.h>
-#else
-#include <linux/if.h>
-#endif
-#include <netinet/in.h>
-#include <errno.h>
-#include <iostream>
-#include <iomanip>
+// #include <iostream>
 
 #ifndef MAX
 #define MAX(_a, _b) ((_a) > (_b) ? (_a) : (_b))

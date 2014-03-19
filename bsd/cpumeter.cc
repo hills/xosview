@@ -13,11 +13,11 @@
 //    authors for a copy.
 //
 
-#include <stdlib.h>
-#include <strings.h>
-#include <sys/types.h>
-#include "kernel.h"
 #include "cpumeter.h"
+#include "kernel.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <strings.h>
 
 
 CPUMeter::CPUMeter( XOSView *parent, unsigned int nbr )

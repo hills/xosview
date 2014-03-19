@@ -9,6 +9,8 @@
 
 #include <X11/Xlib.h>
 #include <X11/Xresource.h>
+#include <iostream>
+
 
 class Xrm {
 public:

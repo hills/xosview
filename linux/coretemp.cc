@@ -10,15 +10,18 @@
 //  This file may be distributed under terms of the GPL
 //
 //
-//
+
 #include "coretemp.h"
-#include "xosview.h"
 #include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 #include <glob.h>
-#include <dirent.h>
-#include <sys/stat.h>
 #include <sys/types.h>
+#include <sys/stat.h>
+#include <dirent.h>
 #include <fstream>
+#include <iostream>
+#include <string>
 
 #define PATH_SIZE 128
 

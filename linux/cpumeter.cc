@@ -5,15 +5,14 @@
 //
 
 #include "cpumeter.h"
-#include "xosview.h"
-#include <fstream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <string>
-#include <sstream>
 #include <ctype.h>
 #include <sys/utsname.h>
+#include <string>
+#include <iostream>
+#include <fstream>
 
 static const char STATFILENAME[] = "/proc/stat";
 static int cputime_to_field[10] = { 0, 1, 2, 9, 5, 4, 3, 8, 6, 7 };

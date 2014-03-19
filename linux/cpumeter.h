@@ -8,6 +8,8 @@
 #define _CPUMETER_H_
 
 #include "fieldmetergraph.h"
+#include "xosview.h"
+
 
 class CPUMeter : public FieldMeterGraph {
 public:

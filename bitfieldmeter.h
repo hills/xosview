@@ -9,7 +9,9 @@
 #define _BITFIELDMETER_H_
 
 #include "meter.h"
+#include "xosview.h"
 #include "timer.h"
+
 
 class BitFieldMeter : public Meter {
 public:

@@ -8,7 +8,9 @@
 #define _INTMETER_H_
 
 #include "bitmeter.h"
+#include "xosview.h"
 #include "cpumeter.h"
+
 
 class IntMeter : public BitMeter {
 public:

@@ -4,9 +4,6 @@
 //  This file may be distributed under terms of the GPL
 //
 
-#include <unistd.h>
-#include <stdlib.h>
-#include <sys/time.h>
 #include "xosview.h"
 #include "meter.h"
 #include "MeterMaker.h"
@@ -14,6 +11,11 @@
       defined(XOSVIEW_OPENBSD) || defined(XOSVIEW_DFBSD) )
 # include "kernel.h"
 #endif
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+#include <iostream>
 
 static const char * const versionString = "xosview version: Git";
 

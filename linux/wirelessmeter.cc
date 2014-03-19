@@ -4,14 +4,12 @@
 //  This file may be distributed under terms of the GPL
 //
 //
-// $Id: wirelessmeter.cc,v 1.3 2001/06/13
-//
+
 #include "wirelessmeter.h"
-#include "xosview.h"
-#include <fstream>
 #include <stdlib.h>
-#include <string.h>
 #include <stdio.h>
+#include <fstream>
+#include <iostream>
 
 
 WirelessMeter::WirelessMeter( XOSView *parent, int ID, const char *wlID)

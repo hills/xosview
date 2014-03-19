@@ -1,13 +1,13 @@
 #ifndef _XWIN_H_
 #define _XWIN_H_
 
+#include "Xrm.h"
+#include <string.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <iostream>
-#include <string.h>
 
 class XWin;
-class Xrm;
 
 typedef void (XWin::*EventCallBack)( XEvent &event );
 

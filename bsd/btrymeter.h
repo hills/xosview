@@ -11,6 +11,7 @@
 #define _BTRYMETER_H_
 
 #include "fieldmeter.h"
+#include "xosview.h"
 
 
 class BtryMeter : public FieldMeter {

@@ -13,10 +13,12 @@
 //    authors for a copy.
 //
 
-#include <stdlib.h>
-#include <stdio.h>
-#include "kernel.h"
 #include "loadmeter.h"
+#include "kernel.h"
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+#include <iostream>
 
 
 LoadMeter::LoadMeter( XOSView *parent )

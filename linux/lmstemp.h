@@ -12,6 +12,7 @@
 #define _LMSTEMP_H_
 
 #include "sensorfieldmeter.h"
+#include "xosview.h"
 #include <string>
 
 

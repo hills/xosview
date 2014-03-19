@@ -9,7 +9,7 @@
 
 #include "xwin.h"
 #include "Xrm.h"  //  For Xrm resource manager class.
-
+#include <stdio.h>
 
 /*  Take at most n samples per second (default of 10)  */
 extern double MAX_SAMPLES_PER_SECOND;

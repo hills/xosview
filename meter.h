@@ -7,10 +7,9 @@
 #ifndef _METER_H_
 #define _METER_H_
 
+#include "xosview.h"
 #include <stdio.h>
-#include "xosview.h"	//  To grab MAX_SAMPLES_PER_SECOND.
 
-class XOSView;
 
 class Meter {
 public:

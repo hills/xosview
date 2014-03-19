@@ -17,6 +17,8 @@
 #define _CPUMETER_H_
 
 #include "fieldmetergraph.h"
+#include "xosview.h"
+#include "defines.h"
 
 // for CPUSTATES
 #if defined(XOSVIEW_NETBSD)

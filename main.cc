@@ -5,6 +5,7 @@
 //
 
 #include "xosview.h"
+#include <string.h>
 
 int main( int argc, char *argv[] ) {
   /*  Icky.  Need to check for -name option here.  */

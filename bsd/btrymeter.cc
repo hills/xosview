@@ -7,10 +7,9 @@
 //  This file may be distributed under terms of the GPL
 //
 
-#include <stdlib.h>
 #include "btrymeter.h"
-#include "xosview.h"
 #include "kernel.h"
+#include <stdlib.h>
 
 
 BtryMeter::BtryMeter( XOSView *parent )

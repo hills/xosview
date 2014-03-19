@@ -4,17 +4,14 @@
 //  This file may be distributed under terms of the GPL
 //
 
+#include "Xrm.h"
+#include "Xrmcommandline.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>	//  For snprintf().
 #include <ctype.h>
-#include <iostream>
 #include <unistd.h>  //  for access(), etc.  BCG
-#ifndef NULL
-#define NULL 0
-#endif
-#include "Xrm.h"
-#include "Xrmcommandline.h"
+#include <iostream>
 
 extern char *defaultXResourceString;
 

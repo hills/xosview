@@ -8,6 +8,7 @@
 #define _RAIDMETER_H_
 
 #include "bitfieldmeter.h"
+#include "xosview.h"
 
 #define MAX_MD 8
 

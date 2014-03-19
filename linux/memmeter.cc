@@ -5,12 +5,14 @@
 //
 
 #include "memmeter.h"
-#include "xosview.h"
-#include <fstream>
-#include <sstream>
 #include <stdlib.h>
+// #include <stdio.h>
+#include <string.h>
+#include <fstream>
+#include <iostream>
 
 static const char MEMFILENAME[] = "/proc/meminfo";
+
 
 MemMeter::MemMeter( XOSView *parent )
 : FieldMeterGraph( parent, 6, "MEM", "USED/BUFF/SLAB/MAP/CACHE/FREE" ){

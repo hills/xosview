@@ -13,15 +13,16 @@
 //
 //
 #include "lmstemp.h"
-#include "xosview.h"
-#include <string>
-#include <fstream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include <dirent.h>
+#include <sys/types.h>
 #include <sys/stat.h>
+#include <dirent.h>
+#include <iostream>
+#include <string>
+#include <fstream>
 
 static const char PROC_SENSORS[] = "/proc/sys/dev/sensors";
 static const char SYS_SENSORS[]  = "/sys/class/hwmon";

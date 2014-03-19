@@ -8,7 +8,9 @@
 #define _FIELDMETER_H_
 
 #include "meter.h"
+#include "xosview.h"
 #include "timer.h"
+
 
 class FieldMeter : public Meter {
 public:

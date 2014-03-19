@@ -4,12 +4,12 @@
 //  This file may be distributed under terms of the GPL
 //
 //
-// $Id: btrymeter.h,v 1.1 1997/02/26 23:44:50 mromberg Exp $
-//
+
 #ifndef _WIRELESSMETER_H_
 #define _WIRELESSMETER_H_
 
 #include "fieldmetergraph.h"
+#include "xosview.h"
 #include <string>
 
 static const char WLFILENAME[] = "/proc/net/wireless";

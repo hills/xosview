@@ -9,13 +9,13 @@
 //
 //
 
+#include "sensor.h"
+#include "kernel.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 #include <string>
-#include "kernel.h"
-#include "sensor.h"
 
 
 BSDSensor::BSDSensor( XOSView *parent, const char *name, const char *high,

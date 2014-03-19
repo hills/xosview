@@ -12,10 +12,11 @@
 //
 //
 
+#include "coretemp.h"
+#include "kernel.h"
 #include <stdlib.h>
 #include <stdio.h>
-#include "kernel.h"
-#include "coretemp.h"
+#include <iostream>
 
 
 CoreTemp::CoreTemp( XOSView *parent, const char *label, const char *caption, int cpu)

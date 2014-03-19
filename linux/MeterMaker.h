@@ -8,9 +8,9 @@
 #define _MeterMaker_h
 
 #include "pllist.h"
+#include "meter.h"
+#include "xosview.h"
 
-class Meter;
-class XOSView;
 
 class MeterMaker : public PLList<Meter *> {
 public:

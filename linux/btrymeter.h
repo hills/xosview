@@ -7,8 +7,8 @@
 #ifndef _BTRYMETER_H_
 #define _BTRYMETER_H_
 
-
 #include "fieldmeter.h"
+#include "xosview.h"
 #include <string>
 
 

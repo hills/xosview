@@ -12,6 +12,8 @@
 #define UART_MSR        6
 
 #include "bitmeter.h"
+#include "xosview.h"
+
 
 class SerialMeter : public BitMeter {
 public:

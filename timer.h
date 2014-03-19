@@ -14,8 +14,10 @@
 //
 //   Author : Mike Romberg
 
-
 #include "timeval.h"
+#include <sys/time.h>
+#include <iostream>
+
 
 class Timer {
 public:

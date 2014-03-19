@@ -13,10 +13,9 @@
 //    authors for a copy.
 //
 
-#include <stdlib.h>
-#include <sys/types.h>
-#include "kernel.h"
 #include "swapmeter.h"
+#include "kernel.h"
+#include <stdlib.h>
 
 
 SwapMeter::SwapMeter( XOSView *parent )

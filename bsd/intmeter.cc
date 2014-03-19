@@ -4,11 +4,11 @@
 //  This file may be distributed under terms of the GPL
 //
 
+#include "intmeter.h"
+#include "kernel.h"
 #include <stdlib.h>
 #include <strings.h>
 #include <sstream>
-#include "kernel.h"
-#include "intmeter.h"
 
 
 IntMeter::IntMeter( XOSView *parent, const char *, const char *, int dolegends, int dousedlegends )

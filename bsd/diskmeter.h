@@ -15,6 +15,7 @@
 #define _DISKMETER_H_
 
 #include "fieldmetergraph.h"
+#include "xosview.h"
 #include "defines.h"
 
 

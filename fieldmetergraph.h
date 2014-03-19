@@ -12,8 +12,9 @@
 #ifndef _FIELDMETERGRAPH_H_
 #define _FIELDMETERGRAPH_H_
 
-#include "meter.h"
 #include "fieldmeterdecay.h"
+#include "xosview.h"
+
 
 class FieldMeterGraph : public FieldMeterDecay {
 public:

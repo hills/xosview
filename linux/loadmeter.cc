@@ -8,10 +8,13 @@
 //
 
 #include "loadmeter.h"
-#include "xosview.h"
 #include "cpumeter.h"
-#include <fstream>
 #include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <fstream>
+#include <iostream>
+#include <string>
 
 static const char LOADFILENAME[] = "/proc/loadavg";
 static const char SPEEDFILENAME[] = "/proc/cpuinfo";

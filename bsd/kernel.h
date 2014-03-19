@@ -14,7 +14,6 @@
 //    authors for a copy.
 //
 
-#include <sys/types.h>
 #include "defines.h"
 
 void

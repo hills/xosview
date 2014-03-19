@@ -4,12 +4,13 @@
 //  This file may be distributed under terms of the GPL
 //
 
-#include <iostream>
-#include <fstream>
-#include <stdlib.h>
-#include <math.h>
 #include "fieldmeter.h"
-#include "xosview.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+#include <iostream>
+
 
 FieldMeter::FieldMeter( XOSView *parent, int numfields, const char *title,
                         const char *legend, int docaptions, int dolegends,

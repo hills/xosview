@@ -6,12 +6,15 @@
 //
 
 #include "raidmeter.h"
-#include "xosview.h"
-#include <fstream>
-#include <sstream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <fstream>
+#include <sstream>
+#include <iostream>
+
+static const char *RAIDFILE    = "/proc/mdstat";
+
 
 RAIDMeter::RAIDMeter( XOSView *parent, int raiddev)
   : BitFieldMeter( parent, 1, 2, "RAID") {
@@ -89,8 +92,6 @@ int RAIDMeter::find2(const char *key, const char *findwhat,
   rc=!strncmp(buf,key, 80);
   return rc;
 }
-
-static const char *RAIDFILE    = "/proc/mdstat";
 
 int RAIDMeter::raidparse(char *cp){
   char *key, *val;

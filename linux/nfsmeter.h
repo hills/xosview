@@ -7,9 +7,9 @@
 #define _NFSMETER_H_
 
 #include "fieldmetergraph.h"
+#include "xosview.h"
 #include "timer.h"
 
-class Host;
 
 class NFSMeter : public FieldMeterGraph {
 public:

@@ -16,8 +16,9 @@
 #ifndef _FIELDMETERDECAY_H_
 #define _FIELDMETERDECAY_H_
 
-#include "meter.h"
 #include "fieldmeter.h"
+#include "xosview.h"
+
 
 class FieldMeterDecay : public FieldMeter {
 public:

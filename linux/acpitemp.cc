@@ -10,11 +10,15 @@
 //
 
 #include "acpitemp.h"
-#include "xosview.h"
-#include <fstream>
 #include <stdlib.h>
-#include <dirent.h>
+#include <stdio.h>
+#include <string.h>
+#include <sys/types.h>
 #include <sys/stat.h>
+#include <dirent.h>
+#include <fstream>
+#include <iostream>
+#include <string>
 
 static const char PROC_ACPI_TZ[] = "/proc/acpi/thermal_zone";
 static const char SYS_ACPI_TZ[]  = "/sys/devices/virtual/thermal";

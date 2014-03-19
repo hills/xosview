@@ -12,6 +12,7 @@
 #define _IRQRATEMETER_H_
 
 #include "fieldmetergraph.h"
+#include "xosview.h"
 
 
 class IrqRateMeter : public FieldMeterGraph {

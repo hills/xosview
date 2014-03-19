@@ -13,6 +13,7 @@
 
 
 #include "fieldmeter.h"
+#include "xosview.h"
 
 
 class CoreTemp : public FieldMeter {

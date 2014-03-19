@@ -8,11 +8,13 @@
 //  In order to use this new serial meter, xosview needs to be suid root.
 //
 #include "serialmeter.h"
-#include "xosview.h"
-#include <fcntl.h>
 #include <sys/ioctl.h>
-#include <errno.h>
+#include <sys/types.h>
+#include <fcntl.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <iostream>
+#include <string>
 #include <sstream>
 #include <iomanip>
 
@@ -27,7 +29,6 @@ typedef signed long long s64;
 typedef unsigned long long u64;
 #endif
 
-#include <unistd.h>
 #if defined(GNULIBC) || defined(__GLIBC__)
 #if !defined(__powerpc__) && !defined(__hppa__) && !defined(__mips__) && !defined(__sparc__) && !defined(__sh__) && !defined(__s390__) && !defined(__s390x__) && !defined(__m68k__)
 #include <sys/io.h>
@@ -42,6 +43,7 @@ typedef unsigned long long u64;
 #endif
 #endif
 #include <linux/serial.h>
+
 
 SerialMeter::SerialMeter( XOSView *parent, Device device )
   : BitMeter( parent, getTitle(device), "LSR bits(0-7), MSR bits(0-7)", 16){

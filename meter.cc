@@ -5,7 +5,8 @@
 //
 
 #include "meter.h"
-#include "xosview.h"
+#include <string.h>
+
 
 Meter::Meter( XOSView *parent, const char *title, const char *legend,
               int docaptions, int dolegends, int dousedlegends ) {

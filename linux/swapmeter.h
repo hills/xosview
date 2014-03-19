@@ -7,8 +7,8 @@
 #ifndef _SWAPMETER_H_
 #define _SWAPMETER_H_
 
-
 #include "fieldmetergraph.h"
+#include "xosview.h"
 
 
 class SwapMeter : public FieldMeterGraph {

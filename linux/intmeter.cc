@@ -5,11 +5,12 @@
 //
 
 #include "intmeter.h"
-#include "xosview.h"
+#include <stdlib.h>
 #include <fstream>
+#include <string>
+#include <iostream>
 #include <sstream>
 #include <map>
-#include <stdlib.h>
 
 static const char *INTFILE     = "/proc/interrupts";
 static std::map<const int,int> realintnum;

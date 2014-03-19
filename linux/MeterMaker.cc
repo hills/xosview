@@ -7,33 +7,34 @@
 #include "MeterMaker.h"
 #include "xosview.h"
 
+#include "loadmeter.h"
 #include "cpumeter.h"
 #include "memmeter.h"
-#include "swapmeter.h"
-#include "pagemeter.h"
-#include "netmeter.h"
-#include "intmeter.h"
-#include "intratemeter.h"
-#include "serialmeter.h"
-#include "loadmeter.h"
-#include "btrymeter.h"
-#include "wirelessmeter.h"
-#include <fstream>
 #include "diskmeter.h"
 #include "raidmeter.h"
-#include "lmstemp.h"
-#include "acpitemp.h"
+#include "swapmeter.h"
+#include "pagemeter.h"
+#include "wirelessmeter.h"
+#include "netmeter.h"
+#include "nfsmeter.h"
+#include "serialmeter.h"
+#include "intmeter.h"
+#include "intratemeter.h"
+#include "btrymeter.h"
 #if defined(__i386__) || defined(__x86_64__)
 #include "coretemp.h"
 #endif
-#include "nfsmeter.h"
+#include "lmstemp.h"
+#include "acpitemp.h"
 
+#include <string.h>
 #include <stdlib.h>
-
+#include <stdio.h>
+#include <fstream>
+#include <iostream>
 #include <sstream>
 #include <iomanip>
 
-using namespace std;
 
 MeterMaker::MeterMaker(XOSView *xos){
   _xos = xos;
@@ -89,7 +90,7 @@ void MeterMaker::makeMeters(void){
 
   // check for the wireless meter
   if ( _xos->isResourceTrue("wireless") ) {
-    ifstream stats( WLFILENAME );
+    std::ifstream stats( WLFILENAME );
     if (!stats)
       std::cerr << "Wireless Meter needs Linux Wireless Extensions or cfg80211-"
                 << "WEXT compatibility to work." << std::endl;

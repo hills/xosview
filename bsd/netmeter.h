@@ -17,6 +17,7 @@
 #define _NETMETER_H_
 
 #include "fieldmetergraph.h"
+#include "xosview.h"
 #include <string>
 
 

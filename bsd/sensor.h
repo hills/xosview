@@ -11,8 +11,8 @@
 #ifndef _BSDSENSOR_H_
 #define _BSDSENSOR_H__
 
-
 #include "sensorfieldmeter.h"
+#include "xosview.h"
 
 #define NAMESIZE 32
 

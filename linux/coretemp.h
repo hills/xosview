@@ -7,12 +7,12 @@
 //  This file may be distributed under terms of the GPL
 //
 //
-//
+
 #ifndef _CORETEMP_H_
 #define _CORETEMP_H_
 
-#include "cpumeter.h"
 #include "fieldmeter.h"
+#include "xosview.h"
 #include <string>
 #include <vector>
 

@@ -5,11 +5,13 @@
 //  This file may be distributed under terms of the GPL
 //
 //
-#include <fstream>
+
+#include "bitfieldmeter.h"
+#include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include <math.h>
-#include "bitfieldmeter.h"
-#include "xosview.h"
+#include <iostream>
 
 
 BitFieldMeter::BitFieldMeter( XOSView *parent, int numBits, int numfields,

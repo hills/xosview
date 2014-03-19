@@ -5,15 +5,17 @@
 //
 
 #include "diskmeter.h"
-#include "xosview.h"
-#include <fstream>
 #include <stdlib.h>
+#include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h>
+#include <string.h>
 #include <dirent.h>
 #include <errno.h>
 #include <limits.h>
+#include <fstream>
+#include <iostream>
+#include <string>
 
 #define MAX_PROCSTAT_LENGTH 4096
 

@@ -10,11 +10,10 @@
 //    authors for a copy.
 //
 
+#include "diskmeter.h"
+#include "kernel.h"
 #include <stdlib.h>
 #include <err.h>
-#include <sys/types.h>
-#include "kernel.h"
-#include "diskmeter.h"
 
 
 DiskMeter::DiskMeter( XOSView *parent, double max )

@@ -14,9 +14,9 @@
 //    authors for a copy.
 //
 
-#include <stdlib.h>
-#include "kernel.h"
 #include "pagemeter.h"
+#include "kernel.h"
+#include <stdlib.h>
 
 
 PageMeter::PageMeter( XOSView *parent, double total )

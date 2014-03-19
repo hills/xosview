@@ -8,6 +8,7 @@
 #define _INTMETER_H_
 
 #include "bitmeter.h"
+#include "xosview.h"
 #include <map>
 
 

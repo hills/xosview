@@ -5,12 +5,12 @@
 //
 
 #include "pagemeter.h"
-#include "xosview.h"
-#include <fstream>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h>
+#include <string.h>
+#include <fstream>
+#include <iostream>
 
 #define MAX_PROCSTAT_LENGTH 4096
 

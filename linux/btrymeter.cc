@@ -5,27 +5,24 @@
 //
 
 #include "btrymeter.h"
-#include "xosview.h"
-#include <fstream>
-#include <iostream>
-#include <sstream>
 #include <stdlib.h>
-#include <sys/types.h>
-#include <dirent.h>
-
+#include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <dirent.h>
 #include <string.h>
 #include <errno.h>
-
-extern int errno;
-
+#include <fstream>
+#include <string>
+#include <iostream>
+#include <sstream>
 
 static const char APMFILENAME[] = "/proc/apm";
 static const char ACPIBATTERYDIR[] = "/proc/acpi/battery";
 static const char SYSPOWERDIR[] = "/sys/class/power_supply";
+
 
 BtryMeter::BtryMeter( XOSView *parent )
   : FieldMeter( parent, 2, "BTRY", "CHRG/USED", 1, 1, 0 ){

@@ -13,10 +13,10 @@
 //    authors for a copy.
 //
 
+#include "netmeter.h"
+#include "kernel.h"
 #include <stdlib.h>
 #include <err.h>
-#include "kernel.h"
-#include "netmeter.h"
 
 
 NetMeter::NetMeter( XOSView *parent, double max )

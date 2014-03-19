@@ -4,8 +4,8 @@
 //  This file may be distributed under terms of the GPL
 //
 
-#include <iostream>
 #include "llist.h"
+#include <stdio.h>
 
 LList::LNode::LNode( void *data ){
   data_ = data;

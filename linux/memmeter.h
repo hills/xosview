@@ -8,6 +8,9 @@
 #define _MEMMETER_H_
 
 #include "fieldmetergraph.h"
+#include "xosview.h"
+#include <string.h>
+
 
 class MemMeter : public FieldMeterGraph {
 public:
