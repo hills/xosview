@@ -5,7 +5,6 @@
 #define _CPUMETER_H_
 
 #include "fieldmetergraph.h"
-
 #include <kstat.h>
 #include <sys/sysinfo.h>
 
@@ -27,7 +26,6 @@ class CPUMeter : public FieldMeterGraph {
 	int cpuindex_;
 
 	void getcputime(void);
-	const char *toUpper(const char *str);
 
  private:
 	bool aggregate;

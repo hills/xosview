@@ -11,8 +11,7 @@
 #include <sstream>
 
 CPUMeter::CPUMeter(XOSView *parent, kstat_ctl_t *_kc, int cpuid)
-	: FieldMeterGraph(parent, CPU_STATES, toUpper(cpuStr(cpuid)),
-	    "USER/SYS/WAIT/IDLE")
+	: FieldMeterGraph(parent, CPU_STATES, cpuStr(cpuid), "USER/SYS/WAIT/IDLE")
 {
 	kc = _kc;
 	aggregate = ( cpuid == 0 );
@@ -99,31 +98,14 @@ void CPUMeter::getcputime(void)
 		setUsed(total_ - fields_[3], total_);
 }
 
-const char *CPUMeter::toUpper(const char *str)
+const char *CPUMeter::cpuStr(int num)
 {
-	static char buffer[256];
-	strncpy(buffer, str, 256);
-	for (char *tmp = buffer ; *tmp != '\0' ; tmp++)
-		*tmp = toupper(*tmp);
-
+	static char buffer[8] = "CPU";
+	if (num > 0)
+		snprintf(buffer + 3, 4, "%d", num - 1);
+	buffer[7] = '\0';
 	return buffer;
 }
-
-const char *CPUMeter::cpuStr(int num)
-    {
-    static char buffer[32];
-    std::ostringstream str;
-
-    str << "cpu";
-    if (num != 0)
-        str << (num - 1);
-    str << std::ends;
-
-    strncpy(buffer, str.str().c_str(), 32);
-    buffer[31] = '\0';
-
-    return buffer;
-    }
 
 int CPUMeter::countCPUs(kstat_ctl_t *kc)
 {
