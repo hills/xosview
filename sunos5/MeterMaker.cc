@@ -13,6 +13,7 @@
 #include "netmeter.h"
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 
 MeterMaker::MeterMaker(XOSView *xos)
@@ -34,7 +35,7 @@ void MeterMaker::makeMeters(void)
   // Standard meters (usually added, but users could turn them off)
   if (_xos->isResourceTrue("cpu")) {
     bool single, both, all;
-    int cpuCount = CPUMeter::countCPUs(kc);
+    int cpuCount = sysconf(_SC_NPROCESSORS_ONLN);
 
     single = (strncmp(_xos->getResource("cpuFormat"), "single", 2) == 0);
     both = (strncmp(_xos->getResource("cpuFormat"), "both", 2) == 0);

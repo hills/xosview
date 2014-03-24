@@ -6,6 +6,7 @@
 #include "xosview.h"
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include <kstat.h>
 #include <iostream>
 #ifdef NO_GETLOADAVG
@@ -55,7 +56,7 @@ void LoadMeter::checkResources(void)
 
 	const char *warn = parent_->getResource("loadWarnThreshold");
 	if (strncmp(warn, "auto", 2) == 0)
-		warnThreshold = CPUMeter::countCPUs(kc);
+		warnThreshold = sysconf(_SC_NPROCESSORS_ONLN);
 	else
 		warnThreshold = atoi(warn);
 

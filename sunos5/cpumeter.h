@@ -15,10 +15,7 @@ class CPUMeter : public FieldMeterGraph {
 
 	const char *name(void) const { return "CPUMeter"; }
 	void checkevent(void);
-
 	void checkResources(void);
-
-	static int countCPUs(kstat_ctl_t *kc);
 	static const char *cpuStr(int num);
 
  protected:

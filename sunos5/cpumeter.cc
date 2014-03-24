@@ -8,7 +8,7 @@
 #include <ctype.h>
 #include <string.h>
 #include <strings.h>
-#include <sstream>
+
 
 CPUMeter::CPUMeter(XOSView *parent, kstat_ctl_t *_kc, int cpuid)
 	: FieldMeterGraph(parent, CPU_STATES, cpuStr(cpuid), "USER/SYS/WAIT/IDLE")
@@ -105,16 +105,4 @@ const char *CPUMeter::cpuStr(int num)
 		snprintf(buffer + 3, 4, "%d", num - 1);
 	buffer[7] = '\0';
 	return buffer;
-}
-
-int CPUMeter::countCPUs(kstat_ctl_t *kc)
-{
-	kstat_t *ksp;
-	int i = 0;
-
-        for (ksp = kc->kc_chain; ksp != NULL; ksp = ksp->ks_next) {
-                if (strncmp(ksp->ks_name, "cpu_stat", 8) == 0)
-                        i++;
-        }
-	return (i);
 }
