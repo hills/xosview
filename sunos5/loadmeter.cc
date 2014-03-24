@@ -7,18 +7,26 @@
 #include <stdlib.h>
 #include <string.h>
 #include <kstat.h>
-/*#include <sys/loadavg.h>*/
+#ifdef NO_GETLOADAVG
+#ifndef FSCALE
+#define FSCALE (1<<8)
+#endif
+#else
+#include <sys/loadavg.h>
+#endif
 
 
 LoadMeter::LoadMeter(XOSView *parent, kstat_ctl_t *_kc)
 	: FieldMeterGraph(parent, 2, "LOAD", "PROCS/MIN", 1, 1, 0)
 {
 	kc = _kc;
+#ifdef NO_GETLOADAVG
 	ksp = kstat_lookup(kc, "unix", 0, "system_misc");
 	if (ksp == NULL) {
 		parent_->done(1);
 		return;
 	}
+#endif
 	total_ = -1;
 	lastalarmstate = -1;
 }
@@ -81,7 +89,9 @@ void LoadMeter::checkevent(void)
 void LoadMeter::getloadinfo(void)
 {
 	int alarmstate;
-#if 1
+#ifdef NO_GETLOADAVG
+	// This code is mainly for Solaris 6 and earlier, but should work on
+	// any version.
 	kstat_named_t *k;
 
 	if (kstat_read(kc, ksp, NULL) == -1) {
@@ -93,12 +103,10 @@ void LoadMeter::getloadinfo(void)
 		parent_->done(1);
 		return;
 	}
-	fields_[0] = (double)k->value.l / (1l << 8);
+	fields_[0] = (double)k->value.l / FSCALE;
 #else
-	double oneMinLoad;
-
-	getloadavg(&oneMinLoad, 1);
-	fields_[0] = oneMinLoad;
+	// getloadavg() if found on Solaris 7 and newer.
+	getloadavg(&fields_[0], 1);
 #endif
 	
 	if (fields_[0] <  warnThreshold)
