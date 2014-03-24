@@ -11,7 +11,7 @@
 #include "pagemeter.h"
 #include "diskmeter.h"
 #include "netmeter.h"
-
+#include <string.h>
 #include <stdlib.h>
 
 
@@ -33,10 +33,27 @@ void MeterMaker::makeMeters(void)
 
   // Standard meters (usually added, but users could turn them off)
   if (_xos->isResourceTrue("cpu")) {
+    bool single, both, all;
     int cpuCount = CPUMeter::countCPUs(kc);
-    int start = (cpuCount == 0) ? 0 : 1;
-    for (int i = start ; i <= cpuCount ; i++)
-      push(new CPUMeter(_xos, kc, i));
+
+    single = (strncmp(_xos->getResource("cpuFormat"), "single", 2) == 0);
+    both = (strncmp(_xos->getResource("cpuFormat"), "both", 2) == 0);
+    all = (strncmp(_xos->getResource("cpuFormat"), "all", 2) == 0);
+
+    if (strncmp(_xos->getResource("cpuFormat"), "auto", 2) == 0) {
+      if (cpuCount == 1 || cpuCount > 4)
+        single = true;
+      else
+        all = true;
+    }
+
+    if (single || both)
+      push(new CPUMeter(_xos, kc, 0));
+
+    if (all || both) {
+      for (int i = 1; i <= cpuCount; i++)
+        push(new CPUMeter(_xos, kc, i));
+    }
   }
 
   if (_xos->isResourceTrue("mem"))

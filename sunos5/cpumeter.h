@@ -30,6 +30,7 @@ class CPUMeter : public FieldMeterGraph {
 	const char *toUpper(const char *str);
 
  private:
+	bool aggregate;
 	kstat_ctl_t *kc;
 	kstat_t *ksp;
 };

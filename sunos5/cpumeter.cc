@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <ctype.h>
 #include <string.h>
+#include <strings.h>
 #include <sstream>
 
 CPUMeter::CPUMeter(XOSView *parent, kstat_ctl_t *_kc, int cpuid)
@@ -14,17 +15,20 @@ CPUMeter::CPUMeter(XOSView *parent, kstat_ctl_t *_kc, int cpuid)
 	    "USER/SYS/WAIT/IDLE")
 {
 	kc = _kc;
+	aggregate = ( cpuid == 0 );
 	for (int i = 0 ; i < 2 ; i++)
 		for (int j = 0 ; j < CPU_STATES ; j++)
 			cputime_[i][j] = 0;
 	cpuindex_ = 0;
 
-	int j = 0;
-	for (ksp = kc->kc_chain; ksp != NULL; ksp = ksp->ks_next) {
-		if (strncmp(ksp->ks_name, "cpu_stat", 8) == 0) {
-			j++;
-			if (j == cpuid)
-				break;
+	if (!aggregate) {
+		int j = 0;
+		for (ksp = kc->kc_chain; ksp != NULL; ksp = ksp->ks_next) {
+			if (strncmp(ksp->ks_name, "cpu_stat", 8) == 0) {
+				j++;
+				if (j == cpuid)
+					break;
+			}
 		}
 	}
 }
@@ -58,14 +62,31 @@ void CPUMeter::getcputime(void)
 	total_ = 0;
 	cpu_stat_t cs;
 
-	if (kstat_read(kc, ksp, &cs) == -1) {
-		parent_->done(1);
-		return;
+	if (aggregate) {
+		bzero(cputime_[cpuindex_], CPU_STATES * sizeof(cputime_[cpuindex_][0]));
+		for (ksp = kc->kc_chain; ksp != NULL; ksp = ksp->ks_next) {
+			if (strncmp(ksp->ks_name, "cpu_stat", 8))
+				continue;
+			if (kstat_read(kc, ksp, &cs) == -1) {
+				parent_->done(1);
+				return;
+			}
+			cputime_[cpuindex_][0] += cs.cpu_sysinfo.cpu[CPU_USER];
+			cputime_[cpuindex_][1] += cs.cpu_sysinfo.cpu[CPU_KERNEL];
+			cputime_[cpuindex_][2] += cs.cpu_sysinfo.cpu[CPU_WAIT];
+			cputime_[cpuindex_][3] += cs.cpu_sysinfo.cpu[CPU_IDLE];
+		}
 	}
-	cputime_[cpuindex_][0] = cs.cpu_sysinfo.cpu[CPU_USER];
-	cputime_[cpuindex_][1] = cs.cpu_sysinfo.cpu[CPU_KERNEL];
-	cputime_[cpuindex_][2] = cs.cpu_sysinfo.cpu[CPU_WAIT];
-	cputime_[cpuindex_][3] = cs.cpu_sysinfo.cpu[CPU_IDLE];
+	else {
+		if (kstat_read(kc, ksp, &cs) == -1) {
+			parent_->done(1);
+			return;
+		}
+		cputime_[cpuindex_][0] = cs.cpu_sysinfo.cpu[CPU_USER];
+		cputime_[cpuindex_][1] = cs.cpu_sysinfo.cpu[CPU_KERNEL];
+		cputime_[cpuindex_][2] = cs.cpu_sysinfo.cpu[CPU_WAIT];
+		cputime_[cpuindex_][3] = cs.cpu_sysinfo.cpu[CPU_IDLE];
+	}
 
 	int oldindex = (cpuindex_ + 1) % 2;
 	for (int i = 0 ; i < CPU_STATES ; i++) {
