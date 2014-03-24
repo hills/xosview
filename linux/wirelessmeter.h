@@ -34,7 +34,7 @@ private:
   unsigned long _poorqualcol, _fairqualcol, _goodqualcol;
   int _lastquality, _number;
   std::string _devname;
-
+  bool _lastlink;
 };
 
 

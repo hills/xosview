@@ -8,6 +8,7 @@
 #include "wirelessmeter.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <glob.h>
 #include <fstream>
 #include <iostream>
 
@@ -15,6 +16,7 @@
 WirelessMeter::WirelessMeter( XOSView *parent, int ID, const char *wlID)
   : FieldMeterGraph ( parent, 2, wlID, "LINK/LEVEL", 1, 1, 0 ), _number(ID) {
   _lastquality = -1;
+  _lastlink = true;
   total_ = 0;
 }
 
@@ -50,6 +52,7 @@ void WirelessMeter::getpwrinfo( void ){
 
   char buff[16];
   int linkq = 0, quality = 0;
+  bool link = false;
 
   // skip the two header rows
   loadinfo.ignore(1024, '\n');
@@ -66,6 +69,7 @@ void WirelessMeter::getpwrinfo( void ){
       loadinfo >> buff;
       if ( _devname == buff ) {
         loadinfo >> buff >> linkq;
+        link = true;
         break;
       }
       loadinfo.ignore(1024, '\n');
@@ -82,6 +86,17 @@ void WirelessMeter::getpwrinfo( void ){
     quality = 1;
   else
     quality = 0;
+
+  if ( link && !_lastlink ) {
+    legend("LINK/LEVEL");
+    drawlegend();
+    _lastlink = link;
+  }
+  else if ( !link && _lastlink ) {
+    legend("NO LINK/LEVEL");
+    drawlegend();
+    _lastlink = link;
+  }
 
   if ( quality != _lastquality ){
     if ( quality == 0 )
@@ -102,25 +117,10 @@ void WirelessMeter::getpwrinfo( void ){
 }
 
 int WirelessMeter::countdevices(void){
-  std::ifstream stats( WLFILENAME );
-  if ( !stats ){
-    std::cerr << "Can not open file : " << WLFILENAME << std::endl;
-    exit( 1 );
-  }
-
-  char devname[16];
-  int count = 0;
-
-  stats.ignore(1024, '\n');
-  stats.ignore(1024, '\n');
-
-  while ( !stats.eof() ) {
-    stats >> devname;
-    if ( stats.good() )
-      count++;
-    stats.ignore(1024, '\n');
-  }
-
+  glob_t gbuf;
+  glob("/sys/class/net/*/wireless", 0, NULL, &gbuf);
+  int count = gbuf.gl_pathc;
+  globfree(&gbuf);
   return count;
 }
 
