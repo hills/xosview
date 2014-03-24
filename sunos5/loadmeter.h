@@ -19,11 +19,11 @@ class LoadMeter : public FieldMeterGraph {
 
  protected:
 	void getloadinfo(void);
-	unsigned long procloadcol_;
-	unsigned long warnloadcol_;
 
  private:
-	int alarmThreshold;
+	unsigned long procloadcol, warnloadcol, critloadcol;
+	unsigned int warnThreshold, critThreshold;
+	int lastalarmstate;
 	kstat_ctl_t *kc;
 	kstat_t *ksp;
 };

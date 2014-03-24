@@ -2,12 +2,13 @@
 //  Initial port performed by Greg Onufer (exodus@cheers.bungi.com)
 //
 #include "loadmeter.h"
+#include "cpumeter.h"
 #include "xosview.h"
 #include <stdlib.h>
+#include <string.h>
 #include <kstat.h>
 /*#include <sys/loadavg.h>*/
 
-using std::cerr;
 
 LoadMeter::LoadMeter(XOSView *parent, kstat_ctl_t *_kc)
 	: FieldMeterGraph(parent, 2, "LOAD", "PROCS/MIN", 1, 1, 0)
@@ -18,6 +19,8 @@ LoadMeter::LoadMeter(XOSView *parent, kstat_ctl_t *_kc)
 		parent_->done(1);
 		return;
 	}
+	total_ = -1;
+	lastalarmstate = -1;
 }
 
 LoadMeter::~LoadMeter(void)
@@ -28,19 +31,28 @@ void LoadMeter::checkResources(void)
 {
 	FieldMeterGraph::checkResources();
 
-	warnloadcol_ = parent_->allocColor(
-	    parent_->getResource("loadWarnColor" ));
-	procloadcol_ = parent_->allocColor(
-	    parent_->getResource("loadProcColor"));
+	warnloadcol = parent_->allocColor(parent_->getResource("loadWarnColor"));
+	procloadcol = parent_->allocColor(parent_->getResource("loadProcColor"));
+	critloadcol = parent_->allocColor(parent_->getResource("loadCritColor"));
 
-	setfieldcolor(0, procloadcol_);
+	setfieldcolor(0, procloadcol);
 	setfieldcolor(1, parent_->getResource("loadIdleColor"));
 	priority_ = atoi (parent_->getResource("loadPriority"));
 	dodecay_ = parent_->isResourceTrue("loadDecay");
 	useGraph_ = parent_->isResourceTrue("loadGraph");
 	SetUsedFormat(parent_->getResource("loadUsedFormat"));
 
-	alarmThreshold = atoi (parent_->getResource("loadAlarmThreshold"));
+	const char *warn = parent_->getResource("loadWarnThreshold");
+	if (strncmp(warn, "auto", 2) == 0)
+		warnThreshold = CPUMeter::countCPUs(kc);
+	else
+		warnThreshold = atoi(warn);
+
+	const char *crit = parent_->getResource("loadCritThreshold");
+	if (strncmp(crit, "auto", 2) == 0)
+		critThreshold = warnThreshold * 4;
+	else
+		critThreshold = atoi(crit);
 
 	if (dodecay_){
 		/*
@@ -68,6 +80,7 @@ void LoadMeter::checkevent(void)
 
 void LoadMeter::getloadinfo(void)
 {
+	int alarmstate;
 #if 1
 	kstat_named_t *k;
 
@@ -88,18 +101,31 @@ void LoadMeter::getloadinfo(void)
 	fields_[0] = oneMinLoad;
 #endif
 	
-	if (fields_[0] > alarmThreshold) {
-		if (total_ == alarmThreshold) {
-			setfieldcolor(0, warnloadcol_);
-			drawlegend();
-		}
-		total_ = fields_[1] = 20;
-	} else {
-		if (total_ == 20) {
-			setfieldcolor(0, procloadcol_);
-			drawlegend();
-		}
-		total_ = fields_[1] = alarmThreshold;
+	if (fields_[0] <  warnThreshold)
+		alarmstate = 0;
+	else if (fields_[0] >= critThreshold)
+		alarmstate = 2;
+	else /* if fields_[0] >= warnThreshold */
+		alarmstate = 1;
+
+	if (alarmstate != lastalarmstate) {
+		if (alarmstate == 0)
+			setfieldcolor(0, procloadcol);
+		else if (alarmstate == 1)
+			setfieldcolor(0, warnloadcol);
+		else /* if alarmstate == 2 */
+			setfieldcolor(0, critloadcol);
+		drawlegend();
+		lastalarmstate = alarmstate;
 	}
+
+	// Adjust total to next power-of-two of the current load.
+	if ( (fields_[0]*5.0 < total_ && total_ > 1.0) || fields_[0] > total_ ) {
+		unsigned int i = fields_[0];
+		i |= i >> 1; i |= i >> 2; i |= i >> 4; i |= i >> 8; i |= i >> 16;  // i = 2^n - 1
+		total_ = i + 1;
+	}
+
+	fields_[1] = total_ - fields_[0];
 	setUsed(fields_[0], total_);
 }
