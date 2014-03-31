@@ -5,7 +5,9 @@
 #define _SWAPMETER_H_
 
 #include "fieldmetergraph.h"
+#include "xosview.h"
 #include <kstat.h>
+
 
 class SwapMeter : public FieldMeterGraph {
  public:
@@ -20,6 +22,7 @@ class SwapMeter : public FieldMeterGraph {
 	void getswapinfo(void);
 
  private:
+	size_t pagesize;
 };
 
 

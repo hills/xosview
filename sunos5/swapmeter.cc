@@ -2,19 +2,18 @@
 //  Initial port performed by Greg Onufer (exodus@cheers.bungi.com)
 //
 #include "swapmeter.h"
-#include "xosview.h"
 #include <stdlib.h>
 #include <unistd.h>
+#include <limits.h>
 #include <sys/stat.h>
 #include <sys/swap.h>
+#include <iostream>
 
-static size_t Pagesize;
 
 SwapMeter::SwapMeter(XOSView *parent, kstat_ctl_t *_kc)
-	: FieldMeterGraph(parent, 3, "SWAP", "USED/RSVD/FREE")
+	: FieldMeterGraph(parent, 2, "SWAP", "USED/FREE")
 {
-	if (!Pagesize)
-		Pagesize = sysconf(_SC_PAGESIZE);
+	pagesize = sysconf(_SC_PAGESIZE);
 }
 
 SwapMeter::~SwapMeter(void)
@@ -26,8 +25,7 @@ void SwapMeter::checkResources(void)
 	FieldMeterGraph::checkResources();
 
 	setfieldcolor(0, parent_->getResource("swapUsedColor"));
-	setfieldcolor(1, parent_->getResource("swapReservedColor"));
-	setfieldcolor(2, parent_->getResource("swapFreeColor"));
+	setfieldcolor(1, parent_->getResource("swapFreeColor"));
 	priority_ = atoi(parent_->getResource("swapPriority"));
 	dodecay_ = parent_->isResourceTrue("swapDecay");
 	useGraph_ = parent_->isResourceTrue("swapGraph");
@@ -42,15 +40,45 @@ void SwapMeter::checkevent(void)
 
 void SwapMeter::getswapinfo(void)
 {
-	struct anoninfo ai;
+	swaptbl_t *swaps;
+	char *names;
 
-	if (swapctl(SC_AINFO, &ai) == -1)
+	total_ = fields_[0] = fields_[1] = 0;
+	int numswap = swapctl(SC_GETNSWP, NULL);
+	if (numswap < 0) {
+		std::cerr << "Can not determine number of swap spaces." << std::endl;
+		parent_->done(1);
 		return;
+	}
+	if (numswap > 0) {
+		swaps = (swaptbl_t *)malloc(sizeof(swaptbl_t) + numswap * sizeof(swapent_t));
+		names = (char *)calloc(numswap + 1, PATH_MAX);
+		if (!swaps || !names) {
+			std::cerr << "malloc failed." << std::endl;
+			parent_->done(1);
+			return;
+		}
+		swaps->swt_n = numswap;
+		for (int i = 0; i <= numswap; i++)
+			swaps->swt_ent[i].ste_path = names + (i * PATH_MAX);
 
-	total_ = ai.ani_max;
-	fields_[0] = (ai.ani_max - ai.ani_free); // allocated
-	fields_[1] = (ai.ani_resv - (ai.ani_max - ai.ani_free)); // reserved
-	fields_[2] = (ai.ani_max - ai.ani_resv); // available
+		if (swapctl(SC_LIST, swaps) < 0) {
+			std::cerr << "Can not get list of swap spaces." << std::endl;
+			parent_->done(1);
+			return;
+		}
+		for (int i = 0; i < numswap; i++) {
+			total_ += swaps->swt_ent[i].ste_pages;
+			fields_[1] += swaps->swt_ent[i].ste_free;
+			XOSDEBUG("%s: %ld kB (%ld kB free)\n",
+			         swaps->swt_ent[i].ste_path,
+			         swaps->swt_ent[i].ste_pages * (pagesize / 1024),
+			         swaps->swt_ent[i].ste_free * (pagesize / 1024));
+		}
+		fields_[0] = total_ - fields_[1];
+		free(swaps);
+		free(names);
+	}
 
-	setUsed((fields_[0] + fields_[1]) * Pagesize, total_ * Pagesize);
+	setUsed(fields_[0] * pagesize, total_ * pagesize);
 }
