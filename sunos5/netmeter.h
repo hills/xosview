@@ -8,32 +8,29 @@
 #define _NETMETER_H_
 
 #include "fieldmetergraph.h"
+#include "xosview.h"
 #include <kstat.h>
-#define NNETS 100
-#define GUESS_MTU 1500
+#include <string>
 
-class Host;
 
 class NetMeter : public FieldMeterGraph {
 public:
-  NetMeter(XOSView *parent, kstat_ctl_t *_kc, float max);
+  NetMeter( XOSView *parent, kstat_ctl_t *kc, float max );
   ~NetMeter( void );
 
-  const char *name( void ) const { return "NetMeter"; }  
+  const char *name( void ) const { return "NetMeter"; }
   void checkevent( void );
-
   void checkResources( void );
+
 protected:
-  float maxpackets_;
+  void getnetstats( void );
 
 private:
-  long long _lastBytesIn, _lastBytesOut;
-
-  void adjust(void);
-  int nnet;
-  kstat_ctl_t *kc;
-  kstat_t *nnets[NNETS];
-  int packetsize[NNETS];
+  float _maxpackets;
+  uint64_t _lastBytesIn, _lastBytesOut;
+  kstat_ctl_t *_kc;
+  std::string _netIface;
+  bool _ignored;
 };
 
 #endif
