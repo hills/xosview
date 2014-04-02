@@ -1,9 +1,10 @@
 //  
 //  Initial port performed by Greg Onufer (exodus@cheers.bungi.com)
 //
+
 #include "MeterMaker.h"
 #include "xosview.h"
-
+#include "kstats.h"
 #include "cpumeter.h"
 #include "memmeter.h"
 #include "swapmeter.h"
@@ -49,11 +50,12 @@ void MeterMaker::makeMeters(void)
     }
 
     if (single || both)
-      push(new CPUMeter(_xos, kc, 0));
+      push(new CPUMeter(_xos, kc, -1));
 
     if (all || both) {
-      for (int i = 1; i <= cpuCount; i++)
-        push(new CPUMeter(_xos, kc, i));
+      KStatList *cpulist = KStatList::getList(kc, KStatList::CPU_STAT);
+      for (unsigned int i = 0; i < cpulist->count(); i++)
+        push(new CPUMeter(_xos, kc, (*cpulist)[i]->ks_instance));
     }
   }
 
@@ -67,8 +69,7 @@ void MeterMaker::makeMeters(void)
     push(new SwapMeter(_xos, kc));
 
   if (_xos->isResourceTrue("page"))
-    push(new PageMeter(_xos, kc,
-		       atof(_xos->getResource("pageBandwidth"))));
+    push(new PageMeter(_xos, kc, atof(_xos->getResource("pageBandwidth"))));
 
   if (_xos->isResourceTrue("net"))
     push(new NetMeter(_xos, kc, atof(_xos->getResource("netBandwidth"))));

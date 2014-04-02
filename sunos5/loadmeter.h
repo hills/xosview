@@ -5,16 +5,18 @@
 #define _LOADMETER_H_
 
 #include "fieldmetergraph.h"
+#include "xosview.h"
+#include "kstats.h"
 #include <kstat.h>
+
 
 class LoadMeter : public FieldMeterGraph {
  public:
 	LoadMeter(XOSView *parent, kstat_ctl_t *kcp);
 	~LoadMeter(void);
 
-	const char *name(void) const { return "LoadMeter"; }  
+	const char *name(void) const { return "LoadMeter"; }
 	void checkevent(void);
-
 	void checkResources(void);
 
  protected:
@@ -27,6 +29,7 @@ class LoadMeter : public FieldMeterGraph {
 	unsigned int old_cpu_speed, cur_cpu_speed;
 	int lastalarmstate;
 	bool do_cpu_speed;
+	KStatList *cpulist;
 	kstat_ctl_t *kc;
 	kstat_t *ksp;
 };

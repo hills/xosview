@@ -1,35 +1,29 @@
 //
 //  Initial port performed by Greg Onufer (exodus@cheers.bungi.com)
 //
+
 #include "cpumeter.h"
-#include "xosview.h"
 #include <stdlib.h>
-#include <unistd.h>
-#include <ctype.h>
-#include <string.h>
+#include <stdio.h>
 #include <strings.h>
+#include <sys/sysinfo.h>
 
 
 CPUMeter::CPUMeter(XOSView *parent, kstat_ctl_t *_kc, int cpuid)
 	: FieldMeterGraph(parent, CPU_STATES, cpuStr(cpuid), "USER/SYS/WAIT/IDLE")
 {
 	kc = _kc;
-	aggregate = ( cpuid == 0 );
+	aggregate = ( cpuid < 0 );
 	for (int i = 0 ; i < 2 ; i++)
 		for (int j = 0 ; j < CPU_STATES ; j++)
 			cputime_[i][j] = 0;
 	cpuindex_ = 0;
+	cpustats = KStatList::getList(kc, KStatList::CPU_STAT);
 
-	if (!aggregate) {
-		int j = 0;
-		for (ksp = kc->kc_chain; ksp != NULL; ksp = ksp->ks_next) {
-			if (strncmp(ksp->ks_name, "cpu_stat", 8) == 0) {
-				j++;
-				if (j == cpuid)
-					break;
-			}
-		}
-	}
+	if (!aggregate)
+		for (unsigned int i = 0; i < cpustats->count(); i++)
+			if ((*cpustats)[i]->ks_instance == cpuid)
+				ksp = (*cpustats)[i];
 }
 
 CPUMeter::~CPUMeter(void)
@@ -62,11 +56,10 @@ void CPUMeter::getcputime(void)
 	cpu_stat_t cs;
 
 	if (aggregate) {
+		cpustats->update(kc);
 		bzero(cputime_[cpuindex_], CPU_STATES * sizeof(cputime_[cpuindex_][0]));
-		for (ksp = kc->kc_chain; ksp != NULL; ksp = ksp->ks_next) {
-			if (strncmp(ksp->ks_name, "cpu_stat", 8))
-				continue;
-			if (kstat_read(kc, ksp, &cs) == -1) {
+		for (unsigned int i = 0; i < cpustats->count(); i++) {
+			if (kstat_read(kc, (*cpustats)[i], &cs) == -1) {
 				parent_->done(1);
 				return;
 			}
@@ -101,8 +94,8 @@ void CPUMeter::getcputime(void)
 const char *CPUMeter::cpuStr(int num)
 {
 	static char buffer[8] = "CPU";
-	if (num > 0)
-		snprintf(buffer + 3, 4, "%d", num - 1);
+	if (num >= 0)
+		snprintf(buffer + 3, 4, "%d", num);
 	buffer[7] = '\0';
 	return buffer;
 }

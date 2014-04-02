@@ -13,6 +13,7 @@ NetMeter::NetMeter( XOSView *parent, kstat_ctl_t *kc, float max )
   _kc = kc;
   _maxpackets = max;
   _lastBytesIn = _lastBytesOut = 0;
+  _nets = KStatList::getList(_kc, KStatList::NETS);
 }
 
 NetMeter::~NetMeter( void ){
@@ -43,14 +44,13 @@ void NetMeter::checkevent( void ){
 void NetMeter::getnetstats( void ){
   uint64_t nowBytesIn = 0, nowBytesOut = 0;
   kstat_named_t *k;
+  kstat_t *ksp;
   total_ = _maxpackets;
+  _nets->update(_kc);
 
   IntervalTimerStop();
-  for (kstat_t *ksp = _kc->kc_chain; ksp != NULL; ksp = ksp->ks_next) {
-    if ( ksp->ks_type != KSTAT_TYPE_NAMED ||
-         strncmp(ksp->ks_class, "net", 3) ||
-         strncmp(ksp->ks_module, "link", 4) )
-      continue;
+  for (unsigned int i = 0; i < _nets->count(); i++) {
+    ksp = (*_nets)[i];
     if ( _netIface != "False" &&
          ( (!_ignored && ksp->ks_name != _netIface) ||
            ( _ignored && ksp->ks_name == _netIface) ) )

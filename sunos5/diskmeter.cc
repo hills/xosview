@@ -5,7 +5,6 @@
 
 #include "diskmeter.h"
 #include <stdlib.h>
-#include <string.h>
 
 
 DiskMeter::DiskMeter( XOSView *parent, kstat_ctl_t *kc, float max )
@@ -14,6 +13,7 @@ DiskMeter::DiskMeter( XOSView *parent, kstat_ctl_t *kc, float max )
     _kc = kc;
     _read_prev = _write_prev = 0;
     _maxspeed = max;
+    _disks = KStatList::getList(_kc, KStatList::DISKS);
 }
 
 DiskMeter::~DiskMeter( void )
@@ -44,16 +44,14 @@ void DiskMeter::getdiskinfo( void )
     total_ = _maxspeed;
     kstat_io_t kio;
     uint64_t read_curr = 0, write_curr = 0;
+    _disks->update(_kc);
 
     IntervalTimerStop();
-    for (kstat_t *ksp = _kc->kc_chain; ksp != NULL; ksp = ksp->ks_next) {
-        if ( ksp->ks_type != KSTAT_TYPE_IO ||
-             strncmp(ksp->ks_class, "disk", 4) )
-            continue;
-        if ( kstat_read(_kc, ksp, &kio) == -1 )
+    for (unsigned int i = 0; i < _disks->count(); i++) {
+        if ( kstat_read(_kc, (*_disks)[i], &kio) == -1 )
             continue;
         XOSDEBUG("%s: %llu bytes read %llu bytes written.\n",
-                 ksp->ks_name, kio.nread, kio.nwritten);
+                 (*_disks)[i]->ks_name, kio.nread, kio.nwritten);
         read_curr += kio.nread;
         write_curr += kio.nwritten;
     }

@@ -5,8 +5,11 @@
 #define _CPUMETER_H_
 
 #include "fieldmetergraph.h"
+#include "xosview.h"
+#include "kstats.h"
 #include <kstat.h>
 #include <sys/sysinfo.h>
+
 
 class CPUMeter : public FieldMeterGraph {
  public:
@@ -25,6 +28,7 @@ class CPUMeter : public FieldMeterGraph {
 	void getcputime(void);
 
  private:
+	KStatList *cpustats;
 	bool aggregate;
 	kstat_ctl_t *kc;
 	kstat_t *ksp;

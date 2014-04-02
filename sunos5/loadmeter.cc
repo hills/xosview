@@ -1,13 +1,12 @@
 //  
 //  Initial port performed by Greg Onufer (exodus@cheers.bungi.com)
 //
+
 #include "loadmeter.h"
-#include "cpumeter.h"
-#include "xosview.h"
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-#include <kstat.h>
 #include <iostream>
 #ifdef NO_GETLOADAVG
 #ifndef FSCALE
@@ -22,6 +21,7 @@ LoadMeter::LoadMeter(XOSView *parent, kstat_ctl_t *_kc)
 	: FieldMeterGraph(parent, 2, "LOAD", "PROCS/MIN", 1, 1, 0)
 {
 	kc = _kc;
+	cpulist = KStatList::getList(kc, KStatList::CPU_INFO);
 #ifdef NO_GETLOADAVG
 	ksp = kstat_lookup(kc, "unix", 0, "system_misc");
 	if (ksp == NULL) {
@@ -156,20 +156,20 @@ void LoadMeter::getspeedinfo(void)
 {
 	unsigned int total_mhz = 0, cpu = 0;
 	kstat_named_t *k;
-	kstat_t *ksp_speed;
+	kstat_t *ksp;
+	cpulist->update(kc);
 
-	for (ksp_speed = kc->kc_chain; ksp_speed != NULL; ksp_speed = ksp_speed->ks_next) {
-		if (strncmp(ksp_speed->ks_name, "cpu_info", 8))
-			continue;
-		if (kstat_read(kc, ksp_speed, NULL) == -1) {
+	for (cpu = 0; cpu < cpulist->count(); cpu++) {
+		ksp = (*cpulist)[cpu];
+		if (kstat_read(kc, ksp, NULL) == -1) {
 			parent_->done(1);
 			return;
 		}
 		// Try current_clock_Hz first (needs frequency scaling support),
 		// then clock_MHz.
-		k = (kstat_named_t *)kstat_data_lookup(ksp_speed, "current_clock_Hz");
+		k = (kstat_named_t *)kstat_data_lookup(ksp, "current_clock_Hz");
 		if (k == NULL) {
-			k = (kstat_named_t *)kstat_data_lookup(ksp_speed, "clock_MHz");
+			k = (kstat_named_t *)kstat_data_lookup(ksp, "clock_MHz");
 			if (k == NULL) {
 				std::cerr << "CPU speed is not available." << std::endl;
 				parent_->done(1);
@@ -182,7 +182,6 @@ void LoadMeter::getspeedinfo(void)
 			XOSDEBUG("Speed of cpu %d is %lld Hz\n", cpu, k->value.ui64);
 			total_mhz += ( k->value.ui64 / 1000000 );
 		}
-		cpu++;
 	}
 	old_cpu_speed = cur_cpu_speed;
 	cur_cpu_speed = ( cpu > 0 ? total_mhz / cpu : 0 );

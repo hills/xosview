@@ -9,6 +9,7 @@
 
 #include "fieldmetergraph.h"
 #include "xosview.h"
+#include "kstats.h"
 #include <kstat.h>
 
 
@@ -28,6 +29,7 @@ class DiskMeter : public FieldMeterGraph {
     uint64_t _read_prev, _write_prev;
     float _maxspeed;
     kstat_ctl_t *_kc;
+    KStatList *_disks;
 };
 
 #endif

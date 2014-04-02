@@ -9,6 +9,7 @@
 
 #include "fieldmetergraph.h"
 #include "xosview.h"
+#include "kstats.h"
 #include <kstat.h>
 #include <string>
 
@@ -29,6 +30,7 @@ private:
   float _maxpackets;
   uint64_t _lastBytesIn, _lastBytesOut;
   kstat_ctl_t *_kc;
+  KStatList *_nets;
   std::string _netIface;
   bool _ignored;
 };

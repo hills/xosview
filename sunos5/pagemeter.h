@@ -5,7 +5,10 @@
 #define _PAGEMETER_H_
 
 #include "fieldmetergraph.h"
+#include "xosview.h"
+#include "kstats.h"
 #include <kstat.h>
+
 
 class PageMeter : public FieldMeterGraph {
  public:
@@ -14,7 +17,6 @@ class PageMeter : public FieldMeterGraph {
 
 	const char *name(void) const { return "PageMeter"; }
 	void checkevent(void);
-
 	void checkResources(void);
 
  protected:
@@ -25,9 +27,8 @@ class PageMeter : public FieldMeterGraph {
 	void getpageinfo(void);
 
  private:
+	KStatList *cpustats;
 	kstat_ctl_t *kc;
-	kstat_t *ksps[64];	/* XXX */
-	int ncpus;
 };
 
 #endif
