@@ -105,7 +105,8 @@ OBJS += sunos5/MeterMaker.o \
         sunos5/memmeter.o \
         sunos5/netmeter.o \
         sunos5/pagemeter.o \
-        sunos5/swapmeter.o
+        sunos5/swapmeter.o \
+        sunos5/intratemeter.o
 CPPFLAGS += -Isunos5/ -Wno-write-strings
 LDLIBS += -lkstat -lnsl -lsocket
 endif

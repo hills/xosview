@@ -12,6 +12,7 @@
 #include "pagemeter.h"
 #include "diskmeter.h"
 #include "netmeter.h"
+#include "intratemeter.h"
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -73,4 +74,7 @@ void MeterMaker::makeMeters(void)
 
   if (_xos->isResourceTrue("net"))
     push(new NetMeter(_xos, kc, atof(_xos->getResource("netBandwidth"))));
+
+  if (_xos->isResourceTrue("irqrate"))
+    push(new IrqRateMeter(_xos, kc));
 }

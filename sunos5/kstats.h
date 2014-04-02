@@ -13,7 +13,13 @@
 // Helper to keep track of kstats.
 class KStatList {
  public:
-	enum module { CPU_STAT, CPU_INFO, DISKS, NETS };
+	enum module {  // module:instance:name (class)
+	  CPU_STAT,    // *:*:cpu_stat*
+	  CPU_INFO,    // *:*:cpu_info*
+	  CPU_SYS,     // cpu:*:sys
+	  DISKS,       // *:*:*         (disk)
+	  NETS         // {link,lo}:*:* (net)
+	};
 	static KStatList *getList(kstat_ctl_t *kcp, module m) {
 		switch (m) {
 			case CPU_STAT:
@@ -22,6 +28,9 @@ class KStatList {
 			case CPU_INFO:
 				static KStatList cpu_infos(kcp, m);
 				return &cpu_infos;
+			case CPU_SYS:
+				static KStatList cpu_sys(kcp, m);
+				return &cpu_sys;
 			case DISKS:
 				static KStatList disks(kcp, m);
 				return &disks;
@@ -58,6 +67,10 @@ class KStatList {
 			if (_m == CPU_STAT && strncmp(ksp->ks_name, "cpu_stat", 8) == 0)
 				_stats.push_back(ksp);
 			if (_m == CPU_INFO && strncmp(ksp->ks_name, "cpu_info", 8) == 0)
+				_stats.push_back(ksp);
+			if (_m == CPU_SYS && ksp->ks_type == KSTAT_TYPE_NAMED &&
+			    strncmp(ksp->ks_module, "cpu", 3) == 0 &&
+			    strncmp(ksp->ks_name, "sys", 3) == 0)
 				_stats.push_back(ksp);
 			if (_m == DISKS && ksp->ks_type == KSTAT_TYPE_IO &&
 			    strncmp(ksp->ks_class, "disk", 4) == 0)
