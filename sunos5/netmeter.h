@@ -11,6 +11,7 @@
 #include "xosview.h"
 #include "kstats.h"
 #include <kstat.h>
+#include <net/if.h>
 #include <string>
 
 
@@ -33,6 +34,8 @@ private:
   KStatList *_nets;
   std::string _netIface;
   bool _ignored;
+  struct lifreq _lfr;
+  int _socket;
 };
 
 #endif

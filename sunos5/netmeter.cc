@@ -5,7 +5,16 @@
 
 #include "netmeter.h"
 #include <stdlib.h>
+#include <unistd.h>
+#include <stropts.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/sockio.h>
 #include <string.h>
+#include <iostream>
+#ifdef DEBUG
+#include <sstream>
+#endif
 
 
 NetMeter::NetMeter( XOSView *parent, kstat_ctl_t *kc, float max )
@@ -14,9 +23,15 @@ NetMeter::NetMeter( XOSView *parent, kstat_ctl_t *kc, float max )
   _maxpackets = max;
   _lastBytesIn = _lastBytesOut = 0;
   _nets = KStatList::getList(_kc, KStatList::NETS);
+  if ( (_socket = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+    std::cerr << "Opening socket failed." << std::endl;
+    parent_->done(1);
+    return;
+  }
 }
 
 NetMeter::~NetMeter( void ){
+  close(_socket);
 }
 
 void NetMeter::checkResources( void ){
@@ -50,6 +65,9 @@ void NetMeter::getnetstats( void ){
 
   IntervalTimerStop();
   for (unsigned int i = 0; i < _nets->count(); i++) {
+#ifdef DEBUG
+    std::stringstream msg;
+#endif
     ksp = (*_nets)[i];
     if ( _netIface != "False" &&
          ( (!_ignored && ksp->ks_name != _netIface) ||
@@ -58,28 +76,66 @@ void NetMeter::getnetstats( void ){
     if ( kstat_read(_kc, ksp, NULL) == -1 )
       continue;
 
-    XOSDEBUG("%s: ", ksp->ks_name);
+#ifdef DEBUG
+    msg << ksp->ks_name << ": ";
+#endif
+    // try 64-bit byte counter first, then 32-bit one, then packet counter
     if ( (k = (kstat_named_t *)kstat_data_lookup(ksp, "rbytes64")) == NULL ) {
-      if ( (k = (kstat_named_t *)kstat_data_lookup(ksp, "rbytes")) == NULL )
-        continue;
-      nowBytesIn += k->value.ul;
-      XOSDEBUG("%lu bytes received ", k->value.ul);
+      if ( (k = (kstat_named_t *)kstat_data_lookup(ksp, "rbytes")) == NULL ) {
+        if ( (k = (kstat_named_t *)kstat_data_lookup(ksp, "ipackets")) == NULL )
+          continue;
+        // for packet counter, mtu is needed
+        strncpy(_lfr.lifr_name, ksp->ks_name, sizeof(_lfr.lifr_name));
+        if ( ioctl(_socket, SIOCGLIFMTU, (caddr_t)&_lfr) < 0 )
+          continue;
+        nowBytesIn += k->value.ul * _lfr.lifr_mtu; // not exactly, but must do
+#ifdef DEBUG
+        msg << k->value.ul << " packets received ";
+#endif
+      }
+      else {
+        nowBytesIn += k->value.ul;
+#ifdef DEBUG
+        msg << k->value.ul << " bytes received ";
+#endif
+      }
     }
     else {
       nowBytesIn += k->value.ui64;
-      XOSDEBUG("%llu bytes received ", k->value.ui64);
+#ifdef DEBUG
+        msg << k->value.ui64 << " bytes received ";
+#endif
     }
 
     if ( (k = (kstat_named_t *)kstat_data_lookup(ksp, "obytes64")) == NULL ) {
-      if ( (k = (kstat_named_t *)kstat_data_lookup(ksp, "obytes")) == NULL )
-        continue;
-      nowBytesOut += k->value.ul;
-      XOSDEBUG("%lu bytes sent.\n", k->value.ul);
+      if ( (k = (kstat_named_t *)kstat_data_lookup(ksp, "obytes")) == NULL ) {
+        if ( (k = (kstat_named_t *)kstat_data_lookup(ksp, "opackets")) == NULL )
+          continue;
+        strncpy(_lfr.lifr_name, ksp->ks_name, sizeof(_lfr.lifr_name));
+        if ( ioctl(_socket, SIOCGLIFMTU, (caddr_t)&_lfr) < 0 )
+          continue;
+        nowBytesOut += k->value.ul * _lfr.lifr_mtu;
+#ifdef DEBUG
+        msg << k->value.ul << " packets sent ";
+#endif
+      }
+      else {
+        nowBytesOut += k->value.ul;
+#ifdef DEBUG
+        msg << k->value.ul << " bytes sent ";
+#endif
+      }
     }
     else {
       nowBytesOut += k->value.ui64;
-      XOSDEBUG("%llu bytes sent.\n", k->value.ui64);
+#ifdef DEBUG
+      msg << k->value.ui64 << " bytes sent ";
+#endif
     }
+#ifdef DEBUG
+    msg << std::ends;
+    XOSDEBUG("%s\n", msg.str().c_str())
+#endif
   }
 
   uint64_t correction = 0x10000000;

@@ -107,7 +107,7 @@ OBJS += sunos5/MeterMaker.o \
         sunos5/pagemeter.o \
         sunos5/swapmeter.o
 CPPFLAGS += -Isunos5/ -Wno-write-strings
-LDLIBS += -lkstat -lnsl
+LDLIBS += -lkstat -lnsl -lsocket
 endif
 
 ifeq ($(PLATFORM), gnu)

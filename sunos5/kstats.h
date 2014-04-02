@@ -63,7 +63,8 @@ class KStatList {
 				_stats.push_back(ksp);
 			if (_m == NETS && ksp->ks_type == KSTAT_TYPE_NAMED &&
 			    strncmp(ksp->ks_class, "net", 3) == 0 &&
-			    strncmp(ksp->ks_module, "link", 4) == 0)
+			    ( strncmp(ksp->ks_module, "link", 4) == 0 ||
+			      strncmp(ksp->ks_module, "lo", 2) == 0 ))
 				_stats.push_back(ksp);
 		}
 	}
