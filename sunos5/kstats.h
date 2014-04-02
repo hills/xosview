@@ -7,6 +7,7 @@
 #include <strings.h>
 #include <kstat.h>
 #include <vector>
+#include <iostream>
 
 
 // Helper to keep track of kstats.
@@ -72,6 +73,60 @@ class KStatList {
 	module _m;
 	std::vector<kstat_t *> _stats;
 };
+
+
+// Read the correct value from "named" type kstat.
+inline double kstat_to_double(kstat_named_t *k) {
+	switch (k->data_type) {
+		case KSTAT_DATA_INT32:
+			return k->value.i32;
+		case KSTAT_DATA_UINT32:
+			return k->value.ui32;
+#if defined(_INT64_TYPE)
+		case KSTAT_DATA_INT64:
+			return k->value.i64;
+		case KSTAT_DATA_UINT64:
+			return k->value.ui64;
+#endif
+		case KSTAT_DATA_FLOAT:
+			return k->value.f;
+		case KSTAT_DATA_DOUBLE:
+			return k->value.d;
+		case KSTAT_DATA_CHAR:
+		case KSTAT_DATA_STRING:
+		default:
+			std::cerr << "kstat data type " << k->data_type
+			          << " can not be converted to number."
+			          << std::endl;
+			exit(1);
+	}
+}
+
+inline unsigned long long kstat_to_ui64(kstat_named_t *k) {
+	switch (k->data_type) {
+		case KSTAT_DATA_INT32:
+			return k->value.i32;
+		case KSTAT_DATA_UINT32:
+			return k->value.ui32;
+#if defined(_INT64_TYPE)
+		case KSTAT_DATA_INT64:
+			return k->value.i64;
+		case KSTAT_DATA_UINT64:
+			return k->value.ui64;
+#endif
+		case KSTAT_DATA_FLOAT:
+			return k->value.f;
+		case KSTAT_DATA_DOUBLE:
+			return k->value.d;
+		case KSTAT_DATA_CHAR:
+		case KSTAT_DATA_STRING:
+		default:
+			std::cerr << "kstat data type " << k->data_type
+			          << " can not be converted to number."
+			          << std::endl;
+			exit(1);
+	}
+}
 
 
 #endif

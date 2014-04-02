@@ -1,7 +1,9 @@
 //  
 //  Initial port performed by Greg Onufer (exodus@cheers.bungi.com)
 //
+
 #include "memmeter.h"
+#include "kstats.h"
 #include <unistd.h>
 #include <stdlib.h>
 #include <iostream>
@@ -64,7 +66,7 @@ void MemMeter::getmeminfo(void)
 			parent_->done(1);
 			return;
 		}
-		fields_[1] = k->value.ui64 / pageSize;
+		fields_[1] = kstat_to_double(k) / pageSize;
 	}
 
 	if (kstat_read(kc, ksp_sp, NULL) == -1) {
@@ -78,14 +80,14 @@ void MemMeter::getmeminfo(void)
 		parent_->done(1);
 		return;
 	}
-	fields_[0] = k->value.l - fields_[1];
+	fields_[0] = kstat_to_double(k) - fields_[1];
 	k = (kstat_named_t *)kstat_data_lookup(ksp_sp, "freemem");
 	if (k == NULL) {
 		std::cerr << "Can not read unix:0:system_pages:freemem kstat." << std::endl;
 		parent_->done(1);
 		return;
 	}
-	fields_[3] = k->value.l;
+	fields_[3] = kstat_to_double(k);
 	fields_[2] = total_ - (fields_[0] + fields_[1] + fields_[3]);
 
 	XOSDEBUG("kernel: %lld kB zfs: %lld kB other: %lld kB free: %lld kB\n",

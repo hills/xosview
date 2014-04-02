@@ -88,22 +88,22 @@ void NetMeter::getnetstats( void ){
         strncpy(_lfr.lifr_name, ksp->ks_name, sizeof(_lfr.lifr_name));
         if ( ioctl(_socket, SIOCGLIFMTU, (caddr_t)&_lfr) < 0 )
           continue;
-        nowBytesIn += k->value.ul * _lfr.lifr_mtu; // not exactly, but must do
+        nowBytesIn += kstat_to_ui64(k) * _lfr.lifr_mtu; // not exactly, but must do
 #ifdef DEBUG
-        msg << k->value.ul << " packets received ";
+        msg << kstat_to_ui64(k) << " packets received ";
 #endif
       }
       else {
-        nowBytesIn += k->value.ul;
+        nowBytesIn += kstat_to_ui64(k);
 #ifdef DEBUG
-        msg << k->value.ul << " bytes received ";
+        msg << kstat_to_ui64(k) << " bytes received ";
 #endif
       }
     }
     else {
-      nowBytesIn += k->value.ui64;
+      nowBytesIn += kstat_to_ui64(k);
 #ifdef DEBUG
-        msg << k->value.ui64 << " bytes received ";
+        msg << kstat_to_ui64(k) << " bytes received ";
 #endif
     }
 
@@ -114,22 +114,22 @@ void NetMeter::getnetstats( void ){
         strncpy(_lfr.lifr_name, ksp->ks_name, sizeof(_lfr.lifr_name));
         if ( ioctl(_socket, SIOCGLIFMTU, (caddr_t)&_lfr) < 0 )
           continue;
-        nowBytesOut += k->value.ul * _lfr.lifr_mtu;
+        nowBytesOut += kstat_to_ui64(k) * _lfr.lifr_mtu;
 #ifdef DEBUG
-        msg << k->value.ul << " packets sent ";
+        msg << kstat_to_ui64(k) << " packets sent ";
 #endif
       }
       else {
-        nowBytesOut += k->value.ul;
+        nowBytesOut += kstat_to_ui64(k);
 #ifdef DEBUG
-        msg << k->value.ul << " bytes sent ";
+        msg << kstat_to_ui64(k) << " bytes sent ";
 #endif
       }
     }
     else {
-      nowBytesOut += k->value.ui64;
+      nowBytesOut += kstat_to_ui64(k);
 #ifdef DEBUG
-      msg << k->value.ui64 << " bytes sent ";
+      msg << kstat_to_ui64(k) << " bytes sent ";
 #endif
     }
 #ifdef DEBUG

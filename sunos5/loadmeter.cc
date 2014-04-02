@@ -117,7 +117,7 @@ void LoadMeter::getloadinfo(void)
 		parent_->done(1);
 		return;
 	}
-	fields_[0] = (double)k->value.l / FSCALE;
+	fields_[0] = kstat_to_double(k) / FSCALE;
 #else
 	// getloadavg() if found on Solaris 7 and newer.
 	getloadavg(&fields_[0], 1);
@@ -175,12 +175,12 @@ void LoadMeter::getspeedinfo(void)
 				parent_->done(1);
 				return;
 			}
-			XOSDEBUG("Speed of cpu %d is %d MHz\n", cpu, k->value.ui32);
-			total_mhz += k->value.ui32;
+			XOSDEBUG("Speed of cpu %d is %lld MHz\n", cpu, kstat_to_ui64(k));
+			total_mhz += kstat_to_ui64(k);
 		}
 		else {
-			XOSDEBUG("Speed of cpu %d is %lld Hz\n", cpu, k->value.ui64);
-			total_mhz += ( k->value.ui64 / 1000000 );
+			XOSDEBUG("Speed of cpu %d is %lld Hz\n", cpu, kstat_to_ui64(k));
+			total_mhz += ( kstat_to_ui64(k) / 1000000 );
 		}
 	}
 	old_cpu_speed = cur_cpu_speed;
