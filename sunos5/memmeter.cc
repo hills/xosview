@@ -90,11 +90,11 @@ void MemMeter::getmeminfo(void)
 	fields_[3] = kstat_to_double(k);
 	fields_[2] = total_ - (fields_[0] + fields_[1] + fields_[3]);
 
-	XOSDEBUG("kernel: %lld kB zfs: %lld kB other: %lld kB free: %lld kB\n",
-	         (uint64_t)fields_[0] * pageSize / 1024,
-	         (uint64_t)fields_[1] * pageSize / 1024,
-	         (uint64_t)fields_[2] * pageSize / 1024,
-	         (uint64_t)fields_[3] * pageSize / 1024);
+	XOSDEBUG("kernel: %llu kB zfs: %llu kB other: %llu kB free: %llu kB\n",
+	         (unsigned long long)(fields_[0] * pageSize / 1024),
+	         (unsigned long long)(fields_[1] * pageSize / 1024),
+	         (unsigned long long)(fields_[2] * pageSize / 1024),
+	         (unsigned long long)(fields_[3] * pageSize / 1024));
 
 	setUsed((fields_[0] + fields_[1] + fields_[2]) * pageSize, total_ * pageSize);
 }
