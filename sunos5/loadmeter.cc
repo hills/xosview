@@ -154,36 +154,36 @@ void LoadMeter::getloadinfo(void)
 
 void LoadMeter::getspeedinfo(void)
 {
-	unsigned int total_mhz = 0, cpu = 0;
+	unsigned int total_mhz = 0, i = 0;
 	kstat_named_t *k;
-	kstat_t *ksp;
+	kstat_t *cpu;
 	cpulist->update(kc);
 
-	for (cpu = 0; cpu < cpulist->count(); cpu++) {
-		ksp = (*cpulist)[cpu];
-		if (kstat_read(kc, ksp, NULL) == -1) {
+	for (i = 0; i < cpulist->count(); i++) {
+		cpu = (*cpulist)[i];
+		if (kstat_read(kc, cpu, NULL) == -1) {
 			parent_->done(1);
 			return;
 		}
 		// Try current_clock_Hz first (needs frequency scaling support),
 		// then clock_MHz.
-		k = (kstat_named_t *)kstat_data_lookup(ksp, "current_clock_Hz");
+		k = (kstat_named_t *)kstat_data_lookup(cpu, "current_clock_Hz");
 		if (k == NULL) {
-			k = (kstat_named_t *)kstat_data_lookup(ksp, "clock_MHz");
+			k = (kstat_named_t *)kstat_data_lookup(cpu, "clock_MHz");
 			if (k == NULL) {
 				std::cerr << "CPU speed is not available." << std::endl;
 				parent_->done(1);
 				return;
 			}
-			XOSDEBUG("Speed of cpu %d is %lld MHz\n", cpu, kstat_to_ui64(k));
+			XOSDEBUG("Speed of cpu %d is %lld MHz\n", i, kstat_to_ui64(k));
 			total_mhz += kstat_to_ui64(k);
 		}
 		else {
-			XOSDEBUG("Speed of cpu %d is %lld Hz\n", cpu, kstat_to_ui64(k));
+			XOSDEBUG("Speed of cpu %d is %lld Hz\n", i, kstat_to_ui64(k));
 			total_mhz += ( kstat_to_ui64(k) / 1000000 );
 		}
 	}
 	old_cpu_speed = cur_cpu_speed;
-	cur_cpu_speed = ( cpu > 0 ? total_mhz / cpu : 0 );
+	cur_cpu_speed = ( i > 0 ? total_mhz / i : 0 );
 }
 

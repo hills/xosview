@@ -31,7 +31,9 @@ class LoadMeter : public FieldMeterGraph {
 	bool do_cpu_speed;
 	KStatList *cpulist;
 	kstat_ctl_t *kc;
+#ifdef NO_GETLOADAVG
 	kstat_t *ksp;
+#endif
 };
 
 #endif
