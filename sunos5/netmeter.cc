@@ -1,4 +1,4 @@
-//  
+//
 //  Rewritten for Solaris by Arno Augustin 1999
 //  augustin@informatik.uni-erlangen.de
 //
@@ -20,10 +20,11 @@
 NetMeter::NetMeter( XOSView *parent, kstat_ctl_t *kc, float max )
   : FieldMeterGraph( parent, 3, "NET", "IN/OUT/IDLE" ){
   _kc = kc;
+  _ignored = false;
   _maxpackets = max;
   _lastBytesIn = _lastBytesOut = 0;
   _nets = KStatList::getList(_kc, KStatList::NETS);
-  if ( (_socket = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+  if ( (_socket = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) {
     std::cerr << "Opening socket failed." << std::endl;
     parent_->done(1);
     return;
