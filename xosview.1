@@ -123,11 +123,13 @@ FreeBSD, OpenBSD, DragonflyBSD).
    all platforms  :  load
    Linux          :  load | CPU frequency
    *BSD           :  load | CPU frequency
+   SunOS5         :  load | CPU frequency
 
 \fBCPU Usage\fP
    Linux  : user | nice | system | soft-interrupt | interrupt | io-wait |
             guest | niced guest | stolen | idle
    *BSD   : user | nice | system | interrupt | idle
+   SunOS5 : user | system | wait | idle
    IRIX   : user | system | interrupt | wait | idle
    HPUX   : user | nice | system | interrupt | idle
 
@@ -137,6 +139,7 @@ FreeBSD, OpenBSD, DragonflyBSD).
    DFBSD  : active | inactive | wired | cache | free
    OpenBSD: active | inactive | wired | free
    NetBSD : active | inactive | wired | free
+   SunOS5 : kernel | zfs | other | free
    IRIX   : kernel | fs | user | free
    HPUX   : text | used | other | free
    GNU    : active | inactive | wired | free
@@ -144,22 +147,26 @@ FreeBSD, OpenBSD, DragonflyBSD).
 \fBSwap Usage\fP
    Linux  : used | free
    *BSD   : used | free
+   SunOS5 : used | free
    HPUX   : used | free
    GNU    : used | free
 
 \fBDisk Usage\fP: Throughput to/from local disk, per second
    Linux  : in | out | idle
    *BSD   : in | out | idle
+   SunOS5 : in | out | idle
 
 \fBPage Swapping\fP: Pages to/from swap, per second
    Linux  : in | out | idle
    *BSD   : in | out | idle
+   SunOS5 : in | out | idle
    HPUX   : in | out | idle
    GNU    : in | out | idle
 
 \fBNetwork Usage\fP
    Linux  : in | out | idle
    *BSD   : in | out | idle
+   SunOS5 : in | out | idle
 
 \fBGFX Usage\fP: Framebuffer exchanges, per second
    IRIX   : swapbuffers
@@ -171,6 +178,7 @@ FreeBSD, OpenBSD, DragonflyBSD).
 \fBInterrupt Rate\fP: Per second
    Linux  : interrupts | free
    *BSD   : interrupts | free
+   SunOS5 : interrupts | free
 
 \fBSerial Port Status\fP: "leds" which show the serial port parameters
    Linux  : LSR and MSR
@@ -485,8 +493,8 @@ Display the current CPU speed in the load meter.
 
 xosview*cpu: (True or False)
 .RS
-If True then xosview will display a cpu meter. On Linux, *BSD and IRIX SMP
-machines, the resource cpuFormat defines how meters are created for
+If True then xosview will display a cpu meter. On Linux, *BSD, Solaris and
+IRIX SMP machines, the resource cpuFormat defines how meters are created for
 multiple CPUs.
 .RE
 
@@ -614,6 +622,8 @@ automatically.
 .cc mem Cache "cache memory"
 
 .cc mem Free "free memory"
+
+.cc mem Kernel "kernel memory"
 
 .cc mem Shared "shared memory"
 
