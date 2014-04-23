@@ -93,7 +93,7 @@ void WirelessMeter::getpwrinfo( void ){
     _lastlink = link;
   }
   else if ( !link && _lastlink ) {
-    legend("NO LINK/LEVEL");
+    legend("NONE/LEVEL");
     drawlegend();
     _lastlink = link;
   }
