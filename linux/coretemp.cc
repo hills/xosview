@@ -112,9 +112,14 @@ void CoreTemp::findSysFiles( void ) {
   struct dirent *dent;
 
   // Intel and VIA CPUs.
+  // Platform device sysfs node changed in kernel 3.15 -> try both paths.
   snprintf(name, PATH_SIZE, "%s.%d/temp*_label", SYS_CORETEMP, _pkg);
   glob(name, 0, NULL, &gbuf);
+  snprintf(name, PATH_SIZE, "%s.%d/hwmon/hwmon*/temp*_label", SYS_CORETEMP, _pkg);
+  glob(name, GLOB_APPEND, NULL, &gbuf);
   snprintf(name, PATH_SIZE, "%s.%d/temp*_label", SYS_VIATEMP, _pkg);
+  glob(name, GLOB_APPEND, NULL, &gbuf);
+  snprintf(name, PATH_SIZE, "%s.%d/hwmon/hwmon*/temp*_label", SYS_VIATEMP, _pkg);
   glob(name, GLOB_APPEND, NULL, &gbuf);
   for (i = 0; i < gbuf.gl_pathc; i++) {
     file.open(gbuf.gl_pathv[i]);
@@ -262,9 +267,14 @@ unsigned int CoreTemp::countCores( unsigned int pkg )
   std::ifstream file;
 
   // Intel or VIA CPU.
+  // Platform device sysfs node changed in kernel 3.15 -> try both paths.
   snprintf(s, PATH_SIZE, "%s.%d/temp*_label", SYS_CORETEMP, pkg);
   glob(s, 0, NULL, &gbuf);
+  snprintf(s, PATH_SIZE, "%s.%d/hwmon/hwmon*/temp*_label", SYS_CORETEMP, pkg);
+  glob(s, GLOB_APPEND, NULL, &gbuf);
   snprintf(s, PATH_SIZE, "%s.%d/temp*_label", SYS_VIATEMP, pkg);
+  glob(s, GLOB_APPEND, NULL, &gbuf);
+  snprintf(s, PATH_SIZE, "%s.%d/hwmon/hwmon*/temp*_label", SYS_VIATEMP, pkg);
   glob(s, GLOB_APPEND, NULL, &gbuf);
   // loop through paths in gbuf and check if it is a core or package
   for (i = 0; i < gbuf.gl_pathc; i++) {
