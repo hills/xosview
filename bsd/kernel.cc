@@ -114,13 +114,8 @@ static struct nlist nlst[] =
 // this later on.  This keeps the indices within the nlist constant.
 #define DUMMY_SYM "dummy_sym"
 
-#if defined(XOSVIEW_FREEBSD)
-{ "_cnt" },
-#define VMMETER_SYM_INDEX    0
-#else
 { DUMMY_SYM },
 #define DUMMY_0
-#endif
 
 { DUMMY_SYM },
 #define DUMMY_1
@@ -334,7 +329,20 @@ BSDGetPageStats(uint64_t *meminfo, uint64_t *pageinfo) {
 #else  /* HAVE_UVM */
 	struct vmmeter vm;
 #if defined(XOSVIEW_FREEBSD)
-	safe_kvm_read_symbol(VMMETER_SYM_INDEX, &vm, sizeof(vm));
+	size_t size = sizeof(unsigned int);
+#define	GET_VM_STATS(name) \
+	sysctlbyname("vm.stats.vm." #name, &vm.name, &size, NULL, 0)
+	GET_VM_STATS(v_active_count);
+	GET_VM_STATS(v_inactive_count);
+	GET_VM_STATS(v_wire_count);
+	GET_VM_STATS(v_cache_count);
+	GET_VM_STATS(v_free_count);
+	GET_VM_STATS(v_page_size);
+	GET_VM_STATS(v_vnodepgsin);
+	GET_VM_STATS(v_vnodepgsout);
+	GET_VM_STATS(v_swappgsin);
+	GET_VM_STATS(v_swappgsout);
+#undef GET_VM_STATS
 #else  /* XOSVIEW_DFBSD */
 	struct vmstats vms;
 	size_t size = sizeof(vms);
