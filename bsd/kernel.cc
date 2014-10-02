@@ -114,47 +114,41 @@ static struct nlist nlst[] =
 // this later on.  This keeps the indices within the nlist constant.
 #define DUMMY_SYM "dummy_sym"
 
-{ DUMMY_SYM },
-#define DUMMY_0
-
-{ DUMMY_SYM },
-#define DUMMY_1
-
 #if defined(XOSVIEW_OPENBSD)
 { "_disklist" },
-#define DISKLIST_SYM_INDEX   2
+#define DISKLIST_SYM_INDEX   0
 #else
 { DUMMY_SYM },
-#define DUMMY_2
+#define DUMMY_0
 #endif
 #if defined(XOSVIEW_NETBSD)
 { "_allevents" },
-#define ALLEVENTS_SYM_INDEX  3
+#define ALLEVENTS_SYM_INDEX  1
 { "_bufmem" },
-#define BUFMEM_SYM_INDEX     4
+#define BUFMEM_SYM_INDEX     2
 #else
 { DUMMY_SYM },
-#define DUMMY_3
+#define DUMMY_1
 { DUMMY_SYM },
-#define DUMMY_4
+#define DUMMY_2
 #endif
 #if defined(XOSVIEW_FREEBSD)
 { "_intrnames" },
-#define INTRNAMES_SYM_INDEX  5
+#define INTRNAMES_SYM_INDEX  3
 # if __FreeBSD_version >= 900040
 { "_sintrnames" },
 # else
 { "_eintrnames" },
 # endif
-#define EINTRNAMES_SYM_INDEX 6
+#define EINTRNAMES_SYM_INDEX 4
 { "_intrcnt" },
-#define INTRCNT_SYM_INDEX    7
+#define INTRCNT_SYM_INDEX    5
 # if __FreeBSD_version >= 900040
 { "_sintrcnt" },
 # else
 { "_eintrcnt" },
 # endif
-#define EINTRCNT_SYM_INDEX   8
+#define EINTRCNT_SYM_INDEX   6
 #endif
 { NULL }
 };
