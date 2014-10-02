@@ -28,6 +28,7 @@
 #include <string.h>
 #include <err.h>
 #include <errno.h>
+#include <ifaddrs.h>
 #include <sysexits.h>
 #include <sys/types.h>
 #include <sys/queue.h>
@@ -44,7 +45,6 @@
 static const char ACPIDEV[] = "/dev/acpi";
 static const char APMDEV[] = "/dev/apm";
 static int maxcpus = 1;
-#include <net/if_var.h>
 #include <sys/ioctl.h>
 #include <sys/resource.h>
 #include <dev/acpica/acpiio.h>
@@ -121,13 +121,9 @@ static struct nlist nlst[] =
 { DUMMY_SYM },
 #define DUMMY_0
 #endif
-#if !defined(XOSVIEW_OPENBSD)
-{ "_ifnet" },
-#define IFNET_SYM_INDEX      1
-#else
+
 { DUMMY_SYM },
 #define DUMMY_1
-#endif
 
 #if defined(XOSVIEW_OPENBSD)
 { "_disklist" },
@@ -468,99 +464,37 @@ BSDGetCPUTimes(uint64_t *timeArray, unsigned int cpu) {
 int
 BSDNetInit() {
 	OpenKDIfNeeded();
-#if defined(XOSVIEW_NETBSD)
-	return ValidSymbol(IFNET_SYM_INDEX);
-#else
 	return 1;
-#endif
 }
 
 void
 BSDGetNetInOut(uint64_t *inbytes, uint64_t *outbytes, const char *netIface, bool ignored) {
-	char ifname[IFNAMSIZ];
+	struct ifaddrs *ifap, *ifa;
 	*inbytes = 0;
 	*outbytes = 0;
-#if defined(XOSVIEW_OPENBSD)
-	size_t size;
-	char *buf, *next;
-	struct if_msghdr *ifm;
-	struct if_data ifd;
-	struct sockaddr_dl *sdl;
 
-	if ( sysctl(mib_ifl, 6, NULL, &size, NULL, 0) < 0 )
-		err(EX_OSERR, "BSDGetNetInOut(): sysctl 1 failed");
-	if ( (buf = (char *)malloc(size)) == NULL)
-		err(EX_OSERR, "BSDGetNetInOut(): malloc failed");
-	if ( sysctl(mib_ifl, 6, buf, &size, NULL, 0) < 0 )
-		err(EX_OSERR, "BSDGetNetInOut(): sysctl 2 failed");
+	if (getifaddrs(&ifap) != 0)
+		return;
 
-	for (next = buf; next < buf + size; next += ifm->ifm_msglen) {
+	for (ifa = ifap; ifa; ifa = ifa->ifa_next) {
 		bool skipif = false;
-		ifm = (struct if_msghdr *)next;
-		if (ifm->ifm_type != RTM_IFINFO || ifm->ifm_addrs & RTAX_IFP == 0)
+
+		if (ifa->ifa_addr->sa_family != AF_LINK)
 			continue;
-		ifd = ifm->ifm_data;
-		sdl = (struct sockaddr_dl *)(ifm + 1);
-		if (sdl->sdl_family != AF_LINK)
-			continue;
+
 		if ( strncmp(netIface, "False", 5) != 0 ) {
-			memcpy(ifname, sdl->sdl_data, (sdl->sdl_nlen >= IFNAMSIZ ? IFNAMSIZ - 1 : sdl->sdl_nlen));
-			if ( (!ignored && strncmp(sdl->sdl_data, netIface, sdl->sdl_nlen) != 0) ||
-				 ( ignored && strncmp(sdl->sdl_data, netIface, sdl->sdl_nlen) == 0) )
+			if ( (!ignored && strncmp(ifa->ifa_name, netIface, 256) != 0) ||
+			     ( ignored && strncmp(ifa->ifa_name, netIface, 256) == 0) )
 				skipif = true;
 		}
+#define	IFA_STAT(s)	(((struct if_data *)ifa->ifa_data)->ifi_ ## s)
 		if (!skipif) {
-			*inbytes += ifd.ifi_ibytes;
-			*outbytes += ifd.ifi_obytes;
+			*inbytes  += IFA_STAT(ibytes);
+			*outbytes += IFA_STAT(obytes);
 		}
+#undef IFA_STAT
 	}
-	free(buf);
-#else  /* XOSVIEW_OPENBSD */
-	struct ifnet *ifnetp;
-	struct ifnet ifnet;
-#if defined (XOSVIEW_NETBSD)
-	struct ifnet_head ifnethd;
-#else
-	struct ifnethead ifnethd;
-#endif
-	safe_kvm_read(nlst[IFNET_SYM_INDEX].n_value, &ifnethd, sizeof(ifnethd));
-	ifnetp = TAILQ_FIRST(&ifnethd);
-
-	while (ifnetp) {
-		bool skipif = false;
-		//  Now, dereference the pointer to get the ifnet struct.
-		safe_kvm_read((unsigned long)ifnetp, &ifnet, sizeof(ifnet));
-		strlcpy(ifname, ifnet.if_xname, sizeof(ifname));
-#if defined(XOSVIEW_NETBSD)
-		ifnetp = TAILQ_NEXT(&ifnet, if_list);
-#else
-		ifnetp = TAILQ_NEXT(&ifnet, if_link);
-#endif
-		if (!(ifnet.if_flags & IFF_UP))
-			continue;
-		if ( strncmp(netIface, "False", 5) != 0 ) {
-			if ( (!ignored && strncmp(ifname, netIface, 256) != 0) ||
-			     ( ignored && strncmp(ifname, netIface, 256) == 0) )
-				skipif = true;
-		}
-		if (!skipif) {
-#if defined(XOSVIEW_DFBSD) && __DragonFly_version > 300304
-			struct ifdata_pcpu *ifdatap = ifnet.if_data_pcpu;
-			struct ifdata_pcpu ifdata;
-			int ncpus = BSDCountCpus();
-			for (int cpu = 0; cpu < ncpus; cpu++) {
-				safe_kvm_read((unsigned long)ifdatap + cpu * sizeof(ifdata),
-				              &ifdata, sizeof(ifdata));
-				*inbytes  += ifdata.ifd_ibytes;
-				*outbytes += ifdata.ifd_obytes;
-			}
-#else
-			*inbytes  += ifnet.if_ibytes;
-			*outbytes += ifnet.if_obytes;
-#endif
-		}
-	}
-#endif  /* XOSVIEW_OPENBSD */
+	freeifaddrs(ifap);
 }
 
 
