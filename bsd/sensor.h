@@ -9,7 +9,7 @@
 //
 //
 #ifndef _BSDSENSOR_H_
-#define _BSDSENSOR_H__
+#define _BSDSENSOR_H_
 
 #include "sensorfieldmeter.h"
 #include "xosview.h"
