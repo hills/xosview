@@ -49,7 +49,7 @@ FieldMeterGraph::~FieldMeterGraph( void )
 	delete [] heightfield_;
 }
 
-void FieldMeterGraph::drawfields( int manditory )
+void FieldMeterGraph::drawfields( int mandatory )
 {
 	int i,j;
 	enum XOSView::windowVisibilityState currWinState;
@@ -58,7 +58,7 @@ void FieldMeterGraph::drawfields( int manditory )
 	{
 		// Call FieldMeterDecay code if this meter should not be
 		// drawn as a graph
-		FieldMeterDecay::drawfields( manditory );
+		FieldMeterDecay::drawfields( mandatory );
 		return;
 	}
 
@@ -114,7 +114,7 @@ void FieldMeterGraph::drawfields( int manditory )
 	currWinState = parent_->getWindowVisibilityState();
 
 	// Try to avoid having to redraw everything.
-	if (!manditory && currWinState == XOSView::FULLY_VISIBLE && currWinState == lastWinState)
+	if (!mandatory && currWinState == XOSView::FULLY_VISIBLE && currWinState == lastWinState)
 	{
 		// scroll area
 		int col_width = width_/graphNumCols_;
@@ -141,7 +141,7 @@ void FieldMeterGraph::drawfields( int manditory )
 	parent_->setStippleN(0);	//  Restore all-bits stipple.
 	if ( dousedlegends_ )
 	{
-		drawused( manditory );
+		drawused( mandatory );
 	}
 }
 

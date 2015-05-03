@@ -46,7 +46,7 @@ FieldMeterDecay::~FieldMeterDecay( void ){
   delete[] lastDecayval_;
 }
 
-void FieldMeterDecay::drawfields( int manditory ){
+void FieldMeterDecay::drawfields( int mandatory ){
   int twidth, x = x_;
   int decay_changed = 0;
 
@@ -54,7 +54,7 @@ void FieldMeterDecay::drawfields( int manditory ){
   {
     //  If this meter shouldn't be done as a decaying splitmeter,
     //  call the ordinary fieldmeter code.
-    FieldMeter::drawfields (manditory);
+    FieldMeter::drawfields (mandatory);
     return;
   }
 
@@ -71,7 +71,7 @@ void FieldMeterDecay::drawfields( int manditory ){
 
   if (firsttime_) {
     firsttime_ = 0;
-    manditory = 1;
+    mandatory = 1;
     for (int i = 0; i < numfields_; i++)
          {
                 decay_[i] = 1.0*fields_[i]/total_;
@@ -129,13 +129,13 @@ void FieldMeterDecay::drawfields( int manditory ){
 
     //  drawFilledRectangle() adds one to its width and height.
     //    Let's correct for that here.
-    if ( manditory || (twidth != lastvals_[i]) || (x != lastx_[i]) ){
+    if ( mandatory || (twidth != lastvals_[i]) || (x != lastx_[i]) ){
       if (!checkX(x, twidth))
         std::cerr <<__FILE__ << ":" << __LINE__ <<std::endl;
       parent_->drawFilledRectangle( x, y_, twidth, halfheight );
     }
 
-    if ( manditory || decay_changed || (decay_[i] != lastDecayval_[i]) ){
+    if ( mandatory || decay_changed || (decay_[i] != lastDecayval_[i]) ){
       if (!checkX(decayx, decaytwidth))
         std::cerr <<__FILE__ << ":" << __LINE__ <<std::endl;
       decay_changed = 1;
@@ -149,7 +149,7 @@ void FieldMeterDecay::drawfields( int manditory ){
 
     parent_->setStippleN(0);	/*  Restore all-bits stipple.  */
     if ( dousedlegends_ )
-      drawused( manditory );
+      drawused( mandatory );
     x += twidth;
 
     decayx += decaytwidth;

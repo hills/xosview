@@ -48,7 +48,7 @@ void BitMeter::checkevent( void ){
   drawBits();
 }
 
-void BitMeter::drawBits( int manditory ){
+void BitMeter::drawBits( int mandatory ){
   static int pass = 1;
 
 //  pass = (pass + 1) % 2;
@@ -61,7 +61,7 @@ void BitMeter::drawBits( int manditory ){
     else
       x2 = x_ + (width_+1) - 1;
 
-    if ( (bits_[i] != lastbits_[i]) || manditory ){
+    if ( (bits_[i] != lastbits_[i]) || mandatory ){
       if ( bits_[i] && pass )
 	parent_->setForeground( onColor_ );
       else

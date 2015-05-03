@@ -168,8 +168,8 @@ void FieldMeter::drawlegend( void ){
   parent_->setStippleN(0);	/*  Restore default all-bits stipple.  */
 }
 
-void FieldMeter::drawused( int manditory ){
-  if ( !manditory )
+void FieldMeter::drawused( int mandatory ){
+  if ( !mandatory )
     if ( lastused_ == used_ )
       return;
 
@@ -218,7 +218,7 @@ void FieldMeter::drawused( int manditory ){
   lastused_ = used_;
 }
 
-void FieldMeter::drawfields( int manditory ){
+void FieldMeter::drawfields( int mandatory ){
   int twidth, x = x_;
 
   if ( total_ == 0 )
@@ -242,7 +242,7 @@ void FieldMeter::drawfields( int manditory ){
     if ( (i == numfields_ - 1) && ((x + twidth) != (x_ + width_)) )
       twidth = width_ + x_ - x;
 
-    if ( manditory || (twidth != lastvals_[i]) || (x != lastx_[i]) ){
+    if ( mandatory || (twidth != lastvals_[i]) || (x != lastx_[i]) ){
       parent_->setForeground( colors_[i] );
       parent_->setStippleN(i%4);
       parent_->drawFilledRectangle( x, y_, twidth, height_ );
@@ -253,7 +253,7 @@ void FieldMeter::drawfields( int manditory ){
     x += twidth;
   }
   if ( dousedlegends_ )
-    drawused( manditory );
+    drawused( mandatory );
 }
 
 void FieldMeter::checkevent( void ){

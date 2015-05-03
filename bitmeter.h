@@ -34,7 +34,7 @@ protected:
 
   void setBits(int startbit, unsigned char values);
 
-  void drawBits( int manditory = 0 );
+  void drawBits( int mandatory = 0 );
 private:
 };
 

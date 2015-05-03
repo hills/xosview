@@ -195,8 +195,8 @@ void BitFieldMeter::drawfieldlegend( void ){
   parent_->setStippleN(0);	/*  Restore default all-bits stipple.  */
 }
 
-void BitFieldMeter::drawused( int manditory ){
-  if ( !manditory )
+void BitFieldMeter::drawused( int mandatory ){
+  if ( !mandatory )
     if ( lastused_ == used_ )
       return;
 
@@ -245,7 +245,7 @@ void BitFieldMeter::drawused( int manditory ){
   lastused_ = used_;
 }
 
-void BitFieldMeter::drawBits( int manditory ){
+void BitFieldMeter::drawBits( int mandatory ){
   static int pass = 1;
 
 //  pass = (pass + 1) % 2;
@@ -255,7 +255,7 @@ void BitFieldMeter::drawBits( int manditory ){
   w = (width_/2 - (numbits_+1)) / numbits_;
 
   for ( int i = 0 ; i < numbits_ ; i++ ){
-    if ( (bits_[i] != lastbits_[i]) || manditory ){
+    if ( (bits_[i] != lastbits_[i]) || mandatory ){
       if ( bits_[i] && pass )
 	parent_->setForeground( onColor_ );
       else
@@ -269,7 +269,7 @@ void BitFieldMeter::drawBits( int manditory ){
   }
 }
 
-void BitFieldMeter::drawfields( int manditory ){
+void BitFieldMeter::drawfields( int mandatory ){
   int twidth, x = x_ + width_/2 + 4;
 
   if ( total_ == 0 )
@@ -293,7 +293,7 @@ void BitFieldMeter::drawfields( int manditory ){
     if ( (i == numfields_ - 1) && ((x + twidth) != (x_ + width_)) )
       twidth = width_ + x_ - x;
 
-    if ( manditory || (twidth != lastvals_[i]) || (x != lastx_[i]) ){
+    if ( mandatory || (twidth != lastvals_[i]) || (x != lastx_[i]) ){
       parent_->setForeground( colors_[i] );
       parent_->setStippleN(i%4);
       parent_->drawFilledRectangle( x, y_, twidth, height_ );
@@ -302,7 +302,7 @@ void BitFieldMeter::drawfields( int manditory ){
       lastx_[i] = x;
 
       if ( dousedlegends_ )
-	drawused( manditory );
+	drawused( mandatory );
     }
     x += twidth;
   }

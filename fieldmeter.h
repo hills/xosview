@@ -19,7 +19,7 @@ public:
 	      int docaptions = 0, int dolegends = 0, int dousedlegends = 0 );
   virtual ~FieldMeter( void );
 
-  virtual void drawfields( int manditory = 0 );
+  virtual void drawfields( int mandatory = 0 );
   void setfieldcolor( int field, const char *color );
   void setfieldcolor( int field, unsigned long color);
   void docaptions( int val ) { docaptions_ = val; }
@@ -50,7 +50,7 @@ protected:
 
   void SetUsedFormat ( const char * const str );
   void drawlegend( void );
-  void drawused( int manditory );
+  void drawused( int mandatory );
   bool checkX(int x, int width) const;
 
   void setNumFields(int n);

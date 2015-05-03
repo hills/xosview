@@ -23,7 +23,7 @@ public:
               int docaptions = 0, int dolegends = 0, int dousedlegends = 0 );
   virtual ~FieldMeterGraph( void );
 
-  virtual void drawfields( int manditory = 0 );
+  virtual void drawfields( int mandatory = 0 );
 
   virtual void checkResources( void );
 
