@@ -110,6 +110,7 @@ void CoreTemp::findSysFiles( void ) {
   glob_t gbuf;
   DIR *dir;
   struct dirent *dent;
+  struct stat buf;
 
   // Intel and VIA CPUs.
   // Platform device sysfs node changed in kernel 3.15 -> try both paths.
@@ -146,10 +147,15 @@ void CoreTemp::findSysFiles( void ) {
          !strncmp(dent->d_name, "..", 2) )
       continue;
 
-    snprintf(name, PATH_SIZE, "%s/%s/device/name", SYS_HWMON, dent->d_name);
+    snprintf(name, PATH_SIZE, "%s/%s/name", SYS_HWMON, dent->d_name);
     file.open(name);
-    if (!file)
-      continue;
+    if (!file) {
+      // Older kernels place the name in device directory.
+      snprintf(name, PATH_SIZE, "%s/%s/device/name", SYS_HWMON, dent->d_name);
+      file.open(name);
+      if (!file)
+        continue;
+    }
     file >> dummy;
     file.close();
 
@@ -161,14 +167,20 @@ void CoreTemp::findSysFiles( void ) {
       // K10 has only one sensor per physical CPU
       if (_cpu < 0) {  // avg or max
         for (i = 1; i <= cpucount; i++) {
-          snprintf(name, PATH_SIZE, "%s/%s/device/temp%d_input",
+          snprintf(name, PATH_SIZE, "%s/%s/temp%d_input",
                    SYS_HWMON, dent->d_name, i);
+          if (!( stat(name, &buf) == 0 && S_ISREG(buf.st_mode) ))
+            snprintf(name, PATH_SIZE, "%s/%s/device/temp%d_input",
+                     SYS_HWMON, dent->d_name, i);
           _cpus.push_back(name);
         }
       }
       else {  // single sensor
-        snprintf(name, PATH_SIZE, "%s/%s/device/temp%d_input",
+        snprintf(name, PATH_SIZE, "%s/%s/temp%d_input",
                  SYS_HWMON, dent->d_name, _cpu + 1);
+        if (!( stat(name, &buf) == 0 && S_ISREG(buf.st_mode) ))
+          snprintf(name, PATH_SIZE, "%s/%s/device/temp%d_input",
+                   SYS_HWMON, dent->d_name, i);
         _cpus.push_back(name);
       }
     }
@@ -263,6 +275,7 @@ unsigned int CoreTemp::countCores( unsigned int pkg )
   unsigned int i, count = 0, cpu = 0;
   DIR *dir;
   struct dirent *dent;
+  struct stat buf;
   std::string dummy;
   std::ifstream file;
 
@@ -296,7 +309,11 @@ unsigned int CoreTemp::countCores( unsigned int pkg )
     if ( !strncmp(dent->d_name, ".", 1) ||
          !strncmp(dent->d_name, "..", 2) )
       continue;
-    snprintf(s, PATH_SIZE, "%s/%s/device/name", SYS_HWMON, dent->d_name);
+    snprintf(s, PATH_SIZE, "%s/%s/name", SYS_HWMON, dent->d_name);
+    if (!( stat(s, &buf) == 0 && S_ISREG(buf.st_mode) ))
+      // Older kernels place the name in device directory.
+      snprintf(s, PATH_SIZE, "%s/%s/device/name", SYS_HWMON, dent->d_name);
+
     file.open(s);
     if ( file.good() ) {
       file >> dummy;
@@ -305,8 +322,10 @@ unsigned int CoreTemp::countCores( unsigned int pkg )
            strncmp(dummy.c_str(), "k10temp", 7) == 0 ) {
         if (cpu++ < pkg)
           continue;
-        snprintf(s, PATH_SIZE, "%s/%s/device/temp*_input", SYS_HWMON, dent->d_name);
+        snprintf(s, PATH_SIZE, "%s/%s/temp*_input", SYS_HWMON, dent->d_name);
         glob(s, 0, NULL, &gbuf);
+        snprintf(s, PATH_SIZE, "%s/%s/device/temp*_input", SYS_HWMON, dent->d_name);
+        glob(s, GLOB_APPEND, NULL, &gbuf);
         count += gbuf.gl_pathc;
         globfree(&gbuf);
       }
@@ -324,6 +343,7 @@ unsigned int CoreTemp::countCpus( void )
   unsigned int count = 0;
   DIR *dir;
   struct dirent *dent;
+  struct stat buf;
   std::string dummy;
   std::ifstream file;
 
@@ -344,7 +364,10 @@ unsigned int CoreTemp::countCpus( void )
     if ( !strncmp(dent->d_name, ".", 1) ||
          !strncmp(dent->d_name, "..", 2) )
       continue;
-    snprintf(s, PATH_SIZE, "%s/%s/device/name", SYS_HWMON, dent->d_name);
+    snprintf(s, PATH_SIZE, "%s/%s/name", SYS_HWMON, dent->d_name);
+    if (!( stat(s, &buf) == 0 && S_ISREG(buf.st_mode) ))
+      // Older kernels place the name in device directory.
+      snprintf(s, PATH_SIZE, "%s/%s/device/name", SYS_HWMON, dent->d_name);
     file.open(s);
     if ( file.good() ) {
       file >> dummy;
