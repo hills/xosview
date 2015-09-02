@@ -21,10 +21,8 @@
 #include "defines.h"
 
 // for CPUSTATES
-#if defined(XOSVIEW_NETBSD)
+#if defined(XOSVIEW_NETBSD) || defined(XOSVIEW_OPENBSD)
 #include <sys/sched.h>
-#elif defined(XOSVIEW_OPENBSD)
-#include <sys/dkstat.h>
 #else
 #include <sys/resource.h>
 #endif

@@ -64,7 +64,6 @@ static int mib_dsk[3] = { CTL_HW, HW_IOSTATS, sizeof(struct io_sysctl) };
 #if defined(XOSVIEW_OPENBSD)
 #include <sys/sched.h>
 #include <sys/disk.h>
-#include <sys/dkstat.h>
 #include <sys/mount.h>
 #include <net/route.h>
 #include <net/if_dl.h>
