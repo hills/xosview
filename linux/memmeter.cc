@@ -56,7 +56,7 @@ void MemMeter::checkevent( void ){
 
 void MemMeter::getmeminfo( void ){
   getmemstat(MEMFILENAME, _MIlineInfos, _numMIlineInfos);
-  fields_[4] -= fields_[3]; // mapped comes from cache
+  fields_[3] -= fields_[4]; // mapped comes from cache
   fields_[0] = total_ - fields_[5] - fields_[4] - fields_[3] - fields_[2] - fields_[1];
 
   if (total_)
