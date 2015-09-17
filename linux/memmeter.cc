@@ -109,10 +109,11 @@ void MemMeter::getstats() {
   fields_[1] = KB(buffers);
   fields_[2] = KB(slab);
   fields_[3] = KB(mapped);
-  fields_[4] = KB(cached - mapped); // cached includes mapped
+  fields_[4] = KB(cached);
   fields_[5] = KB(mem_free);
 
-  fields_[0] = KB(mem_total - mem_free - buffers - cached - slab);
+  fields_[0] =
+	KB(mem_total - mem_free - buffers - mapped - cached - slab);
   total_ =     KB(mem_total);
 
   setUsed(KB(mem_total - mem_free), KB(mem_total));
