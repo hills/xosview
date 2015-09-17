@@ -1,27 +1,23 @@
 //
 //  Copyright (c) 1994, 1995, 2006 by Mike Romberg ( mike.romberg@noaa.gov )
+//  Copyright (c) 2015 Framestore
 //
 //  This file may be distributed under terms of the GPL
 //
 
 #include "memmeter.h"
+#include <limits.h>
 #include <stdlib.h>
-// #include <stdio.h>
+#include <stdio.h>
 #include <string.h>
-#include <fstream>
-#include <iostream>
 
-static const char MEMFILENAME[] = "/proc/meminfo";
+#define MEMFILENAME "/proc/meminfo"
+
+#define KB(x) ((double)((x) * 1024))
 
 
 MemMeter::MemMeter( XOSView *parent )
 : FieldMeterGraph( parent, 6, "MEM", "USED/BUFF/SLAB/MAP/CACHE/FREE" ){
-  _MIlineInfos = NULL;
-  initLineInfo();
-}
-
-MemMeter::~MemMeter( void ){
-  delete[] _MIlineInfos;
 }
 
 void MemMeter::checkResources( void ){
@@ -40,99 +36,84 @@ void MemMeter::checkResources( void ){
 }
 
 void MemMeter::checkevent( void ){
-  getmeminfo();
-  /* for debugging (see below)
-  printf("t %4.1f used %4.1f buffer %4.1f slab %4.1f map %4.1f cache %4.1f free %4.1f\n",
-         total_/1024.0/1024.0,
-         fields_[0]/1024.0/1024.0, fields_[1]/1024.0/1024.0,
-	 fields_[2]/1024.0/1024.0, fields_[3]/1024.0/1024.0,
-	 fields_[4]/1024.0/1024.0, fields_[5]/1024.0/1024.0);
-  */
+  getstats();
   drawfields();
 }
 
-// FIXME: /proc/memstat and /proc/meminfo don't seem to correspond
-// maybe it is time to fix this in the kernel and get real infos ...
+void MemMeter::getstats() {
+  FILE *f;
 
-void MemMeter::getmeminfo( void ){
-  getmemstat(MEMFILENAME, _MIlineInfos, _numMIlineInfos);
-  /*
-   * Commenting out as "mapped" and "cached" seem to be unrelated.
-   * Sometimes mapped > cached, sometimes cached > mapped.
-   * Let's leave them raw.
-   *		--RAM, 2015-09-16
-   */
-#if 0	/* DISABLED */
-  fields_[3] -= fields_[4]; // mapped comes from cache
-#endif
-  fields_[0] = total_ - fields_[5] - fields_[4] - fields_[3] - fields_[2] - fields_[1];
-
-  if (total_)
-    setUsed (total_ - fields_[5], total_);
-}
-
-MemMeter::LineInfo *MemMeter::findLines(LineInfo *tmplate, int len,
-                                             const char *fname){
-  std::ifstream meminfo(fname);
-  if (!meminfo){
-    std::cerr << "Can not open file : " << fname << std::endl;
+  f = fopen(MEMFILENAME, "r");
+  if (!f) {
+    perror(MEMFILENAME);
     exit(1);
   }
 
-  LineInfo *rval = new LineInfo[len];
+  long mem_total = 0,
+    mem_free = 0,
+    buffers = 0,
+    slab = 0,
+    mapped = 0,
+    cached = 0;
 
-  char buf[256];
+  for (;;) {
+    char line[128];
+    char *c, *endptr;
+    long unsigned kb = 0;
 
-  // Get the info from the "standard" meminfo file.
-  int lineNum = 0;
-  int inum = 0;  // which info are we going to insert
-  while (!meminfo.eof()){
-    meminfo.getline(buf, 256);
-    lineNum++;
+    /*
+     * Parse lines in the format: "FieldName:      12345678 kB"
+     *
+     * We prefer to not use scanf because it's harder with variable
+     * number of fields; the 'kB' is not present if value is 0
+     */
 
-    for (int i = 0 ; i < len ; i++)
-      if(!strncmp(tmplate[i].id(), buf, tmplate[i].idlen())){
-        rval[inum] = tmplate[i];
-        rval[inum].line(lineNum);
-        inum++;
-      }
+    if (!fgets(line, sizeof line, f))
+      break;
+
+    c = strchr(line, ':');
+    if (!c) {
+      fprintf(stderr, MEMFILENAME ": parse error, ':' expected at '%s'\n", line);
+      exit(1);
+    }
+
+    *c = '\0';
+    c++;
+
+    kb = strtoul(c, &endptr, 10);
+    if (kb == ULONG_MAX) {
+      fprintf(stderr, MEMFILENAME ": parse error, '%s' is out of range\n", c);
+      exit(1);
+    }
+
+    if (strcmp(line, "MemTotal") == 0)
+      mem_total = kb;
+    else if (strcmp(line, "MemFree") == 0)
+      mem_free = kb;
+    else if (strcmp(line, "Buffers") == 0)
+      buffers = kb;
+    else if (strcmp(line, "Cached") == 0)
+      cached = kb;
+    else if (strcmp(line, "Slab") == 0)
+      slab = kb;
+    else if (strcmp(line, "Mapped") == 0)
+      mapped = kb;
   }
 
-  return rval;
-}
+  if (fclose(f) != 0)
+    abort();
 
-void MemMeter::initLineInfo(void){
-  static LineInfo infos[] = {
-    LineInfo("MemTotal", &total_),
-    LineInfo("MemFree", &fields_[5]),
-    LineInfo("Buffers", &fields_[1]),
-    LineInfo("Slab", &fields_[2]),
-    LineInfo("Mapped", &fields_[3]),
-    LineInfo("Cached", &fields_[4])
-  };
-  _numMIlineInfos = sizeof(infos) / sizeof(LineInfo);
+  /* Don't do arithmetic on the fields_ themselves; these are floating
+   * point and when memory is large are affected by inaccuracy */
 
-  _MIlineInfos = findLines(infos, _numMIlineInfos, MEMFILENAME);
-}
+  fields_[1] = KB(buffers);
+  fields_[2] = KB(slab);
+  fields_[3] = KB(mapped);
+  fields_[4] = KB(cached - mapped); // cached includes mapped
+  fields_[5] = KB(mem_free);
 
-void MemMeter::getmemstat(const char *fname, LineInfo *infos, int ninfos){
-  std::ifstream meminfo(fname);
-  if (!meminfo){
-    std::cerr << "Can not open file : " << fname << std::endl;
-    exit(1);
-  }
+  fields_[0] = KB(mem_total - mem_free - buffers - cached - slab);
+  total_ =     KB(mem_total);
 
-  // Get the info from the "standard" meminfo file.
-  int lineNum = 0, inum = 0;
-  unsigned long long val;
-  char buf[256];
-  while (inum < ninfos && !meminfo.eof()){
-    meminfo.getline(buf, 256);
-    if (++lineNum != infos[inum].line())
-      continue;
-
-    val = strtoull(buf + infos[inum].idlen() + 1, NULL, 10);
-    /*  All stats are in KB.  */
-    infos[inum++].setVal((double)(val<<10));	/*  Multiply by 1024 bytes per K  */
-  }
+  setUsed(KB(mem_total - mem_free), KB(mem_total));
 }
