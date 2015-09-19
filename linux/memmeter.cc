@@ -17,7 +17,7 @@
 
 
 MemMeter::MemMeter( XOSView *parent )
-: FieldMeterGraph( parent, 6, "MEM", "USED/BUFF/SLAB/MAP/CACHE/FREE" ){
+: FieldMeterGraph( parent, 5, "MEM", "USED/BUFF/SLAB/CACHE/FREE" ){
 }
 
 void MemMeter::checkResources( void ){
@@ -26,9 +26,8 @@ void MemMeter::checkResources( void ){
   setfieldcolor( 0, parent_->getResource( "memUsedColor" ) );
   setfieldcolor( 1, parent_->getResource( "memBufferColor" ) );
   setfieldcolor( 2, parent_->getResource( "memSlabColor" ) );
-  setfieldcolor( 3, parent_->getResource( "memMapColor" ) );
-  setfieldcolor( 4, parent_->getResource( "memCacheColor" ) );
-  setfieldcolor( 5, parent_->getResource( "memFreeColor" ) );
+  setfieldcolor( 3, parent_->getResource( "memCacheColor" ) );
+  setfieldcolor( 4, parent_->getResource( "memFreeColor" ) );
   priority_ = atoi (parent_->getResource( "memPriority" ) );
   dodecay_ = parent_->isResourceTrue( "memDecay" );
   useGraph_ = parent_->isResourceTrue( "memGraph" );
@@ -53,7 +52,6 @@ void MemMeter::getstats() {
     mem_free = 0,
     buffers = 0,
     slab = 0,
-    mapped = 0,
     cached = 0;
 
   for (;;) {
@@ -96,8 +94,6 @@ void MemMeter::getstats() {
       cached = kb;
     else if (strcmp(line, "Slab") == 0)
       slab = kb;
-    else if (strcmp(line, "Mapped") == 0)
-      mapped = kb;
   }
 
   if (fclose(f) != 0)
@@ -108,9 +104,8 @@ void MemMeter::getstats() {
 
   fields_[1] = KB(buffers);
   fields_[2] = KB(slab);
-  fields_[3] = KB(mapped);
-  fields_[4] = KB(cached - mapped); // cached includes mapped
-  fields_[5] = KB(mem_free);
+  fields_[3] = KB(cached);
+  fields_[4] = KB(mem_free);
 
   fields_[0] = KB(mem_total - mem_free - buffers - cached - slab);
   total_ =     KB(mem_total);

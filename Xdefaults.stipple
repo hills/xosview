@@ -17,7 +17,6 @@ xosvstipple*memUsedColor:	orange
 xosvstipple*memSharedColor:	orange
 xosvstipple*memBufferColor:	orange
 xosvstipple*memSlabColor:	orange
-xosvstipple*memMapColor:        orange
 xosvstipple*memPTColor:         orange
 xosvstipple*memCacheColor:	orange
 xosvstipple*memFreeColor:	orange
@@ -60,7 +59,6 @@ xosvstipplebw*memUsedColor:	black
 xosvstipplebw*memSharedColor:	black
 xosvstipplebw*memBufferColor:	black
 xosvstipplebw*memSlabColor:	black
-xosvstipplebw*memMapColor:      black
 xosvstipplebw*memPTColor:       black
 xosvstipplebw*memCacheColor:	black
 xosvstipplebw*memFreeColor:	black

@@ -77,7 +77,6 @@ xosview*memUsedColor:       seagreen
 xosview*memSharedColor:     SkyBlue
 xosview*memBufferColor:     red
 xosview*memSlabColor:	    blue
-xosview*memMapColor:	    SlateBlue1
 xosview*memCacheColor:      orange
 xosview*memFreeColor:       aquamarine
 xosview*memTextColor:       blue
