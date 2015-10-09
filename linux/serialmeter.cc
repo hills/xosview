@@ -30,10 +30,10 @@ typedef unsigned long long u64;
 #endif
 
 #if defined(GNULIBC) || defined(__GLIBC__)
-#if !defined(__powerpc__) && !defined(__hppa__) && !defined(__mips__) && !defined(__sparc__) && !defined(__sh__) && !defined(__s390__) && !defined(__s390x__) && !defined(__m68k__)
+#if !defined(__powerpc__) && !defined(__hppa__) && !defined(__mips__) && !defined(__sparc__) && !defined(__sh__) && !defined(__s390__) && !defined(__s390x__) && !defined(__m68k__) && !defined(__aarch64__)
 #include <sys/io.h>
 #endif
-#if !defined(__alpha__) && !defined(__sparc__) && !defined(__powerpc__) && !defined(__ia64__) && !defined(__hppa__) && !defined(__arm__) && !defined(__mips__) && !defined(__sh__) && !defined(__s390__) && !defined (__s390x__) && !defined(__m68k__)
+#if !defined(__alpha__) && !defined(__sparc__) && !defined(__powerpc__) && !defined(__ia64__) && !defined(__hppa__) && !defined(__arm__) && !defined(__mips__) && !defined(__sh__) && !defined(__s390__) && !defined (__s390x__) && !defined(__m68k__) && !defined(__aarch64__)
 #include <sys/perm.h>
 #define HAVE_IOPERM
 #endif
