@@ -48,7 +48,16 @@ void MemMeter::getstats() {
     exit(1);
   }
 
-  long mem_total = 0,
+  /*
+   * The kernel's "unsigned long" values vary in size on 64-bit and
+   * 32-bit implementations.
+   *
+   * But there's nothing saying userland will match the kernel; we
+   * must pretty much accomodate anything in ASCII that /proc gives
+   * us, so 64-bit integers are always used.
+   */
+
+  unsigned long long mem_total = 0,
     mem_free = 0,
     buffers = 0,
     slab = 0,
@@ -57,7 +66,7 @@ void MemMeter::getstats() {
   for (;;) {
     char line[128];
     char *c, *endptr;
-    long unsigned kb = 0;
+    unsigned long long kb = 0;
 
     /*
      * Parse lines in the format: "FieldName:      12345678 kB"
@@ -78,8 +87,8 @@ void MemMeter::getstats() {
     *c = '\0';
     c++;
 
-    kb = strtoul(c, &endptr, 10);
-    if (kb == ULONG_MAX) {
+    kb = strtoull(c, &endptr, 10);
+    if (kb == ULLONG_MAX) {
       fprintf(stderr, MEMFILENAME ": parse error, '%s' is out of range\n", c);
       exit(1);
     }
