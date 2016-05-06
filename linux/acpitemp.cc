@@ -118,12 +118,12 @@ void ACPITemp::getacpitemp( void ) {
   std::ifstream high_file(_highfile);
 
   if (!temp_file) {
-    std::cerr << "Can not open file : " << temp_file << std::endl;
+    std::cerr << "Can not open file : " << _tempfile << std::endl;
     parent_->done(1);
     return;
   }
   if (!high_file) {
-    std::cerr << "Can not open file : " << high_file << std::endl;
+    std::cerr << "Can not open file : " << _highfile << std::endl;
     parent_->done(1);
     return;
   }
