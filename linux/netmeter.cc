@@ -104,8 +104,7 @@ void NetMeter::getSysStats( unsigned long long &totin, unsigned long long &totou
 
   // walk through /sys/class/net/*/statistics/{r,t}x_bytes
   while ( (ent = readdir(dir)) ) {
-    if ( !strncmp(ent->d_name, ".", 1) ||
-         !strncmp(ent->d_name, "..", 2) )
+    if ( ent->d_type != DT_LNK )
       continue;
     if ( _netIface != "False" &&
          ( (!_ignored && ent->d_name != _netIface) ||
