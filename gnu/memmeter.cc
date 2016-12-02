@@ -52,10 +52,10 @@ void MemMeter::getmeminfo( void ){
     return;
   }
 
-  fields_[0] = vmstats.active_count * vmstats.pagesize;
-  fields_[1] = vmstats.inactive_count * vmstats.pagesize;;
-  fields_[2] = vmstats.wire_count * vmstats.pagesize;;
-  fields_[3] = vmstats.free_count * vmstats.pagesize;;
+  fields_[0] = (double) vmstats.active_count * vmstats.pagesize;
+  fields_[1] = (double) vmstats.inactive_count * vmstats.pagesize;;
+  fields_[2] = (double) vmstats.wire_count * vmstats.pagesize;;
+  fields_[3] = (double) vmstats.free_count * vmstats.pagesize;;
   total_ = fields_[0] + fields_[1] + fields_[2] + fields_[3];
 
   FieldMeterDecay::setUsed (total_ - fields_[3], total_);
