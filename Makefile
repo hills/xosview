@@ -10,6 +10,8 @@ PREFIX ?= /usr/local
 
 BINDIR ?= $(PREFIX)/bin
 MANDIR ?= $(PREFIX)/share/man
+XDGAPPSDIR ?= $(PREFIX)/share/applications
+ICONDIR ?= $(PREFIX)/share/icons/hicolor
 
 # Optional build arguments; user may wish to override
 
@@ -140,8 +142,12 @@ dist:
 install:	xosview
 		$(INSTALL) -d $(DESTDIR)$(BINDIR)
 		$(INSTALL) -d $(DESTDIR)$(MANDIR)/man1
+		$(INSTALL) -d $(DESTDIR)$(XDGAPPSDIR)
+		$(INSTALL) -d $(DESTDIR)$(ICONDIR)/32x32/apps
 		$(INSTALL) -m 755 xosview $(DESTDIR)$(BINDIR)/xosview
 		$(INSTALL) -m 644 xosview.1 $(DESTDIR)$(MANDIR)/man1/xosview.1
+		$(INSTALL) -m 644 xosview.desktop $(DESTDIR)$(XDGAPPSDIR)
+		$(INSTALL) -m 644 xosview.png $(DESTDIR)$(ICONDIR)/32x32/apps
 
 clean:
 		rm -f xosview $(OBJS) $(DEPS) defaultstring.cc
