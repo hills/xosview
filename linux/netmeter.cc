@@ -20,6 +20,33 @@
 static const char PROCNETDEV[] = "/proc/net/dev";
 static const char SYSCLASSNET[] = "/sys/class/net";
 
+/*
+ * Parse the integer count from the given filename
+ *
+ * This is quite relaxed about error conditions because the file may
+ * have been removed before it was opened, or truncated, in which case
+ * the count is zero.
+ *
+ * Return: 0 if not not avilable, otherwise count (which may be zero)
+ */
+
+static unsigned long long getCount( const char *filename ){
+  unsigned long long n, count = 0;
+  FILE *f;
+
+  f = fopen(filename, "r");
+  if (!f)
+    return 0;
+
+  if (fscanf(f, "%llu", &n) == 1)
+    count = n;
+
+  if (fclose(f) != 0)
+    abort();
+
+  return count;
+}
+
 
 NetMeter::NetMeter( XOSView *parent, float max )
   : FieldMeterGraph( parent, 3, "NET", "IN/OUT/IDLE" ){
@@ -94,7 +121,6 @@ void NetMeter::getSysStats( unsigned long long &totin, unsigned long long &totou
   struct dirent *ent;
   char filename[128];
   std::ifstream ifs;
-  unsigned long long value;
 
   if ( !(dir = opendir(SYSCLASSNET)) ) {
     std::cerr << "Can not open directory : " << SYSCLASSNET << std::endl;
@@ -112,28 +138,10 @@ void NetMeter::getSysStats( unsigned long long &totin, unsigned long long &totou
         continue;
 
     snprintf(filename, 128, "%s/%s/statistics/rx_bytes", SYSCLASSNET, ent->d_name);
-    ifs.open(filename);
-    if ( !ifs.good() ) {
-      std::cerr << "Can not open file : " << filename << std::endl;
-      parent_->done(1);
-      return;
-    }
-    ifs >> value;
-    ifs.close();
-    totin += value;
-    XOSDEBUG("%s: %llu bytes received", ent->d_name, value);
+    totin += getCount(filename);
 
     snprintf(filename, 128, "%s/%s/statistics/tx_bytes", SYSCLASSNET, ent->d_name);
-    ifs.open(filename);
-    if ( !ifs.good() ) {
-      std::cerr << "Can not open file : " << filename << std::endl;
-      parent_->done(1);
-      return;
-    }
-    ifs >> value;
-    ifs.close();
-    totout += value;
-    XOSDEBUG(", %llu bytes sent.\n", value);
+    totout += getCount(filename);
   }
   closedir(dir);
 }
