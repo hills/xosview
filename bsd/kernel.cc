@@ -654,7 +654,7 @@ DevStat_Init(void) {
 
 uint64_t
 DevStat_Get(uint64_t *read_bytes, uint64_t *write_bytes) {
-	register int dn;
+	int dn;
 	long double busy_seconds;
 	uint64_t reads, writes, total_bytes = 0;
 	struct devinfo *tmp_dinfo;
