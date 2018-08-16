@@ -320,7 +320,18 @@ BSDGetPageStats(uint64_t *meminfo, uint64_t *pageinfo) {
 		pageinfo[1] = (uint64_t)uvm.pgswapout;
 	}
 #else  /* HAVE_UVM */
-	struct vmmeter vm;
+	struct vmmeter_fbsd {
+		u_int v_active_count;
+		u_int v_inactive_count;
+		u_int v_wire_count;
+		u_int v_cache_count;
+		u_int v_free_count;
+		u_int v_page_size;
+		u_int v_vnodepgsin;
+		u_int v_vnodepgsout;
+		u_int v_swappgsin;
+		u_int v_swappgsout;
+	} vm;
 #if defined(XOSVIEW_FREEBSD)
 	size_t size = sizeof(unsigned int);
 #define	GET_VM_STATS(name) \
