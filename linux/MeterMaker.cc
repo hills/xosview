@@ -9,6 +9,7 @@
 
 #include "loadmeter.h"
 #include "cpumeter.h"
+#include "ccxmeter.h"
 #include "memmeter.h"
 #include "diskmeter.h"
 #include "raidmeter.h"
@@ -47,18 +48,19 @@ void MeterMaker::makeMeters(void){
 
   // Standard meters (usually added, but users could turn them off)
   if (_xos->isResourceTrue("cpu")){
-    bool single, both, all;
+    bool single, both, all, zen2ccx;
     unsigned int cpuCount = CPUMeter::countCPUs();
 
     single = (strncmp(_xos->getResource("cpuFormat"), "single", 2) == 0);
     both = (strncmp(_xos->getResource("cpuFormat"), "both", 2) == 0);
     all = (strncmp(_xos->getResource("cpuFormat"), "all", 2) == 0);
+    zen2ccx = (strncmp(_xos->getResource("cpuFormat"), "zen2ccx", 2) == 0);
 
     if (strncmp(_xos->getResource("cpuFormat"), "auto", 2) == 0) {
       if (cpuCount == 1 || cpuCount > 4) {
-	single = true;
+	      single = true;
       } else {
-	all = true;
+	      all = true;
       }
     }
 
@@ -68,6 +70,13 @@ void MeterMaker::makeMeters(void){
     if (all || both) {
       for (unsigned int i = 1; i <= cpuCount; i++)
 	push(new CPUMeter(_xos, CPUMeter::cpuStr(i)));
+    }
+
+    if (zen2ccx) {
+      int ccxCount = CCXMeter::countCCXs();
+      for (int i=0; i<ccxCount; i++) {
+        push(new CCXMeter(_xos, i));
+      }
     }
   }
   if (_xos->isResourceTrue("mem"))
