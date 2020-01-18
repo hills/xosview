@@ -25,7 +25,6 @@ CCXMeter::CCXMeter(XOSView *parent, const int ccxID)
 
   _ccxId = ccxID;
   _lineNumStart = findLine(ccxID);
-  _lineNumEnd = _lineNumStart + ccxSize;
 
   for ( int i = 0 ; i < 2 ; i++ )
     for ( int j = 0 ; j < 10 ; j++ )

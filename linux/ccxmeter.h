@@ -29,7 +29,6 @@ protected:
   static const int ccxSize = 4 * smtCount; // 4 cores per ccx
   int _ccxId;
   int _lineNumStart;
-  int _lineNumEnd;
   unsigned long long cputime_[2][10];
   int cpuindex_;
   int kernel_;
