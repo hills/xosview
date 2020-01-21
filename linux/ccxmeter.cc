@@ -21,7 +21,7 @@ static int cputime_to_field[10] = { 0, 1, 2, 9, 5, 4, 3, 8, 6, 7 };
 #define MAX_PROCSTAT_LENGTH 4096
 
 CCXMeter::CCXMeter(XOSView *parent, const int ccxID)
-: FieldMeterGraph( parent, 10, ("CCX" + std::to_string(ccxID)).c_str(), "USR/NIC/SYS/SI/HI/WIO/GST/NGS/STL/IDLE" ) {
+: FieldMeterGraph( parent, 10, ("CCX" + to_string(ccxID)).c_str(), "USR/NIC/SYS/SI/HI/WIO/GST/NGS/STL/IDLE" ) {
 
   _ccxId = ccxID;
   _lineNumStart = findLine(ccxID);
@@ -44,6 +44,12 @@ CCXMeter::CCXMeter(XOSView *parent, const int ccxID)
 }
 
 CCXMeter::~CCXMeter( void ){
+}
+
+std::string CCXMeter::to_string(int i) {
+  char str[128];
+  sprintf(str, "%d", i);
+  return std::string(str);
 }
 
 void CCXMeter::checkResources( void ){
@@ -268,7 +274,7 @@ void CCXMeter::getcputime( void ){
       }
       if (!firstField) {
         //std::cout << "[" << _ccxId << "][" << col << "] " << field << std::endl;
-        cputime_[cpuindex_][col++] += std::stoll(field);
+        cputime_[cpuindex_][col++] += strtol(field.c_str(), NULL, 10);
       }
     }
   }
@@ -297,7 +303,7 @@ void CCXMeter::getcputime( void ){
 }
 
 int CCXMeter::findLine(const int ccxId){
-  std::string cpuStartId = "cpu" + std::to_string(ccxId * ccxSize);
+  std::string cpuStartId = "cpu" + to_string(ccxId * ccxSize);
 
   std::ifstream stats( STATFILENAME );
 

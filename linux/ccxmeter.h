@@ -34,6 +34,7 @@ protected:
   int kernel_;
   int statfields_;
 
+  std::string to_string(int);
   void getcputime(void);
   int findLine(const int ccxId);
 private:
