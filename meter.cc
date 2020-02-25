@@ -41,8 +41,7 @@ void Meter::title( const char *title ){
 
   int len = strlen(title);
   title_ = new char[len + 1];
-  strncpy( title_, title, len );
-  title_[len] = '\0'; // strncpy() will not null terminate if s2 > len
+  memcpy( title_, title, len + 1 );
 }
 
 void Meter::legend( const char *legend ){
@@ -52,8 +51,7 @@ void Meter::legend( const char *legend ){
 
   int len = strlen(legend);
   legend_ = new char[len + 1];
-  strncpy( legend_, legend, len );
-  legend_[len] = '\0'; // strncpy() will not null terminate if s2 > len
+  memcpy( legend_, legend, len + 1 );
 }
 
 void Meter::resize( int x, int y, int width, int height ){
