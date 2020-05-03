@@ -8,6 +8,7 @@
 //  In order to use this new serial meter, xosview needs to be suid root.
 //
 #include "serialmeter.h"
+#include <linux/serial.h>
 #include <sys/ioctl.h>
 #include <sys/types.h>
 #include <fcntl.h>
@@ -27,8 +28,6 @@
 #include <sys/perm.h>
 #define HAVE_IOPERM
 #endif
-#include <linux/serial.h>
-
 
 SerialMeter::SerialMeter( XOSView *parent, Device device )
   : BitMeter( parent, getTitle(device), "LSR bits(0-7), MSR bits(0-7)", 16){
