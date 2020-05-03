@@ -18,8 +18,11 @@
 #include <sstream>
 #include <iomanip>
 
-
-#if !defined(__alpha__) && !defined(__sparc__) && !defined(__powerpc__) && !defined(__ia64__) && !defined(__hppa__) && !defined(__arm__) && !defined(__mips__) && !defined(__sh__) && !defined(__s390__) && !defined (__s390x__) && !defined(__m68k__) && !defined(__aarch64__)
+/*
+ * To fetch status information requires ioperm() and inb()
+ * otherwise these meter is largely a no-op.
+ */
+#if defined(__i386__) || defined(__ia64__) || defined(__amd64__)
 #include <sys/io.h>
 #include <sys/perm.h>
 #define HAVE_IOPERM
