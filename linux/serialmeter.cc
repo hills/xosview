@@ -18,17 +18,6 @@
 #include <sstream>
 #include <iomanip>
 
-// This should go away after types.h gets fixed in the kernel.
-#ifdef __alpha__
-typedef unsigned char u8;
-typedef signed short s16;
-typedef unsigned short u16;
-typedef signed int s32;
-typedef unsigned int u32;
-typedef signed long long s64;
-typedef unsigned long long u64;
-#endif
-
 #if defined(GNULIBC) || defined(__GLIBC__)
 #if !defined(__powerpc__) && !defined(__hppa__) && !defined(__mips__) && !defined(__sparc__) && !defined(__sh__) && !defined(__s390__) && !defined(__s390x__) && !defined(__m68k__) && !defined(__aarch64__) && !defined(__arm__)
 #include <sys/io.h>
