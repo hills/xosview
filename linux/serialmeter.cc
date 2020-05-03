@@ -60,7 +60,7 @@ bool SerialMeter::getport(unsigned short int port){
 #ifdef HAVE_IOPERM
   return ioperm(port, 1, 1) != -1;
 #else
-  return -1 != -1;
+  return false;
 #endif
 }
 
