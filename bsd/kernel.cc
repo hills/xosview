@@ -219,8 +219,10 @@ OpenKDIfNeeded() {
 	 *  that kernel file.  Otherwise, use the default kernel, by
 	 *  specifying NULL.  */
 	if ((kd = kvm_openfiles((kernelFileName[0] ? kernelFileName : NULL),
-		                    NULL, NULL, O_RDONLY, errstring)) == NULL)
-		err(EX_OSFILE, "OpenKDIfNeeded(): %s", errstring);
+		                    NULL, NULL, O_RDONLY, errstring)) == NULL) {
+		warn("OpenKDIfNeeded(): %s", errstring);
+		return;
+	}
 
 	// Parenthetical note:  FreeBSD kvm_openfiles() uses getbootfile() to get
 	// the correct kernel file if the 1st arg is NULL.  As far as I can see,
