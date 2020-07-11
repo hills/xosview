@@ -278,7 +278,7 @@ BSDGetCPUSpeed() {
 	size = sizeof(speed);
 #if defined(XOSVIEW_NETBSD)
 	if ( sysctlbyname("machdep.tsc_freq", &speed, &size, NULL, 0) < 0 )
-		err(EX_OSERR, "sysctl machdep.tsc_freq failed");
+		warn("sysctl machdep.tsc_freq failed");
 #else  /* XOSVIEW_DFBSD */
 	if ( sysctlbyname("hw.tsc_frequency", &speed, &size, NULL, 0) < 0 )
 		err(EX_OSERR, "sysctl hw.tsc_frequency failed");
