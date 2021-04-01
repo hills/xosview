@@ -145,8 +145,9 @@ void XWin::setFont( void ){
   const char* fontName = getResource("font");
 
   if ((font_ = XLoadQueryFont(display_, fontName)) == NULL){
-    std::cerr <<name_ <<": display " <<DisplayString(display_)
-      <<" cannot load font " << fontName << std::endl;
+    std::cerr <<name_ <<": font \"" << fontName
+	      << "\" does not exist; see xlsfonts(1)"
+	      << std::endl;
     exit(1);
   }
 }

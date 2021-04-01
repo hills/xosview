@@ -406,7 +406,11 @@ The width of the border for the xosview window.
 
 xosview*font: \fIfont\fP
 .RS
-This is the font that xosview will use.
+This is the font that xosview will use. This is a bitmap font
+rendered at the X server. To list the available fonts, use
+.BR xlsfonts (1),
+and rehash the list with
+.BR xset (1).
 .RE
 
 xosview*background: \fIcolor\fP
