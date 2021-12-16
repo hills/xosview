@@ -25,7 +25,6 @@
  */
 #if defined(__i386__) || defined(__amd64__)
 #include <sys/io.h>
-#include <sys/perm.h>
 #define HAVE_IOPERM
 #endif
 
