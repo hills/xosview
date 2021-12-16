@@ -96,14 +96,14 @@ void NFSDStats::checkevent(void)
     if (t < 0)
         t = 0.1;
 
-	maxpackets_ = MAX(netcnt, calls) - _lastNetCnt;
-	if (maxpackets_ == 0) {
-		maxpackets_ = netcnt;
-	} else {
-		fields_[0] = (badcalls - _lastBad) * t;
-		fields_[1] = (netudpcnt - _lastUdp) * t;
-		fields_[2] = (nettcpcnt - _lastTcp) * t;
-	}
+    maxpackets_ = MAX(netcnt, calls) - _lastNetCnt;
+    if (maxpackets_ == 0) {
+        maxpackets_ = netcnt;
+    } else {
+        fields_[0] = (badcalls - _lastBad) * t;
+        fields_[1] = (netudpcnt - _lastUdp) * t;
+        fields_[2] = (nettcpcnt - _lastTcp) * t;
+    }
 
     total_ = fields_[0] + fields_[1] + fields_[2];
     if (total_ > maxpackets_)
@@ -178,14 +178,14 @@ void NFSStats::checkevent(void)
     if (t < 0)
         t = 0.1;
 
-	maxpackets_ = calls - _lastcalls;
-	if (maxpackets_ == 0) {
-		maxpackets_ = calls;
-	} else {
-		fields_[2] = (calls - _lastcalls) * t;
-		fields_[1] = (authrefresh - _lastauthrefresh) * t;
-		fields_[0] = (retrns - _lastretrns) * t;
-	}
+    maxpackets_ = calls - _lastcalls;
+    if (maxpackets_ == 0) {
+        maxpackets_ = calls;
+    } else {
+        fields_[2] = (calls - _lastcalls) * t;
+        fields_[1] = (authrefresh - _lastauthrefresh) * t;
+        fields_[0] = (retrns - _lastretrns) * t;
+    }
 
     total_ = fields_[0] + fields_[1] + fields_[2];
     if (total_ > maxpackets_)
