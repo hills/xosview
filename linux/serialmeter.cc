@@ -23,7 +23,7 @@
  * To fetch status information requires ioperm() and inb()
  * otherwise these meter is largely a no-op.
  */
-#if defined(__i386__) || defined(__ia64__) || defined(__amd64__)
+#if defined(__i386__) || defined(__amd64__)
 #include <sys/io.h>
 #include <sys/perm.h>
 #define HAVE_IOPERM
