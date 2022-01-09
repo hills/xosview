@@ -180,7 +180,7 @@ void BitFieldMeter::drawfieldlegend( void ){
       n++;
     }
     tmp2++;
-    strncpy( buff, tmp1, n );
+    memcpy( buff, tmp1, n );
     buff[n] = '\0';
     parent_->setStippleN(i%4);
     parent_->setForeground( colors_[i] );
@@ -364,6 +364,5 @@ void BitFieldMeter::setfieldlegend( const char *fieldlegend ){
   delete[] fieldLegend_;
   int len = strlen(fieldlegend);
   fieldLegend_ = new char[len + 1];
-  strncpy( fieldLegend_, fieldlegend, len );
-  fieldLegend_[len] = '\0'; // strncpy() will not null terminate if s2 > len
+  memcpy(fieldLegend_, fieldlegend, len + 1);
 }

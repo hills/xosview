@@ -66,8 +66,8 @@ int ACPITemp::checkacpi( const char *tempfile, const char *highfile ) {
   }
 
   if (temp_found && high_found) {
-    strncpy(_tempfile, tempfile, PATH_SIZE);
-    strncpy(_highfile, highfile, PATH_SIZE);
+    snprintf(_tempfile, PATH_SIZE, "%s", tempfile);
+    snprintf(_highfile, PATH_SIZE, "%s", highfile);
     return true;
   }
 

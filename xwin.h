@@ -139,8 +139,8 @@ protected:
   void init( int argc, char *argv[] );
   void getGeometry( void );
   int getPixmap(Pixmap *);
-  void setDisplayName (const char* new_display_name) { strncpy
-    (display_name_, new_display_name, 256); }
+  void setDisplayName (const char* new_display_name) {
+      snprintf(display_name_, 256, "%s", new_display_name); }
   const char* displayName () { return display_name_; }
 
   void addEvent( Event *event );

@@ -79,7 +79,7 @@ const char *Xrm::getResource(const char *rname) const{
   {
     //  Let's try with a non-uppercased class name.
     char fcn_lower[1024];
-    strncpy(fcn_lower, className(), 1024);
+    snprintf(fcn_lower, 1024, "%s", className());
     char *p = fcn_lower;
     while (p && *p)
       {
@@ -223,7 +223,7 @@ Listed from weakest to strongest:
 
 void Xrm::initClassName(const char* name){
   char className[256];
-  strncpy(className, name, 255);  //  Avoid evil people out there...
+  snprintf(className, 256, "%s", name);  //  Avoid evil people out there...
 
   className[0] = toupper(className[0]);
   if (className[0] == 'X')
