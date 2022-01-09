@@ -213,7 +213,7 @@ void MeterMaker::makeMeters(void){
     const char *tempfile, *highfile, *lowfile, *name, *label;
     snprintf( caption, 16, "ACT/HIGH/%s",
               _xos->getResourceOrUseDefault("lmstempHighest", "100") );
-    for (int i = 1 ; ; i++) {
+    for (int i = 1 ; i < 1000 ; i++) {
       snprintf(s, 16, "lmstemp%d", i);
       tempfile = _xos->getResourceOrUseDefault(s, NULL);
       if (!tempfile || !*tempfile)
@@ -235,7 +235,7 @@ void MeterMaker::makeMeters(void){
     char caption[32];
     snprintf(caption, 32, "ACT(\260C)/HIGH/%s",
              _xos->getResourceOrUseDefault("acpitempHighest", "100"));
-    for (int i = 1 ; ; i++) {
+    for (int i = 1 ; i < 100 ; i++) {
       char s[16];
       snprintf(s, 16, "acpitemp%d", i);
       const char *tempfile = _xos->getResourceOrUseDefault(s, NULL);
