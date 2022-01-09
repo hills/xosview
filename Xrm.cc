@@ -12,6 +12,7 @@
 #include <ctype.h>
 #include <unistd.h>  //  for access(), etc.  BCG
 #include <iostream>
+#include "stringutils.h"
 
 extern char *defaultXResourceString;
 
@@ -86,7 +87,7 @@ const char *Xrm::getResource(const char *rname) const{
       *p = tolower(*p);
       p++;
       }
-    snprintf(fcn, 1024, "%s.%s", fcn_lower, rname);
+    snprintf_or_abort(fcn, 1024, "%s.%s", fcn_lower, rname);
     XrmGetResource(_db, frn, fcn, &type, &val);
   }
 

@@ -12,6 +12,7 @@
 //
 
 #include "coretemp.h"
+#include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -22,6 +23,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include "stringutils.h"
 
 #define PATH_SIZE 128
 
@@ -147,11 +149,12 @@ void CoreTemp::findSysFiles( void ) {
          !strncmp(dent->d_name, "..", 2) )
       continue;
 
-    snprintf(name, PATH_SIZE, "%s/%s/name", SYS_HWMON, dent->d_name);
+    snprintf_or_abort(name, PATH_SIZE, "%s/%s/name", SYS_HWMON, dent->d_name);
     file.open(name);
     if (!file) {
       // Older kernels place the name in device directory.
-      snprintf(name, PATH_SIZE, "%s/%s/device/name", SYS_HWMON, dent->d_name);
+      snprintf_or_abort(name, PATH_SIZE,
+          "%s/%s/device/name", SYS_HWMON, dent->d_name);
       file.open(name);
       if (!file)
         continue;
@@ -167,19 +170,19 @@ void CoreTemp::findSysFiles( void ) {
       // K10 has only one sensor per physical CPU
       if (_cpu < 0) {  // avg or max
         for (i = 1; i <= cpucount; i++) {
-          snprintf(name, PATH_SIZE, "%s/%s/temp%d_input",
+          snprintf_or_abort(name, PATH_SIZE, "%s/%s/temp%d_input",
                    SYS_HWMON, dent->d_name, i);
           if (!( stat(name, &buf) == 0 && S_ISREG(buf.st_mode) ))
-            snprintf(name, PATH_SIZE, "%s/%s/device/temp%d_input",
+            snprintf_or_abort(name, PATH_SIZE, "%s/%s/device/temp%d_input",
                      SYS_HWMON, dent->d_name, i);
           _cpus.push_back(name);
         }
       }
       else {  // single sensor
-        snprintf(name, PATH_SIZE, "%s/%s/temp%d_input",
+        snprintf_or_abort(name, PATH_SIZE, "%s/%s/temp%d_input",
                  SYS_HWMON, dent->d_name, _cpu + 1);
         if (!( stat(name, &buf) == 0 && S_ISREG(buf.st_mode) ))
-          snprintf(name, PATH_SIZE, "%s/%s/device/temp%d_input",
+          snprintf_or_abort(name, PATH_SIZE, "%s/%s/device/temp%d_input",
                    SYS_HWMON, dent->d_name, i);
         _cpus.push_back(name);
       }
@@ -309,10 +312,12 @@ unsigned int CoreTemp::countCores( unsigned int pkg )
     if ( !strncmp(dent->d_name, ".", 1) ||
          !strncmp(dent->d_name, "..", 2) )
       continue;
-    snprintf(s, PATH_SIZE, "%s/%s/name", SYS_HWMON, dent->d_name);
-    if (!( stat(s, &buf) == 0 && S_ISREG(buf.st_mode) ))
+    snprintf_or_abort(s, PATH_SIZE, "%s/%s/name", SYS_HWMON, dent->d_name);
+    if (!( stat(s, &buf) == 0 && S_ISREG(buf.st_mode) )) {
       // Older kernels place the name in device directory.
-      snprintf(s, PATH_SIZE, "%s/%s/device/name", SYS_HWMON, dent->d_name);
+      snprintf_or_abort(s, PATH_SIZE,
+          "%s/%s/device/name", SYS_HWMON, dent->d_name);
+    }
 
     file.open(s);
     if ( file.good() ) {
@@ -322,9 +327,11 @@ unsigned int CoreTemp::countCores( unsigned int pkg )
            strncmp(dummy.c_str(), "k10temp", 7) == 0 ) {
         if (cpu++ < pkg)
           continue;
-        snprintf(s, PATH_SIZE, "%s/%s/temp*_input", SYS_HWMON, dent->d_name);
+        snprintf_or_abort(s, PATH_SIZE,
+            "%s/%s/temp*_input", SYS_HWMON, dent->d_name);
         glob(s, 0, NULL, &gbuf);
-        snprintf(s, PATH_SIZE, "%s/%s/device/temp*_input", SYS_HWMON, dent->d_name);
+        snprintf_or_abort(s, PATH_SIZE,
+            "%s/%s/device/temp*_input", SYS_HWMON, dent->d_name);
         glob(s, GLOB_APPEND, NULL, &gbuf);
         count += gbuf.gl_pathc;
         globfree(&gbuf);
@@ -364,10 +371,11 @@ unsigned int CoreTemp::countCpus( void )
     if ( !strncmp(dent->d_name, ".", 1) ||
          !strncmp(dent->d_name, "..", 2) )
       continue;
-    snprintf(s, PATH_SIZE, "%s/%s/name", SYS_HWMON, dent->d_name);
+    snprintf_or_abort(s, PATH_SIZE, "%s/%s/name", SYS_HWMON, dent->d_name);
     if (!( stat(s, &buf) == 0 && S_ISREG(buf.st_mode) ))
       // Older kernels place the name in device directory.
-      snprintf(s, PATH_SIZE, "%s/%s/device/name", SYS_HWMON, dent->d_name);
+      snprintf_or_abort(s, PATH_SIZE,
+          "%s/%s/device/name", SYS_HWMON, dent->d_name);
     file.open(s);
     if ( file.good() ) {
       file >> dummy;

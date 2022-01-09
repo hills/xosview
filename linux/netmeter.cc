@@ -16,6 +16,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include "stringutils.h"
 
 static const char PROCNETDEV[] = "/proc/net/dev";
 static const char SYSCLASSNET[] = "/sys/class/net";
@@ -137,10 +138,12 @@ void NetMeter::getSysStats( unsigned long long &totin, unsigned long long &totou
            ( _ignored && ent->d_name == _netIface) ) )
         continue;
 
-    snprintf(filename, 128, "%s/%s/statistics/rx_bytes", SYSCLASSNET, ent->d_name);
+    snprintf_or_abort(filename, 128,
+        "%s/%s/statistics/rx_bytes", SYSCLASSNET, ent->d_name);
     totin += getCount(filename);
 
-    snprintf(filename, 128, "%s/%s/statistics/tx_bytes", SYSCLASSNET, ent->d_name);
+    snprintf_or_abort(filename, 128,
+        "%s/%s/statistics/tx_bytes", SYSCLASSNET, ent->d_name);
     totout += getCount(filename);
   }
   closedir(dir);

@@ -18,6 +18,7 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include "stringutils.h"
 
 static const char APMFILENAME[] = "/proc/apm";
 static const char ACPIBATTERYDIR[] = "/proc/acpi/battery";
@@ -125,9 +126,9 @@ bool BtryMeter::has_syspower( void ){
       continue;
     if (!strncmp(dp->d_name, "..", 2))
       continue;
-    snprintf(dirname, 80, "%s/%s", SYSPOWERDIR, dp->d_name);
+    snprintf_or_abort(dirname, 80, "%s/%s", SYSPOWERDIR, dp->d_name);
     if (stat(dirname, &buf) == 0 && S_ISDIR(buf.st_mode)) {
-      snprintf(f, 80, "%s/%s", dirname, "/type");
+      snprintf_or_abort(f, 80, "%s%s", dirname, "/type");
       type.open(f);
       if (type.good()) {
         type >> t;

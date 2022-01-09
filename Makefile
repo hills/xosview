@@ -33,6 +33,7 @@ OBJS = Host.o \
 	llist.o \
 	main.o \
 	meter.o \
+	stringutils.o \
 	xosview.o \
 	xwin.o
 
