@@ -31,6 +31,9 @@ protected:
   void setNumCols( int n );
 
   int useGraph_;
+  int lineGraph_; /* Lines instead of area graph. */
+  unsigned long backgroundColor_; /* When lineGraph_ == 1. */
+  int stackGraph_;
   int graphNumCols_;
   int graphpos_;
   /*  There's some sort of corruption going on -- we can't have

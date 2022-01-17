@@ -9,6 +9,7 @@
 
 #include "loadmeter.h"
 #include "cpumeter.h"
+#include "gpumeter.h"
 #include "memmeter.h"
 #include "diskmeter.h"
 #include "raidmeter.h"
@@ -69,6 +70,12 @@ void MeterMaker::makeMeters(void){
       for (unsigned int i = 1; i <= cpuCount; i++)
 	push(new CPUMeter(_xos, CPUMeter::cpuStr(i)));
     }
+  }
+  if (_xos->isResourceTrue("gpu")){
+    GPUList gpus;
+
+    for (unsigned int i = 0; i < gpus.getCount(); i++)
+	push(new GPUMeter(_xos, gpus.getGPU(i)));
   }
   if (_xos->isResourceTrue("mem"))
     push(new MemMeter(_xos));

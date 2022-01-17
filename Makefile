@@ -45,6 +45,7 @@ OBJS += sensorfieldmeter.o \
 	linux/MeterMaker.o \
 	linux/btrymeter.o \
 	linux/cpumeter.o \
+	linux/gpumeter.o \
 	linux/diskmeter.o \
 	linux/intmeter.o \
 	linux/intratemeter.o \

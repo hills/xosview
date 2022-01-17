@@ -35,6 +35,8 @@ FieldMeterGraph::FieldMeterGraph( XOSView *parent,
 {
 
 	useGraph_ = 0;
+	lineGraph_ = 0;
+	stackGraph_ = 1;
 	heightfield_ = NULL;
 	lastWinState = XOSView::OBSCURED;
 
@@ -117,7 +119,7 @@ void FieldMeterGraph::drawfields( int mandatory )
 	if (!mandatory && currWinState == XOSView::FULLY_VISIBLE && currWinState == lastWinState)
 	{
 		// scroll area
-		int col_width = width_/graphNumCols_;
+		int col_width = (width_+(graphNumCols_-1))/graphNumCols_;
 		if( col_width < 1 )
 		{
 			col_width = 1;
@@ -156,8 +158,18 @@ void FieldMeterGraph::drawBar( int i )
 	if( barwidth>0 )
 	{
 		int barheight;
+
+		if (lineGraph_) {
+			parent_->setForeground( backgroundColor_ );
+			parent_->drawFilledRectangle( x, y_, barwidth, height_);
+			parent_->lineWidth(3);
+		}
+
 		for( j = 0 ; j < numfields_; j++ )
 		{
+			if (!stackGraph_)
+				y = y_ + height_;
+
 			/*  Round up, by adding 0.5 before
 			*  converting to an int.  */
 			barheight = (int)((heightfield_[i*numfields_+j]*height_)+0.5);
@@ -169,12 +181,28 @@ void FieldMeterGraph::drawBar( int i )
 				barheight = (y-y_);
 
 			// hack to ensure last field always reaches top of graph area
-			if( j == numfields_-1 )
+			if( stackGraph_ && j == numfields_-1 )
 				barheight = (y-y_);
 
 			y -= barheight;
-			if( barheight>0 )
-				parent_->drawFilledRectangle( x, y, barwidth, barheight );
+			if( barheight>0 ) {
+				if (lineGraph_) {
+					int prev = i - 1;
+
+					if (prev >= 0) {
+						barheight = (int)((heightfield_[prev*numfields_+j]*height_)+0.5);
+						if( barheight > height_ )
+							barheight = height_;
+						prev = y_ + height_ - barheight;
+					} else {
+						prev = y;
+					}
+
+					parent_->drawLine( x, prev, x + barwidth, y );
+				} else {
+					parent_->drawFilledRectangle( x, y, barwidth, barheight);
+				}
+			}
 		}
 	}
 }

@@ -68,6 +68,18 @@ xosview*cpuGraph:           True
 xosview*cpuUsedFormat:	    percent
 xosview*cpuFormat:          auto   ! single, all, auto or both
 
+! GPU Meter Resources ( Linux )
+
+xosview*gpu:		True
+xosview*gpuPriority:	1
+xosview*gpuIdleColor:	aquamarine
+xosview*gpuColor1:	red
+xosview*gpuColor2:	seagreen
+xosview*gpuColor3:	blue
+xosview*gpuColor4:	orange
+xosview*gpuColor5:	purple
+xosview*gpuColor6:	grey
+
 ! Memory Meter Resources
 ! Not all of these are used by a specific platform.
 
