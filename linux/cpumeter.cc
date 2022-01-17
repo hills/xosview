@@ -327,7 +327,7 @@ const char *CPUMeter::cpuStr(int num){
 
 const char *CPUMeter::toUpper(const char *str){
   static char buffer[MAX_PROCSTAT_LENGTH + 1];
-  memcpy(buffer, str, MAX_PROCSTAT_LENGTH);
+  snprintf(buffer, MAX_PROCSTAT_LENGTH + 1, "%s", str);
   buffer[MAX_PROCSTAT_LENGTH] = 0;
   for (char *tmp = buffer ; *tmp != '\0' ; tmp++)
     *tmp = toupper(*tmp);
