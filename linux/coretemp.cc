@@ -126,12 +126,15 @@ void CoreTemp::findSysFiles( void ) {
   glob(name, GLOB_APPEND, NULL, &gbuf);
   for (i = 0; i < gbuf.gl_pathc; i++) {
     file.open(gbuf.gl_pathv[i]);
-    file >> dummy >> cpu;  // "Core n" or "Physical id n"
+    file >> dummy;  // "Core n" or "Physical id n"
     file.close();
     if ( strncmp(dummy.c_str(), "Core", 4) == 0 ) {
       strcpy(strrchr(gbuf.gl_pathv[i], '_'), "_input");
-      if (_cpu < 0 || cpu == _cpu)
+      if (_cpu < 0)
         _cpus.push_back(gbuf.gl_pathv[i]);
+      else if (cpu == _cpu)
+        _cpus.push_back(gbuf.gl_pathv[i]);
+      cpu++;        // The numbers seen in temp*_label might not continuously growing!
     }
   }
   globfree(&gbuf);
