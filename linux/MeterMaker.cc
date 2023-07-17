@@ -189,14 +189,18 @@ void MeterMaker::makeMeters(void){
       do {
         if (pkgCount > 1)
           snprintf(name, 8, "CPU%d", pkg);
-        push(new CoreTemp(_xos, name, caption, pkg, -1));
+	coreCount = CoreTemp::countCores(pkg);
+        if (coreCount > 0)
+	  push(new CoreTemp(_xos, name, caption, pkg, -1));
       } while (++pkg < pkgCount);
     }
     else if ( strncmp(displayType, "maximum", 1) == 0 ) {
       do {
         if (pkgCount > 1)
           snprintf(name, 8, "CPU%d", pkg);
-        push(new CoreTemp(_xos, name, caption, pkg, -2));
+        coreCount = CoreTemp::countCores(pkg);
+	if (coreCount > 0)
+	  push(new CoreTemp(_xos, name, caption, pkg, -2));
       } while (++pkg < pkgCount);
     }
     else {
