@@ -14,7 +14,7 @@
 #include <iostream>
 #include "stringutils.h"
 
-extern char *defaultXResourceString;
+extern const char *defaultXResourceString;
 
 
 bool Xrm::_initialized = false;
