@@ -2,6 +2,9 @@
 
 AWK ?= awk
 INSTALL ?= install
+#  AIX has an install(1) that does not know -d, so creating the target
+#  directories is kept separate from copying the files into them.
+INSTALLDIR ?= $(INSTALL) -d
 PLATFORM ?= linux
 
 # Installation paths
@@ -17,10 +20,14 @@ ICONDIR ?= $(PREFIX)/share/icons/hicolor
 
 OPTFLAGS ?= -Wall -O3
 
+# Platforms without libXpm clear this and define -DNO_XPM
+
+XPMLIB ?= -lXpm
+
 # Required build arguments
 
 CPPFLAGS += $(OPTFLAGS) -I. -MMD
-LDLIBS += -lX11 -lXpm
+LDLIBS += -lX11 $(XPMLIB)
 
 OBJS = Host.o \
 	Xrm.o \
@@ -115,6 +122,31 @@ LDLIBS += -lkstat -lnsl -lsocket
 INSTALL = ginstall
 endif
 
+ifeq ($(PLATFORM), aix)
+#  AIXSTATS picks the back end the meters read their statistics through:
+#  perfstat uses libperfstat, which arrived in AIX 5.1, and kmem reads kernel
+#  memory directly for the AIX 4.x releases that predate it.
+AIXSTATS ?= perfstat
+OBJS += aix/MeterMaker.o \
+        aix/cpumeter.o \
+        aix/diskmeter.o \
+        aix/loadmeter.o \
+        aix/memmeter.o \
+        aix/netmeter.o \
+        aix/pagemeter.o \
+        aix/swapmeter.o \
+        aix/$(AIXSTATS).o
+CPPFLAGS += -Iaix/ -DNO_XPM
+XPMLIB =
+LDLIBS += -lm
+ifeq ($(AIXSTATS), perfstat)
+LDLIBS += -lperfstat
+else
+#  Only the AIX 4.x toolchain needs the declarations aixcompat.h supplies.
+CPPFLAGS += -include aix/aixcompat.h
+endif
+endif
+
 ifeq ($(PLATFORM), gnu)
 OBJS += gnu/get_def_pager.o \
 	gnu/loadmeter.o \
@@ -125,7 +157,9 @@ OBJS += gnu/get_def_pager.o \
 CPPFLAGS += -Ignu/
 endif
 
-DEPS := $(OBJS:.o=.d)
+#  gcc 2.x writes the -MMD dependency file into the current directory rather
+#  than next to the object, and is too old to have -MF, so look for both names.
+DEPS := $(OBJS:.o=.d) $(notdir $(OBJS:.o=.d))
 
 xosview:	$(OBJS)
 		$(CXX) $(LDFLAGS) -o $@ $^ $(LDLIBS)
@@ -141,10 +175,10 @@ dist:
 		./mkdist $(VERSION)
 
 install:	xosview
-		$(INSTALL) -d $(DESTDIR)$(BINDIR)
-		$(INSTALL) -d $(DESTDIR)$(MANDIR)/man1
-		$(INSTALL) -d $(DESTDIR)$(XDGAPPSDIR)
-		$(INSTALL) -d $(DESTDIR)$(ICONDIR)/32x32/apps
+		$(INSTALLDIR) $(DESTDIR)$(BINDIR)
+		$(INSTALLDIR) $(DESTDIR)$(MANDIR)/man1
+		$(INSTALLDIR) $(DESTDIR)$(XDGAPPSDIR)
+		$(INSTALLDIR) $(DESTDIR)$(ICONDIR)/32x32/apps
 		$(INSTALL) -m 755 xosview $(DESTDIR)$(BINDIR)/xosview
 		$(INSTALL) -m 644 xosview.1 $(DESTDIR)$(MANDIR)/man1/xosview.1
 		$(INSTALL) -m 644 xosview.desktop $(DESTDIR)$(XDGAPPSDIR)

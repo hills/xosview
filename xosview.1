@@ -112,7 +112,8 @@ horizontal bar which is separated into color coded regions showing how
 much of the resource is being put to a particular use.
 
 \fIxosview\fP runs on several platforms (Linux, NetBSD, FreeBSD,
-OpenBSD, DragonflyBSD, some Solaris systems, IRIX 6.5, HPUX and GNU).
+OpenBSD, DragonflyBSD, some Solaris systems, IRIX 6.5, HPUX, AIX 4.x
+and 5.x, and GNU).
 Not all of the meters described below are supported on all platforms.
 Some of the meters may appear different depending upon the platform
 \fIxosview\fP is running on.  Note that *BSD is used as an
@@ -132,6 +133,7 @@ FreeBSD, OpenBSD, DragonflyBSD).
    SunOS5 : user | system | wait | idle
    IRIX   : user | system | interrupt | wait | idle
    HPUX   : user | nice | system | interrupt | idle
+   AIX    : user | system | io-wait | idle
 
 \fBMemory Usage\fP
    Linux  : used | buffers | slab | map | cache | free
@@ -142,6 +144,7 @@ FreeBSD, OpenBSD, DragonflyBSD).
    SunOS5 : kernel | zfs | other | free
    IRIX   : kernel | fs | user | free
    HPUX   : text | used | other | free
+   AIX    : used | cache | free
    GNU    : active | inactive | wired | free
 
 \fBSwap Usage\fP
@@ -149,24 +152,28 @@ FreeBSD, OpenBSD, DragonflyBSD).
    *BSD   : used | free
    SunOS5 : used | free
    HPUX   : used | free
+   AIX    : used | free
    GNU    : used | free
 
 \fBDisk Usage\fP: Throughput to/from local disk, per second
    Linux  : in | out | idle
    *BSD   : in | out | idle
    SunOS5 : in | out | idle
+   AIX    : in | out | idle
 
 \fBPage Swapping\fP: Pages to/from swap, per second
    Linux  : in | out | idle
    *BSD   : in | out | idle
    SunOS5 : in | out | idle
    HPUX   : in | out | idle
+   AIX    : in | out | idle
    GNU    : in | out | idle
 
 \fBNetwork Usage\fP
    Linux  : in | out | idle
    *BSD   : in | out | idle
    SunOS5 : in | out | idle
+   AIX    : in | out | idle
 
 \fBGFX Usage\fP: Framebuffer exchanges, per second
    IRIX   : swapbuffers

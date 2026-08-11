@@ -1,0 +1,91 @@
+
+  The AIX port supports AIX 4.x and 5.x and provides these meters:
+
+    - load meter
+    - cpu meter:  user | system | io-wait | idle
+    - mem meter:  used | cache | free
+    - swap meter: used | free
+    - page meter: paging space traffic, in | out | idle
+    - disk meter: read | write | idle
+    - net meter:  in | out | idle
+
+  Building
+  --------
+
+    cp targets/aix5 .config        # AIX 5.1 and later
+    cp targets/aix4 .config        # AIX 4.1 through 4.3
+    gmake
+
+  The build needs GNU make; the AIX make will not parse the Makefile.  It
+  needs no libraries beyond libX11, and in particular does not need
+  libXpm, which AIX does not ship: the targets define -DNO_XPM, which
+  drops support for the pixmapName resource and leaves everything else
+  intact.
+
+  Where the numbers come from
+  ---------------------------
+
+  The meters do not read any statistic directly.  They go through the
+  small interface in aix/aixstats.h, which has two implementations; the
+  target file picks one by setting AIXSTATS.
+
+  aix/perfstat.cc is the AIX 5.x back end and the default.  It uses
+  libperfstat, which arrived in AIX 5.1 and is the supported interface
+  for all of these figures.  It needs no special privileges and its
+  counters are 64 bit, so they do not wrap.
+
+  aix/kmem.cc is the AIX 4.x back end, for the releases that predate
+  libperfstat.  It reads everything out of /dev/kmem at addresses
+  resolved with knlist().  The symbols used are avenrun (load averages),
+  sysinfo (cpu ticks, see <sys/sysinfo.h>), vmminfo (paging counters, see
+  <sys/vminfo.h>), ifnet (the interface chain) and iostat (the per disk
+  dkstat chain, see <sys/iostat.h>).
+
+  Real memory and paging space totals have no header on AIX 4.x and come
+  from the kernel "vmker" symbol instead.  The layout in aix/vmker.h was
+  reverse engineered by Jussi Maki for "monitor" and is the same one the
+  AIX 4.1 module of top(1) uses.  It has been checked against "lsattr -El
+  sys0 -a realmem", the vmstat "fre" column and lsps(1).  Note that this
+  layout is specific to AIX 4.x: the same symbol exists on AIX 5.1 but
+  its fields have moved, which is one reason the 5.x back end uses
+  libperfstat rather than extending the guesswork.
+
+  Because the 4.x figures are kernel internals rather than a supported
+  interface, they are the most likely thing to need attention on a
+  release other than the ones tested.  Each meter checks its statistic at
+  startup and disables itself if it is unavailable, so an unsupported
+  kernel loses individual meters rather than failing to start.
+
+  Notes
+  -----
+
+  The disk meter reports the same counters as iostat(1), and the kernel
+  only maintains those when disk i/o history is turned on.  If the disk
+  meter stays flat and "iostat -d" prints "Disk history since boot not
+  available", enable it with:
+
+    chdev -l sys0 -a iostat=true
+
+  The page meter counts traffic to and from paging space only, which is
+  what vmstat reports in its pi and po columns.  Ordinary file paging is
+  deliberately left out because the disk meter already covers it.
+
+  The cpu meter is a single aggregate meter.  The ticks both back ends
+  read are accumulated system wide, so the cpuFormat resource has no
+  effect on this platform.
+
+  The mem meter shows the file cache separately from used memory, since
+  AIX will hand those pages back under memory pressure.
+
+  On AIX 4.x the interface and disk byte counters are 32 bit and will
+  wrap on a busy machine.  A sample in which the total moves backwards is
+  skipped rather than plotted as a spike.
+
+
+*****************************************************************************
+  Note:  the AIX 4.x back end reads /dev/kmem, which is mode 0440 and
+    owned by root:system, so on those releases xosview must either run as
+    root or be installed setgid system.  Without that access it starts,
+    reports the problem on stderr and shows every meter as disabled.  The
+    AIX 5.x back end needs no privileges.
+*****************************************************************************

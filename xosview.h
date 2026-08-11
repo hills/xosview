@@ -75,13 +75,26 @@ private:
   enum windowVisibilityState windowVisibility;
 };
 
+//  gcc 2.x predates both C99 variadic macros and __func__, but has the
+//  equivalent GNU extensions.
 #ifdef DEBUG
+#if defined(__GNUC__) && __GNUC__ < 3
+#define XOSDEBUG(args...) { \
+  fprintf(stderr, "%s:%d: ", __FUNCTION__, __LINE__); \
+  fprintf(stderr, args); \
+}
+#else
 #define XOSDEBUG(...) { \
   fprintf(stderr, "%s:%d: ", __func__, __LINE__); \
   fprintf(stderr, __VA_ARGS__); \
 }
+#endif
+#else
+#if defined(__GNUC__) && __GNUC__ < 3
+#define XOSDEBUG(args...)
 #else
 #define XOSDEBUG(...)
+#endif
 #endif
 
 #endif

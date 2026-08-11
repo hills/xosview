@@ -1,7 +1,9 @@
 #include "xwin.h"
 #include "Xrm.h"
 #include <X11/Xatom.h>
+#ifndef NO_XPM
 #include <X11/xpm.h>
+#endif
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -227,6 +229,11 @@ void XWin::setColors( void ){
 
 int XWin::getPixmap(Pixmap *pixmap)
 {
+#ifdef NO_XPM
+  //  Built without libXpm, so background pixmaps are simply unavailable.
+  (void) pixmap;
+  return 0;
+#else
   char	*pixmap_file;
   XWindowAttributes	root_att;
   XpmAttributes		pixmap_att;
@@ -251,6 +258,7 @@ int XWin::getPixmap(Pixmap *pixmap)
   }
 
   return 1;
+#endif
 }
 
 //-----------------------------------------------------------------------------

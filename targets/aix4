@@ -1,0 +1,8 @@
+PLATFORM = aix
+#  AIX 4.x predates libperfstat, so read the statistics out of kernel memory.
+AIXSTATS = kmem
+CXX = g++
+#  installbsd moves its source file unless -c is given, and its -d flag for
+#  creating directories does not exist at all.
+INSTALL = installbsd -c
+INSTALLDIR = mkdir -p
