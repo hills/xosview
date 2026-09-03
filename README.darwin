@@ -1,0 +1,21 @@
+This port brings xosview to the Mac platform and should run on recent
+Darwin/Mach systems.
+
+The Darwin port requires XQuartz.  Its headers and libraries normally live
+under /opt/X11.
+
+To build without installing:
+
+  $ cp targets/darwin .config
+  $ make
+
+The Darwin target provides load-average, CPU, memory, swap, network, and
+disk-I/O meters.
+
+Implemented meters follow the classic Linux display order: load, CPU, memory,
+disk, swap, then network.
+
+If an existing X resource database disables the implemented meters, this build
+will report that no meters are enabled.  Override those resources for the test:
+
+  $ ./xosview -xrm 'xosview*load: True' -xrm 'xosview*cpu: True' -xrm 'xosview*mem: True' -xrm 'xosview*swap: True' -xrm 'xosview*net: True' -xrm 'xosview*disk: True'
