@@ -61,6 +61,13 @@ double MAX_SAMPLES_PER_SECOND = 10;
 
 XOSView::XOSView( const char * instName, int argc, char *argv[] ) : XWin(),
 						xrm(Xrm("xosview", instName)){
+  // save original arguments before calling XrmParseCommand()
+  int saved_argc = argc;
+  char **saved_argv = new char *[argc + 1];
+  for (int i = 0; i < argc; ++i)
+    saved_argv[i] = argv[i];
+  saved_argv[argc] = nullptr;
+
   // Check for version arguments first.  This allows
   // them to work without the need for a connection
   // to the X server
@@ -140,7 +147,7 @@ XOSView::XOSView( const char * instName, int argc, char *argv[] ) : XWin(),
 
   // determine the width and height of the window then create it
   figureSize();
-  init( argc, argv );
+  init( saved_argc, saved_argv );
   title( winname() );
   iconname( winname() );
   dolegends();
