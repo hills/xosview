@@ -125,6 +125,18 @@ OBJS += gnu/get_def_pager.o \
 CPPFLAGS += -Ignu/
 endif
 
+ifeq ($(PLATFORM), darwin)
+OBJS += darwin/MeterMaker.o \
+	darwin/cpumeter.o \
+	darwin/diskmeter.o \
+	darwin/loadmeter.o \
+	darwin/memmeter.o \
+	darwin/netmeter.o \
+	darwin/swapmeter.o
+CPPFLAGS += -Idarwin/
+LDFLAGS += -framework IOKit -framework CoreFoundation
+endif
+
 DEPS := $(OBJS:.o=.d)
 
 xosview:	$(OBJS)
