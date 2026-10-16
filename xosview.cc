@@ -66,7 +66,7 @@ XOSView::XOSView( const char * instName, int argc, char *argv[] ) : XWin(),
   char **saved_argv = new char *[argc + 1];
   for (int i = 0; i < argc; ++i)
     saved_argv[i] = argv[i];
-  saved_argv[argc] = nullptr;
+  saved_argv[argc] = NULL;
 
   // Check for version arguments first.  This allows
   // them to work without the need for a connection
