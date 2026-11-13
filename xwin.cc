@@ -5,7 +5,200 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <ctype.h>
+#include <strings.h>
+#include <vector>
 #include <iostream>
+#ifdef HAVE_XFT
+#include <fontconfig/fontconfig.h>
+#endif
+
+namespace {
+
+std::string trimFontName( const std::string &name ) {
+  size_t first = name.find_first_not_of( " \t\r\n" );
+  if ( first == std::string::npos )
+    return "";
+  size_t last = name.find_last_not_of( " \t\r\n" );
+  return name.substr( first, last - first + 1 );
+}
+
+std::vector<std::string> splitXlfd( const std::string &fontName ) {
+  std::string name = trimFontName( fontName );
+  if ( name.size() >= 2 && name[0] == '"' && name[name.size()-1] == '"' )
+    name = name.substr( 1, name.size() - 2 );
+  if ( name.empty() || name[0] != '-' )
+    return std::vector<std::string>();
+
+  std::vector<std::string> parts;
+  size_t start = 0;
+  while ( start <= name.size() ) {
+    size_t dash = name.find( '-', start );
+    if ( dash == std::string::npos ) {
+      parts.push_back( name.substr( start ) );
+      break;
+    }
+    parts.push_back( name.substr( start, dash - start ) );
+    start = dash + 1;
+  }
+
+  if ( parts.size() != 15 || !parts[0].empty() )
+    return std::vector<std::string>();
+  return std::vector<std::string>( parts.begin() + 1, parts.end() );
+}
+
+std::string joinXlfd( const std::vector<std::string> &fields ) {
+  std::string name = "-";
+  for ( size_t i = 0; i < fields.size(); i++ ) {
+    if ( i )
+      name += '-';
+    name += fields[i];
+  }
+  return name;
+}
+
+bool isScalableXlfd( const std::vector<std::string> &fields ) {
+  return fields.size() == 14 && fields[6] == "0";
+}
+
+std::string scaledXlfdName( const std::vector<std::string> &fields,
+                            int pixelHeight ) {
+  std::vector<std::string> scaled = fields;
+  char size[32];
+  snprintf( size, sizeof(size), "%d", pixelHeight );
+  scaled[6] = size;
+  scaled[7] = "0";
+  scaled[8] = "0";
+  scaled[9] = "0";
+  scaled[11] = "0";
+  return joinXlfd( scaled );
+}
+
+int xlfdPixelSize( const std::string &fontName ) {
+  std::vector<std::string> fields = splitXlfd( fontName );
+  if ( fields.size() != 14 || fields[6].empty() ||
+       !isdigit( static_cast<unsigned char>( fields[6][0] ) ) )
+    return 0;
+  return atoi( fields[6].c_str() );
+}
+
+std::string closestBitmapFont( Display *display,
+                               const std::vector<std::string> &fields,
+                               int pixelHeight ) {
+  std::vector<std::string> patternFields( 14, "*" );
+  for ( int i = 0; i < 6; i++ )
+    patternFields[i] = fields[i];
+  patternFields[10] = fields[10];
+  patternFields[12] = fields[12];
+  patternFields[13] = fields[13];
+
+  int count = 0;
+  char **names = XListFonts( display, joinXlfd( patternFields ).c_str(),
+                             4096, &count );
+  if ( !names )
+    return "";
+
+  std::vector<std::string> bestFields;
+  int bestDiff = 0x7fffffff;
+  int bestPixel = 0;
+  for ( int i = 0; i < count; i++ ) {
+    std::vector<std::string> candidate = splitXlfd( names[i] );
+    int pixel = xlfdPixelSize( names[i] );
+    if ( candidate.size() != 14 || pixel <= 0 )
+      continue;
+    int diff = pixel > pixelHeight ? pixel - pixelHeight
+                                   : pixelHeight - pixel;
+    if ( diff < bestDiff ||
+         ( diff == bestDiff &&
+           ( pixelHeight >= bestPixel ? pixel > bestPixel
+                                      : pixel < bestPixel ) ) ) {
+      bestDiff = diff;
+      bestPixel = pixel;
+      bestFields = candidate;
+    }
+  }
+  XFreeFontNames( names );
+  return bestFields.empty() ? "" : joinXlfd( bestFields );
+}
+
+std::string lowerFontString( const std::string &text ) {
+  std::string result = text;
+  for ( size_t i = 0; i < result.size(); i++ )
+    result[i] = static_cast<char>( tolower( static_cast<unsigned char>( result[i] ) ) );
+  return result;
+}
+
+bool containsFontText( const std::string &text, const char *needle ) {
+  return lowerFontString( text ).find( needle ) != std::string::npos;
+}
+
+bool fontWeightIsBold( const std::string &weight ) {
+  std::string w = lowerFontString( weight );
+  return containsFontText( w, "bold" ) || containsFontText( w, "demi" ) ||
+         containsFontText( w, "black" ) || containsFontText( w, "heavy" );
+}
+
+bool fontSpacingIsMono( const std::vector<std::string> &fields ) {
+  std::string spacing = lowerFontString( fields[10] );
+  std::string family = lowerFontString( fields[1] );
+  return spacing == "m" || spacing == "c" ||
+         containsFontText( family, "mono" ) ||
+         containsFontText( family, "courier" ) ||
+         containsFontText( family, "fixed" ) ||
+         containsFontText( family, "typewriter" );
+}
+
+bool fontSlantIsItalic( const std::string &slant ) {
+  std::string s = lowerFontString( slant );
+  return s == "i" || s == "o" || containsFontText( s, "italic" ) ||
+         containsFontText( s, "oblique" );
+}
+
+bool fontSpecWantsBold( const std::string &fontName ) {
+  std::vector<std::string> fields = splitXlfd( fontName );
+  if ( fields.size() == 14 )
+    return fontWeightIsBold( fields[2] );
+  std::string name = lowerFontString( fontName );
+  return containsFontText( name, "bold" ) || containsFontText( name, "demi" ) ||
+         containsFontText( name, "black" ) || containsFontText( name, "heavy" );
+}
+
+bool fontSpecWantsItalic( const std::string &fontName ) {
+  std::vector<std::string> fields = splitXlfd( fontName );
+  if ( fields.size() == 14 )
+    return fontSlantIsItalic( fields[3] );
+  std::string name = lowerFontString( fontName );
+  return containsFontText( name, "italic" ) || containsFontText( name, "oblique" );
+}
+
+int scalableFontScore( const std::vector<std::string> &fields,
+                       bool wantBold, bool wantItalic ) {
+  int score = 0;
+  bool bold = fontWeightIsBold( fields[2] );
+  bool italic = fontSlantIsItalic( fields[3] );
+
+  if ( bold == wantBold )
+    score += 4;
+  if ( italic == wantItalic )
+    score += 2;
+  if ( fontSpacingIsMono( fields ) )
+    score += 8;
+
+  std::string registry = lowerFontString( fields[12] );
+  if ( registry.find( "iso8859" ) != std::string::npos ||
+       registry.find( "iso10646" ) != std::string::npos )
+    score += 2;
+  if ( registry == "adobe-fontspecific" )
+    score -= 4;
+
+  std::string family = lowerFontString( fields[1] );
+  if ( containsFontText( family, "dingbat" ) ||
+       containsFontText( family, "symbol" ) )
+    score -= 10;
+  return score;
+}
+
+} // namespace
 
 //-----------------------------------------------------------------------------
 
@@ -41,9 +234,23 @@ void XWin::XWinInit (int argc, char** argv, char* geometry, Xrm* xrm) {
   geometry_ = geometry;  //  Save for later use.
   width_ = height_ = x_ = y_ = 0;
   xrmptr_ = xrm;
+  fontScaling_ = !strncasecmp( getResourceOrUseDefault( "fontScaling", "True" ),
+                               "True", 4 );
 
+  window_ = None;
+  gc_ = None;
   name_ = (char *)malloc(0);
   font_ = NULL;
+#ifdef HAVE_XFT
+  xftFont_ = NULL;
+  xftDraw_ = NULL;
+  useXft_ = false;
+#endif
+  baseFontHeight_ = fontPixelHeight_ = lastFontSizeRequest_ = 0;
+  fontScale_ = 1.0;
+  fallbackFontSearched_ = false;
+  fontName_.clear();
+  fallbackFontName_.clear();
   done_ = 0;
 
   // Set up the default Events
@@ -69,9 +276,18 @@ XWin::~XWin( void ){
   XFree( sizehints_ );
   XFree( wmhints_ );
   XFree( classhints_ );
-  XFreeGC( display_, gc_ );
-  XFreeFont( display_, font_ );
-  XDestroyWindow( display_, window_ );
+  if ( gc_ != None )
+    XFreeGC( display_, gc_ );
+  if ( font_ )
+    XFreeFont( display_, font_ );
+#ifdef HAVE_XFT
+  if ( xftDraw_ )
+    XftDrawDestroy( xftDraw_ );
+  if ( xftFont_ )
+    XftFontClose( display_, xftFont_ );
+#endif
+  if ( window_ != None )
+    XDestroyWindow( display_, window_ );
   // close the connection to the display
   XCloseDisplay( display_ );
 }
@@ -128,6 +344,9 @@ void XWin::init( int argc, char **argv ){
     std::cerr <<"Error getting attributes of Main." <<std::endl;
     exit(2);
   }
+#ifdef HAVE_XFT
+  initXftDraw();
+#endif
 
   //  Create stipple pixmaps.
   stipples_[0] = createPixmap("\000\000", 2, 2);
@@ -142,15 +361,239 @@ void XWin::setFont( void ){
   // Set up the font
   if ( font_ != NULL )
     return;
-  const char* fontName = getResource("font");
+  fontName_ = getResource("font");
 
-  if ((font_ = XLoadQueryFont(display_, fontName)) == NULL){
-    std::cerr <<name_ <<": font \"" << fontName
+  if ((font_ = XLoadQueryFont(display_, fontName_.c_str())) == NULL){
+    std::cerr <<name_ <<": font \"" << fontName_
 	      << "\" does not exist; see xlsfonts(1)"
 	      << std::endl;
     exit(1);
   }
+  baseFontHeight_ = fontPixelHeight_ = lastFontSizeRequest_ = textHeight();
+  fontScale_ = 1.0;
+#ifdef HAVE_XFT
+  xftFont_ = openXftFont( baseFontHeight_ );
+  useXft_ = xftFont_ != NULL;
+#endif
 }
+//-----------------------------------------------------------------------------
+
+bool XWin::fontHeightClose( XFontStruct *font, int pixelHeight ) const {
+  int height = font->ascent + font->descent;
+  int diff = height > pixelHeight ? height - pixelHeight
+                                  : pixelHeight - height;
+  int tolerance = pixelHeight / 10 + 2;
+  return diff <= tolerance;
+}
+
+const std::string &XWin::fallbackScalableFont( void ) {
+  if ( fallbackFontSearched_ )
+    return fallbackFontName_;
+  fallbackFontSearched_ = true;
+
+  std::vector<std::string> patternFields( 14, "*" );
+  patternFields[6] = "0";
+
+  int count = 0;
+  char **names = XListFonts( display_, joinXlfd( patternFields ).c_str(),
+                             4096, &count );
+  if ( !names )
+    return fallbackFontName_;
+
+  bool wantBold = fontSpecWantsBold( fontName_ );
+  bool wantItalic = fontSpecWantsItalic( fontName_ );
+  int bestMonoScore = -0x7fffffff;
+  int bestAnyScore = -0x7fffffff;
+  std::string bestMonoName, bestAnyName;
+  for ( int i = 0; i < count; i++ ) {
+    std::vector<std::string> fields = splitXlfd( names[i] );
+    if ( !isScalableXlfd( fields ) )
+      continue;
+    int score = scalableFontScore( fields, wantBold, wantItalic );
+    if ( score > bestAnyScore ) {
+      bestAnyScore = score;
+      bestAnyName = joinXlfd( fields );
+    }
+    if ( fontSpacingIsMono( fields ) && score > bestMonoScore ) {
+      bestMonoScore = score;
+      bestMonoName = joinXlfd( fields );
+    }
+  }
+  XFreeFontNames( names );
+
+  fallbackFontName_ = bestMonoName.empty() ? bestAnyName : bestMonoName;
+  return fallbackFontName_;
+}
+
+std::string XWin::fallbackFontNameForPixelHeight( int pixelHeight ) {
+  const std::string &base = fallbackScalableFont();
+  if ( base.empty() )
+    return "";
+  std::vector<std::string> fields = splitXlfd( base );
+  if ( fields.size() != 14 )
+    return "";
+  return scaledXlfdName( fields, pixelHeight );
+}
+
+std::string XWin::fontNameForPixelHeight( int pixelHeight ) {
+  std::vector<std::string> fields = splitXlfd( fontName_ );
+  if ( fields.size() == 14 ) {
+    if ( isScalableXlfd( fields ) )
+      return scaledXlfdName( fields, pixelHeight );
+    std::string closest = closestBitmapFont( display_, fields, pixelHeight );
+    if ( !closest.empty() )
+      return closest;
+  }
+  if ( pixelHeight == baseFontHeight_ )
+    return fontName_;
+  return "";
+}
+
+bool XWin::setFontScale( double scale ) {
+  fontScale_ = scale;
+  if ( !fontScaling_ || !font_ || baseFontHeight_ <= 0 )
+    return false;
+
+  int pixelHeight = static_cast<int>( baseFontHeight_ * scale + 0.5 );
+  if ( pixelHeight < 6 )
+    pixelHeight = 6;
+  else if ( pixelHeight > 200 )
+    pixelHeight = 200;
+  if ( pixelHeight == lastFontSizeRequest_ )
+    return false;
+  lastFontSizeRequest_ = pixelHeight;
+
+#ifdef HAVE_XFT
+  if ( useXft_ ) {
+    XftFont *candidate = openXftFont( pixelHeight );
+    if ( !candidate )
+      return false;
+    if ( xftFont_ )
+      XftFontClose( display_, xftFont_ );
+    xftFont_ = candidate;
+    fontPixelHeight_ = pixelHeight;
+    return true;
+  }
+#endif
+
+  std::vector<std::string> candidates;
+  std::string primary = fontNameForPixelHeight( pixelHeight );
+  if ( !primary.empty() )
+    candidates.push_back( primary );
+  std::string fallback = fallbackFontNameForPixelHeight( pixelHeight );
+  if ( !fallback.empty() && fallback != primary )
+    candidates.push_back( fallback );
+
+  for ( size_t i = 0; i < candidates.size(); i++ ) {
+    XFontStruct *candidate = XLoadQueryFont( display_, candidates[i].c_str() );
+    if ( !candidate )
+      continue;
+    if ( fontHeightClose( candidate, pixelHeight ) ) {
+      if ( font_ )
+        XFreeFont( display_, font_ );
+      font_ = candidate;
+      fontPixelHeight_ = pixelHeight;
+      if ( gc_ != None ) {
+        XGCValues gcv;
+        gcv.font = font_->fid;
+        XChangeGC( display_, gc_, GCFont, &gcv );
+      }
+      return true;
+    }
+    XFreeFont( display_, candidate );
+  }
+  return false;
+}
+//-----------------------------------------------------------------------------
+
+void XWin::updateTextColor( unsigned long pixelvalue ) {
+#ifdef HAVE_XFT
+  updateXftColor( pixelvalue );
+#endif
+}
+
+#ifdef HAVE_XFT
+XftFont *XWin::openXftFont( int pixelHeight ) {
+  FcInit();
+  FcPattern *pattern = FcPatternCreate();
+  if ( !pattern )
+    return NULL;
+
+  FcPatternAddString( pattern, FC_FAMILY, (const FcChar8 *)"monospace" );
+  FcPatternAddInteger( pattern, FC_WEIGHT,
+                       fontSpecWantsBold( fontName_ ) ? FC_WEIGHT_BOLD
+                                                      : FC_WEIGHT_NORMAL );
+  FcPatternAddInteger( pattern, FC_SLANT,
+                       fontSpecWantsItalic( fontName_ ) ? FC_SLANT_ITALIC
+                                                        : FC_SLANT_ROMAN );
+  FcPatternAddInteger( pattern, FC_SPACING, FC_MONO );
+  FcPatternAddDouble( pattern, FC_PIXEL_SIZE, pixelHeight );
+  FcPatternAddBool( pattern, FC_ANTIALIAS, FcTrue );
+  FcPatternAddBool( pattern, FC_HINTING, FcTrue );
+  FcPatternAddInteger( pattern, FC_RGBA, FC_RGBA_RGB );
+
+  FcConfig *config = FcConfigGetCurrent();
+  if ( config )
+    FcConfigSubstitute( config, pattern, FcMatchPattern );
+  FcDefaultSubstitute( pattern );
+
+  FcPattern *matched = NULL;
+  if ( config ) {
+    FcResult result;
+    matched = FcFontMatch( config, pattern, &result );
+  }
+  XftFont *font = XftFontOpenPattern( display_, matched ? matched : pattern );
+  if ( matched )
+    FcPatternDestroy( matched );
+  FcPatternDestroy( pattern );
+  return font;
+}
+
+void XWin::initXftDraw( void ) {
+  if ( !useXft_ )
+    return;
+  Visual *visual = attr_.visual ? attr_.visual
+                                : DefaultVisual( display_, screen() );
+  xftDraw_ = XftDrawCreate( display_, window_, visual, colormap_ );
+  if ( !xftDraw_ ) {
+    useXft_ = false;
+    return;
+  }
+  updateXftColor( fgcolor_ );
+}
+
+bool XWin::validXftPixel( unsigned long pixelvalue ) const {
+  if ( pixelvalue > 0xffffffffUL )
+    return false;
+  Visual *visual = attr_.visual ? attr_.visual
+                                : DefaultVisual( display_, DefaultScreen( display_ ) );
+  if ( !visual )
+    return false;
+  if ( visual->c_class == TrueColor || visual->c_class == DirectColor ) {
+    unsigned long mask = visual->red_mask | visual->green_mask |
+                         visual->blue_mask;
+    return mask == 0 || ( pixelvalue & ~mask ) == 0;
+  }
+  unsigned long entries = visual->map_entries > 0
+                          ? static_cast<unsigned long>( visual->map_entries )
+                          : 256;
+  return pixelvalue < entries;
+}
+
+void XWin::updateXftColor( unsigned long pixelvalue ) {
+  if ( !useXft_ || !xftDraw_ || !validXftPixel( pixelvalue ) )
+    return;
+  XColor color;
+  color.pixel = pixelvalue;
+  if ( !XQueryColor( display_, colormap_, &color ) )
+    return;
+  xftColor_.pixel = pixelvalue;
+  xftColor_.color.red = color.red;
+  xftColor_.color.green = color.green;
+  xftColor_.color.blue = color.blue;
+  xftColor_.color.alpha = 0xffff;
+}
+#endif
 //-----------------------------------------------------------------------------
 
 void XWin::setHints( int argc, char *argv[] ){

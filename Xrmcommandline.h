@@ -71,6 +71,9 @@ static XrmOptionDescRec options[] = {
 //  Disk Meter Options
 { "-disk", "*disk", XrmoptionNoArg, "False" },
 { "+disk", "*disk", XrmoptionNoArg, "True" },
+//  Tape Meter Options
+{ "-tape", "*tape", XrmoptionNoArg, "False" },
+{ "+tape", "*tape", XrmoptionNoArg, "True" },
 #endif
 
 // Interrupt meter resources  --  all sorts of aliases.

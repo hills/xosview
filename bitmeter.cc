@@ -96,7 +96,7 @@ void BitMeter::draw( void ){
     parent_->setForeground( onColor_ );
     if(docaptions_)
     {
-      parent_->drawString( x_, y_ - 5, legend_ );
+      parent_->drawString( x_, y_ - parent_->textCaptionOffset(), legend_ );
       }
   }
 

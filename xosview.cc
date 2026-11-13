@@ -107,6 +107,7 @@ XOSView::XOSView( const char * instName, int argc, char *argv[] ) : XWin(),
   checkArgs (argc, argv);  //  Check for any other unhandled args.
   xoff_ = hmargin_;
   yoff_ = 0;
+  fontBaseWidth_ = fontBaseHeight_ = 0;
   nummeters_ = 0;
   meters_ = NULL;
   name_ = const_cast<char *>("xosview");
@@ -148,6 +149,8 @@ XOSView::XOSView( const char * instName, int argc, char *argv[] ) : XWin(),
   // determine the width and height of the window then create it
   figureSize();
   init( saved_argc, saved_argv );
+  fontBaseWidth_ = width_;
+  fontBaseHeight_ = height_;
   title( winname() );
   iconname( winname() );
   dolegends();
@@ -164,7 +167,7 @@ void XOSView::checkVersion(int argc, char *argv[]) const
             }
     }
 
-void XOSView::figureSize ( void ) {
+void XOSView::updateLabelOffsets( void ) {
   if ( legend_ ){
     if ( !usedlabels_ )
       xoff_ = textWidth( "XXXXXX" );
@@ -173,15 +176,32 @@ void XOSView::figureSize ( void ) {
 
     yoff_ = caption_ ? textHeight() + textHeight() / 4 : 0;
   }
+  else {
+    xoff_ = hmargin_;
+    yoff_ = 0;
+  }
+}
+
+void XOSView::figureSize ( void ) {
+  updateLabelOffsets();
   static int firsttime = 1;
   if (firsttime) {
     firsttime = 0;
     width_ = findx();
     height_ = findy();
   }
-  else
-  {
-  }
+}
+
+void XOSView::updateFontScale( void ) {
+  if ( fontBaseWidth_ <= 0 || fontBaseHeight_ <= 0 ||
+       width_ <= 0 || height_ <= 0 )
+    return;
+
+  double widthScale = 1.0 * width_ / fontBaseWidth_;
+  double heightScale = 1.0 * height_ / fontBaseHeight_;
+  double scale = widthScale < heightScale ? widthScale : heightScale;
+  if ( setFontScale( scale ) )
+    updateLabelOffsets();
 }
 
 void XOSView::checkMeterResources( void ){
@@ -272,6 +292,8 @@ const char *XOSView::winname( void ){
 
 
 void  XOSView::resize( void ){
+  updateFontScale();
+
   int spacing = vspacing_+1;
   int topmargin = vmargin_;
   int rightmargin = hmargin_;

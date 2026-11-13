@@ -22,6 +22,14 @@ OPTFLAGS ?= -Wall -O3
 CPPFLAGS += $(OPTFLAGS) -I. -MMD
 LDLIBS += -lX11 -lXpm
 
+HAVE_XFT := $(shell pkg-config --exists xft fontconfig 2>/dev/null && echo 1)
+XFT_CFLAGS ?= $(shell pkg-config --cflags xft fontconfig 2>/dev/null)
+XFT_LIBS ?= $(shell pkg-config --libs xft fontconfig 2>/dev/null)
+ifeq ($(HAVE_XFT),1)
+CPPFLAGS += -DHAVE_XFT $(XFT_CFLAGS)
+LDLIBS += $(XFT_LIBS)
+endif
+
 OBJS = Host.o \
 	Xrm.o \
 	bitfieldmeter.o \
@@ -57,6 +65,7 @@ OBJS += sensorfieldmeter.o \
 	linux/raidmeter.o \
 	linux/serialmeter.o \
 	linux/swapmeter.o \
+	linux/tapemeter.o \
 	linux/wirelessmeter.o \
 	linux/acpitemp.o
 ifeq ($(findstring 86,$(ARCH)),86)

@@ -156,6 +156,9 @@ FreeBSD, OpenBSD, DragonflyBSD).
    *BSD   : in | out | idle
    SunOS5 : in | out | idle
 
+\fBTape Usage\fP: Throughput to/from SCSI tape drives (e.g. LTO), per second
+   Linux  : in | out | idle
+
 \fBPage Swapping\fP: Pages to/from swap, per second
    Linux  : in | out | idle
    *BSD   : in | out | idle
@@ -297,6 +300,7 @@ xosview*pageBandWidth will be set to \fIval\fP.
 .RE
 
 .pm disk
+.pm tape
 .pm int
 
 \-ints +ints
@@ -411,6 +415,13 @@ rendered at the X server. To list the available fonts, use
 .BR xlsfonts (1),
 and rehash the list with
 .BR xset (1).
+.RE
+
+xosview*fontScaling: (True or False)
+.RS
+If True then xosview will choose a similarly sized font when the window
+is resized so labels remain proportional to the window size. Set this to
+False to keep the startup font fixed while resizing.
 .RE
 
 xosview*background: \fIcolor\fP
@@ -1387,6 +1398,49 @@ This color will be used for the linux meter to show reads.
 .dg disk
 
 .uf disk
+
+
+\fBTape Meter Resources\fP
+
+.\"  Do the tape: True resource.
+.xt tape
+
+One tape meter is shown for each SCSI tape drive (stN device,
+e.g. an LTO drive) found in /sys/class/scsi_tape.  The meter title
+is derived from the drive model where possible (e.g. "LTO5"),
+falling back to the device name (e.g. "ST0").
+
+.\"  tape colors
+.cc tape In reads
+
+.cc tape Out writes
+
+.cc tape Idle idle
+
+xosview*tapeBandwidth: \fIbandwidth\fP
+.RS
+This number is used to specify the expected maximum bandwidth in bytes
+per second for the tape meter.
+.RE
+
+xosview*tapeWriteColor: \fIcolor\fP
+.RS
+This color will be used for the linux meter to show writes.
+.RE
+
+xosview*tapeReadColor: \fIcolor\fP
+.RS
+This color will be used for the linux meter to show reads.
+.RE
+
+.\"  Priority, decay, usedFormat resources:
+.pp tape
+
+.dc tape
+
+.dg tape
+
+.uf tape
 
 
 \fBRAID Meter Resources\fP
