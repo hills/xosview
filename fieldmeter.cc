@@ -136,11 +136,12 @@ void FieldMeter::draw( void ){
 void FieldMeter::drawlegend( void ){
   char *tmp1, *tmp2, buff[100];
   int n, x = x_;
+  int captionY = y_ - parent_->textCaptionOffset();
 
   if (!docaptions_ || !dolegends_)
     return;
 
-  parent_->clear( x_, y_ - 5 - parent_->textHeight(),
+  parent_->clear( x_, captionY - parent_->textAscent() - 2,
                   width_ + 5, parent_->textHeight() + 4 );
 
   tmp1 = tmp2 = legend_;
@@ -157,11 +158,11 @@ void FieldMeter::drawlegend( void ){
     buff[n] = '\0';
     parent_->setStippleN(i%4);
     parent_->setForeground( colors_[i] );
-    parent_->drawString( x, y_ - 5, buff );
+    parent_->drawString( x, captionY, buff );
     x += parent_->textWidth( buff, n );
     parent_->setForeground( parent_->foreground() );
     if ( i != numfields_ - 1 )
-      parent_->drawString( x, y_ - 5, "/" );
+      parent_->drawString( x, captionY, "/" );
     x += parent_->textWidth( "/", 1 );
     tmp1 = tmp2;
   }
@@ -174,10 +175,9 @@ void FieldMeter::drawused( int mandatory ){
       return;
 
   parent_->setStippleN(0);	/*  Use all-bits stipple.  */
-  static const int onechar = parent_->textWidth( "X" );
-  if (!usedoffset_)  // metric meters need extra space for '-' sign
-    usedoffset_ = ( metric_ ? parent_->textWidth( "XXXXXX" )
-                            : parent_->textWidth( "XXXXX" ) );
+  const int onechar = parent_->textWidth( "X" );
+  usedoffset_ = ( metric_ ? parent_->textWidth( "XXXXXX" )
+                          : parent_->textWidth( "XXXXX" ) );
   char buf[10];
 
   if (print_ == PERCENT){

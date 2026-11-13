@@ -11,6 +11,7 @@
 #include "cpumeter.h"
 #include "memmeter.h"
 #include "diskmeter.h"
+#include "tapemeter.h"
 #include "raidmeter.h"
 #include "swapmeter.h"
 #include "pagemeter.h"
@@ -74,6 +75,14 @@ void MeterMaker::makeMeters(void){
     push(new MemMeter(_xos));
   if (_xos->isResourceTrue("disk"))
       push(new DiskMeter(_xos, atof(_xos->getResource("diskBandwidth"))));
+
+  // check for the tape meters (SCSI tape drives, e.g. LTO)
+  if (_xos->isResourceTrue("tape")) {
+    int count = TapeMeter::countTapes();
+    for (int i = 0; i < count; i++)
+      push(new TapeMeter(_xos, atof(_xos->getResource("tapeBandwidth")),
+            TapeMeter::driveName(i)));
+  }
 
   // check for the RAID meter
   if (_xos->isResourceTrue("RAID")){

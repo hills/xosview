@@ -50,6 +50,7 @@ protected:
 
   int caption_, legend_, xoff_, yoff_, nummeters_, usedlabels_;
   int hmargin_, vmargin_, vspacing_;
+  int fontBaseWidth_, fontBaseHeight_;
   unsigned long sleeptime_, usleeptime_;
 
   void usleep_via_select( unsigned long usec );
@@ -61,6 +62,8 @@ protected:
   void dolegends( void );
 
   void checkOverallResources();
+  void updateFontScale( void );
+  void updateLabelOffsets( void );
   void resizeEvent( XConfigureEvent &event );
   void exposeEvent( XExposeEvent &event );
   void keyPressEvent( XKeyEvent &event );

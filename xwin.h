@@ -3,8 +3,12 @@
 
 #include "Xrm.h"
 #include <string.h>
+#include <string>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
+#ifdef HAVE_XFT
+#include <X11/Xft/Xft.h>
+#endif
 #include <iostream>
 
 class XWin;
@@ -36,7 +40,7 @@ public:
     { XClearArea( display_, window_, x, y, width, height, False ); }
   unsigned long allocColor( const char *name );
   void setForeground( unsigned long pixelvalue )
-    { XSetForeground( display_, gc_, pixelvalue ); }
+    { XSetForeground( display_, gc_, pixelvalue ); updateTextColor( pixelvalue ); }
   void setBackground( unsigned long pixelvalue )
     { XSetBackground( display_, gc_, pixelvalue ); }
   void setStipple( Pixmap stipple)
@@ -66,17 +70,55 @@ public:
     { XDrawRectangle( display_, window_, gc_, x, y, width, height ); }
   void drawFilledRectangle( int x, int y, int width, int height )
     { XFillRectangle( display_, window_, gc_, x, y, width + 1, height + 1 ); }
-  void drawString( int x, int y, const char *str )
-    { XDrawString( display_, window_, gc_, x, y, str, strlen( str ) ); }
+  void drawString( int x, int y, const char *str ) {
+#ifdef HAVE_XFT
+    if ( useXft_ ) {
+      XftDrawString8( xftDraw_, &xftColor_, xftFont_, x, y,
+                     const_cast<FcChar8 *>( reinterpret_cast<const FcChar8 *>( str ) ),
+                     strlen( str ) );
+      return;
+    }
+#endif
+    XDrawString( display_, window_, gc_, x, y, str, strlen( str ) );
+  }
   void copyArea( int src_x, int src_y, int width, int height, int dest_x, int dest_y )
     { XCopyArea( display_, window_, window_, gc_, src_x, src_y, width, height, dest_x, dest_y ); }
-  int textWidth( const char *str, int n )
-    { return XTextWidth( font_, str, n ); }
+  int textWidth( const char *str, int n ) {
+#ifdef HAVE_XFT
+    if ( useXft_ ) {
+      XGlyphInfo extents;
+      XftTextExtents8( display_, xftFont_,
+                       const_cast<FcChar8 *>( reinterpret_cast<const FcChar8 *>( str ) ),
+                       n, &extents );
+      return extents.width;
+    }
+#endif
+    return XTextWidth( font_, str, n );
+  }
   int textWidth( const char *str )
     { return textWidth( str, strlen( str ) ); }
-  int textAscent( void ) { return font_->ascent; }
-  int textDescent( void ) { return font_->descent; }
+  int textAscent( void ) {
+#ifdef HAVE_XFT
+    if ( useXft_ )
+      return xftFont_->ascent;
+#endif
+    return font_->ascent;
+  }
+  int textDescent( void ) {
+#ifdef HAVE_XFT
+    if ( useXft_ )
+      return xftFont_->descent;
+#endif
+    return font_->descent;
+  }
   int textHeight( void ) { return textAscent() + textDescent(); }
+  int textCaptionOffset( void ) {
+    int offset = textAscent() / 2;
+    int minimum = textDescent() + 2;
+    return offset > minimum ? offset : minimum;
+  }
+  bool setFontScale( double scale );
+  double fontScale( void ) const { return fontScale_; }
 
 
   virtual void checkevent( void );
@@ -117,6 +159,20 @@ protected:
   Window        window_;        //  Application's main window
   GC            gc_;            //  The graphics context for the window
   XFontStruct   *font_;         //  Info on the default font
+#ifdef HAVE_XFT
+  XftFont       *xftFont_;
+  XftDraw       *xftDraw_;
+  XftColor       xftColor_;
+  bool           useXft_;
+#endif
+  std::string   fontName_;      //  Font name from the resource database
+  std::string   fallbackFontName_;
+  int           baseFontHeight_;
+  int           fontPixelHeight_;
+  int           lastFontSizeRequest_;
+  double        fontScale_;
+  bool          fontScaling_;
+  bool          fallbackFontSearched_;
   char          *name_;         //  Application's name
   XTextProperty title_;         //  Window name for title bar
   XTextProperty iconname_;      //  Icon name for icon label
@@ -139,6 +195,17 @@ protected:
   void init( int argc, char *argv[] );
   void getGeometry( void );
   int getPixmap(Pixmap *);
+  std::string fontNameForPixelHeight( int pixelHeight );
+  std::string fallbackFontNameForPixelHeight( int pixelHeight );
+  const std::string &fallbackScalableFont( void );
+  bool fontHeightClose( XFontStruct *font, int pixelHeight ) const;
+  void updateTextColor( unsigned long pixelvalue );
+#ifdef HAVE_XFT
+  XftFont *openXftFont( int pixelHeight );
+  void initXftDraw( void );
+  void updateXftColor( unsigned long pixelvalue );
+  bool validXftPixel( unsigned long pixelvalue ) const;
+#endif
   void setDisplayName (const char* new_display_name) {
       snprintf(display_name_, 256, "%s", new_display_name); }
   const char* displayName () { return display_name_; }

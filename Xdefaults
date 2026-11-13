@@ -12,6 +12,8 @@ xosview*usedlabels:         True
 xosview*usedLabelColor:     wheat
 xosview*borderwidth:        1
 xosview*font:               7x13bold
+! Scale text when the window is resized.
+xosview*fontScaling:        True
 xosview*background:         navy
 xosview*foreground:         wheat
 xosview*enableStipple:	    False ! Change to true to try beta stipple support.
@@ -205,6 +207,19 @@ xosview*diskPriority:	    10
 xosview*diskDecay:	    True
 xosview*diskUsedFormat:     autoscale
 xosview*diskGraph:	    True
+
+! Tape (SCSI tape drive, e.g. LTO) Meter Resources
+
+xosview*tape:		    True
+xosview*tapeUsedColor:	    seagreen
+xosview*tapeIdleColor:	    black
+xosview*tapeWriteColor:     SlateBlue1
+xosview*tapeReadColor:      SkyBlue
+xosview*tapeBandwidth:      400000000 ! 400MB/s
+xosview*tapePriority:	    10
+xosview*tapeDecay:	    True
+xosview*tapeUsedFormat:     autoscale
+xosview*tapeGraph:	    True
 
 
 xosview*RAID:                 False
